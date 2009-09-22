@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project name="findbugs-idea" default="assemble-all" basedir=".">
+
+    <property file="./build.properties"/>
+
+    <property name="versionString" value="0.9.9"/>
+    <property name="final.name" value="${component.name}-${versionString}"/>
+
+
+    <path id="component.classpath">
+        <pathelement path="${src.dir}/api"/>
+        <pathelement path="${src.dir}/dev"/>
+        <pathelement path="${src.dir}/impl"/>
+
+        <pathelement path="${target.dir}/api"/>
+        <pathelement path="${target.dir}/dev"/>
+        <pathelement path="${target.dir}/impl"/>
+
+        <fileset id="libs" dir="${lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+
+        <fileset id="idea-libs" dir="${idea.home}/lib">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="component.testpath">
+        <path refid="component.classpath"/>
+        <fileset dir="${testlib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+        <pathelement path="${src.dir}/test"/>
+        <pathelement path="${target.dir}/test"/>
+    </path>
+
+    <fileset id="component.classes.api" dir="${target.dir}/api">
+        <include name="**/**.class"/>
+        <include name="**/**.png"/>
+        <include name="**/**.properties"/>
+    </fileset>
+
+    <fileset id="component.classes.dev" dir="${target.dir}/dev">
+        <include name="**/**.class"/>
+        <include name="**/**.png"/>
+        <include name="**/**.properties"/>
+    </fileset>
+
+    <fileset id="component.classes.impl" dir="${target.dir}/impl">
+        <include name="**/**.class"/>
+        <include name="**/**.png"/>
+        <include name="**/**.properties"/>
+    </fileset>
+
+
+    <target name="init" description="${component.name} initialization">
+        <!--<tstamp>
+          <format property="start.time" pattern="MM/dd/yyyy hh:mm aa"/>
+      </tstamp>-->
+        <tstamp>
+            <format property="current.year" pattern="yyyy"/>
+            <format property="DSTAMP" pattern="yyyy-MM-dd"/>
+            <format property="TSTAMP" pattern="HH:mm:ss"/>
+        </tstamp>
+
+        <available
+                property="junit.present"
+                classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask"
+                />
+
+        <ant target="mktargetdirs"/>
+
+    </target>
+
+
+    <target name="all" depends="compile, assemble" description="Build entire ${component.name}"/>
+    <target name="build" depends="compile, assemble" description="Build entire ${component.name}"/>
+
+    <target name="compile" depends="clean, init" description="Compile ${component.name} sources">
+        <ant target="compile_api"/>
+        <ant target="compile_dev"/>
+        <ant target="compile_impl"/>
+    </target>
+
+    <target name="compile_api" depends="init" description="Compile ${component.name} sources">
+        <javac srcdir="${src.dir}/api"
+               destdir="${target.dir}/api"
+               debug="${javac.debug}"
+               optimize="${javac.optimize}"
+               source="${javac.source}"
+               target="${javac.target}"
+               deprecation="${javac.deprecation}"
+               failonerror="true"
+               fork="true"
+               memoryMaximumSize="256m"
+               encoding="${javac.encoding}"
+               listfiles="${javac.listfiles}">
+            <compilerarg value="${javac.compilerarg}"/>
+            <classpath refid="component.classpath"/>
+            <include name="**/*.java"/>
+        </javac>
+    </target>
+
+    <target name="compile_dev" depends="init" description="Compile ${component.name} sources">
+        <javac srcdir="${src.dir}/dev"
+               destdir="${target.dir}/dev"
+               debug="${javac.debug}"
+               optimize="${javac.optimize}"
+               source="${javac.source}"
+               target="${javac.target}"
+               deprecation="${javac.deprecation}"
+               failonerror="true"
+               fork="true"
+               memoryMaximumSize="256m"
+               encoding="${javac.encoding}"
+               listfiles="${javac.listfiles}">
+            <compilerarg value="${javac.compilerarg}"/>
+            <classpath refid="component.classpath"/>
+            <include name="**/*.java"/>
+        </javac>
+    </target>
+
+    <target name="compile_impl" depends="init" description="Compile ${component.name} sources">
+        <javac srcdir="${src.dir}/impl"
+               destdir="${target.dir}/impl"
+               debug="${javac.debug}"
+               optimize="${javac.optimize}"
+               source="${javac.source}"
+               target="${javac.target}"
+               deprecation="${javac.deprecation}"
+               failonerror="true"
+               fork="true"
+               memoryMaximumSize="256m"
+               encoding="${javac.encoding}"
+               listfiles="${javac.listfiles}">
+            <compilerarg value="${javac.compilerarg}"/>
+            <classpath refid="component.classpath"/>
+            <include name="**/*.java"/>
+        </javac>
+    </target>
+
+    <!--	<target name="compile-test" depends="compile">
+       <mkdir dir="${target.dir}/test"/>
+       <javac
+               encoding="${build.encoding}"
+               srcdir="src/test"
+               includes="**/*.java"
+               destdir="${build.dir}/classes/test"
+               debug="true">
+           <classpath refid="test.classpath"/>
+       </javac>
+   </target>-->
+
+
+    <target name="assemble" depends="makePluginXml, compile, init, copyResources" description="Create ${component.name} jar files">
+        <buildnumber/>
+        
+        <jar destfile="${target.dir}/jar/${final.name}.jar"
+             index="${jar.index}"
+             keepcompression="${jar.keepcompression}"
+             encoding="${javac.encoding}"
+             level="${jar.compression.level}"
+             whenmanifestonly="${jar.whenmanifestonly}"
+             update="${jar.update}">
+            <metainf dir=".">
+                <include name="LICENSE.txt"/>
+                <include name="README"/>
+                <include name="NOTICE"/>
+                <include name="LICENSE-AppleJavaExtension.txt"/>
+                <include name="LICENSE-ASM.txt"/>
+                <include name="LICENSE-bcel.txt"/>
+                <include name="LICENSE-commons-lang.txt"/>
+                <include name="LICENSE-docbook.txt"/>
+                <include name="LICENSE-dom4j.txt"/>
+                <include name="LICENSE-FindBugs.txt"/>
+                <include name="LICENSE-jaxen.txt"/>
+                <include name="LICENSE-jcip.txt"/>
+                <include name="LICENSE-jFormatString.txt"/>
+                <include name="LICENSE-jsr305.txt"/>
+                <include name="plugin.xml"/>
+            </metainf>
+            <manifest> <!-- external manifest file attributes overide internal attributes -->
+                <attribute name="Created-By" value="${user.name}"/>
+                <section name="org/twodividedbyzero/idea/findbugs">
+                    <attribute name="Specification-Title" value="${component.name}"/>
+                    <attribute name="Specification-Version" value="${versionString}"/>
+                    <attribute name="Implementation-Title" value="org.twodividedbyzero.idea.findbugs"/>
+                    <attribute name="Implementation-Version" value="build ${DSTAMP} ${TSTAMP}"/>
+                    <attribute name="Implementation-Vendor-Id" value="org.twodividedbyzero"/>
+                    <attribute name="Implementation-Vendor" value="Andre Pfeiler"/>
+                    <attribute name="X-Compile-Source-JDK" value="${javac.source}"/>
+                    <attribute name="X-Compile-Target-JDK" value="${javac.target}"/>
+                    <attribute name="Extension-Name" value="findbugs-idea"/>
+                </section>
+            </manifest>
+            <!--<indexjars>
+             <fileset dir="${lib.dir}"/>
+         </indexjars>-->
+            <fileset refid="component.classes.api"/>
+            <fileset refid="component.classes.dev"/>
+            <fileset refid="component.classes.impl"/>
+            <!--<fileset refid="libs"/>-->
+        </jar>
+        <delete file="plugin.xml"/>
+    </target>
+
+    <target name="assemble-all" depends="assemble-plugin, assemble-src"/>
+
+    <target name="assemble-plugin" depends="assemble">
+	    <mkdir dir="${target.dir}/tmp/${final.name}"/>
+
+        <mkdir dir="${target.dir}/tmp/${final.name}/lib"/>
+        <mkdir dir="${target.dir}/tmp/${final.name}/help"/>
+        <copy todir="${target.dir}/tmp/${final.name}">
+    	    <fileset dir=".">
+    		    <include name="LICENSE.txt"/>
+                <include name="README"/>
+                <include name="NOTICE"/>
+                <include name="LICENSE-AppleJavaExtension.txt"/>
+                <include name="LICENSE-ASM.txt"/>
+                <include name="LICENSE-bcel.txt"/>
+                <include name="LICENSE-commons-lang.txt"/>
+                <include name="LICENSE-docbook.txt"/>
+                <include name="LICENSE-dom4j.txt"/>
+                <include name="LICENSE-FindBugs.txt"/>
+                <include name="LICENSE-jaxen.txt"/>
+                <include name="LICENSE-jcip.txt"/>
+                <include name="LICENSE-jFormatString.txt"/>
+                <include name="LICENSE-jsr305.txt"/>
+    	    </fileset>
+        </copy>
+
+        <!--<antcall target="makePluginXml"/>-->
+        <copy file="${target.dir}/jar/${final.name}.jar" tofile="${target.dir}/tmp/${final.name}/lib/${final.name}.jar"/>
+        <copy todir="${target.dir}/tmp/${final.name}/lib">
+    	    <fileset refid="libs"/>
+        </copy>
+        
+        <zip destfile="${target.dir}/zip/${final.name}.zip" basedir="${target.dir}/tmp"/>
+        
+    </target>
+
+    <target name="makePluginXml">
+        <copy overwrite="true" file="META-INF/plugin.xml"
+              tofile="plugin.xml">
+            <filterset>
+                <filter token="VERSION" value="${versionString}"/>
+            </filterset>
+        </copy>
+    </target>
+    
+    
+    <target name="copyResources">
+	<copy failonerror="true" overwrite="true" todir="${target.dir}/impl/${component.package.path}/resources">
+	    <fileset dir="${src.dir}/impl/${component.package.path}/resources">
+		    <include name="**/**.*"/>
+	    </fileset>
+	</copy>
+    </target>
+
+    <target name="assemble-src" depends="init">
+        <jar destfile="${target.dir}/zip/${final.name}-src.zip">
+            <exclude name="${src.dir}/impl/${component.package.path}/common/nevent"/>
+            <fileset dir="${basedir}">
+                <exclude name="${lib.dir}"/>
+                <exclude name="${src.dir}/impl/${component.package.path}/common/nevent"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <target name="clean" description="Clean ${component.name} target directories">
+        <delete dir="${target.dir}/api"/>
+        <delete dir="${target.dir}/dev"/>
+        <delete dir="${target.dir}/impl"/>
+        <delete dir="${target.dir}/jar"/>
+        <delete dir="${target.dir}/tmp"/>
+        <delete dir="${target.dir}/zip"/>
+        <delete dir="${target.dir}"/>
+    </target>
+
+
+    <target name="mktargetdirs" description="Create ${component.name} nessesarry target directoryies">
+        <mkdir dir="${target.dir}"/>
+        <mkdir dir="${target.dir}/api"/>
+        <mkdir dir="${target.dir}/dev"/>
+        <mkdir dir="${target.dir}/impl"/>
+        <mkdir dir="${target.dir}/jar"/>
+        <mkdir dir="${target.dir}/tmp"/>
+        <mkdir dir="${target.dir}/zip"/>
+    </target>
+
+</project>

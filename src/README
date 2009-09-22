@@ -1,0 +1,39 @@
+FindBugs-IDEA
+
+Copyright 2008 2009 Andre Pfeiler <andrepdo@dev.java.net>
+
+FindBugs for IntelliJ IDEA
+Provides static byte code analysis to look for bugs in Java code from within IntelliJ IDEA.
+FindBugs-IDEA uses FindBugs&trade; under the hood. for more information
+see http://findbugs.sourceforge.net/
+
+
+Both the name FindBugs and the FindBugs bug mark are
+trademarked by the University of Maryland.
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+FindBugs Copyright  2003-2007 University of Maryland and others. 
+The FindBugs name and logo are trademarked by the University of Maryland.
+Findbugs is written and maintained by the FindBugs development team, 
+with help from numerous contributors. GUI2 (which you are now using) 
+was written by University of Maryland undergraduates Daniel Hakim, 
+Reuven Lazarus and Kristin Stephens as part of the FindBugs Summer of Code 2006, 
+supported by Sun Microsystems.
+FindBugs is sponsored by Fortify Software.
+Fortify Software sells security tools, including Fortify Source Code Analysis, 
+which scans for security vulnerabilities. Fortify Software now provides JOR (Java Open Review),
+a free static analysis and on-line reviewing service to selected open source projects. 
+JOR provides results both from FindBugs and from Fortify's static analysis for security vulnerabilities.
+Visit the FindBugs web page for more information at http://findbugs.sourceforge.net
+FindBugs is free software; see the License tab for details.
+
+Gui Resource Icons Copyright:
+Most Icons are taken from FindBugs and IntelliJ IDEA with slightly modifications.
+
+
+BUILD
+------
+execute '. setenv.sh'
+run 'ant assemble-all'

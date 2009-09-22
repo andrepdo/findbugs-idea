@@ -1,0 +1,365 @@
+<!DOCTYPE idea-plugin PUBLIC "Plugin/DTD" "http://plugins.intellij.net/plugin.dtd">
+<idea-plugin url="http://findbugs-idea.dev.java.net">
+    <name>FindBugs-IDEA</name>
+	<description>
+		<![CDATA[
+		FindBugs for IntelliJ IDEA<br/>
+		Provides static byte code analysis to look for bugs in Java code from within IntelliJ IDEA.
+		FindBugs-IDEA uses FindBugs&trade; under the hood. for more information
+		see <a href="http://findbugs.sourceforge.net/">http://findbugs.sourceforge.net/</a>.
+		<p>
+		..."We use IDEA inspections and FindBugs complementary. FindBugs is running in our continuous integration process and IDEA inspections are used during coding."
+		What about using both during coding from within IntelliJ IDEA?
+		</p>
+		for screenshots see <a href='https://findbugs-idea.dev.java.net/#screenshots'>https://findbugs-idea.dev.java.net/#screenshots</a>
+		]]>
+	</description>
+	<change-notes>
+		<![CDATA[<html>
+		<h3>0.9.9</h3>
+		<ul>
+			<li>time to configure ... treated some configuration options:</li>
+			<li>configure findbugs on idea project and module level</li>
+			<ul>
+			    <li>&nbsp;min. priority to report</li>
+			    <li>&nbsp;background scanning</li>
+			    <li>&nbsp;configurable effort run level</li>
+			    <li>&nbsp;configurable detectors</li>
+			    <li>&nbsp;bug categories to report</li>
+			    <li>&nbsp;file filter (include, exclude, exclude baseline bugs)</li>
+			    <li>&nbsp;load additional detector plugins like fs-contrib.jar</li>
+			</ul>
+			<li>updated findbugs under the hood to version 1.3.9<li>
+			<li>new action: run analysis on all changed files of the the active (selected) changelist (findbugs-idea toolwindow and changelist toolwindow)</li>
+			<li>new action: group by bug rank</li>
+		</ul>
+		<h3>0.9.84-dev</h3>
+		<ul>
+			<li>refix [Issue #4] jump to source not working in win environments</li>
+			<li>updated findbugs under the hood to version 1.3.8<li>
+			<li>add findbugs bug pattern running as inspection (note: this is an experimental feature, quickfix (FindBugs.SuppressWaring(<bugPattern>)) is not fully/finally implemented)<li>
+		</ul>
+		<h3>0.9.83-dev</h3>
+		<ul>
+		    <li>some minor fixes</li>
+			<li>fix again [Issue #7] Exception while navigating results tree</li>
+		</ul>
+		<h3>0.9.82-dev</h3>
+		<ul>
+			<li>fix [Issue #7] Exception while navigating results tree</li>
+		</ul>
+		<h3>0.9.81-dev</h3>
+		<ul>
+			<li>add Jump To Source (F4) action</li>
+			<li>add local history (put label, show history) on bug tree</li>
+			<li>add auto Jump to Source toggle button</li>
+			<li>add auto scroll to source in details view (Class: _____ (package))</li>
+			<li>fix some issues reported on <a href="https://findbugs-idea.dev.java.net/servlets/ProjectIssues">issue tracker</a> - thanks to all reporters</li>
+			<li>fix [Issue 6] Exception when inspecting a package or module</li>
+		</ul>
+		<h3>0.9.31-dev</h3>
+		<ul>
+			<li>fix some minor issues</li>
+		</ul>
+		<h3>0.9.30-dev</h3>
+		<ul>
+			<li>fixed grouping issues</li>
+			<li>added quick search capabilities</li>
+			<li>new grouping actions added (byPackage, byClass, byPriority, byCategory)</li>
+			<li>updated findbugs under the hood to 1.3.7</li>
+			<li>fixed some bugs, ... added some</li>
+			<li>added floatable/dockable toolbar wrapper/layout</li>
+			<li>fix missing resource keys</li>
+		</ul>
+		<h3>0.9.21</h3>
+		<ul>
+			<li>made 8.1EAP compatible (annotation assert error)</li>
+			<li>build idea-8-jdk1.5 MacOS X compatible binary</li>
+		</ul>
+		<h3>0.9.2</h3>
+		<ul>
+			<li>fixed missing resource</li>
+			<li>fix building valid idea plugin package</li>
+		</ul>	
+		<h3>0.9.1</h3>
+		<ul>
+			<li>Initial dev release (contest jit release)</li>
+			<li><a href="https://findbugs-idea.dev.java.net/#screenshots">for screenshots see https://findbugs-idea.dev.java.net/#screenshots</a></li>
+			<li><a href="https://findbugs-idea.dev.java.net/servlets/ProjectIssues">issue tracker</a></li>
+			<li>some features are still missing, e.g. sorting by Class or by bug category or package. current default ordering is by bug category. jump to source/bug is still missing.</li>
+		</ul>
+		<html>]]>
+	</change-notes>
+	<id>FindBugs-IDEA</id>
+	<version>@VERSION@</version>
+	<vendor logo="/org/twodividedbyzero/idea/findbugs/resources/icons/bug.png"
+			email="andrepdo@dev.java.net" url="http://findbugs-idea.dev.java.net">Andre Pfeiler
+	</vendor>
+	<idea-version since-build="9013"/><!-- until-build="10762" min="8.0"-->
+	<!--<helpset file="your-help.jar" path="path-to-helpset.hs"/>-->
+	<resource-bundle>org.twodividedbyzero.idea.findbugs.resources.i18n.Messages</resource-bundle>
+    <!--<extensions defaultExtensionNs="com.intellij">
+        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.FindBugsLineMarkerProvider"/>
+    </extensions>-->
+	<project-components>
+		<component>
+			<implementation-class>org.twodividedbyzero.idea.findbugs.FindBugsPluginImpl</implementation-class>
+			<interface-class>org.twodividedbyzero.idea.findbugs.FindBugsPlugin</interface-class>
+		</component>
+	</project-components>
+    <application-components>
+        <component>
+            <implementation-class>org.twodividedbyzero.idea.findbugs.inspection.FindBugsInspectionProvider</implementation-class>
+        </component>
+    </application-components>
+    <module-components>
+        <component>
+            <implementation-class>org.twodividedbyzero.idea.findbugs.ModuleComponentImpl</implementation-class>
+            <interface-class>org.twodividedbyzero.idea.findbugs.FindBugsPlugin</interface-class>
+        </component>
+    </module-components>
+
+	<actions>
+		<group id="FindBugs.EditorPopup" text="FindBugs" popup="true">
+			<add-to-group anchor="after" group-id="EditorPopupMenu" relative-to-action="AnalyzeMenu"/>
+		</group>
+
+		<group id="FindBugs.ProjectViewPopupMenu" text="FindBugs" popup="true">
+			<add-to-group anchor="after" group-id="ProjectViewPopupMenu" relative-to-action="AnalyzeMenu"/>
+		</group>
+
+		<group id="FindBugs.AnalyzeMenu" text="FindBugs" popup="true">
+			<add-to-group anchor="last" group-id="ToolsMenu"/>
+		</group>
+
+		<action id="FindBugs.SelectedFilesAction"
+				class="org.twodividedbyzero.idea.findbugs.actions.AnalyzeSelectedFiles"
+				text="Analyze Selected File(s)"
+				description="Run FindBugs analysis on the current selected file(s) in the project view."
+				icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeSelectedFile.png">
+			<!--<add-to-group group-id="EditorPopupMenu" anchor="last"/>-->
+			<!--<add-to-group group-id="FindBugsEditorPopup" anchor="last"/>-->
+			<add-to-group group-id="FindBugs.ProjectViewPopupMenu" anchor="last"/>
+			<!--<add-to-group group-id="FindBugsAnalyzeMenu" anchor="last"/>-->
+		</action>
+
+		<group id="FindBugs.ToolBarActions.left" text="FindBugsSubGroup" popup="true">
+			<!--<add-to-group anchor="last" group-id="EditorPopupMenu"/>-->
+			<!--<add-to-group group-id="FindBugsEditorPopup" anchor="last"/>-->
+
+			<action id="FindBugs.CurrentFileAction"
+					class="org.twodividedbyzero.idea.findbugs.actions.AnalyzeCurrentEditorFile"
+					text="Analyze Current File"
+					description="Run FindBugs analysis on the current editor file."
+					icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeSelectedFile.png">
+
+				<keyboard-shortcut keymap="$default" first-keystroke="shift ctrl alt F"/>
+
+				<!--<add-to-group group-id="EditorPopupMenu" anchor="last"/>-->
+				<add-to-group group-id="FindBugs.EditorPopup" anchor="last"/>
+				<!--<add-to-group group-id="FindBugsProjectViewPopupMenu" anchor="last"/>-->
+				<add-to-group group-id="FindBugs.AnalyzeMenu" anchor="last"/>
+			</action>
+
+            <action id="FindBugs.ClassUnderCursorAction"
+					class="org.twodividedbyzero.idea.findbugs.actions.AnalyzeClassUnderCursor"
+					text="Analyze Class (non-anonymous) under Cursor"
+					description="Run FindBugs analysis on the class (non-anonymous) under the editor cursor."
+					icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeClassUnderCursor.png">
+
+                <keyboard-shortcut keymap="$default" first-keystroke="shift ctrl alt C"/>
+
+				<!--<add-to-group group-id="EditorPopupMenu" anchor="last"/>-->
+				<add-to-group group-id="FindBugs.EditorPopup" anchor="last"/>
+				<!--<add-to-group group-id="FindBugsProjectViewPopupMenu" anchor="last"/>-->
+				<add-to-group group-id="FindBugs.AnalyzeMenu" anchor="last"/>
+			</action>
+
+			<action id="FindBugs.AnalysePackage"
+					class="org.twodividedbyzero.idea.findbugs.actions.AnalyzePackageFiles"
+					text="Analyze Package(s) Files"
+					description="Run FindBugs analysis on files off the selected package(s)."
+					icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzePackages.png">
+
+				<!--<add-to-group group-id="EditorPopupMenu" anchor="last"/>-->
+				<add-to-group group-id="FindBugs.EditorPopup" anchor="last"/>
+				<add-to-group group-id="FindBugs.ProjectViewPopupMenu" anchor="last"/>
+				<!--<add-to-group group-id="FindBugs.AnalyzeMenu" anchor="last"/>-->
+			</action>
+
+			<action id="FindBugs.ModuleFilesAction"
+					class="org.twodividedbyzero.idea.findbugs.actions.AnalyzeModuleFiles"
+					text="Analyze Module Files"
+					description="Run FindBugs analysis on all module files."
+					icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeModule.png">
+
+				<!--<add-to-group group-id="EditorPopupMenu" anchor="last"/>-->
+				<add-to-group group-id="FindBugs.EditorPopup" anchor="last"/>
+				<add-to-group group-id="FindBugs.ProjectViewPopupMenu" anchor="last"/>
+				<add-to-group group-id="FindBugs.AnalyzeMenu" anchor="last"/>
+			</action>
+
+			<action id="FindBugs.ProjectFilesAction"
+					class="org.twodividedbyzero.idea.findbugs.actions.AnalyzeProjectFiles"
+					text="Anaylze Project Files"
+					description="Run FindBugs analysis on all project files."
+					icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeProject.png">
+
+				<!--<add-to-group group-id="EditorPopupMenu" anchor="last"/>-->
+				<add-to-group group-id="FindBugs.EditorPopup" anchor="last"/>
+				<add-to-group group-id="FindBugs.ProjectViewPopupMenu" anchor="last"/>
+				<add-to-group group-id="FindBugs.AnalyzeMenu" anchor="last"/>
+			</action>
+
+			<action id="FindBugs.DefaultChangeListAction"
+					class="org.twodividedbyzero.idea.findbugs.actions.AnalyzeAllModifiedFiles"
+					text="Analyze All Modified Files"
+					description="Run FindBugs analysis on all modified files. (Changelists)"
+					icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeModifiedFiles.png">
+
+				<!--<add-to-group group-id="EditorPopupMenu" anchor="last"/>-->
+				<add-to-group group-id="FindBugs.EditorPopup" anchor="last"/>
+				<add-to-group group-id="FindBugs.ProjectViewPopupMenu" anchor="last"/>
+				<add-to-group group-id="FindBugs.AnalyzeMenu" anchor="last"/>
+
+                <keyboard-shortcut keymap="$default" first-keystroke="alt shift C"/>
+			</action>
+
+            <action id="FindBugs.ActiveChangeListAction"
+					class="org.twodividedbyzero.idea.findbugs.actions.AnalyzeChangelistFiles"
+					text="Analyze active changelist Files"
+					description="Run FindBugs analysis on all modified files of the active changelist."
+					icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeActiveChangelist.png">
+
+				<!--<add-to-group group-id="EditorPopupMenu" anchor="last"/>-->
+				<add-to-group group-id="FindBugs.EditorPopup" anchor="last"/>
+				<add-to-group group-id="FindBugs.ProjectViewPopupMenu" anchor="last"/>
+				<add-to-group group-id="FindBugs.AnalyzeMenu" anchor="last"/>
+
+                <keyboard-shortcut keymap="$default" first-keystroke="alt shift A"/>
+			</action>
+
+
+			<separator/>
+
+			<action id="FindBugs.StopAction"
+					class="org.twodividedbyzero.idea.findbugs.actions.StopAction"
+					text="Stop the analysis run"
+					description="Stop the currently running analysis."
+					icon="/actions/suspend.png"/>
+
+			<action id="FindBugs.CloseAction"
+					class="org.twodividedbyzero.idea.findbugs.actions.CloseToolWindow"
+					text="Close FindBugs Tool Window"
+					description="Close the FindBugs Tool Window Panel."
+					icon="/actions/cancel.png"/>
+
+            <action id="FindBugs.HelpAction"
+					class="org.twodividedbyzero.idea.findbugs.actions.HelpAction"
+					text="FindBugs-IDEA help"
+					description="Show the FindBugs-IDEA plugin help."
+					icon="/actions/help.png"/>
+
+		</group>
+
+
+        <action id="FindBugs.ChangesViewToolbar.ActiveChangeListAction"
+					class="org.twodividedbyzero.idea.findbugs.actions.AnalyzeChangelistFiles"
+					text="FindBugs - Analyze active changelist Files"
+					description="Run FindBugs analysis on all modified files of the active changelist."
+					icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/fbAnalyzeActiveChangelist.png">
+
+			<add-to-group group-id="ChangesViewToolbar" anchor="last"/>
+            <add-to-group group-id="ChangesViewPopupMenu" anchor="last"/>
+
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift C"/>
+		</action>
+
+        <group id="FindBugs.ToolBarActions.right" text="FindBugsSubGroup" popup="true">
+
+            <action id="FindBugs.GroupByBugCategory"
+					class="org.twodividedbyzero.idea.findbugs.actions.GroupByBugCategory"
+					text="Group by bug category"
+					description="Group by bug category."
+					icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByBugCategory.png"/>
+
+            <action id="FindBugs.GroupByClass"
+					class="org.twodividedbyzero.idea.findbugs.actions.GroupByClass"
+					text="Group by class"
+					description="Group by class."
+					icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByClass.png"/>
+
+            <action id="FindBugs.GroupByPackage"
+					class="org.twodividedbyzero.idea.findbugs.actions.GroupByPackage"
+					text="Group by package"
+					description="Group by package."
+					icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByPackage.png"/>
+
+            <action id="FindBugs.GroupByPriority"
+					class="org.twodividedbyzero.idea.findbugs.actions.GroupByPriority"
+					text="Group by priority"
+					description="Group by priority."
+					icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByPriority.png"/>
+
+            <action id="FindBugs.GroupByRank"
+					class="org.twodividedbyzero.idea.findbugs.actions.GroupByRank"
+					text="Group by bug rank"
+					description="Group by bug rank."
+					icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByRank.png"/>
+
+           <!-- <action id="FindBugs.GroupByFilter"
+					class="org.twodividedbyzero.idea.findbugs.actions.GroupByFilter"
+					text="Filter/Group bugs"
+					description="Filter bugs."
+                    popup="true"
+					icon="/icons/inspector/useFilter.png"/>-->
+        </group>
+        <group id="FindBugs.ToolBarActions.navigation" text="FindBugsSubGroup" popup="true">
+
+            <action id="FindBugs.ScrollToSourceAction"
+					class="org.twodividedbyzero.idea.findbugs.actions.ScrollToSource"
+					text="Autoscroll to Source"
+					description="Autoscroll to the source location of possible bugs."
+					icon="/general/autoscrollToSource.png"/>
+
+			<action id="FindBugs.ExpandAllAction"
+					class="org.twodividedbyzero.idea.findbugs.actions.ExpandAll"
+					text="Expand All"
+					description="Expand all elements in the tool window."
+					icon="/actions/expandall.png"/>
+
+			<action id="FindBugs.CollapseAllAction"
+					class="org.twodividedbyzero.idea.findbugs.actions.CollapseAll"
+					text="Collapse All"
+					description="Collapse all elements in the tool window"
+					icon="/actions/collapseall.png"/>
+
+            <!--<action id="FindBugs.TreePreviousOccurence"
+					class="org.twodividedbyzero.idea.findbugs.actions.TreePreviousOccurence"
+					text="Next Bug"
+					description="Navigate to the previous occurence"
+					icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/moveUp.png">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt UP"/>
+            </action>
+
+            <action id="FindBugs.TreeNextOccurence"
+					class="org.twodividedbyzero.idea.findbugs.actions.TreeNextOccurence"
+					text="Previous Bug"
+					description="Navigate to the next oocurence"
+					icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/moveDown.png">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt DOWN"/>
+            </action>-->
+
+            <separator/>
+
+            <action id="FindBugs.Preferences"
+					class="org.twodividedbyzero.idea.findbugs.actions.ShowPreferencesPage"
+					text="Plugin Preferences"
+					description="FindBugs plugin preferences page."
+					icon="/general/ideOptions.png"/>
+
+
+        </group>
+
+	</actions>
+</idea-plugin>

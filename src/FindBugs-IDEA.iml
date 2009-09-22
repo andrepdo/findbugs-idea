@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module relativePaths="true" type="PLUGIN_MODULE" version="4">
+  <component name="DevKit.ModuleBuildProperties" url="file://$MODULE_DIR$/META-INF/plugin.xml" />
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/target/impl" />
+    <output-test url="file://$MODULE_DIR$/target/test" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/api" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/dev" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/impl" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/lib" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../stuff/JAVA/Findbugs/findbugs-1.3.7/src/infonodeJava" />
+          <root url="file://$MODULE_DIR$/../../stuff/JAVA/Findbugs/findbugs-1.3.7/src/java5" />
+          <root url="file://$MODULE_DIR$/../../stuff/JAVA/Findbugs/findbugs-1.3.7/src/java" />
+          <root url="file://$MODULE_DIR$/../../stuff/JAVA/Findbugs/findbugs-1.3.7/src/tools" />
+        </SOURCES>
+        <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
+      </library>
+    </orderEntry>
+  </component>
+  <component name="copyright">
+    <Base>
+      <setting name="state" value="2" />
+    </Base>
+  </component>
+</module>
+
