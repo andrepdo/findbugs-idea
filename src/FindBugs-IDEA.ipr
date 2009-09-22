@@ -2198,7 +2198,7 @@
   </component>
   <component name="ProjectFileVersion" converted="true" />
   <component name="ProjectKey">
-    <option name="state" value="project:///home/andrep/workspace/FindBugs-IDEA/FindBugs-IDEA.ipr" />
+    <option name="state" value="https://findbugs-idea.dev.java.net/svn/findbugs-idea/trunk/src/FindBugs-IDEA.ipr" />
   </component>
   <component name="ProjectModuleManager">
     <modules>
@@ -2227,7 +2227,7 @@
     <option name="mySupportsUserInfoFilter" value="true" />
   </component>
   <component name="VcsDirectoryMappings">
-    <mapping directory="" vcs="" />
+    <mapping directory="" vcs="svn" />
   </component>
   <component name="WebServicesPlugin" addRequiredLibraries="true" />
   <component name="com.sixrr.metrics.MetricsReloaded">
