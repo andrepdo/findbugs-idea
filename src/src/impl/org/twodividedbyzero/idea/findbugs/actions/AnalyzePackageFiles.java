@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
@@ -81,6 +82,7 @@ public class AnalyzePackageFiles extends BaseAction implements EventListener<Bug
 			initWorker();
 		} else {
 			FindBugsPluginImpl.showToolWindowNotifier("No bug categories or bug pattern detectors selected. analysis aborted.", MessageType.WARNING);  // NON-NLS
+			ShowSettingsUtil.getInstance().editConfigurable(project, IdeaUtilImpl.getPluginComponent(project));
 		}
 	}
 
@@ -133,7 +135,10 @@ public class AnalyzePackageFiles extends BaseAction implements EventListener<Bug
 		final com.intellij.openapi.project.Project project = IdeaUtilImpl.getProject(_dataContext);
 		final Module module = IdeaUtilImpl.getModule(_dataContext);
 
-		IdeaUtilImpl.activateToolWindow(getPluginInterface(project).getInternalToolWindowId(), _dataContext);
+		final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
+		if(Boolean.valueOf(preferences.getProperty(FindBugsPreferences.TOOLWINDOW_TOFRONT))) {
+			IdeaUtilImpl.activateToolWindow(getPluginInterface(project).getInternalToolWindowId(), _dataContext);
+		}
 
 		final FindBugsWorker worker = new FindBugsWorker(project, module);
 

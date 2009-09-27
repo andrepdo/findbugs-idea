@@ -11,11 +11,53 @@
 		..."We use IDEA inspections and FindBugs complementary. FindBugs is running in our continuous integration process and IDEA inspections are used during coding."
 		What about using both during coding from within IntelliJ IDEA?
 		</p>
-		for screenshots see <a href='https://findbugs-idea.dev.java.net/#screenshots'>https://findbugs-idea.dev.java.net/#screenshots</a>
+		<p>
+            <ul>
+                <li>for screenshots see <a href='https://findbugs-idea.dev.java.net/#screenshots'>https://findbugs-idea.dev.java.net/#screenshots</a></li>
+                <li>@see article at dzone: <a href='http://jetbrains.dzone.com/tips/intellij-idea-finds-bugs'>http://jetbrains.dzone.com/tips/intellij-idea-finds-bugs</a></li>
+            </ul>
+		</p>
+		<p>
+		FindBugs-IDEA plugin supports all FindBugs&trade; configuration properties:
+		<ul>
+		    <li>configure findbugs on idea project and module level</li>
+		    <li>jump to source from results shown in toolwindow</li>
+		    <li>bug descriptions, solutions</li>
+		    <li>run analysis always in background</li>
+		    <li>min. priority to report</li>
+            <li>background scanning</li>
+            <li>configurable effort run level</li>
+            <li>configurable detectors</li>
+            <li>bug categories to report</li>
+            <li>file filter (include, exclude, exclude baseline bugs)</li>
+            <li>load additional detector plugins like fs-contrib.jar</li>
+            <li>group results by: bug category, classname, package, priority, bug rank</li>
+            <li>intellij local history support</li>
+            <li>Analyze actions (all actions are also available in the intellij pro0ject tree, toolbar menu, context menu):
+                <ul>
+                    <li>&nbsp;analyze all modfified files</li>
+                    <li>&nbsp;analyze all files on the active changelist</li>
+                    <li>&nbsp;analyze class under cursor</li>
+                    <li>&nbsp;analyze current editor file</li>
+                    <li>&nbsp;analyze all files of an intellij project</li>
+                    <li>&nbsp;analyze all files of an intellij module</li>
+                    <li>&nbsp;analyze all files of the selected package</li>
+                    <li>&nbsp;analyze a bunch of seleted files (project tree)</li>
+                </ul>
+            </li>
+		</ul>
+		</p>
 		]]>
 	</description>
 	<change-notes>
 		<![CDATA[<html>
+		<h3>0.9.91</h3>
+		<ul>
+			<li>maybe fix init default properties on first init</li>
+            <li>show settings dialog (no configured detectors, categories)</li>
+            <li>rename all target (build.xml)</li>
+            <li>configurable activate tool window on analyzis run property</li>
+		</ul>
 		<h3>0.9.9</h3>
 		<ul>
 			<li>time to configure ... treated some configuration options:</li>

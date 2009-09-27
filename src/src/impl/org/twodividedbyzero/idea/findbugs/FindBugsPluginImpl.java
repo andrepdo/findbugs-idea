@@ -63,13 +63,13 @@ import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.List;
-import java.util.Collections;
 
 
 /**
@@ -442,6 +442,13 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 			_preferences.setExcludeBaselineBugs(state.getExcludeBaselineBugs());
 
 			_preferences.setEnabledModuleConfigs(state.getEnabledModuleConfigs());
+
+			if(_preferences.getBugCategories().isEmpty()) {
+				_preferences.setBugCategories(FindBugsPreferences.getDefaultBugCategories(_preferences.getUserPreferences().getFilterSettings()));
+			}
+			if(_preferences.getDetectors().isEmpty()) {
+				_preferences.setDetectors(FindBugsPreferences.getDefaultDetectors(_preferences.getUserPreferences()));
+			}
 		} else {
 			_preferences.clear();
 			_preferences = FindBugsPreferences.createDefault();

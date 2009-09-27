@@ -44,7 +44,7 @@ public class HelpAction extends BaseAction {
 	static {
 		HTML_BODY = new StringBuilder();
 		HTML_BODY.append("<p>");
-		HTML_BODY.append("<h2>").append(VersionManager.getFullVersion()).append("</h2>");
+		HTML_BODY.append("<h2>").append(VersionManager.getVersionWithRevision()).append("</h2>");
 		HTML_BODY.append("Website: <a href='").append(VersionManager.getWebsite()).append("'>").append(VersionManager.getWebsite()).append("</a>");
 		HTML_BODY.append("<br>");
 		HTML_BODY.append("Download: <a href='").append(VersionManager.getDownloadWebsite()).append("'>").append(VersionManager.getDownloadWebsite()).append("</a>");

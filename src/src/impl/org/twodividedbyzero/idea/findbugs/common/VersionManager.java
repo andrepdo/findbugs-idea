@@ -16,6 +16,11 @@
  */
 package org.twodividedbyzero.idea.findbugs.common;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+
 /**
  * $Date$
  *
@@ -27,7 +32,7 @@ public class VersionManager {
 
 	public static final long _major = 0;
 	public static final long _minor = 9;
-	public static final long _build = 9;
+	public static final long _build = 91;
 
 	public static final String _branch = "";// NON-NLS
 
@@ -55,6 +60,8 @@ public class VersionManager {
 		if (revisionString != null) {
 			try {
 				parsedRevision = Long.parseLong(revisionString);
+				System.out.println("Revision: " + revisionString);
+				System.out.println("parsedRevision: " + parsedRevision);
 			} catch (final RuntimeException ignore) {
 			}
 		}
@@ -87,6 +94,11 @@ public class VersionManager {
 	}
 
 
+	public static long getRevision() {
+		return REVISION;
+	}
+
+
 	public static String getName() {
 		return NAME;
 	}
@@ -109,7 +121,29 @@ public class VersionManager {
 
 	@SuppressWarnings({"UseOfSystemOutOrSystemErr"})
 	public static void main(final String[] args) {
+		if(args.length == 1) {
+			final File file = new File(args[0]);  // NON-NLS
+			System.out.println("version string file: " + args[0]);
+			FileWriter writer = null;
+			try {
+				writer = new FileWriter(file);
+				writer.write(getVersion());
+				writer.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				try {
+					if (writer != null) {
+						writer.close();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+		System.out.println(getVersion());
 		System.out.println(getFullVersion());
-		System.out.println("$Id: VersionManager.java 26607 2008-10-17 10:10:00Z andrep $");
+		System.out.println(getVersionWithRevision());
 	}
 }

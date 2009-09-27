@@ -4,10 +4,6 @@
 
     <property file="./build.properties"/>
 
-    <property name="versionString" value="0.9.9"/>
-    <property name="final.name" value="${component.name}-${versionString}"/>
-
-
     <path id="component.classpath">
         <pathelement path="${src.dir}/api"/>
         <pathelement path="${src.dir}/dev"/>
@@ -54,6 +50,36 @@
     </fileset>
 
 
+    <target name="getversion" depends="mktargetdirs">
+        <javac srcdir="${src.dir}/impl"
+               destdir="${target.dir}/impl"
+               debug="${javac.debug}"
+               optimize="${javac.optimize}"
+               source="${javac.source}"
+               target="${javac.target}"
+               deprecation="${javac.deprecation}"
+               failonerror="true"
+               fork="true"
+               memoryMaximumSize="32m"
+               encoding="${javac.encoding}"
+               listfiles="${javac.listfiles}">
+            <compilerarg value="${javac.compilerarg}"/>
+            <classpath refid="component.classpath"/>
+            <include name="**/VersionManager.java"/>
+        </javac>
+
+        <java classname="org.twodividedbyzero.idea.findbugs.common.VersionManager">
+            <arg value="${target.dir}/impl/versionstring.txt"/>
+            <classpath refid="component.classpath"/>
+        </java>
+
+        <loadfile property="version" srcfile="${target.dir}/impl/versionstring.txt"/>
+        <echo message="${version}"/>
+        <property name="versionString" value="${version}"/>
+        <property name="final.name" value="${component.name}-${versionString}"/>
+    </target>
+
+
     <target name="init" description="${component.name} initialization">
         <!--<tstamp>
           <format property="start.time" pattern="MM/dd/yyyy hh:mm aa"/>
@@ -74,7 +100,7 @@
     </target>
 
 
-    <target name="all" depends="compile, assemble" description="Build entire ${component.name}"/>
+    <target name="all" depends="compile, assemble-all" description="Build entire ${component.name}"/>
     <target name="build" depends="compile, assemble" description="Build entire ${component.name}"/>
 
     <target name="compile" depends="clean, init" description="Compile ${component.name} sources">
@@ -153,7 +179,7 @@
    </target>-->
 
 
-    <target name="assemble" depends="makePluginXml, compile, init, copyResources" description="Create ${component.name} jar files">
+    <target name="assemble" depends="getversion, makePluginXml, compile, init, copyResources" description="Create ${component.name} jar files">
         <buildnumber/>
         
         <jar destfile="${target.dir}/jar/${final.name}.jar"

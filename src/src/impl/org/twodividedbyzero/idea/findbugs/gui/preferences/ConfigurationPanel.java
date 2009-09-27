@@ -32,6 +32,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -54,6 +55,7 @@ public class ConfigurationPanel extends JPanel {
 	private final FindBugsPlugin _plugin;
 	private JCheckBox _compileBeforeAnalyseChkb;
 	private JCheckBox _runInBackgroundChkb;
+	private JCheckBox _toolwindowToFront;
 	private JComboBox _effortLevelCombobox;
 
 
@@ -108,7 +110,10 @@ public class ConfigurationPanel extends JPanel {
 			//_detectorThresholdChkb = new JCheckBox("Set DetectorThreshold");
 
 			//_mainPanel.add(_compileBeforeAnalyseChkb);
-			_mainPanel.add(getRunInBgCheckbox(), "1, 1, 1, 1");
+			final JPanel checkboxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			checkboxPanel.add(getRunInBgCheckbox());
+			checkboxPanel.add(getToolwindowToFrontCheckbox());
+			_mainPanel.add(checkboxPanel, "1, 1, 1, 1");
 			//_mainPanel.add(_detectorThresholdChkb);
 			_mainPanel.add(getEffortPanel(), "1, 3, 1, 3");
 
@@ -126,6 +131,7 @@ public class ConfigurationPanel extends JPanel {
 	private void updatePreferences() {
 		getEffortSlider().setValue(AnalysisEffort.valueOfLevel(getPreferences().getProperty(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL, AnalysisEffort.DEFAULT.getEffortLevel())).getValue());
 		getRunInBgCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND, false));
+		getToolwindowToFrontCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.TOOLWINDOW_TOFRONT, true));
 		getEffortLevelCombobox().setSelectedItem(AnalysisEffort.valueOfLevel(getPreferences().getProperty(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL, AnalysisEffort.DEFAULT.getEffortLevel())));
 		//((FindBugsPluginImpl) _plugin).setPreferences(FindBugsPreferences.createDefaultPreferences());
 		getReporterConfig().updatePreferences();
@@ -158,6 +164,20 @@ public class ConfigurationPanel extends JPanel {
 			});
 		}
 		return _runInBackgroundChkb;
+	}
+
+
+	private JCheckBox getToolwindowToFrontCheckbox() {
+		if (_toolwindowToFront == null) {
+			_toolwindowToFront = new JCheckBox("Activate toolwindow on run");  // NON-NLS
+			_toolwindowToFront.setFocusable(false);
+			_toolwindowToFront.addItemListener(new ItemListener() {
+				public void itemStateChanged(final ItemEvent e) {
+					getPreferences().setProperty(FindBugsPreferences.TOOLWINDOW_TOFRONT, e.getStateChange() == ItemEvent.SELECTED);
+				}
+			});
+		}
+		return _toolwindowToFront;
 	}
 
 
@@ -249,7 +269,6 @@ public class ConfigurationPanel extends JPanel {
 
 
 	ReportConfiguration getReporterConfig() {
-		//ProjectFilterSettings.DEFAULT_PRIORITY
 		if (_reporterConfig == null) {
 			_reporterConfig = new ReportConfiguration(this, getPreferences());
 		}
@@ -258,7 +277,6 @@ public class ConfigurationPanel extends JPanel {
 
 
 	FilterConfiguration getFilterConfig() {
-		//ProjectFilterSettings.DEFAULT_PRIORITY
 		if (_filterConfig == null) {
 			_filterConfig = new FilterConfiguration(this, getPreferences());
 		}
@@ -267,7 +285,6 @@ public class ConfigurationPanel extends JPanel {
 
 
 	PluginConfiguration getPluginConfig() {
-		//ProjectFilterSettings.DEFAULT_PRIORITY
 		if (_pluginConfig == null) {
 			_pluginConfig = new PluginConfiguration(this, getPreferences());
 		}
@@ -293,6 +310,7 @@ public class ConfigurationPanel extends JPanel {
 	public void setEnabled(final boolean enabled) {
 		super.setEnabled(enabled);
 		getRunInBgCheckbox().setEnabled(enabled);
+		getToolwindowToFrontCheckbox().setEnabled(enabled);
 		getEffortLevelCombobox().setEnabled(enabled);
 		getEffortSlider().setEnabled(enabled);
 		getDetectorConfig().setEnabled(enabled);

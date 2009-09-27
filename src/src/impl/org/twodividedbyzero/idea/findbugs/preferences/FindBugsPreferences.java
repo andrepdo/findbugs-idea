@@ -24,19 +24,19 @@ import edu.umd.cs.findbugs.config.UserPreferences;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Collections;
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.io.File;
 
 
 /**
@@ -44,11 +44,12 @@ import java.io.File;
  *
  * @author Andre Pfeiler<andrepdo@dev.java.net>
  * @version $Revision$
- * @since 0.9.9-dev
+ * @since 0.9.9
  */
+@SuppressWarnings({"HardCodedStringLiteral"})
 public class FindBugsPreferences extends Properties {
 
-	private static final long serialVersionUID = 0L;
+	private static final long serialVersionUID = 1L;
 
 	private static DetectorFactoryCollection _detectorFactoryCollection;
 
@@ -64,6 +65,9 @@ public class FindBugsPreferences extends Properties {
 	public static final String MIN_PRIORITY_TO_REPORT = PROPERTIES_PREFIX + "minPriorityToReport";
 	public static final String SHOW_HIDDEN_DETECTORS = PROPERTIES_PREFIX + "showHiddenDetectors";
 
+	public static final String TOOLWINDOW_TOFRONT = PROPERTIES_PREFIX + "toolWindowToFront";
+	public static final String COMPILE_BEFORE_ANALYZE = PROPERTIES_PREFIX + "compileBeforeAnalyse";
+
 
 	public Map<String, String> _detectors;
 	public Map<String, String> _bugCategories;
@@ -74,9 +78,8 @@ public class FindBugsPreferences extends Properties {
 
 	public List<String> _enabledModuleConfigs;
 
-	public UserPreferences _userPreferences;
+	public transient UserPreferences _userPreferences;
 
-	public boolean COMPILE_BEFORE_ANALYZE = false;
 	private boolean _isModified;
 
 
@@ -495,7 +498,7 @@ public class FindBugsPreferences extends Properties {
 	@Override
 	public int hashCode() {
 		int result = super.hashCode();
-		result = 31 * result + (COMPILE_BEFORE_ANALYZE ? 1 : 0);
+		result = 31 * result;
 		return result;
 	}
 
@@ -513,12 +516,9 @@ public class FindBugsPreferences extends Properties {
 		//_preferences.setProperty(FindBugsPreferences.MIN_PRIORITY_TO_REPORT, ReportConfiguration.DEFAULT_PRIORITY);
 		preferences.setProperty(FindBugsPreferences.MIN_PRIORITY_TO_REPORT, filterSettings.getMinPriority());
 		preferences.setProperty(FindBugsPreferences.SHOW_HIDDEN_DETECTORS, false);
+		preferences.setProperty(FindBugsPreferences.TOOLWINDOW_TOFRONT, true);
 
-		final Map<String, String> bugCategories = new HashMap<String, String>();
-		final Collection<String> categoryList = I18N.instance().getBugCategories();
-		for (final String category : categoryList) {
-			bugCategories.put(category, String.valueOf(filterSettings.containsCategory(category)));
-		}
+		final Map<String, String> bugCategories = getDefaultBugCategories(filterSettings);
 		preferences.setBugCategories(bugCategories);
 
 		return preferences;
@@ -529,6 +529,24 @@ public class FindBugsPreferences extends Properties {
 		final FindBugsPreferences preferences = createEmpty(Collections.<String>emptyList());
 		final UserPreferences userPrefs = preferences.getUserPreferences();
 
+		final Map<String, String> detectorsAvailableList = getDefaultDetectors(userPrefs);
+		preferences.setDetectors(detectorsAvailableList);
+
+		return preferences;
+	}
+
+
+	public static Map<String, String> getDefaultBugCategories(final ProjectFilterSettings filterSettings) {
+		final Map<String, String> bugCategories = new HashMap<String, String>();
+		final Collection<String> categoryList = I18N.instance().getBugCategories();
+		for (final String category : categoryList) {
+			bugCategories.put(category, String.valueOf(filterSettings.containsCategory(category)));
+		}
+		return bugCategories;
+	}
+
+
+	public static Map<String, String> getDefaultDetectors(final UserPreferences userPrefs) {
 		final Map<String, String> detectorsAvailableList = new HashMap<String, String>();
 		//final Map<DetectorFactory, String> factoriesToBugAbbrev = new HashMap<DetectorFactory, String>();
 		final Iterator<DetectorFactory> iterator = FindBugsPreferences.getDetectorFactorCollection().factoryIterator();
@@ -543,11 +561,7 @@ public class FindBugsPreferences extends Properties {
 			detectorsAvailableList.put(factory.getShortName(), String.valueOf(userPrefs.isDetectorEnabled(factory)));
 			//addBugsAbbreviation(factory);
 		}
-
-		preferences.setDetectors(detectorsAvailableList);
-
-
-		return preferences;
+		return detectorsAvailableList;
 	}
 
 
