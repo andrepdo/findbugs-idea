@@ -132,9 +132,6 @@ public class GroupByClass extends BaseToggleAction implements EventListener<BugR
 				setRunning(true);
 				break;
 			case ANALYSIS_ABORTED:
-				setEnabled(true);
-				setRunning(false);
-				break;
 			case ANALYSIS_FINISHED:
 				setEnabled(true);
 				setRunning(false);

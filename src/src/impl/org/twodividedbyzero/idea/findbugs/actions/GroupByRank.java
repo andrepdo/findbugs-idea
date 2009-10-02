@@ -131,9 +131,6 @@ public class GroupByRank extends BaseToggleAction implements EventListener<BugRe
 				setRunning(true);
 				break;
 			case ANALYSIS_ABORTED:
-				setEnabled(true);
-				setRunning(false);
-				break;
 			case ANALYSIS_FINISHED:
 				setEnabled(true);
 				setRunning(false);

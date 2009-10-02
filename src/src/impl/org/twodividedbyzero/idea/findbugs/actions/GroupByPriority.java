@@ -132,9 +132,6 @@ public class GroupByPriority extends BaseToggleAction implements EventListener<B
 				setRunning(true);
 				break;
 			case ANALYSIS_ABORTED:
-				setEnabled(true);
-				setRunning(false);
-				break;
 			case ANALYSIS_FINISHED:
 				setEnabled(true);
 				setRunning(false);

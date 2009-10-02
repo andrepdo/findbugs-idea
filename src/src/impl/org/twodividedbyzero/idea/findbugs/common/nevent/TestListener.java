@@ -16,7 +16,6 @@
  */
 package org.twodividedbyzero.idea.findbugs.common.nevent;
 
-import edu.umd.cs.findbugs.BugInstance;
 import org.twodividedbyzero.idea.findbugs.common.nevent.annotation.EventFilter;
 import org.twodividedbyzero.idea.findbugs.common.nevent.types.TestEvent;
 
@@ -33,8 +32,8 @@ public class TestListener extends AbstractListener {
 
 	@Override
 	public void receiveNotification(final Notification notification) {
-		for (Event<BugInstance> event : notification.getEvents()) {
+		/*for (Event<BugInstance> event : notification.getEvents()) {
 
-		}
+		}*/
 	}
 }

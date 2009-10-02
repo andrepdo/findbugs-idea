@@ -193,11 +193,7 @@ public class RecurseClassCollector {
 
 	private void addInnerClasses(final PsiElement psiElement, final String fullQualifiedPath, final int anonymousClassPrefix, @Nullable final String findClass) {
 
-		final PsiElement[] classes = PsiTreeUtil.collectElements(psiElement, new PsiElementFilter() {
-			public boolean isAccepted(final PsiElement e) {
-				return (e instanceof PsiClass) && psiElement.equals(PsiTreeUtil.getParentOfType(e, PsiClass.class));
-			}
-		});
+		final PsiElement[] classes = PsiTreeUtil.collectElements(psiElement, new InnerClassesPsiElementFilter(psiElement));
 
 		for (final PsiElement element : classes) {
 			final PsiClass psiClass = (PsiClass) element;
@@ -238,11 +234,7 @@ public class RecurseClassCollector {
 
 	private void addAnonymousClasses(final PsiElement psiElement, final String fullQualifiedPath, @Nullable final String findClass) {
 
-		final PsiElement[] classes = PsiTreeUtil.collectElements(psiElement, new PsiElementFilter() {
-			public boolean isAccepted(final PsiElement e) {
-				return (e instanceof PsiAnonymousClass) && psiElement.equals(PsiTreeUtil.getParentOfType(e, PsiClass.class));
-			}
-		});
+		final PsiElement[] classes = PsiTreeUtil.collectElements(psiElement, new AnonymouseClassesPsiElementFilter(psiElement));
 
 		for (int i = 0; i < classes.length; i++) {
 
@@ -342,5 +334,36 @@ public class RecurseClassCollector {
 	 */
 	public Set<String> getResult() {
 		return _classes;
+	}
+
+
+	private static class AnonymouseClassesPsiElementFilter implements PsiElementFilter {
+
+		private final PsiElement _psiElement;
+
+
+		public AnonymouseClassesPsiElementFilter(final PsiElement psiElement) {
+			_psiElement = psiElement;
+		}
+
+
+		public boolean isAccepted(final PsiElement e) {
+			return (e instanceof PsiAnonymousClass) && _psiElement.equals(PsiTreeUtil.getParentOfType(e, PsiClass.class));
+		}
+	}
+
+	private static class InnerClassesPsiElementFilter implements PsiElementFilter {
+
+		private final PsiElement _psiElement;
+
+
+		public InnerClassesPsiElementFilter(final PsiElement psiElement) {
+			_psiElement = psiElement;
+		}
+
+
+		public boolean isAccepted(final PsiElement e) {
+			return (e instanceof PsiClass) && _psiElement.equals(PsiTreeUtil.getParentOfType(e, PsiClass.class));
+		}
 	}
 }

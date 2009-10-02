@@ -120,7 +120,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 			filteredBugCount++;
 		}*/
 
-		if(isHiddenBugGroup(bug)) {
+		if (isHiddenBugGroup(bug)) {
 			return;
 		}
 		_filteredBugCount++;
@@ -158,11 +158,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 		// Report unique errors in order of their sequence
 		final List<Error> errorList = new ArrayList<Error>(getQueuedErrors());
 		if (errorList.size() > 0) {
-			Collections.sort(errorList, new Comparator<Error>() {
-				public int compare(final Error o1, final Error o2) {
-					return o1.getSequence() - o2.getSequence();
-				}
-			});
+			Collections.sort(errorList, new QueuedErrorsComparator());
 
 			final Map<String, Map<String, Throwable>> status = new HashMap<String, Map<String, Throwable>>();// NON-NLS
 			final String key = "The following errors occurred during FindBugs analysis:";  // NON-NLS
@@ -254,7 +250,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 
 			if (_isInspectionRun) {
 				EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent.Operation.ANALYSIS_ABORTED, _project.getName()));
-			} else if(!isRunning()) {
+			} else if (!isRunning()) {
 				EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_ABORTED, _project.getName()));
 			}
 		}
@@ -330,7 +326,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 
 		if (_isInspectionRun) {
 			EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent.Operation.ANALYSIS_STARTED, null, 0, _project.getName()));
-		} else if(!isRunning()) {
+		} else if (!isRunning()) {
 			EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_STARTED, null, 0, _project.getName()));
 		}
 	}
@@ -414,4 +410,10 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 	}
 
 
+	private static class QueuedErrorsComparator implements Comparator<Error> {
+
+		public int compare(final Error o1, final Error o2) {
+			return o1.getSequence() - o2.getSequence();
+		}
+	}
 }

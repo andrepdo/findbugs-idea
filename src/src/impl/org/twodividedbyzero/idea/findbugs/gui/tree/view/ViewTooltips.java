@@ -581,22 +581,6 @@ public final class ViewTooltips extends MouseAdapter implements MouseMotionListe
 		}
 
 
-		private boolean setLastRenderedScrollPane(final JScrollPane comp) {
-			final boolean result = comp != this.comp;
-			this.comp = comp;
-			return result;
-		}
-
-
-		private boolean setLastRendereredObject(final Object nd) {
-			final boolean result = node != nd;
-			if (result) {
-				node = nd;
-			}
-			return result;
-		}
-
-
 		void clear() {
 			comp = null;
 			node = null;

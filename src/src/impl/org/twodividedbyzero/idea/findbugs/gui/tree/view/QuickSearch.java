@@ -929,25 +929,6 @@ public abstract class QuickSearch<E> {
 		}
 
 
-		private void updatePopupBounds() {
-			if (_popup != null) {
-				_list.invalidate();
-				try {
-					final Dimension size = _list.getPreferredSize();
-					//size.width += _list.getPreferredSize().width;
-					size.width = new JLabel(getLongestString()).getPreferredSize().width + 4;
-					//size.width += 20 /*new JLabel(_searchField.getText()).getPreferredSize().width*//* + 19*/;
-					size.height = _list.getSize().height;
-					_list.setSize(size);
-					_list.setPreferredSize(size);
-					_list.validate();
-				} catch (Exception e) {
-					LOGGER.debug("updatePopupBounds failed.", e);
-				}
-			}
-		}
-
-
 		public String getLongestString() {
 			int maxLen = 0;
 			String longest = null;

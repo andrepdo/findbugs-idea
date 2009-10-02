@@ -35,8 +35,8 @@ public class BugCategoryTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 0L;
 
-	private final transient Object _guardedLock = new Object();
-	private final transient List<BugCategory> _entries;
+	private final Object _guardedLock = new Object();
+	private final List<BugCategory> _entries;
 
 
 	public BugCategoryTableModel() {
@@ -97,11 +97,6 @@ public class BugCategoryTableModel extends AbstractTableModel {
 				}
 			});
 		}
-	}
-
-
-	private boolean oneEntryOnly() {
-		return size() == 1;
 	}
 
 

@@ -319,12 +319,12 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 	@SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
 	public static void processError(final Map<String, Map<String, Throwable>> status) {
-		for (final Entry<String, Map<String, Throwable>> error : status.entrySet()) {
+		/*for (final Entry<String, Map<String, Throwable>> error : status.entrySet()) {
 
 
 			//for()
 			//processError(error.getKey(), error.getValue().);
-		}
+		}*/
 	}
 
 
@@ -340,7 +340,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 
 	public FindBugsPreferences getPreferences() {
-		if(_preferences == null) {
+		if (_preferences == null) {
 			_preferences = getEmptyPreferences(Collections.<String>emptyList());
 		}
 		//noinspection ReturnOfCollectionOrArrayField
@@ -401,19 +401,19 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 
 	private synchronized FindBugsPreferences getDefaultPreferences() {
-		if(_preferences == null) {
+		if (_preferences == null) {
 			_preferences = FindBugsPreferences.createDefault();
 		}
 		return _preferences;
- 	}
+	}
 
 
 	private synchronized FindBugsPreferences getEmptyPreferences(final List<String> pluginList) {
-		if(_preferences == null) {
+		if (_preferences == null) {
 			_preferences = FindBugsPreferences.createEmpty(pluginList);
 		}
 		return _preferences;
- 	}
+	}
 
 
 	public void loadState(final PersistencePreferencesBean state) {
@@ -431,7 +431,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 			_preferences.setDetectors(detectors);
 			for (final Entry<String, String> entry : detectors.entrySet()) {
 				final DetectorFactory detectorFactory = FindBugsPreferences.getDetectorFactorCollection().getFactory(entry.getKey());
-				if(detectorFactory != null) {
+				if (detectorFactory != null) {
 					_preferences.getUserPreferences().enableDetector(detectorFactory, Boolean.valueOf(entry.getValue()));
 				}
 			}
@@ -443,10 +443,10 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 			_preferences.setEnabledModuleConfigs(state.getEnabledModuleConfigs());
 
-			if(_preferences.getBugCategories().isEmpty()) {
+			if (_preferences.getBugCategories().isEmpty()) {
 				_preferences.setBugCategories(FindBugsPreferences.getDefaultBugCategories(_preferences.getUserPreferences().getFilterSettings()));
 			}
-			if(_preferences.getDetectors().isEmpty()) {
+			if (_preferences.getDetectors().isEmpty()) {
 				_preferences.setDetectors(FindBugsPreferences.getDefaultDetectors(_preferences.getUserPreferences()));
 			}
 		} else {
@@ -461,7 +461,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 		if (_preferences == null) {
 			_preferences = getDefaultPreferences();
 		}
-		
+
 		for (final Enumeration<?> confNames = _preferences.propertyNames(); confNames.hasMoreElements();) {
 			final String elementName = (String) confNames.nextElement();
 			preferencesBean.getBasePreferences().put(elementName, _preferences.getProperty(elementName));

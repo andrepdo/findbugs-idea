@@ -14,6 +14,7 @@ import javax.swing.Icon;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.Color;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -72,12 +73,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 
 		if (node instanceof BugInstanceNode && node.isLeaf()) {
 
-			Collections.sort(_childs, new Comparator<TreeNode>() {
-
-				public int compare(final TreeNode a, final TreeNode b) {
-					return BugInstanceComparator.getBugInstanceClassComparator().compare(((BugInstanceNode) a).getBugInstance(), ((BugInstanceNode) b).getBugInstance());
-				}
-			});
+			Collections.sort(_childs, new ChildComparator());
 
 			incrementMemberCount();
 			TreeNode treeNode = getParent();
@@ -296,7 +292,6 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 			case BugCategory:
 				return GuiResources.GROUP_BY_CATEGORY_ICON;
 			case BugShortDescription:
-				return _collapsedIcon;
 			case BugType:
 				return _collapsedIcon;
 			case Class:
@@ -310,8 +305,8 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 				} else {
 					return GuiResources.GROUP_BY_PRIORITY_EXP_ICON;
 				}
-				case BugRank:
-					return GuiResources.GROUP_BY_RANK_ICON;
+			case BugRank:
+				return GuiResources.GROUP_BY_RANK_ICON;
 			default:
 				return _collapsedIcon;
 		}
@@ -325,7 +320,6 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 			case BugCategory:
 				return GuiResources.GROUP_BY_CATEGORY_ICON;
 			case BugShortDescription:
-				return _expandedIcon;
 			case BugType:
 				return _expandedIcon;
 			case Class:
@@ -370,27 +364,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 				toString = buf.toString();
 				break;
 			case Class:
-				buf.append("<b>"); // NON-NLS
-				buf.append(_groupName);
-				buf.append("</b>"); // NON-NLS
-				buf.append("<font color='gray'>"); // NON-NLS
-				buf.append(" (");
-				buf.append(_memberCount).append((_memberCount > 1) || (_memberCount == 0) ? " items" : " item"); // NON-NLS
-				buf.append(")");
-				buf.append("</font>"); // NON-NLS
-				toString = buf.toString();
-				break;
 			case Package:
-				buf.append("<b>"); // NON-NLS
-				buf.append(_groupName);
-				buf.append("</b>"); // NON-NLS
-				buf.append("<font color='gray'>"); // NON-NLS
-				buf.append(" (");
-				buf.append(_memberCount).append((_memberCount > 1) || (_memberCount == 0) ? " items" : " item"); // NON-NLS
-				buf.append(")");
-				buf.append("</font>"); // NON-NLS
-				toString = buf.toString();
-				break;
 			case Priority:
 				buf.append("<b>"); // NON-NLS
 				buf.append(_groupName);
@@ -409,9 +383,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 				buf.append(_memberCount).append((_memberCount > 1) || (_memberCount == 0) ? " items" : " item"); // NON-NLS
 				buf.append(")");
 				buf.append("</font>"); // NON-NLS
-
 				toString = buf.toString();
-
 		}
 
 		buf.append("</body></html>"); // NON-NLS
@@ -425,4 +397,14 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 		return getToString(_groupBy);
 	}
 
+
+	private static class ChildComparator implements Comparator<TreeNode>, Serializable {
+
+		private static final long serialVersionUID = 0l;
+
+
+		public int compare(final TreeNode a, final TreeNode b) {
+			return BugInstanceComparator.getBugInstanceClassComparator().compare(((BugInstanceNode) a).getBugInstance(), ((BugInstanceNode) b).getBugInstance());
+		}
+	}
 }

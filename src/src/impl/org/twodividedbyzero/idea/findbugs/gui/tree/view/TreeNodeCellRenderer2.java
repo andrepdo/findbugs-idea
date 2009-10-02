@@ -300,11 +300,6 @@ public class TreeNodeCellRenderer2 extends JPanel implements TreeCellRenderer {
 				final BugInstanceGroupNode groupNode = (BugInstanceGroupNode) value;
 				final TreePath path = tree.getPathForRow(row);
 
-				if (path != null && path.getPathCount() == 2) {
-					//_title.setFont(new Font(getFont().getName(), Font.BOLD, getFont().getSize())); // todo: !!!
-					//_title.setPreferredSize(_title.getPreferredSize().height, );
-				}
-
 				if (expanded) {
 					final Icon expandedIcon = groupNode.getExpandedIcon();
 					((MaskIcon) expandedIcon).setColorPainted(selected);

@@ -198,37 +198,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 
 	private ComponentListener createComponentListener() {
-		return new ComponentAdapter() {
-			@Override
-			public void componentShown(final ComponentEvent e) {
-				super.componentShown(e);
-				final Component component = e.getComponent();
-				resizeSplitNodes(component);
-				//_multiSplitPane.getMultiSplitLayout().setFloatingDividers(true);
-			}
-
-
-			@Override
-			public void componentResized(final ComponentEvent e) {
-				super.componentResized(e);
-				final Component component = e.getComponent();
-				resizeSplitNodes(component);
-				//_multiSplitPane.getMultiSplitLayout().setFloatingDividers(true);
-			}
-
-
-			@Override
-			public void componentMoved(final ComponentEvent e) {
-				super.componentMoved(e);
-				final Component component = e.getComponent();
-				resizeSplitNodes(component);
-				//_multiSplitPane.getMultiSplitLayout().layoutContainer(_bugTreePanel);
-				//_multiSplitPane.getMultiSplitLayout().layoutContainer(_bugDetailsComponents.getBugDetailsPanel());
-				//_multiSplitPane.getMultiSplitLayout().layoutContainer(_bugDetailsComponents.getBugExplanationPanel());
-				//_multiSplitPane.getMultiSplitLayout().setFloatingDividers(true);
-				//_multiSplitPane.doLayout();
-			}
-		};
+		return new ToolWindowComponentAdapter();
 	}
 
 
@@ -258,5 +228,39 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 	public BugDetailsComponents getBugDetailsComponents() {
 		return _bugDetailsComponents;
+	}
+
+
+	private class ToolWindowComponentAdapter extends ComponentAdapter {
+
+		@Override
+		public void componentShown(final ComponentEvent e) {
+			super.componentShown(e);
+			final Component component = e.getComponent();
+			resizeSplitNodes(component);
+			//_multiSplitPane.getMultiSplitLayout().setFloatingDividers(true);
+		}
+
+
+		@Override
+		public void componentResized(final ComponentEvent e) {
+			super.componentResized(e);
+			final Component component = e.getComponent();
+			resizeSplitNodes(component);
+			//_multiSplitPane.getMultiSplitLayout().setFloatingDividers(true);
+		}
+
+
+		@Override
+		public void componentMoved(final ComponentEvent e) {
+			super.componentMoved(e);
+			final Component component = e.getComponent();
+			resizeSplitNodes(component);
+			//_multiSplitPane.getMultiSplitLayout().layoutContainer(_bugTreePanel);
+			//_multiSplitPane.getMultiSplitLayout().layoutContainer(_bugDetailsComponents.getBugDetailsPanel());
+			//_multiSplitPane.getMultiSplitLayout().layoutContainer(_bugDetailsComponents.getBugExplanationPanel());
+			//_multiSplitPane.getMultiSplitLayout().setFloatingDividers(true);
+			//_multiSplitPane.doLayout();
+		}
 	}
 }

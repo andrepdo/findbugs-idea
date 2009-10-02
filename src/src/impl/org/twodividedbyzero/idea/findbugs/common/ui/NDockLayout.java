@@ -236,9 +236,7 @@ public class NDockLayout extends BorderLayout {
 					totalHeight = cheight;
 					offset = 0;
 				}
-				if (totalHeight > h) {
-					//cheight = cheight-2;
-				}
+
 				if (i + 1 == num) {
 					component.setBounds(x, y + offset, w, h - totalHeight + cheight);
 				} else {

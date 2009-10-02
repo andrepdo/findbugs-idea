@@ -17,7 +17,6 @@ package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
 import edu.umd.cs.findbugs.BugPattern;
 import edu.umd.cs.findbugs.DetectorFactory;
-import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import info.clearthought.layout.TableLayout;
@@ -391,9 +390,6 @@ public class DetectorConfiguration implements ConfigurationPage {
 		String abbr = _factoriesToBugAbbrev.get(factory);
 		if (abbr == null) {
 			abbr = createBugsAbbreviation(factory);
-		}
-		if (abbr == null) {
-			abbr = ""; //$NON-NLS-1$
 		}
 		return abbr;
 	}

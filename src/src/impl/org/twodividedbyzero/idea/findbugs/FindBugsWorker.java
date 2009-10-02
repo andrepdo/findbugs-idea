@@ -29,7 +29,6 @@ import com.intellij.psi.PsiClass;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import edu.umd.cs.findbugs.FindBugs2;
-import edu.umd.cs.findbugs.IFindBugsEngine;
 import edu.umd.cs.findbugs.IFindBugsEngine2;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import edu.umd.cs.findbugs.config.UserPreferences;
@@ -40,7 +39,6 @@ import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.report.BugReporter;
@@ -49,11 +47,7 @@ import org.twodividedbyzero.idea.findbugs.tasks.FindBugsTask;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.List;
-import java.util.Collections;
 import java.util.Map.Entry;
-import java.net.URL;
-import java.net.MalformedURLException;
 
 
 /**
@@ -113,13 +107,13 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	 * Configure findbugs project settings.
 	 * Note: detecors are configured in FindBugsPreferences
 	 *
-	 * @see org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences#syncDetectors() 
 	 * @param project
+	 * @see org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences#syncDetectors()
 	 */
 	private void configure(final Project project) {
 
 		FindBugsPreferences preferences = IdeaUtilImpl.getPluginComponent(project).getPreferences();
-		if(_module != null && preferences.isModuleConfigEnabled(_module)) {
+		if (_module != null && preferences.isModuleConfigEnabled(_module)) {
 			preferences = IdeaUtilImpl.getModuleComponent(_module).getPreferences();
 		}
 
@@ -150,8 +144,8 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 
 
 	private static void configureSelectedCategories(final FindBugsPreferences preferences, final ProjectFilterSettings projectFilterSettings) {
-		for (final Entry<String, String> category : preferences.getBugCategories().entrySet()){
-			if("true".equals(category.getValue())) {  // NON-NLS
+		for (final Entry<String, String> category : preferences.getBugCategories().entrySet()) {
+			if ("true".equals(category.getValue())) {  // NON-NLS
 				projectFilterSettings.addCategory(category.getKey());
 			} else {
 				projectFilterSettings.removeCategory(category.getKey());
@@ -297,31 +291,6 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 				}
 			});
 		}
-	}
-
-
-	private void configureExtendedProps(final Collection<String> filterFiles, final IFindBugsEngine findBugs, final boolean include, final boolean bugsFilter) {
-		/*for (final String fileName : filterFiles) {
-			final IFile file = project.getFile(fileName);
-			if (file.exists()) {
-				final String filterName = file.getLocation().toOSString();
-				try {
-					if (bugsFilter) {
-						findBugs.excludeBaselineBugs(filterName);
-					} else {
-						findBugs.addFilter(filterName, include);
-					}
-				} catch (RuntimeException e) {
-					FindbugsPlugin.getDefault().logException(e, "Error while loading filter \"" + filterName + "\".");
-				} catch (DocumentException e) {
-					FindbugsPlugin.getDefault().logException(e, "Error while loading excluded bugs \"" + filterName + "\".");
-				} catch (IOException e) {
-					FindbugsPlugin.getDefault().logException(e, "Error while reading filter \"" + filterName + "\".");
-				}
-			} else {
-				FindBugsPluginImpl.getDefault().logWarning("Include filter not found: " + fileName);
-			}
-		//}*/
 	}
 
 

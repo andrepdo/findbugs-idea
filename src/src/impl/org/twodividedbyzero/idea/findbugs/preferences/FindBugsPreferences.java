@@ -554,9 +554,9 @@ public class FindBugsPreferences extends Properties {
 			final DetectorFactory factory = iterator.next();
 
 			// Only configure non-hidden factories
-			if (factory.isHidden()) {
+			/*if (factory.isHidden()) {
 				//continue;
-			}
+			}*/
 
 			detectorsAvailableList.put(factory.getShortName(), String.valueOf(userPrefs.isDetectorEnabled(factory)));
 			//addBugsAbbreviation(factory);

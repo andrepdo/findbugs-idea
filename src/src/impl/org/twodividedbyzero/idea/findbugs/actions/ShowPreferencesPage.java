@@ -150,9 +150,6 @@ public class ShowPreferencesPage extends BaseAction implements EventListener<Bug
 				setRunning(true);
 				break;
 			case ANALYSIS_ABORTED:
-				setEnabled(true);
-				setRunning(false);
-				break;
 			case ANALYSIS_FINISHED:
 				setEnabled(true);
 				setRunning(false);

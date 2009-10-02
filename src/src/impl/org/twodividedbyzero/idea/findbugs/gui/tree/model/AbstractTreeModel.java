@@ -665,7 +665,7 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 
 		if (aNode == null) {
 			if (depth == 0) {
-				return null;
+				return createEmptyArray(0);
 			} else {
 				retNodes = createEmptyArray(depth);
 			}

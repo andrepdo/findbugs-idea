@@ -112,20 +112,7 @@ public class GroupByFilter extends BaseAction implements EventListener<BugReport
 
 	private DefaultActionGroup filterApplierGroup() {
 		final DefaultActionGroup group = new DefaultActionGroup("FindBugs.GroupByFilter.PopupGroup", true);  // NON-NLS
-		group.add(new AnAction("test1", "test description", IconLoader.getIcon("/general/ideOptions.png")) {
-
-			@Override
-			public void actionPerformed(final AnActionEvent anactionevent) {
-				//ShowSettingsUtil.getInstance().editConfigurable(myProject, TodoConfigurable.getInstance());
-			}
-
-			//final MySetTodoFilterAction this$1;
-
-
-			{
-				// this$1 = MySetTodoFilterAction.this;
-				//super(s, s1, icon);
-			}});
+		group.add(new FilterApplyAction());
 		return group;
 	}
 
@@ -216,15 +203,34 @@ public class GroupByFilter extends BaseAction implements EventListener<BugReport
 				setRunning(true);
 				break;
 			case ANALYSIS_ABORTED:
-				setEnabled(true);
-				setRunning(false);
-				break;
 			case ANALYSIS_FINISHED:
 				setEnabled(true);
 				setRunning(false);
 				break;
 			case NEW_BUG_INSTANCE:
 				break;
+		}
+	}
+
+
+	private static class FilterApplyAction extends AnAction {
+
+		public FilterApplyAction() {
+			super("test1", "test description", IconLoader.getIcon("/general/ideOptions.png"));
+		}
+
+
+		@Override
+		public void actionPerformed(final AnActionEvent anactionevent) {
+			//ShowSettingsUtil.getInstance().editConfigurable(myProject, TodoConfigurable.getInstance());
+		}
+
+		//final MySetTodoFilterAction this$1;
+
+
+		{
+			// this$1 = MySetTodoFilterAction.this;
+			//super(s, s1, icon);
 		}
 	}
 }

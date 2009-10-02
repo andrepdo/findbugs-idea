@@ -125,27 +125,12 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 	private JEditorPane getBugDetailsPane() {
 		if (_bugDetailsPane == null) {
-			_bugDetailsPane = new JEditorPane() {
-				@Override
-				protected void paintComponent(final Graphics g) {
-					super.paintComponent(g);
-					final Graphics2D g2d = (Graphics2D) g;
-					g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-					g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-				}
-			};
+			_bugDetailsPane = new BugDetailsEditorPane();
 			_bugDetailsPane.setBorder(new EmptyBorder(10, 10, 10, 10));
 			_bugDetailsPane.setEditable(false);
 			_bugDetailsPane.setBackground(Color.white);
 			_bugDetailsPane.setContentType("text/html");  // NON-NLS
-
-			_bugDetailsPane.addHyperlinkListener(new HyperlinkListener() {
-				public void hyperlinkUpdate(final HyperlinkEvent evt) {
-					if (_parent instanceof ToolWindowPanel) {
-						scrollToError(evt);
-					}
-				}
-			});
+			_bugDetailsPane.addHyperlinkListener(new BugDetailsPaneHyperlinkListener());
 		}
 
 		return _bugDetailsPane;
@@ -171,15 +156,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 	private JEditorPane getExplanationPane() {
 		if (_explanationPane == null) {
-			_explanationPane = new JEditorPane() {
-				@Override
-				protected void paintComponent(final Graphics g) {
-					super.paintComponent(g);
-					final Graphics2D g2d = (Graphics2D) g;
-					g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-					g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-				}
-			};
+			_explanationPane = new ExplanationEditorPane();
 			_explanationPane.setBorder(new EmptyBorder(10, 10, 10, 10));
 			//_explanationPane.setPreferredSize(new Dimension(_parent.getPreferredSize().width, 150));
 			_explanationPane.setEditable(false);
@@ -396,5 +373,37 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 	public void setSplitPaneHorizontalWeight(final double splitPaneHorizontalWeight) {
 		_splitPaneHorizontalWeight = splitPaneHorizontalWeight;
+	}
+
+
+	private static class BugDetailsEditorPane extends JEditorPane {
+
+		@Override
+		protected void paintComponent(final Graphics g) {
+			super.paintComponent(g);
+			final Graphics2D g2d = (Graphics2D) g;
+			g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		}
+	}
+
+	private static class ExplanationEditorPane extends JEditorPane {
+
+		@Override
+		protected void paintComponent(final Graphics g) {
+			super.paintComponent(g);
+			final Graphics2D g2d = (Graphics2D) g;
+			g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		}
+	}
+
+	private class BugDetailsPaneHyperlinkListener implements HyperlinkListener {
+
+		public void hyperlinkUpdate(final HyperlinkEvent evt) {
+			if (_parent instanceof ToolWindowPanel) {
+				scrollToError(evt);
+			}
+		}
 	}
 }

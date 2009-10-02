@@ -72,6 +72,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	private boolean _isListener;
 	private List<ProblemDescriptor> _problems;
 	private PsiFile _psiFile;
+	private static final ProblemDescriptor[] EMPTY_PROBLEM_DESCRIPTOR = new ProblemDescriptor[] {};
 
 
 	public FindBugsInspection() {
@@ -169,7 +170,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 
 		if (!psiFile.isValid() || !psiFile.isPhysical() || !IdeaUtilImpl.isValidFileType(psiFile.getFileType())) {
 			LOGGER.debug("Skipping file as invalid: " + psiFile.getName());
-			return null;
+			return EMPTY_PROBLEM_DESCRIPTOR;
 		}
 
 		_psiFile = psiFile;
@@ -301,8 +302,6 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 				_problems.clear();
 				break;
 			case ANALYSIS_ABORTED:
-				unregisterEventListner();
-				break;
 			case ANALYSIS_FINISHED:
 				unregisterEventListner();
 				break;
@@ -311,6 +310,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 				final ProblemDescriptor problemDescriptor = createProblemDescriptor(bugInstance);
 				_problems.add(problemDescriptor);
 				break;
+			default:
 		}
 	}
 

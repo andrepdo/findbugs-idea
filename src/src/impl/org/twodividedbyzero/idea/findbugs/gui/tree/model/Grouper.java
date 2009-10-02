@@ -181,10 +181,6 @@ public class Grouper<T> {
 			parentIndex = Collections.binarySearch(groups, comparable, comparators.get(depth - 1)); // todo: comparators.get(depth-1) ???
 
 			if (LOGGER.isDebugEnabled()) {
-				if (parentIndex < 0) {
-					//System.out.println("############################### < 0");
-				}
-
 				System.err.println("\n== StartSubGroup ==\nindex: " + index + " depth: " + depth + " i: " + j);
 				System.err.println("Classname: " + ((BugInstance) comparable).getPrimaryClass().getClassName().split("\\$")[0]);
 				System.err.println("PAckage: " + ((BugInstance) comparable).getPrimaryClass().getPackageName());

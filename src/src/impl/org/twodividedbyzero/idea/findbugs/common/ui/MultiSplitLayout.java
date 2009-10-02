@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -268,13 +269,6 @@ public class MultiSplitLayout implements LayoutManager {
 	private Dimension preferredComponentSize(final Node node) {
 		final Component child = childForNode(node);
 		return (child != null) ? child.getPreferredSize() : new Dimension(0, 0);
-
-	}
-
-
-	private Dimension minimumComponentSize(final Node node) {
-		final Component child = childForNode(node);
-		return (child != null) ? child.getMinimumSize() : new Dimension(0, 0);
 
 	}
 
@@ -1276,7 +1270,7 @@ public class MultiSplitLayout implements LayoutManager {
 				if ((token = st.nextToken()) != StreamTokenizer.TT_WORD) {
 					throwParseException(st, "invalid node type");
 				}
-				final String nodeType = st.sval.toUpperCase();
+				final String nodeType = st.sval.toUpperCase(Locale.ENGLISH);
 				if ("LEAF".equals(nodeType)) {
 					parseLeaf(st, parent);
 				} else if ("ROW".equals(nodeType) || "COLUMN".equals(nodeType)) {

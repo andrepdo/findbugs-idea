@@ -40,7 +40,7 @@ public class BugPatternTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 0L;
 
-	private final transient Object _guardedLock = new Object();
+	private final Object _guardedLock = new Object();
 	private final transient List<DetectorFactory> _entries;
 	private final FindBugsPreferences _preferences;
 
@@ -98,11 +98,6 @@ public class BugPatternTableModel extends AbstractTableModel {
 				}
 			});
 		}
-	}
-
-
-	private boolean oneEntryOnly() {
-		return size() == 1;
 	}
 
 
@@ -258,6 +253,7 @@ public class BugPatternTableModel extends AbstractTableModel {
 					//_entries.get(rowIndex).set
 					fireTableCellUpdated(rowIndex, columnIndex);
 					break;
+				default:
 			}
 		}
 	}
@@ -272,8 +268,6 @@ public class BugPatternTableModel extends AbstractTableModel {
 	@Override
 	public String getColumnName(final int col) {
 		switch (col) {
-			case 0:
-				return "";
 			case 1:
 				return "Detector id";  // NON-NLS
 			case 2:
@@ -282,8 +276,9 @@ public class BugPatternTableModel extends AbstractTableModel {
 				return "Speed";  // NON-NLS
 			case 4:
 				return "Category";  // NON-NLS
+			default:
+				return "";
 		}
-		return "";
 	}
 
 

@@ -83,7 +83,7 @@ public class AnalyzeClassUnderCursor extends BaseAction implements EventListener
 		}
 
 		final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
-		if(preferences.getBugCategories().containsValue("true") && preferences.getDetectors().containsValue("true")) {  // NON-NLS
+		if (preferences.getBugCategories().containsValue("true") && preferences.getDetectors().containsValue("true")) {  // NON-NLS
 			initWorker();
 		} else {
 			FindBugsPluginImpl.showToolWindowNotifier("No bug categories or bug pattern detectors selected. analysis aborted.", MessageType.WARNING);  // NON-NLS
@@ -142,7 +142,7 @@ public class AnalyzeClassUnderCursor extends BaseAction implements EventListener
 		final Module module = IdeaUtilImpl.getModule(_dataContext);
 
 		final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
-		if(Boolean.valueOf(preferences.getProperty(FindBugsPreferences.TOOLWINDOW_TOFRONT))) {
+		if (Boolean.valueOf(preferences.getProperty(FindBugsPreferences.TOOLWINDOW_TOFRONT))) {
 			IdeaUtilImpl.activateToolWindow(getPluginInterface(project).getInternalToolWindowId(), _dataContext);
 		}
 
@@ -212,9 +212,6 @@ public class AnalyzeClassUnderCursor extends BaseAction implements EventListener
 				setRunning(true);
 				break;
 			case ANALYSIS_ABORTED:
-				setEnabled(true);
-				setRunning(false);
-				break;
 			case ANALYSIS_FINISHED:
 				setEnabled(true);
 				setRunning(false);

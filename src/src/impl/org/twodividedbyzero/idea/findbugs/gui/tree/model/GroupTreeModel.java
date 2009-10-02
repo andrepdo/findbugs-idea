@@ -91,14 +91,6 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	}
 
 
-	private boolean isHiddenBugGroup(final BugInstance node) {
-		final Map<String, String> categories = _preferences.getBugCategories();
-		//final String categoryName = I18N.instance().getBugCategoryDescription(groupNode.getSimpleName());
-		final String category = node.getBugPattern().getCategory();
-		return categories.containsKey(category) && "false".equals(categories.get(category));  // NON-NLS
-	}
-
-
 	public int getBugCount() {
 		return _bugCount;
 	}

@@ -96,26 +96,7 @@ public abstract class AbstractBar extends JToolBar {
 
 
 	public void installListener() {
-		addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-			// This method is called whenever the orientation of the toolbar is changed
-			public void propertyChange(final java.beans.PropertyChangeEvent evt) {
-				final String propName = evt.getPropertyName();
-				if ("orientation".equals(propName)) { // NON-NLS
-					// Get the old orientation
-					@SuppressWarnings({"UnusedDeclaration"})
-					final Integer oldValue = (Integer) evt.getOldValue();
-
-					// Get the new orientation
-					final Integer newValue = (Integer) evt.getNewValue();
-
-					if (newValue == JToolBar.HORIZONTAL) {
-						// toolbar now has horizontal orientation
-					} else {
-						// toolbar now has vertical orientation
-					}
-				}
-			}
-		});
+		addPropertyChangeListener(new InstallPropertyChangeListener());
 	}
 
 
@@ -282,5 +263,27 @@ public abstract class AbstractBar extends JToolBar {
 			return controlKeyStr;
 		}
 
+	}
+
+	private static class InstallPropertyChangeListener implements java.beans.PropertyChangeListener {
+
+		// This method is called whenever the orientation of the toolbar is changed
+		public void propertyChange(final java.beans.PropertyChangeEvent evt) {
+			final String propName = evt.getPropertyName();
+			if ("orientation".equals(propName)) { // NON-NLS
+				// Get the old orientation
+				@SuppressWarnings({"UnusedDeclaration"})
+				final Integer oldValue = (Integer) evt.getOldValue();
+
+				// Get the new orientation
+				final Integer newValue = (Integer) evt.getNewValue();
+
+				if (newValue == JToolBar.HORIZONTAL) {
+					// toolbar now has horizontal orientation
+				} else {
+					// toolbar now has vertical orientation
+				}
+			}
+		}
 	}
 }

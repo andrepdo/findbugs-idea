@@ -22,7 +22,6 @@ import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.SourceLineAnnotation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.gui.tree.NodeVisitor;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.MaskIcon;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
@@ -264,25 +263,7 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 			return buf.toString();
 		}
 
-		//final ResourceBundle resources = ResourceBundle.getBundle(FindBugsPluginConstants.RESOURCE_BUNDLE);
-		//final MessageFormat stringFormat = new MessageFormat(resources.getString("plugin.results.file-result"));
 
-		final String column;
-
-		if (_problem instanceof ExtendedProblemDescriptor) {
-			//column = Integer.toString(((ExtendedProblemDescriptor) _problem).getColumn());
-		} else {
-			//column = "?";
-		}
-
-		final int line;
-		if (_problem instanceof ExtendedProblemDescriptor) {
-			//line = ((ExtendedProblemDescriptor) _problem).getLine();
-		} else {
-			//line = _problem.getLineNumber();
-		}
-
-		//return stringFormat.format(new Object[] {_file.getName(), _problem.getDescriptionTemplate(), line, column});
 		return _simpleName == null ? "null" : _simpleName;
 	}
 

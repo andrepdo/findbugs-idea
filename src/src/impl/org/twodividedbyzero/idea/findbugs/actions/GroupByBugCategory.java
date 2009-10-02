@@ -132,9 +132,6 @@ public class GroupByBugCategory extends BaseToggleAction implements EventListene
 				setRunning(true);
 				break;
 			case ANALYSIS_ABORTED:
-				setEnabled(true);
-				setRunning(false);
-				break;
 			case ANALYSIS_FINISHED:
 				setEnabled(true);
 				setRunning(false);
