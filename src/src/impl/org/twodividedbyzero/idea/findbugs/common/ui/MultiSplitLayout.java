@@ -77,7 +77,7 @@ public class MultiSplitLayout implements LayoutManager {
 
 	private final Map<String, Component> childMap = new HashMap<String, Component>();
 	private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-	private Node model;
+	private transient Node model;
 	private int dividerSize;
 	private boolean floatingDividers = true;
 

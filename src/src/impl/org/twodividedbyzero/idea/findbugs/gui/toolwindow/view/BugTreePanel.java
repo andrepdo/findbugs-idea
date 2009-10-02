@@ -60,19 +60,19 @@ import java.util.Map;
  */
 public class BugTreePanel extends JPanel {
 
-	private Project _project;
+	private final Project _project;
 
 	private boolean _scrollToSource;
-	private BugTree _bugTree;
+	private final BugTree _bugTree;
 
-	private RootNode _visibleRootNode;
-	private GroupTreeModel _treeModel;
-	private FindBugsPreferences _preferences;
-	private SortedBugCollection _bugCollection;
+	private final transient RootNode _visibleRootNode;
+	private final GroupTreeModel _treeModel;
+	private final FindBugsPreferences _preferences;
+	private transient SortedBugCollection _bugCollection;
 	private GroupBy[] _groupBy;
-	private Component _parent;
+	private final Component _parent;
 	private double _splitPaneVerticalWeight = 1.0;
-	private double _splitPaneHorizontalWeight = 0.4;
+	private final double _splitPaneHorizontalWeight = 0.4;
 
 
 	public BugTreePanel(final Component parent, final Project project) {
@@ -108,7 +108,7 @@ public class BugTreePanel extends JPanel {
 		}
 
 		_treeModel.addNode(bugInstance);
-		
+
 	}
 
 
@@ -137,7 +137,7 @@ public class BugTreePanel extends JPanel {
 
 	void clear(final boolean resetBugCount) {
 		if (EventQueue.isDispatchThread()) {
-			if(resetBugCount) {
+			if (resetBugCount) {
 				_visibleRootNode.setBugCount(0);
 			}
 			_treeModel.clear();
@@ -321,7 +321,6 @@ public class BugTreePanel extends JPanel {
 	public BugTree getBugTree() {
 		return _bugTree;
 	}
-
 
 
 	public GroupTreeModel getGroupModel() {

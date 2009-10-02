@@ -232,6 +232,7 @@ public class BugCategoryTableModel extends AbstractTableModel {
 					_entries.get(rowIndex).setEnabled((Boolean) aValue);
 					fireTableCellUpdated(rowIndex, columnIndex);
 					break;
+				default:
 			}
 		}
 	}

@@ -236,7 +236,7 @@ public class MultiSplitPane extends JPanel {
 
 
 	private boolean dragUnderway = false;
-	private MultiSplitLayout.Divider dragDivider = null;
+	private transient MultiSplitLayout.Divider dragDivider = null;
 	private Rectangle initialDividerBounds = null;
 	private boolean oldFloatingDividers = true;
 	private int dragOffsetX = 0;

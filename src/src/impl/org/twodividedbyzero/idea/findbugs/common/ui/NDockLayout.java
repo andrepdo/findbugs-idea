@@ -43,10 +43,10 @@ public class NDockLayout extends BorderLayout {
 
 	private static final long serialVersionUID = 0L;
 
-	private ArrayList<Component> _north = new ArrayList<Component>(1);
-	private ArrayList<Component> _south = new ArrayList<Component>(1);
-	private ArrayList<Component> _east = new ArrayList<Component>(1);
-	private ArrayList<Component> _west = new ArrayList<Component>(1);
+	private final ArrayList<Component> _north = new ArrayList<Component>(1);
+	private final ArrayList<Component> _south = new ArrayList<Component>(1);
+	private final ArrayList<Component> _east = new ArrayList<Component>(1);
+	private final ArrayList<Component> _west = new ArrayList<Component>(1);
 	private Component _center = null;
 	private int _northHeight;
 	private int _southHeight;
@@ -89,7 +89,7 @@ public class NDockLayout extends BorderLayout {
 				//component.getParent().invalidate();
 				component.getParent().validate();
 			} else {
-				throw new IllegalArgumentException("cannot add to layout: constraint must be a string. '" + s + "' is invalid for this constraint.");
+				throw new IllegalArgumentException("cannot add to layout: constraint must be a string.");
 			}
 		}
 	}

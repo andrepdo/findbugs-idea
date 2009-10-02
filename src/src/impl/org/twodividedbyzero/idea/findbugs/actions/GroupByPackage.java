@@ -132,10 +132,9 @@ public class GroupByPackage extends BaseToggleAction implements EventListener<Bu
 				setRunning(true);
 				break;
 			case ANALYSIS_ABORTED:
+			case ANALYSIS_FINISHED:
 				setEnabled(true);
 				setRunning(false);
-				break;
-			case ANALYSIS_FINISHED:
 			case NEW_BUG_INSTANCE:
 				break;
 		}

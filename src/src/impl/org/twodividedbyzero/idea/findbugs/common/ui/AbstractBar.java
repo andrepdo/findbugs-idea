@@ -269,7 +269,7 @@ public abstract class AbstractBar extends JToolBar {
 
 		// This method is called whenever the orientation of the toolbar is changed
 		public void propertyChange(final java.beans.PropertyChangeEvent evt) {
-			final String propName = evt.getPropertyName();
+			/*final String propName = evt.getPropertyName();
 			if ("orientation".equals(propName)) { // NON-NLS
 				// Get the old orientation
 				@SuppressWarnings({"UnusedDeclaration"})
@@ -283,7 +283,7 @@ public abstract class AbstractBar extends JToolBar {
 				} else {
 					// toolbar now has vertical orientation
 				}
-			}
+			}*/
 		}
 	}
 }

@@ -38,13 +38,13 @@ public final class BrowseAction extends AbstractAction {
 
 	private static final long serialVersionUID = 0L;
 
-	private ConfigurationPanel _parent;
-	private FileFilter _fileFilter;
+	private final ConfigurationPanel _parent;
+	private final transient FileFilter _fileFilter;
 	private JList _list;
 	private Collection<String> _collection;
 	private FindBugsPreferences _preferences;
 
-	private final BrowseActionCallback _callback;
+	private final transient BrowseActionCallback _callback;
 
 
 	public BrowseAction(final ConfigurationPanel parent, final String name, final FileFilter fileFilter, final BrowseActionCallback callback) {
@@ -70,6 +70,7 @@ public final class BrowseAction extends AbstractAction {
 			_callback.addSelection(selectedFile);
 		}
 	}
+
 
 	public interface BrowseActionCallback {
 

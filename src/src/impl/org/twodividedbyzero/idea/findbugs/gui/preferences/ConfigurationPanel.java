@@ -63,12 +63,12 @@ public class ConfigurationPanel extends JPanel {
 	private JCheckBox _detectorThresholdChkb;
 	private JPanel _effortPanel;
 	private JTabbedPane _tabbedPane;
-	private DetectorConfiguration _detectorConfig;
-	private ReportConfiguration _reporterConfig;
+	private transient DetectorConfiguration _detectorConfig;
+	private transient ReportConfiguration _reporterConfig;
 	private JButton _restoreDefaultsButton;
 	private JSlider _effortSlider;
-	private FilterConfiguration _filterConfig;
-	private PluginConfiguration _pluginConfig;
+	private transient FilterConfiguration _filterConfig;
+	private transient PluginConfiguration _pluginConfig;
 
 
 	public ConfigurationPanel(final FindBugsPlugin plugin) {
@@ -142,7 +142,7 @@ public class ConfigurationPanel extends JPanel {
 
 
 	private void updatePlugins() {
-		if(!_plugin.isModuleComponent()) {
+		if (!_plugin.isModuleComponent()) {
 			getPluginConfig().updatePreferences();
 		}
 	}
@@ -252,7 +252,7 @@ public class ConfigurationPanel extends JPanel {
 			_tabbedPane.addTab("Reporter configuration", getReporterConfig().getComponent());  // NON-NLS
 			_tabbedPane.addTab("Filter configuration", getFilterConfig().getComponent());  // NON-NLS
 
-			if(!_plugin.isModuleComponent()) {
+			if (!_plugin.isModuleComponent()) {
 				_tabbedPane.addTab("Plugin configuration", getPluginConfig().getComponent());  // NON-NLS
 			}
 		}
@@ -317,7 +317,7 @@ public class ConfigurationPanel extends JPanel {
 		getReporterConfig().setEnabled(enabled);
 		getFilterConfig().setEnabled(enabled);
 
-		if(!_plugin.isModuleComponent()) {
+		if (!_plugin.isModuleComponent()) {
 			getPluginConfig().setEnabled(enabled);
 		}
 

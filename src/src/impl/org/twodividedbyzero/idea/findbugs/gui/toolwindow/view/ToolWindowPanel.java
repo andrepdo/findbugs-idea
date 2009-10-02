@@ -68,7 +68,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 	private ActionToolbar _toolbarNavigation;
 	private ToolWindow _toolWindow;
 	private BugTreePanel _bugTreePanel;
-	private BugDetailsComponents _bugDetailsComponents;
+	private transient BugDetailsComponents _bugDetailsComponents;
 	private ComponentListener _componentListener;
 	private MultiSplitPane _multiSplitPane;
 
@@ -193,6 +193,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 				//_bugTreePanel.addTreeNode(event.getBugInstance());
 				_bugTreePanel.updateRootNode(event.getProjectStats());
 				break;
+			default:
 		}
 	}
 

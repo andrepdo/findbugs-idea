@@ -46,10 +46,10 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	private static final Logger LOGGER = Logger.getInstance(GroupTreeModel.class.getName());
 
 	private GroupBy[] _groupBy;
-	private volatile Map<String, Map<Integer, List<BugInstanceGroupNode>>> _groups;
+	private final Map<String, Map<Integer, List<BugInstanceGroupNode>>> _groups;
 	private transient Grouper<BugInstance> _grouper;
 
-	private FindBugsPreferences _preferences;
+	private final FindBugsPreferences _preferences;
 	private int _bugCount;
 
 

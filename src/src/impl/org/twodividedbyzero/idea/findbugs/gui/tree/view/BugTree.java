@@ -60,14 +60,14 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 
 	private static final Logger LOGGER = Logger.getInstance(BugTree.class.getName());
 
-	private BugTreePanel _bugTreePanel;
-	private TreeMouseListener _treeMouseListener;
-	private TreeSelectionListener _treeSelectionListener;
-	private Project _project;
-	private BugTreeHelper _treeHelper;
+	private final BugTreePanel _bugTreePanel;
+	private transient TreeMouseListener _treeMouseListener;
+	private transient TreeSelectionListener _treeSelectionListener;
+	private final Project _project;
+	private transient BugTreeHelper _treeHelper;
 	private KeyAdapter _treeKeyAdapter;
-	private ScrollToSourceHandler _scrollToSourceHandler;
-	private TreeOccurenceNavigator _occurenceNavigator;
+	private transient ScrollToSourceHandler _scrollToSourceHandler;
+	private final transient TreeOccurenceNavigator _occurenceNavigator;
 
 
 	public BugTree(final TreeModel treeModel, final BugTreePanel bugTreePanel, final Project project) {

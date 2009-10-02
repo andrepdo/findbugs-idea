@@ -103,27 +103,26 @@ public class TableSorter extends AbstractTableModel {
 
 	private static final Directive EMPTY_DIRECTIVE = new Directive(-1, NOT_SORTED);
 
-	public static final Comparator COMPARABLE_COMAPRATOR;
-	public static final Comparator LEXICAL_COMPARATOR;
+	public static final Comparator<?> COMPARABLE_COMAPRATOR;
+	public static final Comparator<?> LEXICAL_COMPARATOR;
 
 	private TableModel _tableModel;
-	private Row[] _viewToModel;
+	private transient Row[] _viewToModel;
 	private int[] _modelToView;
 	private JTableHeader _tableHeader;
-	private MouseListener _mouseListener;
-	private TableModelListener _tableModelListener;
+	private transient MouseListener _mouseListener;
+	private transient TableModelListener _tableModelListener;
 	private final List<JTableHeader> _registredTableHeaders = new ArrayList<JTableHeader>();
-	private final Map<Class, Comparator> _columnComparators = new HashMap<Class, Comparator>();
+	private final Map<Class<?>, Comparator<?>> _columnComparators = new HashMap<Class<?>, Comparator<?>>();
 	private final List<Directive> _sortingColumns = new ArrayList<Directive>();
 	private boolean _disableNotSorted;
-
 
 
 	static {
 		COMPARABLE_COMAPRATOR = new Comparator() {
 			@SuppressWarnings({"unchecked"})
 			public int compare(final Object o1, final Object o2) {
-				return ((Comparable) o1).compareTo(o2);
+				return ((Comparable<Object>) o1).compareTo(o2);
 			}
 		};
 		LEXICAL_COMPARATOR = new Comparator() {

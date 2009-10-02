@@ -97,7 +97,7 @@ public abstract class QuickSearch<E> {
 	private int _cursor = -1;
 	private Color _foregroundColor = UIManager.getColor("ToolTip.foreground");  // NON-NLS
 	private Color _backgroundColor = new Color(255, 255, 200);
-	private Stack<String> _recentSearches;
+	private final Stack<String> _recentSearches;
 
 
 	protected QuickSearch() {
@@ -610,7 +610,7 @@ public abstract class QuickSearch<E> {
 			_searchField.setCursor(getCursor());
 
 			_searchField.getDocument().addDocumentListener(new DocumentListener() {
-				private Timer _timer = new Timer(200, new ActionListener() {
+				private final Timer _timer = new Timer(200, new ActionListener() {
 					public void actionPerformed(final ActionEvent e) {
 						doFind();
 					}
@@ -710,7 +710,8 @@ public abstract class QuickSearch<E> {
 					_popup.setSize(size);
 					_popup.setPreferredSize(size);
 					_popup.validate();
-				} catch (Exception ignore) {
+				} catch (Exception e) {
+					LOGGER.debug(e);
 				}
 			}
 		}

@@ -345,10 +345,10 @@ public class DetectorConfiguration implements ConfigurationPage {
 
 	public static String trimHtml(final String detailHTML, final String startTag, final String endTag) {
 		String detailHTML1 = detailHTML;
-		if (detailHTML1.indexOf(startTag) > 0) {
+		if (detailHTML1.contains(startTag)) {
 			detailHTML1 = detailHTML1.substring(detailHTML1.indexOf(startTag) + startTag.length());
 		}
-		if (detailHTML1.indexOf(endTag) > 0) {
+		if (detailHTML1.contains(endTag)) {
 			detailHTML1 = detailHTML1.substring(0, detailHTML1.lastIndexOf(endTag));
 		}
 		return detailHTML1;

@@ -39,6 +39,7 @@ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.tasks.FindBugsTask;
 
 import java.awt.EventQueue;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -410,7 +411,10 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 	}
 
 
-	private static class QueuedErrorsComparator implements Comparator<Error> {
+	private static class QueuedErrorsComparator implements Comparator<Error>, Serializable {
+
+		private static final long serialVersionUID = 0L;
+
 
 		public int compare(final Error o1, final Error o2) {
 			return o1.getSequence() - o2.getSequence();

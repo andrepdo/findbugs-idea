@@ -221,7 +221,8 @@ public class BugDetailsComponents /*extends JPanel*/ {
 				//BrowserUtil.launchBrowser(url.get);
 				_explanationPane.setPage(url);
 			}
-		} catch (Exception ignore) {
+		} catch (Exception e) {
+			LOGGER.debug(e);
 		}
 	}
 

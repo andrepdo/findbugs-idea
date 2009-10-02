@@ -226,7 +226,6 @@ public class BugInstanceComparator {
 	public static final Comparator<BugInstance> _bugInstanceBugRankComparator = new BugInstanceBugRankComparator();
 
 
-
 	public static Comparator<BugInstance> getBugInstanceClassComparator() {
 		return _bugInstanceClassComparator;
 	}
@@ -275,7 +274,7 @@ public class BugInstanceComparator {
 			return getBugInstanceShortDescrComparator();
 		} else if (groupBy.equals(GroupBy.Priority)) {
 			return getBugInstancePriorityComparator();
-		}  else if (groupBy.equals(GroupBy.BugRank)) {
+		} else if (groupBy.equals(GroupBy.BugRank)) {
 			return getBugInstanceBugRankComparator();
 		} else {
 			throw new IllegalArgumentException("Bad sort order: " + groupBy);
@@ -325,7 +324,7 @@ public class BugInstanceComparator {
 		private static final long serialVersionUID = 0L;
 		private final int _compareDepth;
 		private final GroupBy[] _groupBy;
-		final List<Comparator<BugInstance>> _comparators;
+		final transient List<Comparator<BugInstance>> _comparators;
 
 
 		public ComparatorChain(final int compareDepth, final GroupBy[] groupBy) {

@@ -69,14 +69,14 @@ public class FindBugsPreferences extends Properties {
 	public static final String COMPILE_BEFORE_ANALYZE = PROPERTIES_PREFIX + "compileBeforeAnalyse";
 
 
-	public Map<String, String> _detectors;
-	public Map<String, String> _bugCategories;
-	public List<String> _includeFilters;
-	public List<String> _excludeFilters;
-	public List<String> _excludeBaselineBugs;
-	public List<String> _plugins;
+	public transient Map<String, String> _detectors;
+	public transient Map<String, String> _bugCategories;
+	public transient List<String> _includeFilters;
+	public transient List<String> _excludeFilters;
+	public transient List<String> _excludeBaselineBugs;
+	public transient List<String> _plugins;
 
-	public List<String> _enabledModuleConfigs;
+	public transient List<String> _enabledModuleConfigs;
 
 	public transient UserPreferences _userPreferences;
 
