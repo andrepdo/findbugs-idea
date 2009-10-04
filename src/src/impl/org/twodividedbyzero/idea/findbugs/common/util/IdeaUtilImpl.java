@@ -49,7 +49,6 @@ import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ChangeList;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vcs.changes.ContentRevision;
-import com.intellij.openapi.vcs.changes.LocalChangeList;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -69,11 +68,11 @@ import com.intellij.psi.PsiPackage;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
-import com.intellij.util.PathsList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.FindBugsPluginImpl;
+import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 
@@ -202,13 +201,14 @@ public final class IdeaUtilImpl {
 
 
 	// todo:
-	public static void getSelectedChangelist() {
+	/*public static void getSelectedChangelist() {
 		final Project project = getProject();
 		final ChangeListManager changeListManager = ChangeListManager.getInstance(project);
 		for (final LocalChangeList list : changeListManager.getChangeLists()) {
 		}
 
-	}
+	}*/
+
 
 	public static ChangeList getChangeListByName(final String name) {
 		final Project project = getProject();
@@ -223,7 +223,7 @@ public final class IdeaUtilImpl {
 		// (Change[]) DataProvider.getData(DataConstants.CHANGES)
 		for (final Change change : changeCollection) {
 			final ContentRevision contentRevision = change.getAfterRevision();
-			if(contentRevision != null) {
+			if (contentRevision != null) {
 				final FilePath path = contentRevision.getFile();
 				result.add(path.getVirtualFile());
 			}
@@ -565,14 +565,9 @@ public final class IdeaUtilImpl {
 		final ProjectRootsTraversing.RootTraversePolicy traversePolicy = null;
 		for (final Module module : modules) {
 			final List<VirtualFile> virtualFiles = new ArrayList<VirtualFile>();
-			if (traversePolicy != null) {
-				final PathsList list = ProjectRootsTraversing.collectRoots(module, traversePolicy);
-				virtualFiles.addAll(list.getVirtualFiles());
-			} else {
-				final VirtualFile outputDirectory = CompilerPaths.getModuleOutputDirectory(module, false);
-				if (outputDirectory != null) {
-					virtualFiles.add(outputDirectory);
-				}
+			final VirtualFile outputDirectory = CompilerPaths.getModuleOutputDirectory(module, false);
+			if (outputDirectory != null) {
+				virtualFiles.add(outputDirectory);
 			}
 			for (final VirtualFile virtualFile : virtualFiles) {
 				final File file = VfsUtil.virtualToIoFile(virtualFile);
@@ -839,5 +834,18 @@ public final class IdeaUtilImpl {
 
 	public static String getIdeaMajorVersion() {
 		return ApplicationInfo.getInstance().getMajorVersion();
+	}
+
+
+	@Nullable
+	public static PsiFile getPsiFile(@NotNull final Project project, @NotNull final ExtendedProblemDescriptor issue) {
+		return (issue.getFile() == null) ? null : PsiManager.getInstance(project).findFile(issue.getFile());
+	}
+
+
+	@Nullable
+	public static Document getDocument(@NotNull final Project project, @NotNull final ExtendedProblemDescriptor issue) {
+		final PsiFile psiFile = getPsiFile(project, issue);
+		return (psiFile == null) ? null : PsiDocumentManager.getInstance(project).getDocument(psiFile);
 	}
 }

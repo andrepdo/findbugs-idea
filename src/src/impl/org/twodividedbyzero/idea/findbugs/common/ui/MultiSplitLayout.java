@@ -711,7 +711,7 @@ public class MultiSplitLayout implements LayoutManager {
 
 		private static final long serialVersionUID = 0L;
 
-		private final Node node;
+		private final transient Node node;
 
 
 		public InvalidLayoutException(final String msg, final Node node) {
@@ -1267,7 +1267,7 @@ public class MultiSplitLayout implements LayoutManager {
 					addSplitChild(parent, new Leaf(st.sval));
 				}
 			} else if (token == '(') {
-				if ((token = st.nextToken()) != StreamTokenizer.TT_WORD) {
+				if ((st.nextToken()) != StreamTokenizer.TT_WORD) {
 					throwParseException(st, "invalid node type");
 				}
 				final String nodeType = st.sval.toUpperCase(Locale.ENGLISH);

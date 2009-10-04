@@ -19,8 +19,10 @@ package org.twodividedbyzero.idea.findbugs.common;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.QuickFix;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 
 /**
@@ -32,12 +34,23 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ExtendedProblemDescriptor implements ProblemDescriptor {
 
-	private final ProblemDescriptor _delegate;
-	private final int _column;
-	private final int _line;
+	private ProblemDescriptor _delegate;
+	private int _column;
+	private int _line;
+	private VirtualFile _file;
+	private int _lineStart;
+	private int _lineEnd;
+	private int _hash;
 
 
-	public ExtendedProblemDescriptor(final ProblemDescriptor delegate, final int line, final int column) {
+	public ExtendedProblemDescriptor(final VirtualFile file, final int[] lines) {
+		_file = file;
+		_lineStart = lines[0];
+		_lineEnd = lines[1];
+	}
+
+
+	/*public ExtendedProblemDescriptor(final ProblemDescriptor delegate, final int line, final int column) {
 		if (delegate == null) {
 			throw new IllegalArgumentException("Delegate may not be null.");
 		}
@@ -46,7 +59,7 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor {
 		_delegate = delegate;
 		_line = line;
 		_column = column;
-	}
+	}*/
 
 
 	/**
@@ -116,7 +129,48 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor {
 
 
 	/** {@inheritDoc} */
-	public QuickFix[] getFixes() {
+	@Nullable
+	public QuickFix<?>[] getFixes() {
 		return _delegate.getFixes();
+	}
+
+
+	public void setFile(final VirtualFile file) {
+		_file = file;
+	}
+
+
+	public void setLineStart(final int lineStart) {
+		_lineStart = lineStart;
+	}
+
+
+	public void setLineEnd(final int lineEnd) {
+		_lineEnd = lineEnd;
+	}
+
+
+	public void setHash(final int hash) {
+		_hash = hash;
+	}
+
+
+	public VirtualFile getFile() {
+		return _file;
+	}
+
+
+	public int getLineStart() {
+		return _lineStart;
+	}
+
+
+	public int getLineEnd() {
+		return _lineEnd;
+	}
+
+
+	public int getHash() {
+		return _hash;
 	}
 }

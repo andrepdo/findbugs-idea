@@ -178,31 +178,31 @@ public class ToolBarButton extends ToggleableButton {
 
 	@Override
 	public Icon getIcon() {
-		return new ButtonIcon(_buttonBackground, super.getIcon(), _icon);
+		return new ButtonIcon(getIconSize(), _buttonBackground, super.getIcon(), _icon);
 	}
 
 
 	@Override
 	public Icon getDisabledIcon() {
-		return new ButtonIcon(true, _buttonBackground, super.getIcon(), _icon);
+		return new ButtonIcon(true, getIconSize(), _buttonBackground, super.getIcon(), _icon);
 	}
 
 
 	@Override
 	public Icon getRolloverIcon() {
-		return new ButtonIcon(_buttonBackground, super.getRolloverIcon(), _icon);
+		return new ButtonIcon(getIconSize(), _buttonBackground, super.getRolloverIcon(), _icon);
 	}
 
 
 	@Override
 	public Icon getPressedIcon() {
-		return new ButtonIcon(_buttonPressedBackground, super.getPressedIcon(), _icon);
+		return new ButtonIcon(getIconSize(), _buttonPressedBackground, super.getPressedIcon(), _icon);
 	}
 
 
 	@Override
 	public Icon getSelectedIcon() {
-		return new ButtonIcon(_buttonPressedBackground, super.getPressedIcon(), _selectedIcon);
+		return new ButtonIcon(getIconSize(), _buttonPressedBackground, super.getPressedIcon(), _selectedIcon);
 	}
 
 
@@ -212,7 +212,7 @@ public class ToolBarButton extends ToggleableButton {
 	}
 
 
-	private class ButtonIcon implements Icon {
+	private static class ButtonIcon implements Icon {
 
 		private static final float DISABLED_OPACITY = 0.5f;
 		private Icon[] _icons;
@@ -221,15 +221,14 @@ public class ToolBarButton extends ToggleableButton {
 		private boolean _disabledOpacity;
 
 
-		public ButtonIcon(final Icon... icons) {
-			this(false, icons);
+		public ButtonIcon(final Dimension dimension, final Icon... icons) {
+			this(false, dimension, icons);
 		}
 
 
-		public ButtonIcon(final boolean disabledOpacity, final Icon... icons) {
+		public ButtonIcon(final boolean disabledOpacity, final Dimension dimension, final Icon... icons) {
 			_disabledOpacity = disabledOpacity;
 			_icons = icons;
-			final Dimension dimension = getIconSize();
 			_maxWidth = (int) dimension.getWidth();
 			_maxHeight = (int) dimension.getHeight();
 		}
@@ -245,6 +244,9 @@ public class ToolBarButton extends ToggleableButton {
 		}
 
 
+		@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+				value = "BC_UNCONFIRMED_CAST",
+				justification = "")
 		@SuppressWarnings({"AssignmentToMethodParameter"})
 		public void paintIcon(final Component c, final Graphics g, int x, int y) {
 			for (final Icon icon : _icons) {

@@ -447,6 +447,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 				_preferences.setBugCategories(FindBugsPreferences.getDefaultBugCategories(_preferences.getUserPreferences().getFilterSettings()));
 			}
 			if (_preferences.getDetectors().isEmpty()) {
+				LOGGER.debug("empty detectors loading defaults.");
 				_preferences.setDetectors(FindBugsPreferences.getDefaultDetectors(_preferences.getUserPreferences()));
 			}
 		} else {

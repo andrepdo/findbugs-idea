@@ -38,7 +38,15 @@ public class BugReporterEventImpl extends EventImpl implements BugReporterEvent 
 	private Operation _operation;
 	private BugInstance _bugInstance;
 	private Integer _bugCount;
+
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+			value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
+			justification = "because I know better")
 	private transient BugCollection _bugCollection;
+
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+			value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
+			justification = "because I know better")
 	private transient ProjectStats _projectStats;
 	private String _projectName;
 

@@ -91,6 +91,9 @@ import java.beans.PropertyChangeListener;
  * @author Tim Boudreau
  * @author Andre Pfeiler - made some tiny modification on positioning the buffered image rect
  */
+@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+		value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
+		justification = "")
 @SuppressWarnings({"AssignmentToNull"})
 public final class ViewTooltips extends MouseAdapter {
 
@@ -103,9 +106,13 @@ public final class ViewTooltips extends MouseAdapter {
 	/** The last row we were invoked against */
 	private int row = -1;
 	/** An array of currently visible popups */
-	private Popup[] popups = new Popup[2];
+	private final Popup[] popups = new Popup[2];
 	/** A component we'll reuse to paint into the popups */
-	private ImgComp painter = new ImgComp();
+
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+			value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
+			justification = "because I know better")
+	private final ImgComp painter = new ImgComp();
 
 
 	/** Nobody should instantiate this */
@@ -491,7 +498,7 @@ public final class ViewTooltips extends MouseAdapter {
 	 */
 	private static final class ImgComp extends JComponent {
 
-		private BufferedImage img;
+		private transient BufferedImage img;
 		private Dimension d = null;
 
 		private Color bg = Color.WHITE;
@@ -627,6 +634,9 @@ public final class ViewTooltips extends MouseAdapter {
 		}
 
 
+		@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+				value = "BC_UNCONFIRMED_CAST",
+				justification = "")
 		@Override
 		public void paint(final Graphics g) {
 			g.setColor(bg);
@@ -672,10 +682,13 @@ public final class ViewTooltips extends MouseAdapter {
 
 		private final JTree tree;
 
-		private JScrollPane pane;
+		private final JScrollPane pane;
 		private final JList list;
 
 
+		@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+				value = "BC_UNCONFIRMED_CAST",
+				justification = "")
 		public Hider(final JComponent comp, final JScrollPane pane) {
 			if (comp instanceof JTree) {
 				this.tree = (JTree) comp;

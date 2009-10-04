@@ -20,10 +20,8 @@ import com.intellij.openapi.diagnostic.Logger;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.I18N;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -79,7 +77,7 @@ public class Grouper<T> {
 	 * @param collection the natural SORTED collection
 	 * @param comparator the comparator
 	 */
-	public void group(final Collection<T> collection, final Comparator<T> comparator) {
+	/*public void group(final Collection<T> collection, final Comparator<T> comparator) {
 		final Iterator<T> i = collection.iterator();
 		T last = null;
 		while (i.hasNext()) {
@@ -94,7 +92,7 @@ public class Grouper<T> {
 
 			last = current;
 		}
-	}
+	}*/
 
 
 	/**

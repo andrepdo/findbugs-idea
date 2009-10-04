@@ -415,9 +415,9 @@ public class TableSorter extends AbstractTableModel {
 
 	// Helper classes
 
-	private class Row implements Comparable {
+	private class Row implements Comparable<Object> {
 
-		private int _modelIndex;
+		private final int _modelIndex;
 
 
 		public Row(final int index) {
@@ -444,9 +444,9 @@ public class TableSorter extends AbstractTableModel {
 				} else if (o2 == null) {
 					comparison = 1;
 				} else {
-					final Comparator comp = getComparator(column);
+					final Comparator<Object> comp = getComparator(column);
 					if (comp instanceof TableColumnComparator) {
-						comparison = ((TableColumnComparator) comp).compare(column, o1, o2);
+						comparison = ((TableColumnComparator<Object>) comp).compare(column, o1, o2);
 					} else {
 						comparison = comp.compare(o1, o2);
 					}
@@ -456,6 +456,31 @@ public class TableSorter extends AbstractTableModel {
 				}
 			}
 			return 0;
+		}
+
+
+		@Override
+		public boolean equals(final Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (!(o instanceof Row)) {
+				return false;
+			}
+
+			final Row row = (Row) o;
+
+			if (_modelIndex != row._modelIndex) {
+				return false;
+			}
+
+			return true;
+		}
+
+
+		@Override
+		public int hashCode() {
+			return _modelIndex;
 		}
 	}
 
@@ -548,9 +573,9 @@ public class TableSorter extends AbstractTableModel {
 
 	private static class Arrow implements Icon {
 
-		private boolean _descending;
-		private int _size;
-		private int _priority;
+		private final boolean _descending;
+		private final int _size;
+		private final int _priority;
 
 
 		public Arrow(final boolean descending, final int size, final int priority) {
@@ -564,7 +589,7 @@ public class TableSorter extends AbstractTableModel {
 			final Color color = c == null ? Color.GRAY : c.getBackground();
 			// In a compound sort, make each succesive triangle 20%
 			// smaller than the previous one.
-			final int dx = (int) (_size / 2 * Math.pow(0.8, _priority));
+			final int dx = _size / 2 * (int) Math.pow(0.8, _priority);
 			final int dy = _descending ? dx : -dx;
 			// Align icon (roughly) with font baseline.
 			y = y + 5 * _size / 6 + (_descending ? -dy : 0);
@@ -606,7 +631,7 @@ public class TableSorter extends AbstractTableModel {
 
 	private class SortableHeaderRenderer implements TableCellRenderer {
 
-		private TableCellRenderer _tableCellRenderer;
+		private final TableCellRenderer _tableCellRenderer;
 
 
 		public SortableHeaderRenderer(final TableCellRenderer tableCellRenderer) {
@@ -628,8 +653,8 @@ public class TableSorter extends AbstractTableModel {
 
 	private static class Directive {
 
-		private int _column;
-		private int _direction;
+		private final int _column;
+		private final int _direction;
 
 
 		public Directive(final int column, final int direction) {

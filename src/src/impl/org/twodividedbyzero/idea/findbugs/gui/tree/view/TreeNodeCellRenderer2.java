@@ -26,7 +26,6 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreePath;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -298,7 +297,7 @@ public class TreeNodeCellRenderer2 extends JPanel implements TreeCellRenderer {
 
 			} else if (value instanceof BugInstanceGroupNode) {
 				final BugInstanceGroupNode groupNode = (BugInstanceGroupNode) value;
-				final TreePath path = tree.getPathForRow(row);
+				//final TreePath path = tree.getPathForRow(row);
 
 				if (expanded) {
 					final Icon expandedIcon = groupNode.getExpandedIcon();
@@ -349,6 +348,9 @@ public class TreeNodeCellRenderer2 extends JPanel implements TreeCellRenderer {
 
 
 	/** Paints the value.  The background is filled based on selected color. */
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+			value = "BC_UNCONFIRMED_CAST",
+			justification = "")
 	@Override
 	public void paint(final Graphics g) {
 		Color bColor;

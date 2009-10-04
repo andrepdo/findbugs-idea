@@ -484,13 +484,13 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 	private void readObject(final ObjectInputStream s) throws IOException, ClassNotFoundException {
 		s.defaultReadObject();
 
-		final Vector values = (Vector) s.readObject();
+		final Vector<?> values = (Vector<?>) s.readObject();
 		int indexCounter = 0;
 		final int maxCounter = values.size();
 
 		if (indexCounter < maxCounter && values.elementAt(indexCounter).equals("root")) {
 			_root = (N) values.elementAt(++indexCounter);
-			indexCounter++;
+			//indexCounter++;
 		}
 	}
 

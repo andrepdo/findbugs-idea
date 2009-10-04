@@ -114,7 +114,7 @@ public class FilterConfiguration implements ConfigurationPage {
 
 	public JPanel getIncludePanel() {
 		if (_includePanel == null) {
-			
+
 			final double border = 5;
 			final double rowsGap = 5;
 			final double colsGap = 10;
@@ -135,14 +135,14 @@ public class FilterConfiguration implements ConfigurationPage {
 
 
 			final double[][] bPanelSize = {{border, TableLayout.PREFERRED}, // Columns
-									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
+										   {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout btbl = new TableLayout(bPanelSize);
 
 			final JPanel buttonPanel = new JPanel(btbl);
 			_includePanel.add(buttonPanel, "3, 1, 3, 1");
 
 			final JButton addButton = new JButton();
-			final BrowseAction action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTESIONS_SET),  new BrowseActionCallback() {
+			final BrowseAction action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTESIONS_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
 					((DefaultListModel) _includeList.getModel()).addElement(selectedFile.getAbsolutePath());
 					_preferences.getIncludeFilters().add(selectedFile.getAbsolutePath());
@@ -153,6 +153,8 @@ public class FilterConfiguration implements ConfigurationPage {
 			buttonPanel.add(addButton, "1, 1, 1, 1");
 
 			final JButton removeButton = new JButton("Remove") {  // NON-NLS
+
+
 				@Override
 				public boolean isEnabled() {
 					return super.isEnabled() && _includeList.getSelectedIndex() > -1;
@@ -167,12 +169,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			});
 			buttonPanel.add(removeButton, "1, 3, 1, 3");
 
-			_includeList.addListSelectionListener(new ListSelectionListener() {
-				public void valueChanged(final ListSelectionEvent e) {
-					removeButton.setEnabled(!e.getValueIsAdjusting() && e.getFirstIndex() >= 0);
-
-				}
-			});
+			_includeList.addListSelectionListener(new MyListSelectionListener(removeButton));
 		}
 
 		return _includePanel;
@@ -202,7 +199,7 @@ public class FilterConfiguration implements ConfigurationPage {
 
 
 			final double[][] bPanelSize = {{border, TableLayout.PREFERRED}, // Columns
-									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
+										   {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout btbl = new TableLayout(bPanelSize);
 
 			final JPanel buttonPanel = new JPanel(btbl);
@@ -220,6 +217,8 @@ public class FilterConfiguration implements ConfigurationPage {
 			buttonPanel.add(addButton, "1, 1, 1, 1");
 
 			final JButton removeButton = new JButton("Remove") {  // NON-NLS
+
+
 				@Override
 				public boolean isEnabled() {
 					return super.isEnabled() && _excludeList.getSelectedIndex() > -1;
@@ -269,7 +268,7 @@ public class FilterConfiguration implements ConfigurationPage {
 
 
 			final double[][] bPanelSize = {{border, TableLayout.PREFERRED}, // Columns
-									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
+										   {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout btbl = new TableLayout(bPanelSize);
 
 			final JPanel buttonPanel = new JPanel(btbl);
@@ -287,6 +286,8 @@ public class FilterConfiguration implements ConfigurationPage {
 			buttonPanel.add(addButton, "1, 1, 1, 1");
 
 			final JButton removeButton = new JButton("Remove") {  // NON-NLS
+
+
 				@Override
 				public boolean isEnabled() {
 					return super.isEnabled() && _baselineList.getSelectedIndex() > -1;
@@ -313,7 +314,7 @@ public class FilterConfiguration implements ConfigurationPage {
 
 
 	public JList getIncludeList() {
-		if(_includeList == null) {
+		if (_includeList == null) {
 			getIncludePanel();
 		}
 		return _includeList;
@@ -321,7 +322,7 @@ public class FilterConfiguration implements ConfigurationPage {
 
 
 	public JList getExcludeList() {
-		if(_excludeList == null) {
+		if (_excludeList == null) {
 			getExcludePanel();
 		}
 		return _excludeList;
@@ -329,7 +330,7 @@ public class FilterConfiguration implements ConfigurationPage {
 
 
 	public JList getBaselineList() {
-		if(_baselineList == null) {
+		if (_baselineList == null) {
 			getBaseLinePanel();
 		}
 		return _baselineList;
@@ -350,5 +351,22 @@ public class FilterConfiguration implements ConfigurationPage {
 
 	public boolean showInModulePreferences() {
 		return true;
+	}
+
+
+	private static class MyListSelectionListener implements ListSelectionListener {
+
+		private final JButton _removeButton;
+
+
+		public MyListSelectionListener(final JButton removeButton) {
+			_removeButton = removeButton;
+		}
+
+
+		public void valueChanged(final ListSelectionEvent e) {
+			_removeButton.setEnabled(!e.getValueIsAdjusting() && e.getFirstIndex() >= 0);
+
+		}
 	}
 }

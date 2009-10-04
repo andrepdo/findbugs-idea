@@ -254,9 +254,9 @@ public class BugTreeHelper {
 
 	// todo:
 	private void _buildElementsCache(final Object node, final TreePath path, final TreeModel model) {
-		if (_tree.isRootVisible() || path.getLastPathComponent() != _tree.getModel().getRoot()) {
+		/*if (_tree.isRootVisible() || path.getLastPathComponent() != _tree.getModel().getRoot()) {
 			//_elementsCache.add(path);
-		}
+		}*/
 		for (int i = 0; i < model.getChildCount(node); i++) {
 			final Object childNode = model.getChild(node, i);
 			_buildElementsCache(childNode, path.pathByAddingChild(childNode), model);

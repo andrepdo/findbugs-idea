@@ -163,6 +163,11 @@
             <interface-class>org.twodividedbyzero.idea.findbugs.FindBugsPlugin</interface-class>
         </component>
     </module-components>
+    <project-components>
+        <component>
+            <implementation-class>org.twodividedbyzero.idea.findbugs.gui.editor.EditorHandler</implementation-class>
+        </component>
+    </project-components>
 
     <actions>
         <group id="FindBugs.EditorPopup" text="FindBugs" popup="true">

@@ -70,7 +70,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	private static final Logger LOGGER = Logger.getInstance(FindBugsInspection.class.getName());
 
 	private boolean _isListener;
-	private List<ProblemDescriptor> _problems;
+	private final List<ProblemDescriptor> _problems;
 	private PsiFile _psiFile;
 	private static final ProblemDescriptor[] EMPTY_PROBLEM_DESCRIPTOR = new ProblemDescriptor[] {};
 

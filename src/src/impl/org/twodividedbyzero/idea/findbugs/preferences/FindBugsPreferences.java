@@ -143,13 +143,21 @@ public class FindBugsPreferences extends Properties {
 		}
 
 
-		for (final String propertyName : properties.keySet()) {
+		for (final java.util.Map.Entry<String, String> entry : properties.entrySet()) {
+			final String value = entry.getValue();
+			if (value != null) {
+				setProperty(PROPERTIES_PREFIX + entry, value);
+				setModified(true);
+			}
+		}
+
+		/*for (final String propertyName : properties.keySet()) {
 			final String value = properties.get(propertyName);
 			if (value != null) {
 				setProperty(PROPERTIES_PREFIX + propertyName, value);
 				setModified(true);
 			}
-		}
+		}*/
 	}
 
 

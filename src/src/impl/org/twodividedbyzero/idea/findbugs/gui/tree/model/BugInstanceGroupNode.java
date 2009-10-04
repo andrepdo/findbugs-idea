@@ -403,7 +403,13 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 		private static final long serialVersionUID = 0l;
 
 
+		@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+				value = "BC_UNCONFIRMED_CAST",
+				justification = "")
 		public int compare(final TreeNode a, final TreeNode b) {
+			if (!(a instanceof BugInstanceNode) || !(b instanceof BugInstanceNode)) {
+				throw new IllegalArgumentException("argument not instance of BugInstanceNode.");
+			}
 			return BugInstanceComparator.getBugInstanceClassComparator().compare(((BugInstanceNode) a).getBugInstance(), ((BugInstanceNode) b).getBugInstance());
 		}
 	}

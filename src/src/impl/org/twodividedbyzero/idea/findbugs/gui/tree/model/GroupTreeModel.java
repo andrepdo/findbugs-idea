@@ -19,11 +19,9 @@ package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import edu.umd.cs.findbugs.BugInstance;
-import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.Grouper.GrouperCallback;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,10 +44,9 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	private static final Logger LOGGER = Logger.getInstance(GroupTreeModel.class.getName());
 
 	private GroupBy[] _groupBy;
-	private final Map<String, Map<Integer, List<BugInstanceGroupNode>>> _groups;
+	private final transient Map<String, Map<Integer, List<BugInstanceGroupNode>>> _groups;
 	private transient Grouper<BugInstance> _grouper;
 
-	private final FindBugsPreferences _preferences;
 	private int _bugCount;
 
 
@@ -57,7 +54,6 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 		_root = root;
 		_groupBy = groupBy.clone();
 		_groups = new ConcurrentHashMap<String, Map<Integer, List<BugInstanceGroupNode>>>();
-		_preferences = IdeaUtilImpl.getPluginComponent(project).getPreferences();
 	}
 
 
@@ -91,12 +87,12 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	}
 
 
-	public int getBugCount() {
+	public synchronized int getBugCount() {
 		return _bugCount;
 	}
 
 
-	public void addNode(final BugInstance bugInstance) {
+	public synchronized void addNode(final BugInstance bugInstance) {
 		/*if(isHiddenBugGroup(bugInstance)) {
 			return;
 		}*/

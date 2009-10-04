@@ -167,6 +167,9 @@ public class MultiSplitPane extends JPanel {
 
 	private class DefaultDividerPainter extends DividerPainter {
 
+		@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+				value = "BC_UNCONFIRMED_CAST",
+				justification = "")
 		@Override
 		public void paint(final Graphics g, final Divider divider) {
 			if ((divider == activeDivider()) && !isContinuousLayout()) {

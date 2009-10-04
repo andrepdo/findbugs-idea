@@ -18,7 +18,6 @@ package org.twodividedbyzero.idea.findbugs.gui.tree;
 
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.BugPattern;
-import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -110,11 +109,7 @@ public class BugInstanceComparator {
 		@SuppressWarnings({"MethodMayBeStatic"})
 		public String getTypeDescription(final BugInstance bugInstance) {
 			final BugPattern bugPattern = bugInstance.getBugPattern();
-			if (bugPattern == null) {
-				throw new FindBugsPluginException("Unknown bug pattern for bug type: " + bugInstance.getType()); // NON-NLS
-			} else {
-				return bugPattern.getAbbrev();
-			}
+			return bugPattern.getAbbrev();
 		}
 	}
 
@@ -141,11 +136,7 @@ public class BugInstanceComparator {
 		@SuppressWarnings({"MethodMayBeStatic"})
 		public String getCategory(final BugInstance bugInstance) {
 			final BugPattern bugPattern = bugInstance.getBugPattern();
-			if (bugPattern == null) {
-				throw new FindBugsPluginException("Unknown bug pattern for bug type: " + bugInstance.getType()); // NON-NLS
-			} else {
-				return bugPattern.getCategory();
-			}
+			return bugPattern.getCategory();
 		}
 	}
 
@@ -172,11 +163,7 @@ public class BugInstanceComparator {
 		@SuppressWarnings({"MethodMayBeStatic"})
 		public String getShortDescr(final BugInstance warning) {
 			final BugPattern bugPattern = warning.getBugPattern();
-			if (bugPattern == null) {
-				throw new FindBugsPluginException("Unknown bug pattern for bug type: " + warning.getType());
-			} else {
-				return bugPattern.getShortDescription();
-			}
+			return bugPattern.getShortDescription();
 		}
 	}
 
