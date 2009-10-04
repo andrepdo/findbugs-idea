@@ -87,7 +87,7 @@ class CustomGutterIconRenderer extends com.intellij.openapi.editor.markup.Gutter
 	}
 
 
-	public void addIssue(@NotNull final ExtendedProblemDescriptor issue, @NotNull final RangeMarker marker) {
+	public void addProblem(@NotNull final ExtendedProblemDescriptor issue, @NotNull final RangeMarker marker) {
 		_issues.put(issue, marker);
 		_fullySynchronized = ((_fullySynchronized) && (_editorHandler.isSynchronized(issue, marker)));
 	}

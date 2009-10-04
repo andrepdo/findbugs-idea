@@ -179,9 +179,10 @@
    </target>-->
 
 
-    <target name="assemble" depends="getversion, makePluginXml, compile, init, copyResources" description="Create ${component.name} jar files">
+    <target name="assemble" depends="getversion, makePluginXml, compile, init, copyResources"
+            description="Create ${component.name} jar files">
         <buildnumber/>
-        
+
         <jar destfile="${target.dir}/jar/${final.name}.jar"
              index="${jar.index}"
              keepcompression="${jar.keepcompression}"
@@ -212,7 +213,7 @@
                     <attribute name="Specification-Title" value="${component.name}"/>
                     <attribute name="Specification-Version" value="${versionString}"/>
                     <attribute name="Implementation-Title" value="org.twodividedbyzero.idea.findbugs"/>
-                    <attribute name="Implementation-Version" value="build ${DSTAMP} ${TSTAMP}"/>
+                    <attribute name="Implementation-Version" value="${versionString}"/>
                     <attribute name="Implementation-Vendor-Id" value="org.twodividedbyzero"/>
                     <attribute name="Implementation-Vendor" value="Andre Pfeiler"/>
                     <attribute name="X-Compile-Source-JDK" value="${javac.source}"/>
@@ -234,13 +235,13 @@
     <target name="assemble-all" depends="assemble-plugin, assemble-src"/>
 
     <target name="assemble-plugin" depends="assemble">
-	    <mkdir dir="${target.dir}/tmp/${final.name}"/>
+        <mkdir dir="${target.dir}/tmp/${final.name}"/>
 
         <mkdir dir="${target.dir}/tmp/${final.name}/lib"/>
         <mkdir dir="${target.dir}/tmp/${final.name}/help"/>
         <copy todir="${target.dir}/tmp/${final.name}">
-    	    <fileset dir=".">
-    		    <include name="LICENSE.txt"/>
+            <fileset dir=".">
+                <include name="LICENSE.txt"/>
                 <include name="README"/>
                 <include name="NOTICE"/>
                 <include name="LICENSE-AppleJavaExtension.txt"/>
@@ -254,17 +255,18 @@
                 <include name="LICENSE-jcip.txt"/>
                 <include name="LICENSE-jFormatString.txt"/>
                 <include name="LICENSE-jsr305.txt"/>
-    	    </fileset>
+            </fileset>
         </copy>
 
         <!--<antcall target="makePluginXml"/>-->
-        <copy file="${target.dir}/jar/${final.name}.jar" tofile="${target.dir}/tmp/${final.name}/lib/${final.name}.jar"/>
+        <copy file="${target.dir}/jar/${final.name}.jar"
+              tofile="${target.dir}/tmp/${final.name}/lib/${final.name}.jar"/>
         <copy todir="${target.dir}/tmp/${final.name}/lib">
-    	    <fileset refid="libs"/>
+            <fileset refid="libs"/>
         </copy>
-        
+
         <zip destfile="${target.dir}/zip/${final.name}.zip" basedir="${target.dir}/tmp"/>
-        
+
     </target>
 
     <target name="makePluginXml">
@@ -275,14 +277,14 @@
             </filterset>
         </copy>
     </target>
-    
-    
+
+
     <target name="copyResources">
-	<copy failonerror="true" overwrite="true" todir="${target.dir}/impl/${component.package.path}/resources">
-	    <fileset dir="${src.dir}/impl/${component.package.path}/resources">
-		    <include name="**/**.*"/>
-	    </fileset>
-	</copy>
+        <copy failonerror="true" overwrite="true" todir="${target.dir}/impl/${component.package.path}/resources">
+            <fileset dir="${src.dir}/impl/${component.package.path}/resources">
+                <include name="**/**.*"/>
+            </fileset>
+        </copy>
     </target>
 
     <target name="assemble-src" depends="init">

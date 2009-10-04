@@ -132,7 +132,7 @@ public class EditorHandler implements ProjectComponent {
 	}
 
 
-	private void installHightlighters(@NotNull final Editor editor, @NotNull final ExtendedProblemDescriptor issue, @NotNull final RangeMarker marker) {
+	private void installHightlighters(@NotNull final Editor editor, @NotNull final ExtendedProblemDescriptor problem, @NotNull final RangeMarker marker) {
 		Map<Integer, CustomGutterIconRenderer> editorRenderers = _renderers.get(editor);
 		if (editorRenderers == null) {
 			editorRenderers = new HashMap<Integer, CustomGutterIconRenderer>();
@@ -146,19 +146,19 @@ public class EditorHandler implements ProjectComponent {
 		}
 
 		final RangeHighlighter highlighter = editor.getMarkupModel().addRangeHighlighter(marker.getStartOffset(), marker.getEndOffset(), HighlighterLayer.FIRST - 1, null, HighlighterTargetArea.LINES_IN_RANGE);
-		editorHighlighters.put(issue, highlighter);
+		editorHighlighters.put(problem, highlighter);
 
 		// Gutter renderer, only one renderer for same line start
-		CustomGutterIconRenderer renderer = editorRenderers.get(issue.getLineStart());
+		CustomGutterIconRenderer renderer = editorRenderers.get(problem.getLineStart());
 		if (renderer == null) {
-			renderer = new CustomGutterIconRenderer(this, issue.getLineStart());
-			editorRenderers.put(issue.getLineStart(), renderer);
+			renderer = new CustomGutterIconRenderer(this, problem.getLineStart());
+			editorRenderers.put(problem.getLineStart(), renderer);
 
 			// Only set gutter icon for first highligther with same line start
 			highlighter.setGutterIconRenderer(renderer);
 		}
 
-		renderer.addIssue(issue, highlighter);
+		renderer.addProblem(problem, highlighter);
 	}
 
 
