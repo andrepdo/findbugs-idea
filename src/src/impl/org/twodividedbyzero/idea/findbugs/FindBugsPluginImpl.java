@@ -421,7 +421,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 		if (!state.isEmpty()) {
 			_preferences = getEmptyPreferences(state.getPlugins());
-			_preferences.clear();
+			//_preferences.clear();
 			_preferences.setPlugins(state.getPlugins()); // needs to be set first before DetectorFactoryCollection instance is created first
 			for (final String key : state.getBasePreferences().keySet()) {
 				_preferences.setProperty(key, state.getBasePreferences().get(key));
@@ -448,7 +448,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 			}
 			if (_preferences.getDetectors().isEmpty()) {
 				LOGGER.debug("empty detectors loading defaults.");
-				_preferences.setDetectors(FindBugsPreferences.getDefaultDetectors(_preferences.getUserPreferences()));
+				_preferences.setDetectors(FindBugsPreferences.getAvailableDetectors(_preferences.getUserPreferences()));
 			}
 		} else {
 			_preferences.clear();

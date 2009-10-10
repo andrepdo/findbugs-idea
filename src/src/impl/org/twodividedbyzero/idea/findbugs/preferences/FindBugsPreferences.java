@@ -249,20 +249,32 @@ public class FindBugsPreferences extends Properties {
 	public void setDetectors(final Map<String, String> detectors) {
 		//noinspection AssignmentToCollectionOrArrayFieldFromParameter
 		_detectors = detectors;
-		syncDetectors();
+		applyDetectors();
 	}
 
 
-	private void syncDetectors() {
-		for (final Map.Entry<String, String> entry : getDetectors().entrySet()) {
-			final DetectorFactoryCollection detectorFactoryCollection = FindBugsPreferences.getDetectorFactorCollection();
+	private void applyDetectors() {
+		final DetectorFactoryCollection detectorFactoryCollection = FindBugsPreferences.getDetectorFactorCollection();
+
+		final Iterator<DetectorFactory> iterator = detectorFactoryCollection.factoryIterator();
+		while (iterator.hasNext()) {
+			final DetectorFactory factory = iterator.next();
+
+			if (getDetectors().containsKey(factory.getShortName())) {
+				final String value = getDetectors().get(factory.getShortName());
+				getUserPreferences().enableDetector(factory, Boolean.valueOf(value));
+			} else {
+				//getUserPreferences().enableDetector(factory, true); // newly, first time loaded plugin detectors
+			}
+		}
+		_detectors = getAvailableDetectors(getUserPreferences());
+		setModified(true);
+		/*for (final Map.Entry<String, String> entry : getDetectors().entrySet()) {
 			final DetectorFactory factory = detectorFactoryCollection.getFactory(entry.getKey());
 			if (factory != null) {
 				getUserPreferences().enableDetector(factory, Boolean.valueOf(entry.getValue()));
-				//DetectorFactoryCollection.rawInstance().setPluginList(new URL[0])
-				//detectorFactoryCollection.setPluginList();
 			}
-		}
+		}*/
 	}
 
 
@@ -272,7 +284,7 @@ public class FindBugsPreferences extends Properties {
 			for (int i = 0; i < pluginList.size(); i++) {
 				final String s = pluginList.get(i);
 				try {
-					result[i] = new File(s).toURI().toURL();  // NON-NLS
+					result[i] = new File(s).toURI().toURL();
 				} catch (MalformedURLException e) {
 					throw new FindBugsPluginException("plugin '" + s + "' can not be injected.", e);
 				}
@@ -537,7 +549,7 @@ public class FindBugsPreferences extends Properties {
 		final FindBugsPreferences preferences = createEmpty(Collections.<String>emptyList());
 		final UserPreferences userPrefs = preferences.getUserPreferences();
 
-		final Map<String, String> detectorsAvailableList = getDefaultDetectors(userPrefs);
+		final Map<String, String> detectorsAvailableList = getAvailableDetectors(userPrefs);
 		preferences.setDetectors(detectorsAvailableList);
 
 		return preferences;
@@ -554,7 +566,7 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public static Map<String, String> getDefaultDetectors(final UserPreferences userPrefs) {
+	public static Map<String, String> getAvailableDetectors(final UserPreferences userPrefs) {
 		final Map<String, String> detectorsAvailableList = new HashMap<String, String>();
 		//final Map<DetectorFactory, String> factoriesToBugAbbrev = new HashMap<DetectorFactory, String>();
 		final Iterator<DetectorFactory> iterator = FindBugsPreferences.getDetectorFactorCollection().factoryIterator();
