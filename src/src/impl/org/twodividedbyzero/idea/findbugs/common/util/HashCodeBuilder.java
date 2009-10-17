@@ -107,7 +107,7 @@ public class HashCodeBuilder {
 			} else if (obj instanceof double[]) {
 				return Arrays.hashCode((double[]) obj);
 			} else {
-				throw new IllegalArgumentException("couldn't find hascode for" + obj.getClass().getComponentType().getSimpleName() + "[]");
+				throw new IllegalArgumentException("couldn't find hashcode for" + obj.getClass().getComponentType().getSimpleName() + "[]");
 			}
 		} else {
 			return obj.hashCode();
