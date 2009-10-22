@@ -5,6 +5,11 @@
         <![CDATA[
 		FindBugs for IntelliJ IDEA<br/>
 		Provides static byte code analysis to look for bugs in Java code from within IntelliJ IDEA.
+		FindBugs is a defect detection tool for Java that uses static analysis to look for more than 200 bug patterns,
+		such as null pointer dereferences, infinite recursive loops, bad uses of the Java libraries and deadlocks.
+		FindBugs can identify hundreds of serious defects in large applications (typically about 1 defect per 1000-2000
+		lines of non-commenting source statements). FindBugs is open source, and has been downloaded more than 230,000 times,
+		and is used by many major companies and financial institutions.
 		FindBugs-IDEA uses FindBugs&trade; under the hood. for more information
 		see <a href="http://findbugs.sourceforge.net/">http://findbugs.sourceforge.net/</a>.
 		<p>
