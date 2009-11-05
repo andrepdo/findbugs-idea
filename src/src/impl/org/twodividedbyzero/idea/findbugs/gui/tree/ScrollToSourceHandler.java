@@ -28,7 +28,7 @@ import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.BugTreePanel;
  */
 public class ScrollToSourceHandler extends com.intellij.ui.AutoScrollToSourceHandler {
 
-	private BugTreePanel _panel;
+	private final BugTreePanel _panel;
 
 
 	public ScrollToSourceHandler(final BugTreePanel panel) {

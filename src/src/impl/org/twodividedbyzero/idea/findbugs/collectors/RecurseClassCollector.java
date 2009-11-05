@@ -54,6 +54,7 @@ public class RecurseClassCollector {
 	private Set<String> _classes; // TODO: collect all classes url's and addFile later
 	private static final String CLASS_FILE_SUFFIX = ".class";
 	private boolean _collectAndAdd;
+	private static final String ANONYMOUSE_CLASS_DELIMITER = "$";
 
 
 	public RecurseClassCollector(final FindBugsProject findBugsProject, final Project project) {
@@ -160,7 +161,7 @@ public class RecurseClassCollector {
 
 		for (final PsiClass innerPsiClass : psiClasses) {			//final String fqn = buildOutputFilePath(_compileOutputDir.getPresentableUrl(), innerPsiClass);
 			final String innerClassName = innerPsiClass.getName();
-			final String fqp = fullQualifiedPath + '$' + innerClassName;
+			final String fqp = fullQualifiedPath + ANONYMOUSE_CLASS_DELIMITER + innerClassName;
 
 
 			assert innerClassName != null;
@@ -200,7 +201,7 @@ public class RecurseClassCollector {
 			final String className = psiClass.getName();
 
 			if (!"null".equals(className)) { // NON-NLS
-				final String fqp = fullQualifiedPath + '$' + anonymousClassPrefix + className;
+				final String fqp = fullQualifiedPath + ANONYMOUSE_CLASS_DELIMITER + anonymousClassPrefix + className;
 
 				if (findClass != null && String.valueOf(anonymousClassPrefix).equals(findClass)) {
 					if (isCollectAndAdd()) {
@@ -239,7 +240,7 @@ public class RecurseClassCollector {
 		for (int i = 0; i < classes.length; i++) {
 
 			final int anonymousClassPrefix = i + 1;
-			final String fqp = fullQualifiedPath + '$' + anonymousClassPrefix;
+			final String fqp = fullQualifiedPath + ANONYMOUSE_CLASS_DELIMITER + anonymousClassPrefix;
 
 			if (findClass != null && String.valueOf(anonymousClassPrefix).equals(findClass)) {
 				if (isCollectAndAdd()) {
