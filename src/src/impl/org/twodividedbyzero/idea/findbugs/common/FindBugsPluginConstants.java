@@ -44,6 +44,8 @@ public class FindBugsPluginConstants {
 
 	public static final String ACTION_GROUP_NAVIGATION = "FindBugs.ToolBarActions.navigation";
 
+	public static final String ACTION_GROUP_GUTTER = "FindBugs.GutterPopup.group";
+
 	public static final String CURRENT_FILE_ACTION = "FindBugs.CurrentFileAction";
 
 	public static final String CLOSE_ACTION = "FindBugs.CloseAction";

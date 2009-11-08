@@ -25,7 +25,6 @@ import com.intellij.openapi.wm.ToolWindow;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.ProjectStats;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
 import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
@@ -38,6 +37,7 @@ import org.twodividedbyzero.idea.findbugs.common.ui.MultiSplitPane;
 import org.twodividedbyzero.idea.findbugs.common.ui.NDockLayout;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 
 import javax.swing.JPanel;
@@ -99,9 +99,9 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 		final ActionGroup actionGroupNavigation = (ActionGroup) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTION_GROUP_NAVIGATION);
 		_toolbarNavigation = ActionManager.getInstance().createActionToolbar(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId(), actionGroupNavigation, false);
 
-		final ActionToolbarContainer toolbarLeft = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Analysis...", SwingConstants.VERTICAL, _toolbarLeft, true); // NON-NLS
-		final ActionToolbarContainer toolbarRight = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Grouping...", SwingConstants.VERTICAL, _toolbarRight, true); // NON-NLS
-		final ActionToolbarContainer toolbarNavigation = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Navigation...", SwingConstants.VERTICAL, _toolbarNavigation, true); // NON-NLS
+		final Component toolbarLeft = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Analysis...", SwingConstants.VERTICAL, _toolbarLeft, true); // NON-NLS
+		final Component toolbarRight = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Grouping...", SwingConstants.VERTICAL, _toolbarRight, true); // NON-NLS
+		final Component toolbarNavigation = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Navigation...", SwingConstants.VERTICAL, _toolbarNavigation, true); // NON-NLS
 
 
 		add(toolbarLeft, NDockLayout.WEST);
@@ -140,6 +140,11 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 		if (findBugsPlugin == null) {
 			throw new IllegalStateException("Couldn't get " + FindBugsPluginConstants.TOOL_WINDOW_ID + " plugin");
 		}
+	}
+
+
+	public BugCollection getBugCollection() {
+		return _bugTreePanel.getBugCollection();
 	}
 
 

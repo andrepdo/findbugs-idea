@@ -27,10 +27,10 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import org.jetbrains.annotations.NonNls;
-import org.twodividedbyzero.idea.findbugs.FindBugsPlugin;
-import org.twodividedbyzero.idea.findbugs.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 
 import java.util.Collections;
 import java.util.HashSet;

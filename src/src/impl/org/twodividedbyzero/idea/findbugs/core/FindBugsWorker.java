@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.twodividedbyzero.idea.findbugs;
+package org.twodividedbyzero.idea.findbugs.core;
 
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.openapi.compiler.CompileContext;
@@ -87,11 +87,12 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 
 
 	public FindBugsWorker(final com.intellij.openapi.project.Project project, final Module module) {
-		_startInBackground = false;
+		final FindBugsPreferences preferences = IdeaUtilImpl.getPluginComponent(project).getPreferences();
+		_startInBackground = preferences.getBooleanProperty(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND, false);
 		_project = project;
 		_module = module;
 
-		configure(project);
+		configure();
 	}
 
 
@@ -99,28 +100,26 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 		_startInBackground = startInBackground;
 		_project = project;
 
-		configure(project);
+		configure();
 	}
 
 
 	/**
 	 * Configure findbugs project settings.
-	 * Note: detecors are configured in FindBugsPreferences
+	 * Note: detectors are configured in FindBugsPreferences
 	 *
-	 * @param project
-	 * @see org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences#syncDetectors()
+	 * @see org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences#applyDetectors()
 	 */
-	private void configure(final Project project) {
+	private void configure() {
 
-		FindBugsPreferences preferences = IdeaUtilImpl.getPluginComponent(project).getPreferences();
+		FindBugsPreferences preferences = IdeaUtilImpl.getPluginComponent(_project).getPreferences();
 		if (_module != null && preferences.isModuleConfigEnabled(_module)) {
 			preferences = IdeaUtilImpl.getModuleComponent(_module).getPreferences();
 		}
 
-		_startInBackground = preferences.getBooleanProperty(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND, false);
+		//_startInBackground = preferences.getBooleanProperty(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND, false);
 
 		_userPrefs = preferences.getUserPreferences();//UserPreferences.createDefaultUserPreferences();
-		//_userPrefs.enableAllDetectors(true);
 		_userPrefs.setEffort(preferences.getProperty(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL, AnalysisEffort.DEFAULT.getEffortLevel()));
 
 		final ProjectFilterSettings projectFilterSettings = _userPrefs.getFilterSettings();
@@ -132,12 +131,12 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 		_userPrefs.setIncludeFilterFiles(preferences.getIncludeFilters());
 		_userPrefs.setExcludeBugsFiles(preferences.getExcludeBaselineBugs());
 		_userPrefs.setExcludeFilterFiles(preferences.getExcludeFilters());
+		//_userPrefs.setUserDetectorThreshold(preferences.getProperty(FindBugsPreferences.MIN_PRIORITY_TO_REPORT)); // todo: needed?
 
-		//configurePlugins(preferences);
-		// DetectorFactoryCollection.rawInstance().setPluginList(new URL[0])
 		_findBugsProject = new FindBugsProject();
 		_findBugsProject.setProjectName(_project.getName());
 
+		//CompilerManager.getInstance(_project).addCompilationStatusListener(this);
 
 		//initCollectorTask(_findBugsProject);
 	}
@@ -239,11 +238,12 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 
 
 	protected IFindBugsEngine2 createFindBugsEngine() {
-		//TODO: FindBugs.setHome(FindBugsPlugin.getFindBugsEnginePluginLocation());
-
 		// Create BugReporter
 		_bugReporter = new BugReporter(_project);
+
+		//final ProjectFilterSettings projectFilterSettings = _userPrefs.getFilterSettings();
 		_bugReporter.setPriorityThreshold(_userPrefs.getUserDetectorThreshold());
+		//_bugReporter.setPriorityThreshold(projectFilterSettings.getMinPriorityAsInt());
 
 		// Create IFindBugsEngine
 		final IFindBugsEngine2 engine = new FindBugs2();
@@ -251,28 +251,12 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 		engine.setBugReporter(_bugReporter);
 		engine.setProject(_findBugsProject);
 		engine.setProgressCallback(_bugReporter);
-
-//engine.addFilter();
-//engine.excludeBaselineBugs();
-		//_userPrefs.setProjectFilterSettings();
-		//_userPrefs.setExcludeBugsFiles();
-		//_userPrefs.setExcludeFilterFiles();
+		//engine.setScanNestedArchives(true); // todo: prefrences Bean
+		//engine.setRelaxedReportingMode(true); // todo: prefrences Bean
+		//engine.setRankThreshold(99);
 
 		// add plugins to detector collection
 		final DetectorFactoryCollection factoryCollection = FindBugsPreferences.getDetectorFactorCollection();
-
-
-		/*for (Iterator<DetectorFactory> i = factoryCollection.factoryIterator(); i.hasNext();) {
-			final DetectorFactory factory = i.next();
-			_userPrefs.enableDetector(factory, true);
-			//detectorEnablementMap.put(, enable);
-		}*/
-
-		//Plugin fakePlugin = new Plugin("edu.umd.cs.findbugs.fakeplugin", null);
-		//fakePlugin.setEnabled(true);
-		//dfc.setPlugins(new Plugin[]{fakePlugin});
-		//dfc.setPluginList(FindBugsPluginLoader.determinePlugins(new String[] {""}));
-		//DetectorFactoryCollection.rawInstance().setPluginList(new URL[0])
 		engine.setDetectorFactoryCollection(factoryCollection);
 
 		// configure detectors.

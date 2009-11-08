@@ -27,14 +27,15 @@ import edu.umd.cs.findbugs.FindBugsProgress;
 import edu.umd.cs.findbugs.ProjectStats;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import edu.umd.cs.findbugs.classfile.ClassDescriptor;
-import edu.umd.cs.findbugs.config.UserPreferences;
 import org.jetbrains.annotations.NonNls;
-import org.twodividedbyzero.idea.findbugs.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
+import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent.Operation;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventImpl;
+import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEventImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.tasks.FindBugsTask;
 
@@ -67,18 +68,14 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 	/** Persistent store of reported warnings. */
 	private final SortedBugCollection _bugCollection;
 
-	/** Current user preferences for the project. */
-	private UserPreferences _userPrefs;
-
 	private int _pass = -1;
-
 	private int _filteredBugCount = 0;
 	private FindBugsTask _findBugsTask;
 	private int _count;
 	private int _goal;
 	@NonNls
 	private String _currentStageName;
-	private static final String ANALYZING_CLASSES_i18N = "Analyzing classes: ";
+	private static final String ANALYZING_CLASSES_i18N = "Analyzing classes: ";  // NON-NLS
 	private boolean _isInspectionRun;
 	private boolean _isRunning;
 	private FindBugsPreferences _preferences;
@@ -101,12 +98,6 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 		_preferences = IdeaUtilImpl.getPluginComponent(project).getPreferences();
 		_isInspectionRun = isInspectionRun;
 		_bugCollection = new SortedBugCollection();
-		/*try {
-			this.userPrefs = FindbugsPlugin.getUserPreferences(project.getProject());
-		} catch (CoreException e) {
-			FindbugsPlugin.getDefault().logException(e, "Error getting FindBugs preferences for project");
-			this.userPrefs = UserPreferences.createDefaultUserPreferences();
-		}*/
 	}
 
 
@@ -125,12 +116,12 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 			return;
 		}
 		_filteredBugCount++;
-		//_findBugsTask.setIndicatorText2("Bug Count: " + _filteredBugCount);
+		observeClass(bug.getPrimaryClass().getClassDescriptor());
 
 		if (_isInspectionRun) {
-			EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent.Operation.NEW_BUG_INSTANCE, bug, _filteredBugCount, getProjectStats(), _project.getName()));
+			EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(BugReporterInspectionEvent.Operation.NEW_BUG_INSTANCE, bug, _filteredBugCount, getProjectStats(), _project.getName()));
 		} else {
-			EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.NEW_BUG_INSTANCE, bug, _filteredBugCount, getProjectStats(), _project.getName()));
+			EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(BugReporterEvent.Operation.NEW_BUG_INSTANCE, bug, _filteredBugCount, getProjectStats(), _project.getName()));
 		}
 	}
 

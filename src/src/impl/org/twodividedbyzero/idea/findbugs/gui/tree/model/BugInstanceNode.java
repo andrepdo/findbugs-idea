@@ -22,6 +22,8 @@ import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.SourceLineAnnotation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.tree.NodeVisitor;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.MaskIcon;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
@@ -134,7 +136,11 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	}
 
 
+	@Nullable
 	public PsiFile getPsiFile() {
+		if(_file == null) {
+			_file = BugInstanceUtil.getPsiElement(IdeaUtilImpl.getProject(), this);
+		}
 		return _file;
 	}
 

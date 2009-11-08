@@ -2,8 +2,8 @@ package org.twodividedbyzero.idea.findbugs.collectors;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileTypes.FileType;
-import org.twodividedbyzero.idea.findbugs.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 
 import java.io.File;
 import java.io.FileFilter;

@@ -17,14 +17,16 @@
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
 import com.intellij.openapi.module.Module;
-import org.twodividedbyzero.idea.findbugs.FindBugsPlugin;
-import org.twodividedbyzero.idea.findbugs.ModuleComponentImpl;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.ModuleComponentImpl;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -72,9 +74,9 @@ public class ModuleConfigurationPanel extends JPanel {
 	}
 
 
-	private JCheckBox getEnableCheckbox() {
+	private AbstractButton getEnableCheckbox() {
 		if (_checkBox == null) {
-			_checkBox = new JCheckBox("Override FindBugs-IDEA project settings");
+			_checkBox = new JCheckBox("Override FindBugs-IDEA project settings");  // NON-NLS
 			_checkBox.setFocusable(false);
 			_checkBox.addItemListener(new ItemListener() {
 				public void itemStateChanged(final ItemEvent e) {
@@ -93,7 +95,7 @@ public class ModuleConfigurationPanel extends JPanel {
 	}
 
 
-	private ConfigurationPanel getConfigPanel() {
+	private Component getConfigPanel() {
 		if (_configPanel == null) {
 			_configPanel = new ConfigurationPanel(_plugin);
 			updatePreferences();

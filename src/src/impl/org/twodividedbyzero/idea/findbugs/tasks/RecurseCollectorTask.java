@@ -23,7 +23,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.FindBugsProject;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 
 
 /**

@@ -24,7 +24,7 @@ import edu.umd.cs.findbugs.FindBugs2;
 import edu.umd.cs.findbugs.IFindBugsEngine2;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.FindBugsPluginImpl;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 
 import java.io.IOException;
 

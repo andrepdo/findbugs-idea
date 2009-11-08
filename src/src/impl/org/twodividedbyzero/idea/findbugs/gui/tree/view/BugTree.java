@@ -29,6 +29,7 @@ import com.intellij.ui.PopupHandler;
 import com.intellij.util.EditSourceOnDoubleClickHandler;
 import com.intellij.util.OpenSourceUtil;
 import com.intellij.util.ui.UIUtil;
+import edu.umd.cs.findbugs.BugInstance;
 import org.jetbrains.annotations.NonNls;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.BugTreePanel;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugTreeHelper;
@@ -221,6 +222,16 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 	}
 
 
+	public void gotoNode(final BugInstanceNode node) {
+		gotoNode(node.getBugInstance());
+	}
+
+
+	public void gotoNode(final BugInstance bugInstance) {
+		_treeHelper.gotoNode(bugInstance);
+	}
+
+
 	public Project getProject() {
 		return _project;
 	}
@@ -294,6 +305,7 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 				_bugTreePanel.scrollToSource(path);
 			}
 		}
-
 	}
+
+	
 }

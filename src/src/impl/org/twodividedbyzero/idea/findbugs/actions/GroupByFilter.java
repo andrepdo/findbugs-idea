@@ -30,12 +30,12 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.wm.ToolWindow;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 
 import java.awt.Component;
 import java.awt.event.InputEvent;

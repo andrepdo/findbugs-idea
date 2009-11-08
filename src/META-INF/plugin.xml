@@ -35,7 +35,7 @@
             <li>configurable detectors</li>
             <li>bug categories to report</li>
             <li>file filter (include, exclude, exclude baseline bugs)</li>
-            <li>load additional detector plugins like fs-contrib.jar</li>
+            <li>load additional detector plugins like fb-contrib.jar</li>
             <li>group results by: bug category, classname, package, priority, bug rank</li>
             <li>intellij local history support</li>
             <li>run Findbugs anaysis as IntelliJ inspection (experimental)</li>
@@ -57,6 +57,11 @@
     </description>
     <change-notes>
         <![CDATA[<html>
+        <h3>0.9.92</h3>
+		<ul>
+			<li>initialize default properties on run if empty</li>
+            <li>preferences: analyze affected files after compile</li>
+		</ul>
 		<h3>0.9.91</h3>
 		<ul>
 			<li>maybe fix init default properties on first init</li>
@@ -147,13 +152,19 @@
     <!-- until-build="10762" min="8.0"-->
     <!--<helpset file="your-help.jar" path="path-to-helpset.hs"/>-->
     <resource-bundle>org.twodividedbyzero.idea.findbugs.resources.i18n.Messages</resource-bundle>
-    <!--<extensions defaultExtensionNs="com.intellij">
-        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.FindBugsLineMarkerProvider"/>
-    </extensions>-->
+    <extensions defaultExtensionNs="com.intellij">
+        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugsLineMarkerProvider"/>
+    </extensions>
     <project-components>
         <component>
-            <implementation-class>org.twodividedbyzero.idea.findbugs.FindBugsPluginImpl</implementation-class>
-            <interface-class>org.twodividedbyzero.idea.findbugs.FindBugsPlugin</interface-class>
+            <implementation-class>org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl</implementation-class>
+            <interface-class>org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin</interface-class>
+        </component>
+        <!--<component>
+            <implementation-class>org.twodividedbyzero.idea.findbugs.gui.editor.EditorHandler</implementation-class>
+        </component>-->
+        <component>
+            <implementation-class>org.twodividedbyzero.idea.findbugs.core.FindBugsCompileAfterHook</implementation-class>
         </component>
     </project-components>
     <application-components>
@@ -164,15 +175,10 @@
     </application-components>
     <module-components>
         <component>
-            <implementation-class>org.twodividedbyzero.idea.findbugs.ModuleComponentImpl</implementation-class>
-            <interface-class>org.twodividedbyzero.idea.findbugs.FindBugsPlugin</interface-class>
+            <implementation-class>org.twodividedbyzero.idea.findbugs.core.ModuleComponentImpl</implementation-class>
+            <interface-class>org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin</interface-class>
         </component>
     </module-components>
-    <project-components>
-        <component>
-            <implementation-class>org.twodividedbyzero.idea.findbugs.gui.editor.EditorHandler</implementation-class>
-        </component>
-    </project-components>
 
     <actions>
         <group id="FindBugs.EditorPopup" text="FindBugs" popup="true">
@@ -414,6 +420,15 @@
                     icon="/general/ideOptions.png"/>
 
 
+        </group>
+
+
+        <group id="FindBugs.GutterPopup.group" text="FindBugsSubGroup" popup="true">
+            <action id="FindBugs.GutterPoup"
+                    class="org.twodividedbyzero.idea.findbugs.actions.ShowPreferencesPage"
+                    text="Plugin Preferences"
+                    description="FindBugs plugin preferences page."
+                    icon="/general/ideOptions.png"/>    
         </group>
 
     </actions>

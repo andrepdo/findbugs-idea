@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * $Date$
  *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
+ * @author Andre Pfeiler<andrepdo@dev.java.net>
  * @version $Revision$
  * @since 0.0.1
  */
@@ -67,32 +67,6 @@ public class Grouper<T> {
 	public Grouper(final GrouperCallback<T> callback) {
 		_callback = callback;
 	}
-
-
-	/**
-	 * Group elements of given collection according to given
-	 * compartor's test for equality.  The groups are specified by
-	 * calls to the Grouper's callback object.
-	 *
-	 * @param collection the natural SORTED collection
-	 * @param comparator the comparator
-	 */
-	/*public void group(final Collection<T> collection, final Comparator<T> comparator) {
-		final Iterator<T> i = collection.iterator();
-		T last = null;
-		while (i.hasNext()) {
-			final T current = i.next();
-			if (last != null && comparator.compare(last, current) == 0) {
-				// Same group as before
-				//_callback.addToGroup(current);
-			} else {
-				// Start of a new group
-				//_callback.startGroup(current);
-			}
-
-			last = current;
-		}
-	}*/
 
 
 	/**

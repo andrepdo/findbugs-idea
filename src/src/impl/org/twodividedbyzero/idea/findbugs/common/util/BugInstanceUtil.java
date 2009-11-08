@@ -15,12 +15,24 @@
  */
 package org.twodividedbyzero.idea.findbugs.common.util;
 
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiFile;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.ClassAnnotation;
 import edu.umd.cs.findbugs.FieldAnnotation;
 import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.MethodAnnotation;
 import edu.umd.cs.findbugs.SourceLineAnnotation;
+import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
+import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
+
+import java.awt.EventQueue;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -31,6 +43,9 @@ import edu.umd.cs.findbugs.SourceLineAnnotation;
  * @since 0.9.84-dev
  */
 public class BugInstanceUtil {
+
+	private static final Logger LOGGER = Logger.getInstance(BugInstanceUtil.class.getName());
+
 
 	private BugInstanceUtil() {
 		throw new UnsupportedOperationException();
@@ -141,5 +156,58 @@ public class BugInstanceUtil {
 
 	public static String getBugType(final BugInstance bugInstance) {
 		return bugInstance.getBugPattern().getType();
+	}
+
+
+	@Nullable
+	public static PsiFile getPsiElement(final Project project, final BugInstanceNode node) {
+		final PsiClass[] psiClass = new PsiClass[1];
+		if (!EventQueue.isDispatchThread()) {
+			try {
+				EventQueue.invokeAndWait(new Runnable() {
+					public void run() {
+						psiClass[0] = IdeaUtilImpl.findJavaPsiClass(project, node.getSourcePath());
+					}
+				});
+			} catch (final InterruptedException e) {
+				LOGGER.error(e);
+			} catch (final InvocationTargetException e) {
+				LOGGER.error(e);
+			}
+		} else {
+			psiClass[0] = IdeaUtilImpl.findJavaPsiClass(project, node.getSourcePath());
+		}
+
+		return IdeaUtilImpl.getPsiFile(psiClass[0]);
+	}
+
+
+	public static List<String> getBugInstanceGroupPath(final BugInstance bugInstance, final GroupBy[] groupBy) {
+		final List<String> result = new ArrayList<String>();
+		for (final GroupBy group : groupBy) {
+			result.add(GroupBy.getGroupName(group, bugInstance));
+		}
+
+		//Collections.reverse(result);
+		return result;
+	}
+
+
+	public static String[] getGroupPath(final BugInstance bugInstance, final int depth, final GroupBy[] groupBy) {
+		final List<String> path = getBugInstanceGroupPath(bugInstance, groupBy);
+		final String[] result = new String[depth];
+
+		for (int i = 0; i < depth; i++) {
+			final String str = path.get(i);
+			result[i] = str;
+		}
+
+		return result;
+	}
+
+
+	public static String[] getFullGroupPath(final BugInstance bugInstance, final GroupBy[] groupBy) {
+		final List<String> path = getBugInstanceGroupPath(bugInstance, groupBy);
+		return getGroupPath(bugInstance, path.size(), groupBy);
 	}
 }

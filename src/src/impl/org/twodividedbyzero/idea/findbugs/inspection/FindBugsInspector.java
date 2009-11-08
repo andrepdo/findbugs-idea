@@ -21,7 +21,7 @@ import com.intellij.openapi.compiler.CompileTask;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import edu.umd.cs.findbugs.FindBugs2;
 import edu.umd.cs.findbugs.IFindBugsEngine2;
-import org.twodividedbyzero.idea.findbugs.FindBugsWorker;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsWorker;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.report.BugReporter;
 import org.twodividedbyzero.idea.findbugs.tasks.FindBugsTask;
@@ -51,7 +51,7 @@ public class FindBugsInspector extends FindBugsWorker implements CompileTask {
 
 
 	/**
-	 * If using {@link org.twodividedbyzero.idea.findbugs.FindBugsWorker#compile(com.intellij.openapi.vfs.VirtualFile, com.intellij.openapi.project.Project, com.intellij.openapi.compiler.CompileTask)}
+	 * If using {@link org.twodividedbyzero.idea.findbugs.core.FindBugsWorker#compile(com.intellij.openapi.vfs.VirtualFile, com.intellij.openapi.project.Project, com.intellij.openapi.compiler.CompileTask)}
 	 * there's no need to call {@link #work()} before or after. {@link #work()} will be invoked as compile after task {@link #execute(com.intellij.openapi.compiler.CompileContext)}.
 	 *
 	 * @return true on success otherwise false

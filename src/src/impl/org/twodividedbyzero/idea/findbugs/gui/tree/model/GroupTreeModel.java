@@ -18,16 +18,21 @@ package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiFile;
 import edu.umd.cs.findbugs.BugInstance;
+import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
+import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.Grouper.GrouperCallback;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -48,6 +53,12 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	private transient Grouper<BugInstance> _grouper;
 
 	private int _bugCount;
+
+	private static final Map<PsiFile, List<ExtendedProblemDescriptor>> PROBLEM_CACHE;
+
+	static {
+		PROBLEM_CACHE = new ConcurrentHashMap<PsiFile, List<ExtendedProblemDescriptor>>();
+	}
 
 
 	public GroupTreeModel(final VisitableTreeNode root, final GroupBy[] groupBy, final Project project) {
@@ -87,6 +98,27 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	}
 
 
+	public static Map<PsiFile, List<ExtendedProblemDescriptor>> getProblemCache() {
+		return PROBLEM_CACHE;
+	}
+
+
+	@SuppressWarnings({"MethodMayBeStatic"})
+	private void addProblem(final BugInstanceNode leaf) {
+		final PsiFile psiFile = leaf.getPsiFile();
+		if (psiFile != null) {
+			final ExtendedProblemDescriptor element = new ExtendedProblemDescriptor(psiFile, leaf.getBugInstance());
+			if(PROBLEM_CACHE.containsKey(psiFile)) {
+				PROBLEM_CACHE.get(psiFile).add(element);
+			} else {
+				final List<ExtendedProblemDescriptor> list = new ArrayList<ExtendedProblemDescriptor>();
+				list.add(element);
+				PROBLEM_CACHE.put(psiFile, list);
+			}
+		}
+	}
+
+
 	public synchronized int getBugCount() {
 		return _bugCount;
 	}
@@ -116,8 +148,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 		final String groupName = GroupBy.getGroupName(groupBy, member);
 		groupNode = new BugInstanceGroupNode(groupBy, groupName, _root, member, depth);
 
-		//addGroupIfAbsent(groupName, depth, groupNode);
-		addGroupIfAbsent(Arrays.toString(getGroupPath(member, depth)), depth, groupNode);
+		addGroupIfAbsent(Arrays.toString(BugInstanceUtil.getGroupPath(member, depth, _groupBy)), depth, groupNode);
 
 		((RootNode) _root).addChild(groupNode);
 		nodeStructureChanged(_root);
@@ -140,7 +171,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 			groupName = GroupBy.getGroupName(groupBy, member);
 			final BugInstanceGroupNode childGroup = new BugInstanceGroupNode(groupBy, groupName, parentGroup, member, depth);
 
-			addGroupIfAbsent(Arrays.toString(getGroupPath(parent, depth)), depth, childGroup);
+			addGroupIfAbsent(Arrays.toString(BugInstanceUtil.getGroupPath(parent, depth, _groupBy)), depth, childGroup);
 			//addGroupIfAbsent(GroupBy.getGroupName(_groupBy[0], parent), depth, childGroup);
 
 			parentGroup.addChild(childGroup);
@@ -164,10 +195,10 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 		final String groupName = GroupBy.getGroupName(_groupBy[depth], member);
 		final BugInstanceGroupNode parentGroup = ((RootNode) _root).findChildNode(parent, depth, groupName);
 
-
 		if (parentGroup != null) {
 			final BugInstanceNode childNode = new BugInstanceNode(member, parentGroup);
 			parentGroup.addChild(childNode);
+			addProblem(childNode);
 			nodeStructureChanged(parentGroup);
 		} else {
 			//noinspection ThrowableInstanceNeverThrown
@@ -176,34 +207,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	}
 
 
-	public List<String> getBugInstanceGroupPath(final BugInstance bugInstance) {
-		final List<String> result = new ArrayList<String>();
-		for (final GroupBy groupBy : _groupBy) {
-			result.add(GroupBy.getGroupName(groupBy, bugInstance));
-		}
 
-		//Collections.reverse(result);
-		return result;
-	}
-
-
-	public String[] getGroupPath(final BugInstance bugInstance, final int depth) {
-		final List<String> path = getBugInstanceGroupPath(bugInstance);
-		final String[] result = new String[depth];
-
-		for (int i = 0; i < depth; i++) {
-			final String str = path.get(i);
-			result[i] = str;
-		}
-
-		return result;
-	}
-
-
-	public String[] getGroupPath(final BugInstance bugInstance) {
-		final List<String> path = getBugInstanceGroupPath(bugInstance);
-		return getGroupPath(bugInstance, path.size());
-	}
 
 
 	public Comparator<BugInstance> currentGroupComparatorChain(final int depth) {
@@ -216,7 +220,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 
 		//final GroupBy groupBy = _groupBy[0];
 		//final String groupName = GroupBy.getGroupName(groupBy, bugInstance);
-		final String groupName = Arrays.toString(getGroupPath(bugInstance, depth));
+		final String groupName = Arrays.toString(BugInstanceUtil.getGroupPath(bugInstance, depth, _groupBy));
 
 		if (_groups.containsKey(groupName)) {
 			final Map<Integer, List<BugInstanceGroupNode>> map = _groups.get(groupName);
@@ -248,9 +252,35 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 		//_sortedCollection.clear();
 		_bugCount = 0;
 		_groups.clear();
+		PROBLEM_CACHE.clear();
 		((RootNode) _root).removeAllChilds();
 		nodeStructureChanged(_root);
 		reload();
+	}
+
+
+	@Nullable
+	public synchronized BugInstanceNode findNodeByBugInstance(final BugInstance bugInstance) {
+		final String[] fullGroupPath = BugInstanceUtil.getFullGroupPath(bugInstance, _groupBy);
+		final String[] groupNameKey = BugInstanceUtil.getGroupPath(bugInstance, fullGroupPath.length - 1, _groupBy);
+
+		final Map<Integer, List<BugInstanceGroupNode>> map = _groups.get(Arrays.toString(groupNameKey));
+		for (final Entry<Integer, List<BugInstanceGroupNode>> entry : map.entrySet()) {
+
+			final List<BugInstanceGroupNode> groupNodes = entry.getValue();
+			for (final BugInstanceGroupNode groupNode : groupNodes) {
+
+				final List<VisitableTreeNode> bugInstanceNodes = groupNode.getChildsList();
+				for (final VisitableTreeNode node : bugInstanceNodes) {
+					final BugInstance bug = ((BugInstanceNode) node).getBugInstance();
+					if(bug.equals(bugInstance)) {
+						return (BugInstanceNode) node;
+					}
+				}
+			}
+		}
+
+		return null;
 	}
 
 
@@ -349,5 +379,4 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	protected void install(final VisitableTreeNode root) {
 		//TODO: implement
 	}
-
 }

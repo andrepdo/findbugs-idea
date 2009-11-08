@@ -151,6 +151,11 @@ public class BugTreePanel extends JPanel {
 	}
 
 
+	public GroupTreeModel getTreeModel() {
+		return _treeModel;
+	}
+
+
 	boolean isHiddenBugGroup(final BugInstance node) {
 		final Map<String, String> categories = _preferences.getBugCategories();
 		final String category = node.getBugPattern().getCategory();
@@ -180,6 +185,7 @@ public class BugTreePanel extends JPanel {
 
 			final FileEditorManager fileEditorManager = FileEditorManager.getInstance(_project);
 			final PsiFile psiFile = instanceNodeInfo.getPsiFile();
+			@SuppressWarnings({"ConstantConditions"})
 			final VirtualFile virtualFile = psiFile.getVirtualFile();
 
 			if (virtualFile != null) {

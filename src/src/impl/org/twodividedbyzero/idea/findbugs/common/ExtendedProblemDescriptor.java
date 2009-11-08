@@ -19,10 +19,13 @@ package org.twodividedbyzero.idea.findbugs.common;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.QuickFix;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import edu.umd.cs.findbugs.BugInstance;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 
 
 /**
@@ -37,16 +40,29 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor {
 	private ProblemDescriptor _delegate;
 	private int _column;
 	private int _line;
-	private VirtualFile _file;
+	private PsiFile _file;
 	private int _lineStart;
 	private int _lineEnd;
 	private int _hash;
 
+	private final BugInstance _bugInstance;
 
-	public ExtendedProblemDescriptor(final VirtualFile file, final int[] lines) {
+
+	public ExtendedProblemDescriptor(final PsiFile file, final BugInstance bugInstance) {
 		_file = file;
-		_lineStart = lines[0];
-		_lineEnd = lines[1];
+		_bugInstance = bugInstance;
+		final int[] lines = BugInstanceUtil.getSourceLines(_bugInstance);
+		_lineStart = lines[0] - 1;
+		_lineEnd = lines[1] - 1;
+		if(_lineStart < 0 || _lineEnd < 0) { // anonymous class? findbugs does not report line numbers for bug in anonymous/inner classes
+			_lineStart = 0;
+			_lineEnd = 0;
+		}
+	}
+
+
+	public BugInstance getBugInstance() {
+		return _bugInstance;
 	}
 
 
@@ -82,6 +98,11 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor {
 	 */
 	public int getLine() {
 		return _line;
+	}
+
+
+	public void setTextAttributes(final TextAttributesKey key) {
+		//TODO: implement
 	}
 
 
@@ -135,7 +156,7 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor {
 	}
 
 
-	public void setFile(final VirtualFile file) {
+	public void setFile(final PsiFile file) {
 		_file = file;
 	}
 
@@ -155,7 +176,7 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor {
 	}
 
 
-	public VirtualFile getFile() {
+	public PsiFile getFile() {
 		return _file;
 	}
 

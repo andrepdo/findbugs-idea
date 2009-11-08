@@ -70,11 +70,11 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.FindBugsPlugin;
-import org.twodividedbyzero.idea.findbugs.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 
 import java.awt.EventQueue;
 import java.io.File;
@@ -165,13 +165,16 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static PsiFile getPsiFile(final VirtualFile virtualFile) {
-		final Project project = getProject();
+	public static PsiFile getPsiFile(final Project project, final VirtualFile virtualFile) {
 		return PsiManager.getInstance(project).findFile(virtualFile);
 	}
 
 
-	public static PsiFile getPsiFile(@NotNull final PsiClass psiClass) {
+	@Nullable
+	public static PsiFile getPsiFile(final PsiElement psiClass) {
+		if(psiClass == null) {
+			return null;
+		}
 		return psiClass.getContainingFile();
 	}
 
@@ -472,19 +475,22 @@ public final class IdeaUtilImpl {
 
 
 	public static VirtualFile[] getProjectClasspath(final DataContext dataContext) {
-		//final Project project = getProject(dataContext);
-		//final Project project = (Project) dataContext.getData(DataConstants.PROJECT);
-		//final ProjectRootManager projectManager = ProjectRootManager.getInstance(project);
+		final VirtualFile[] files;
+		final Module module = getModule(dataContext);
+		files = getProjectClasspath(module);
 
+		return files;
+	}
+
+
+	public static VirtualFile[] getProjectClasspath(final Module module) {
 		final VirtualFile[] files;
 		try {
-			final Module module = getModule(dataContext);
 			final ModuleRootManager mrm = ModuleRootManager.getInstance(module);
 			files = mrm.getFiles(OrderRootType.COMPILATION_CLASSES);
 		} catch (Exception e) {
 			throw new FindBugsPluginException("ModuleRootManager must not be null. may be the current class is not a project/module class. check your project/module outpath configuration.", e);
 		}
-
 		return files;
 	}
 
@@ -729,20 +735,24 @@ public final class IdeaUtilImpl {
 
 
 	/**
-	 * Find a PsiClass in global project scope.
+	 * Find a PsiClass using {@link GlobalSearchScope#allScope(com.intellij.openapi.project.Project)} }
 	 *
 	 * @param project   the idea project to search in
-	 * @param classname like java/lang/Object.java or java.lang.Object.java or without file extnesion
+	 * @param classname like java/lang/Object.java or java.lang.Object.java or without file extension
 	 * @return the PsiClass element
 	 */
 	@Nullable
 	public static PsiClass findJavaPsiClass(final Project project, final String classname) {
 		final String fqn = classname.endsWith(".java") ? classname.replaceFirst(".java", "") : classname;  // NON-NLS
 		final String dottedName = fqn.contains("/") ? fqn.replace('/', '.') : fqn;
+		final GlobalSearchScope scope = GlobalSearchScope.allScope(project);
+		return findJavaPsiClass(project, dottedName, scope);
+	}
 
-		final GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
-		//JavaPsiFacade.getInstance(project).findClass("java.lang.Object", scope);
-		return JavaPsiFacade.getInstance(project).findClass(dottedName, scope);
+
+	@Nullable
+	public static PsiClass findJavaPsiClass(final Project project, final String dottedFqClassName, final GlobalSearchScope searchScope) {
+		return JavaPsiFacade.getInstance(project).findClass(dottedFqClassName, searchScope);
 	}
 
 
@@ -813,15 +823,20 @@ public final class IdeaUtilImpl {
 	public static void activateToolWindow(final String toolWindowId, final DataContext dataContext) {
 		if (EventQueue.isDispatchThread()) {
 			final ToolWindow toolWindow = getToolWindowById(toolWindowId, dataContext);
-			if (!toolWindow.isActive() && toolWindow.isAvailable()) {
-				toolWindow.show(null);
-			}
+			activateToolWindow(toolWindow);
 		} else {
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					activateToolWindow(toolWindowId, dataContext);
 				}
 			});
+		}
+	}
+
+
+	public static void activateToolWindow(final ToolWindow toolWindow) {
+		if (!toolWindow.isActive() && toolWindow.isAvailable()) {
+			toolWindow.show(null);
 		}
 	}
 
@@ -838,8 +853,9 @@ public final class IdeaUtilImpl {
 
 
 	@Nullable
-	public static PsiFile getPsiFile(@NotNull final Project project, @NotNull final ExtendedProblemDescriptor issue) {
-		return (issue.getFile() == null) ? null : PsiManager.getInstance(project).findFile(issue.getFile());
+	public static PsiFile getPsiFile(@NotNull final Project project, @NotNull final ExtendedProblemDescriptor problem) {
+		final PsiFile file = problem.getFile();
+		return file == null ? null : PsiManager.getInstance(project).findFile(file.getVirtualFile());
 	}
 
 

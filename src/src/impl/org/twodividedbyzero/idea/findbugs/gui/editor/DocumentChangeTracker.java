@@ -23,9 +23,11 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
+import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,24 +69,32 @@ class DocumentChangeTracker implements DocumentListener {
 
 
 	@NotNull
-	RangeMarker addMarker(@NotNull final ExtendedProblemDescriptor issue, final boolean orphanMarker) {
-		final RangeMarker marker = _document.createRangeMarker(_document.getLineStartOffset(issue.getLineStart()), _document.getLineEndOffset(issue.getLineEnd()));
+	RangeMarker addMarker(@NotNull final ExtendedProblemDescriptor problem, final boolean orphanMarker) {
+		final int lineStart = problem.getLineStart();
+		final PsiElement element = IdeaUtilImpl.getElementAtLine(problem.getFile(), lineStart);
+		final RangeMarker marker;
+		if (element != null) {
+			marker = _document.createRangeMarker(element.getTextRange());
+		} else {
+			final int lineEnd = problem.getLineEnd();
+			marker = _document.createRangeMarker(_document.getLineStartOffset(lineStart), _document.getLineEndOffset(lineEnd));
+		}
 
 		marker.putUserData(ORPHAN_MARKER_KEY, orphanMarker);
-		_markers.put(issue, marker);
+		_markers.put(problem, marker);
 
 		return marker;
 	}
 
 
 	@Nullable
-	RangeMarker getMarker(@NotNull final ExtendedProblemDescriptor issue) {
-		return _markers.get(issue);
+	RangeMarker getMarker(@NotNull final ExtendedProblemDescriptor problem) {
+		return _markers.get(problem);
 	}
 
 
-	void removeMarker(@NotNull final ExtendedProblemDescriptor issue) {
-		_markers.remove(issue);
+	void removeMarker(@NotNull final ExtendedProblemDescriptor problem) {
+		_markers.remove(problem);
 	}
 
 
@@ -100,11 +110,11 @@ class DocumentChangeTracker implements DocumentListener {
 	public void documentChanged(final DocumentEvent event) {
 		final int lineStart = _document.getLineNumber(event.getOffset());
 
-		updateIssues(lineStart);
+		updateProblems(lineStart);
 	}
 
 
-	private void updateIssue(@NotNull final ExtendedProblemDescriptor issue, @NotNull final RangeMarker marker) {
+	private void updateProblem(@NotNull final ExtendedProblemDescriptor problem, @NotNull final RangeMarker marker) {
 		if ((marker.isValid()) && (!isOrphanMarker(marker))) {
 			final CharSequence fragment = marker.getDocument().getCharsSequence().subSequence(marker.getStartOffset(), marker.getEndOffset());
 			final int lineStart = marker.getDocument().getLineNumber(marker.getStartOffset());
@@ -114,21 +124,19 @@ class DocumentChangeTracker implements DocumentListener {
 				lineEnd--;
 			}
 
-			issue.setLineStart(lineStart);
-			issue.setLineEnd(lineEnd);
+			problem.setLineStart(lineStart);
+			problem.setLineEnd(lineEnd);
 		}
-
-		//issue.getReview().fireIssueUpdated(issue);
 	}
 
 
-	private void updateIssues(final int lineStart) {
+	private void updateProblems(final int lineStart) {
 		final Map<ExtendedProblemDescriptor, RangeMarker> markersCopy = new HashMap<ExtendedProblemDescriptor, RangeMarker>(_markers);
 		for (final Map.Entry<ExtendedProblemDescriptor, RangeMarker> entry : markersCopy.entrySet()) {
 			final ExtendedProblemDescriptor issue = entry.getKey();
 			final RangeMarker marker = entry.getValue();
 			if (issue.getLineStart() >= lineStart) {
-				updateIssue(issue, marker);
+				updateProblem(issue, marker);
 			}
 		}
 	}

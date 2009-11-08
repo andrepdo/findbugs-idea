@@ -22,9 +22,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import edu.umd.cs.findbugs.Version;
 import org.jetbrains.annotations.NonNls;
-import org.twodividedbyzero.idea.findbugs.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 

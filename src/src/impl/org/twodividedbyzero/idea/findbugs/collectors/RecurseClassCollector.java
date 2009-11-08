@@ -29,9 +29,9 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.PsiElementFilter;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 
 import java.io.File;
 import java.util.HashSet;
@@ -327,7 +327,7 @@ public class RecurseClassCollector {
 
 	/**
 	 * Get the collected class files. use {@link RecurseClassCollector#addFile(String)} to add
-	 * them to a {@link org.twodividedbyzero.idea.findbugs.FindBugsProject}. if using the collectAndAdd flag <code>true</code>
+	 * them to a {@link org.twodividedbyzero.idea.findbugs.core.FindBugsProject}. if using the collectAndAdd flag <code>true</code>
 	 * {@link RecurseClassCollector#RecurseClassCollector(FindBugsProject, com.intellij.openapi.project.Project, boolean)}
 	 * the files were automaticaly added to the given FindBugsProject.
 	 *

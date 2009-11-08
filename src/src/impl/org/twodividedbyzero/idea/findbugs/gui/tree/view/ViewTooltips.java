@@ -77,6 +77,7 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
@@ -95,7 +96,7 @@ import java.beans.PropertyChangeListener;
 		value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
 		justification = "")
 @SuppressWarnings({"AssignmentToNull"})
-public final class ViewTooltips extends MouseAdapter {
+public final class ViewTooltips extends MouseAdapter implements MouseMotionListener {
 
 	/** The default instance, reference counted */
 	private static ViewTooltips INSTANCE = null;

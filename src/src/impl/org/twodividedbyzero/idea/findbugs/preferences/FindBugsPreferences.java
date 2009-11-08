@@ -68,6 +68,7 @@ public class FindBugsPreferences extends Properties {
 	public static final String TOOLWINDOW_TOFRONT = PROPERTIES_PREFIX + "toolWindowToFront";
 	public static final String COMPILE_BEFORE_ANALYZE = PROPERTIES_PREFIX + "compileBeforeAnalyse";
 
+	public static final String ANALYZE_AFTER_COMPILE = PROPERTIES_PREFIX + "analyzeAfterCompile";
 
 	public transient Map<String, String> _detectors;
 	public transient Map<String, String> _bugCategories;
@@ -162,7 +163,7 @@ public class FindBugsPreferences extends Properties {
 
 
 	public void clearDefinedProperies() {
-		final List<String> propertiesToRemove = new ArrayList<String>();
+		final Collection<String> propertiesToRemove = new ArrayList<String>();
 
 		for (final Enumeration<?> properties = propertyNames(); properties.hasMoreElements();) {
 			final String propertyName = (String) properties.nextElement();
@@ -537,6 +538,7 @@ public class FindBugsPreferences extends Properties {
 		preferences.setProperty(FindBugsPreferences.MIN_PRIORITY_TO_REPORT, filterSettings.getMinPriority());
 		preferences.setProperty(FindBugsPreferences.SHOW_HIDDEN_DETECTORS, false);
 		preferences.setProperty(FindBugsPreferences.TOOLWINDOW_TOFRONT, true);
+		preferences.setProperty(FindBugsPreferences.ANALYZE_AFTER_COMPILE, false);
 
 		final Map<String, String> bugCategories = getDefaultBugCategories(filterSettings);
 		preferences.setBugCategories(bugCategories);

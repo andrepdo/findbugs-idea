@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.twodividedbyzero.idea.findbugs;
+package org.twodividedbyzero.idea.findbugs.core;
 
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;

@@ -21,10 +21,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import edu.umd.cs.findbugs.BugInstance;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.AbstractTreeNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
+import org.twodividedbyzero.idea.findbugs.gui.tree.model.GroupTreeModel;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.VisitableTreeNode;
 
 import javax.swing.JTree;
@@ -188,6 +190,7 @@ public class BugTreeHelper {
 	public void scrollPathToVisible(final TreePath path) {
 		if (EventQueue.isDispatchThread()) {
 			_tree.scrollPathToVisible(path);
+			_tree.setSelectionPath(path);
 		} else {
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
@@ -238,7 +241,7 @@ public class BugTreeHelper {
 	}
 
 
-	public static TreePath getPath(TreeNode node) {
+	public static TreePath getPath(@Nullable TreeNode node) {
 		final List<TreeNode> list = new ArrayList<TreeNode>();
 
 		while (node != null) {
@@ -294,33 +297,27 @@ public class BugTreeHelper {
 					break;
 				}
 			}
-
-			/*final int childCount = model.getChildCount(treeNode);
-			   for (int i = childCount-1; i > 0; i--) {
-				   final Object childNode = model.getChild(treeNode, i);
-
-				   if (childNode instanceof BugInstanceNode) {
-					   return (BugInstanceNode) childNode;
-				   }
-				   findPreviousBugNode(childNode, path.pathByAddingChild(childNode), model);
-			   }*/
-			//}
-
-			/*@SuppressWarnings({"unchecked"})
-			final AbstractTreeNode<VisitableTreeNode> treeNode = (AbstractTreeNode<VisitableTreeNode>) path.getLastPathComponent();
-
-			//treeNode.getElement().get
-
-			for (int i = 0; i < model.getChildCount(treeNode); i++) {
-				final Object childNode = model.getChild(treeNode, i);
-
-				if (childNode instanceof BugInstanceNode) {
-					return (BugInstanceNode) childNode;
-				}
-				findPreviousBugNode(childNode, path.pathByAddingChild(childNode), model);
-			}*/
 		}
 
 		return resultNode;
 	}
+
+
+	public void gotoNode(final BugInstanceNode node) {
+		gotoNode(node.getBugInstance());
+	}
+
+
+	public void gotoNode(final BugInstance bugInstance) {
+		final AbstractTreeNode<VisitableTreeNode> node = findTreeNodeByBugInstance(bugInstance);
+		final TreePath path = getPath(node);
+		scrollPathToVisible(path);
+	}
+
+
+	@Nullable
+	private AbstractTreeNode<VisitableTreeNode> findTreeNodeByBugInstance(final BugInstance bugInstance) {
+		return ((GroupTreeModel) _tree.getModel()).findNodeByBugInstance(bugInstance);
+	}
+
 }

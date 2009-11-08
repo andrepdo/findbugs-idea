@@ -29,12 +29,13 @@ import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.gui.tree.model.GroupTreeModel;
 
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -71,10 +72,12 @@ public class EditorHandler implements ProjectComponent {
 
 
 	public void projectOpened() {
+		EditorFactory.getInstance().addEditorFactoryListener(_editorFactoryListener);
 	}
 
 
 	public void projectClosed() {
+		EditorFactory.getInstance().removeEditorFactoryListener(_editorFactoryListener);
 	}
 
 
@@ -85,8 +88,8 @@ public class EditorHandler implements ProjectComponent {
 
 
 	public void initComponent() {
-		EditorFactory.getInstance().addEditorFactoryListener(_editorFactoryListener);
-		_project.getComponent(FindBugsPlugin.class);
+		//EditorFactory.getInstance().addEditorFactoryListener(_editorFactoryListener);
+		//final FindBugsPlugin findBugsPlugin = _project.getComponent(FindBugsPlugin.class);
 	}
 
 
@@ -95,37 +98,33 @@ public class EditorHandler implements ProjectComponent {
 
 
 	@Nullable
-	private RangeMarker findMarker(@NotNull final ExtendedProblemDescriptor issue) {
-		final DocumentChangeTracker documentChangeTracker = _changeTrackers.get(issue.getFile());
+	private RangeMarker findMarker(@NotNull final ExtendedProblemDescriptor problem) {
+		final DocumentChangeTracker documentChangeTracker = _changeTrackers.get(problem.getFile().getVirtualFile());
 		if (documentChangeTracker == null) {
 			return null;
 		}
 
-		return documentChangeTracker.getMarker(issue);
+		return documentChangeTracker.getMarker(problem);
 	}
 
 
-	private RangeMarker addMarker(@Nullable final Editor editor, @NotNull final ExtendedProblemDescriptor issue, final boolean orphanMarker) {
-		if (issue.getLineStart() == -1) {
+	private RangeMarker addMarker(@Nullable final Editor editor, @NotNull final ExtendedProblemDescriptor problem, final boolean orphanMarker) {
+		if (problem.getLineStart() == -1) {
 			return null;
 		}
 
-		/*if (!RevuUtils.isActive(issue.getReview())) {
-			return null;
-		}*/
-
-		final DocumentChangeTracker documentChangeTracker = _changeTrackers.get(issue.getFile());
+		final DocumentChangeTracker documentChangeTracker = _changeTrackers.get(problem.getFile().getVirtualFile());
 		if (documentChangeTracker == null) {
 			return null;
 		}
 
-		final RangeMarker marker = documentChangeTracker.addMarker(issue, orphanMarker);
+		final RangeMarker marker = documentChangeTracker.addMarker(problem, orphanMarker);
 		if (editor == null) {
 			for (final Editor editor2 : documentChangeTracker.getEditors()) {
-				installHightlighters(editor2, issue, marker);
+				installHightlighters(editor2, problem, marker);
 			}
 		} else {
-			installHightlighters(editor, issue, marker);
+			installHightlighters(editor, problem, marker);
 		}
 
 		return marker;
@@ -147,6 +146,7 @@ public class EditorHandler implements ProjectComponent {
 
 		final RangeHighlighter highlighter = editor.getMarkupModel().addRangeHighlighter(marker.getStartOffset(), marker.getEndOffset(), HighlighterLayer.FIRST - 1, null, HighlighterTargetArea.LINES_IN_RANGE);
 		editorHighlighters.put(problem, highlighter);
+		EditorFactory.getInstance().refreshAllEditors(); // todo: find non crude way= LineMarkerHighlighter
 
 		// Gutter renderer, only one renderer for same line start
 		CustomGutterIconRenderer renderer = editorRenderers.get(problem.getLineStart());
@@ -154,7 +154,7 @@ public class EditorHandler implements ProjectComponent {
 			renderer = new CustomGutterIconRenderer(this, problem.getLineStart());
 			editorRenderers.put(problem.getLineStart(), renderer);
 
-			// Only set gutter icon for first highligther with same line start
+			// Only set gutter icon for first highlighter with same line start
 			highlighter.setGutterIconRenderer(renderer);
 		}
 
@@ -162,30 +162,30 @@ public class EditorHandler implements ProjectComponent {
 	}
 
 
-	private void removeMarker(final ExtendedProblemDescriptor issue) {
-		final DocumentChangeTracker documentChangeTracker = _changeTrackers.get(issue.getFile());
+	private void removeMarker(final ExtendedProblemDescriptor problem) {
+		final DocumentChangeTracker documentChangeTracker = _changeTrackers.get(problem.getFile().getVirtualFile());
 		if (documentChangeTracker == null) {
 			return;
 		}
 
-		documentChangeTracker.removeMarker(issue);
+		documentChangeTracker.removeMarker(problem);
 		for (final Editor editor : documentChangeTracker.getEditors()) {
 			final Map<ExtendedProblemDescriptor, RangeHighlighter> editorHighlighters = _highlighters.get(editor);
 			if (editorHighlighters != null) {
-				final RangeHighlighter highlighter = editorHighlighters.remove(issue);
+				final RangeHighlighter highlighter = editorHighlighters.remove(problem);
 
 				if (highlighter != null) {
 					editor.getMarkupModel().removeHighlighter(highlighter);
 
 					final Map<Integer, CustomGutterIconRenderer> editorRenderers = _renderers.get(editor);
-					final CustomGutterIconRenderer renderer = editorRenderers.get(issue.getLineStart());
+					final CustomGutterIconRenderer renderer = editorRenderers.get(problem.getLineStart());
 					if (renderer != null) {
-						renderer.removeIssue(issue);
+						renderer.removeProblem(problem);
 						if (renderer.isEmpty()) {
 							editorRenderers.remove(renderer.getLineStart());
 						} else if (highlighter.getGutterIconRenderer() != null) {
 							// Reaffecct share gutter icon to first remaining highlighter
-							final RangeHighlighter marker = (RangeHighlighter) renderer.getIssues().values().iterator().next();
+							final RangeHighlighter marker = (RangeHighlighter) renderer.getProblems().values().iterator().next();
 							marker.setGutterIconRenderer(renderer);
 						}
 					}
@@ -195,25 +195,25 @@ public class EditorHandler implements ProjectComponent {
 	}
 
 
-	public boolean isSynchronized(@NotNull final ExtendedProblemDescriptor issue, final boolean checkEvenIfEditorNotAvailable) {
-		if (issue.getLineStart() == -1) {
+	public boolean isSynchronized(@NotNull final ExtendedProblemDescriptor problem, final boolean checkEvenIfEditorNotAvailable) {
+		if (problem.getLineStart() == -1) {
 			return true;
 		}
 
-		RangeMarker marker = findMarker(issue);
+		RangeMarker marker = findMarker(problem);
 		if ((marker == null) && (checkEvenIfEditorNotAvailable)) {
-			final Document document = IdeaUtilImpl.getDocument(_project, issue);
+			final Document document = IdeaUtilImpl.getDocument(_project, problem);
 			if (document != null) {
-				marker = document.createRangeMarker(document.getLineStartOffset(issue.getLineStart()), document.getLineEndOffset(issue.getLineEnd()));
+				marker = document.createRangeMarker(document.getLineStartOffset(problem.getLineStart()), document.getLineEndOffset(problem.getLineEnd()));
 			}
 		}
 
-		return isSynchronized(issue, marker);
+		return isSynchronized(problem, marker);
 	}
 
 
-	public boolean isSynchronized(@NotNull final ExtendedProblemDescriptor issue, @Nullable final RangeMarker marker) {
-		if (issue.getLineStart() == -1) {
+	public boolean isSynchronized(@NotNull final ExtendedProblemDescriptor problem, @Nullable final RangeMarker marker) {
+		if (problem.getLineStart() == -1) {
 			return true;
 		}
 
@@ -227,12 +227,12 @@ public class EditorHandler implements ProjectComponent {
 
 		final CharSequence fragment = marker.getDocument().getCharsSequence().subSequence(marker.getStartOffset(), marker.getEndOffset());
 
-		return (issue.getHash() == fragment.toString().hashCode());
+		return (problem.getHash() == fragment.toString().hashCode());
 	}
 
 
-	public int buildNewHash(final ExtendedProblemDescriptor issue) {
-		final RangeMarker marker = findMarker(issue);
+	public int buildNewHash(final ExtendedProblemDescriptor problem) {
+		final RangeMarker marker = findMarker(problem);
 		if (marker == null) {
 			return 0;
 		}
@@ -247,6 +247,7 @@ public class EditorHandler implements ProjectComponent {
 
 		public void editorCreated(final EditorFactoryEvent event) {
 			final Editor editor = event.getEditor();
+			final Project project = event.getEditor().getProject();
 
 			final VirtualFile vFile = FileDocumentManager.getInstance().getFile(editor.getDocument());
 			if (vFile == null) {
@@ -260,24 +261,20 @@ public class EditorHandler implements ProjectComponent {
 			}
 			documentChangeTracker.getEditors().add(editor);
 
-			/*final ReviewManager reviewManager = project.getComponent(ReviewManager.class);
-			for (final Review review : reviewManager.getReviews(RevuUtils.getCurrentUserLogin(), true)) {
-				final List<ProblemDescriptor> issues = review.getIssues(vFile);
-
-				// Apply filter
-				ApplicationManager.getApplication().getComponent(FilterManager.class).filter(project, issues);
-
-				for (final ExtendedProblemDescriptor issue : issues) {
-					addMarker(editor, issue, false);
+			final PsiFile psiFile = IdeaUtilImpl.getPsiFile(project, vFile);
+			if (GroupTreeModel.getProblemCache().containsKey(psiFile)) {
+				for (final ExtendedProblemDescriptor problemDescriptor : GroupTreeModel.getProblemCache().get(psiFile)) {
+					addMarker(editor, problemDescriptor, false);
 				}
-			}*/
-			//addMarker(editor, issue, false);
+
+			}
+			//((FindBugsPluginImpl) IdeaUtilImpl.getPluginComponent(_project)).getBugCollection()
 		}
 
 
 		public void editorReleased(final EditorFactoryEvent event) {
 			final Editor editor = event.getEditor();
-
+			final Project project = event.getEditor().getProject();
 			final VirtualFile vFile = FileDocumentManager.getInstance().getFile(editor.getDocument());
 			if (vFile == null) {
 				return;
@@ -295,7 +292,17 @@ public class EditorHandler implements ProjectComponent {
 
 			_renderers.remove(editor);
 			_highlighters.remove(editor);
+
+			final PsiFile psiFile = IdeaUtilImpl.getPsiFile(project, vFile);
+			if (GroupTreeModel.getProblemCache().containsKey(psiFile)) {
+				for (final ExtendedProblemDescriptor problemDescriptor : GroupTreeModel.getProblemCache().get(psiFile)) {
+					removeMarker(problemDescriptor);
+				}
+
+			}
 		}
+
+
 	}
 
 }

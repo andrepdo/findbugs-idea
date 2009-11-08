@@ -39,7 +39,6 @@ import edu.umd.cs.findbugs.MethodAnnotation;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
 import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
@@ -49,6 +48,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspecti
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.gui.inspection.FindBugsInspectionPanel;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;

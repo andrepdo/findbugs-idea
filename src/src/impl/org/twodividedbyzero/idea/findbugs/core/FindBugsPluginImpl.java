@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.twodividedbyzero.idea.findbugs;
+package org.twodividedbyzero.idea.findbugs.core;
 
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -41,6 +41,7 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.ToolWindowType;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
+import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.ba.AnalysisException;
 import org.jetbrains.annotations.Nls;
@@ -187,7 +188,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 		//final ContentFactory contentFactory = PeerFactory.getInstance().getContentFactory();
 		final ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
 
-		final ToolWindowPanel toolWindowPanel = new ToolWindowPanel(_project, _toolWindow);
+		final JComponent toolWindowPanel = new ToolWindowPanel(_project, _toolWindow);
 		final Content content = contentFactory.createContent(toolWindowPanel, "Found Bugs View", false);
 		//final Content content1 = contentFactory.createContent(_contentPanel1, "Bug Details", false);
 
@@ -206,7 +207,6 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 	private void unregisterToolWindow() {
 		final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(_project);
 		toolWindowManager.unregisterToolWindow(getInternalToolWindowId());
-
 	}
 
 
@@ -248,6 +248,11 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 	}
 
 
+	public BugCollection getBugCollection() {
+		return getToolWindowPanel().getBugCollection();
+	}
+
+
 	private static void registerToolbarActions() {
 		final DefaultActionGroup mainToolbar = (DefaultActionGroup) ActionManager.getInstance().getAction("MainToolBar");
 
@@ -264,13 +269,13 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 	@SuppressWarnings({"MethodMayBeStatic"})
 	private void setActionGroupsIcon() {
-		final DefaultActionGroup findBugsEditorPopup = (DefaultActionGroup) ActionManager.getInstance().getAction("FindBugs.EditorPopup");
+		final AnAction findBugsEditorPopup = ActionManager.getInstance().getAction("FindBugs.EditorPopup");
 		findBugsEditorPopup.getTemplatePresentation().setIcon(GuiResources.FINDBUGS_ICON);
 
-		final DefaultActionGroup findBugsProjectViewPopup = (DefaultActionGroup) ActionManager.getInstance().getAction("FindBugs.ProjectViewPopupMenu");
+		final AnAction findBugsProjectViewPopup = ActionManager.getInstance().getAction("FindBugs.ProjectViewPopupMenu");
 		findBugsProjectViewPopup.getTemplatePresentation().setIcon(GuiResources.FINDBUGS_ICON);
 
-		final DefaultActionGroup findBugsAnalyzeMenu = (DefaultActionGroup) ActionManager.getInstance().getAction("FindBugs.AnalyzeMenu");
+		final AnAction findBugsAnalyzeMenu = ActionManager.getInstance().getAction("FindBugs.AnalyzeMenu");
 		findBugsAnalyzeMenu.getTemplatePresentation().setIcon(GuiResources.FINDBUGS_ICON);
 	}
 
