@@ -29,6 +29,7 @@
 		    <li>jump to source from results shown in toolwindow</li>
 		    <li>bug descriptions, solutions</li>
 		    <li>run analysis always in background</li>
+		    <li>run findbugs analysis on all affected files after compile</li>
 		    <li>min. priority to report</li>
             <li>background scanning</li>
             <li>configurable effort run level</li>
