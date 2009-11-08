@@ -60,7 +60,7 @@
         <h3>0.9.92</h3>
 		<ul>
 			<li>initialize default properties on run if empty</li>
-            <li>preferences: analyze affected files after compile</li>
+            <li>configurable: analyze affected files after compile</li>
 		</ul>
 		<h3>0.9.91</h3>
 		<ul>
@@ -152,9 +152,9 @@
     <!-- until-build="10762" min="8.0"-->
     <!--<helpset file="your-help.jar" path="path-to-helpset.hs"/>-->
     <resource-bundle>org.twodividedbyzero.idea.findbugs.resources.i18n.Messages</resource-bundle>
-    <extensions defaultExtensionNs="com.intellij">
+    <!--<extensions defaultExtensionNs="com.intellij">
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugsLineMarkerProvider"/>
-    </extensions>
+    </extensions>-->
     <project-components>
         <component>
             <implementation-class>org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl</implementation-class>

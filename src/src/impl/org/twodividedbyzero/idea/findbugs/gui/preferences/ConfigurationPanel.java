@@ -326,8 +326,10 @@ public class ConfigurationPanel extends JPanel {
 
 
 	private void restoreDefaultPreferences() {
-		getPreferences().setDefaults(FindBugsPreferences.createDefault());
+		final FindBugsPreferences bugsPreferences = getPreferences();
+		bugsPreferences.setDefaults(FindBugsPreferences.createDefault());
 		updatePreferences();
+		bugsPreferences.setModified(true);
 	}
 
 

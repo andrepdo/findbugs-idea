@@ -34,6 +34,7 @@ public class BugsHighlightingPass implements HighlightingPass {
 
 
 	public void applyInformationToEditor() {
+		//UpdateHighlightersUtil
 		
 	}
 }
