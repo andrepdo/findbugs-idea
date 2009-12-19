@@ -24,9 +24,8 @@ import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ChangeList;
-import com.intellij.openapi.vcs.changes.ChangeListListener;
+import com.intellij.openapi.vcs.changes.ChangeListAdapter;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
@@ -52,7 +51,7 @@ import java.util.List;
  * @version $Revision$
  * @since 0.9.90-dev
  */
-public class AnalyzeChangelistFiles extends BaseAction implements EventListener<BugReporterEvent>, ChangeListListener /*Adapter*/ {
+public class AnalyzeChangelistFiles extends BaseAction implements EventListener<BugReporterEvent> {
 
 	private static final Logger LOGGER = Logger.getInstance(AnalyzeSelectedFiles.class.getName());
 
@@ -181,7 +180,13 @@ public class AnalyzeChangelistFiles extends BaseAction implements EventListener<
 		if (!isRegistered(projectName)) {
 			EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(projectName), this);
 			addRegisteredProject(projectName);
-			ChangeListManager.getInstance(project).addChangeListListener(this);
+			ChangeListManager.getInstance(project).addChangeListListener(new ChangeListAdapter() {
+
+				@Override
+				public void defaultListChanged(final ChangeList oldDefaultList, final ChangeList newDefaultList) {
+					_activeChangeList = newDefaultList;
+				}
+			});
 		}
 	}
 
@@ -235,47 +240,6 @@ public class AnalyzeChangelistFiles extends BaseAction implements EventListener<
 
 	public ChangeList getActiveChangeList() {
 		return _activeChangeList == null ? ChangeListManager.getInstance(_project).getDefaultChangeList() : _activeChangeList;
-	}
-
-
-	public void changeListAdded(final ChangeList list) {
-	}
-
-
-	public void changeListRemoved(final ChangeList list) {
-	}
-
-
-	public void changeListChanged(final ChangeList list) {
-	}
-
-
-	public void changeListRenamed(final ChangeList list, final String oldName) {
-	}
-
-
-	public void changeListCommentChanged(final ChangeList list, final String oldComment) {
-	}
-
-
-	public void defaultListChanged(final ChangeList oldDefaultList, final ChangeList newDefaultList) {
-		_activeChangeList = newDefaultList;
-	}
-
-
-	public void unchangedFileStatusChanged() {
-	}
-
-
-	public void changeListUpdateDone() {
-	}
-
-
-	public void changesMoved(final Collection<Change> changes, final ChangeList fromList, final ChangeList toList) {
-	}
-
-
-	public void changesRemoved(final Collection<Change> changes, final ChangeList fromList) {
 	}
 }
 

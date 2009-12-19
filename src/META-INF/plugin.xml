@@ -58,6 +58,10 @@
     </description>
     <change-notes>
         <![CDATA[<html>
+        <h3>0.9.93</h3>
+		<ul>
+			<li>fixed AbstractMethodError due to API change (ChangeListListener)</li>
+		</ul>
         <h3>0.9.92</h3>
 		<ul>
 			<li>initialize default properties on run if empty</li>
