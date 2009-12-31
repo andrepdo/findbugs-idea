@@ -60,7 +60,7 @@
         <![CDATA[<html>
         <h3>0.9.94</h3>
 		<ul>
-			<li>fixed ClassCastException (ChangelistAction)</li>
+			<li>fixed ClassCastException (unregister ChangelistAction)</li>
 		</ul>
         <h3>0.9.93</h3>
 		<ul>
