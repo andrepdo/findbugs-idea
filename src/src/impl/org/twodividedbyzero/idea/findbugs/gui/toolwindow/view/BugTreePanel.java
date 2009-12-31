@@ -48,6 +48,7 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 
@@ -277,6 +278,11 @@ public class BugTreePanel extends JPanel {
 
 	public SortedBugCollection getBugCollection() {
 		return _bugCollection;
+	}
+
+
+	public Map<PsiFile, List<ExtendedProblemDescriptor>> getProblems() {
+		return getTreeModel().getProblems();
 	}
 
 

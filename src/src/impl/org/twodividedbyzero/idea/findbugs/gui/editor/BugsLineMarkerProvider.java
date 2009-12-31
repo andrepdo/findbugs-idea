@@ -24,7 +24,6 @@ import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.gui.tree.model.GroupTreeModel;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
 import javax.swing.Icon;
@@ -46,7 +45,7 @@ public class BugsLineMarkerProvider implements LineMarkerProvider {
 	@Nullable
 	public LineMarkerInfo<?> getLineMarkerInfo(final PsiElement psiElement) {
 		final PsiFile psiFile = IdeaUtilImpl.getPsiFile(psiElement);
-		final Map<PsiFile, List<ExtendedProblemDescriptor>> problemCache = GroupTreeModel.getProblemCache();
+		final Map<PsiFile, List<ExtendedProblemDescriptor>> problemCache = IdeaUtilImpl.getPluginComponent(psiElement.getProject()).getProblems();
 		if (problemCache.containsKey(psiFile)) {
 			final List<ExtendedProblemDescriptor> descriptors = problemCache.get(psiFile);
 			for (final ExtendedProblemDescriptor problemDescriptor : descriptors) {

@@ -54,17 +54,14 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 
 	private int _bugCount;
 
-	private static final Map<PsiFile, List<ExtendedProblemDescriptor>> PROBLEM_CACHE;
-
-	static {
-		PROBLEM_CACHE = new ConcurrentHashMap<PsiFile, List<ExtendedProblemDescriptor>>();
-	}
+	private final Map<PsiFile, List<ExtendedProblemDescriptor>> _problems;
 
 
 	public GroupTreeModel(final VisitableTreeNode root, final GroupBy[] groupBy, final Project project) {
 		_root = root;
 		_groupBy = groupBy.clone();
 		_groups = new ConcurrentHashMap<String, Map<Integer, List<BugInstanceGroupNode>>>();
+		_problems = new ConcurrentHashMap<PsiFile, List<ExtendedProblemDescriptor>>();
 	}
 
 
@@ -98,8 +95,8 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	}
 
 
-	public static Map<PsiFile, List<ExtendedProblemDescriptor>> getProblemCache() {
-		return PROBLEM_CACHE;
+	public Map<PsiFile, List<ExtendedProblemDescriptor>> getProblems() {
+		return _problems;
 	}
 
 
@@ -108,12 +105,12 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 		final PsiFile psiFile = leaf.getPsiFile();
 		if (psiFile != null) {
 			final ExtendedProblemDescriptor element = new ExtendedProblemDescriptor(psiFile, leaf.getBugInstance());
-			if(PROBLEM_CACHE.containsKey(psiFile)) {
-				PROBLEM_CACHE.get(psiFile).add(element);
+			if(_problems.containsKey(psiFile)) {
+				_problems.get(psiFile).add(element);
 			} else {
 				final List<ExtendedProblemDescriptor> list = new ArrayList<ExtendedProblemDescriptor>();
 				list.add(element);
-				PROBLEM_CACHE.put(psiFile, list);
+				_problems.put(psiFile, list);
 			}
 		}
 	}
@@ -252,7 +249,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 		//_sortedCollection.clear();
 		_bugCount = 0;
 		_groups.clear();
-		PROBLEM_CACHE.clear();
+		_problems.clear();
 		((RootNode) _root).removeAllChilds();
 		nodeStructureChanged(_root);
 		reload();

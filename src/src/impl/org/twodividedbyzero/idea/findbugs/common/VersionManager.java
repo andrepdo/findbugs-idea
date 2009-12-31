@@ -32,7 +32,7 @@ public class VersionManager {
 
 	public static final long _major = 0;
 	public static final long _minor = 9;
-	public static final long _build = 93;
+	public static final long _build = 94;
 
 	public static final String _branch = "";// NON-NLS
 

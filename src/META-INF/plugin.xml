@@ -58,6 +58,10 @@
     </description>
     <change-notes>
         <![CDATA[<html>
+        <h3>0.9.94</h3>
+		<ul>
+			<li>fixed ClassCastException (ChangelistAction)</li>
+		</ul>
         <h3>0.9.93</h3>
 		<ul>
 			<li>fixed AbstractMethodError due to API change (ChangeListListener)</li>
@@ -158,7 +162,8 @@
     <!--<helpset file="your-help.jar" path="path-to-helpset.hs"/>-->
     <resource-bundle>org.twodividedbyzero.idea.findbugs.resources.i18n.Messages</resource-bundle>
     <!--<extensions defaultExtensionNs="com.intellij">
-        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugsLineMarkerProvider"/>
+         <annotator language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugAnnotator"/>
+        &lt;!&ndash;<codeInsight.lineMarkerProvider language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugsLineMarkerProvider"/>&ndash;&gt;
     </extensions>-->
     <project-components>
         <component>

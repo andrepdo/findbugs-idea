@@ -37,6 +37,7 @@ import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
  */
 public class ExtendedProblemDescriptor implements ProblemDescriptor {
 
+
 	private ProblemDescriptor _delegate;
 	private int _column;
 	private int _line;
@@ -58,6 +59,11 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor {
 			_lineStart = 0;
 			_lineEnd = 0;
 		}
+	}
+
+
+	public boolean showTooltip() {
+		return true;
 	}
 
 

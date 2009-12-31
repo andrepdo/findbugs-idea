@@ -25,9 +25,11 @@ import com.intellij.openapi.module.ModuleComponent;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiFile;
 import edu.umd.cs.findbugs.DetectorFactory;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.ModuleConfigurationPanel;
@@ -40,6 +42,7 @@ import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -152,6 +155,11 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 	public FindBugsPreferences getPreferences() {
 		//noinspection ReturnOfCollectionOrArrayField
 		return _preferences;
+	}
+
+
+	public Map<PsiFile, List<ExtendedProblemDescriptor>> getProblems() {
+		return getToolWindowPanel().getProblems();
 	}
 
 

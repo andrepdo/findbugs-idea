@@ -33,12 +33,12 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
-import com.intellij.openapi.vcs.changes.ChangeListListener;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.ToolWindowType;
+import com.intellij.psi.PsiFile;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import edu.umd.cs.findbugs.BugCollection;
@@ -47,7 +47,9 @@ import edu.umd.cs.findbugs.ba.AnalysisException;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.actions.AnalyzeChangelistFiles;
 import org.twodividedbyzero.idea.findbugs.actions.AnalyzeCurrentEditorFile;
+import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
@@ -170,7 +172,8 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 		// called when project is being closed
 		LOGGER.debug("project is being closed");// NON-NLS
 		EventManagerImpl.getInstance().removeEventListener(_project);
-		ChangeListManager.getInstance(_project).removeChangeListListener((ChangeListListener) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTIVE_CHANGELIST_ACTION));
+		final AnalyzeChangelistFiles action = (AnalyzeChangelistFiles) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTIVE_CHANGELIST_ACTION);
+		ChangeListManager.getInstance(_project).removeChangeListListener(action.getChangelistAdapter());
 		unregisterToolWindow();
 		disableToolbarActions();
 	}
@@ -250,6 +253,11 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 	public BugCollection getBugCollection() {
 		return getToolWindowPanel().getBugCollection();
+	}
+
+
+	public Map<PsiFile, List<ExtendedProblemDescriptor>> getProblems() {
+		return getToolWindowPanel().getProblems();
 	}
 
 

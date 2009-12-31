@@ -22,9 +22,11 @@ import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.psi.PsiFile;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.ProjectStats;
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
 import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
@@ -48,6 +50,8 @@ import java.awt.EventQueue;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -145,6 +149,11 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 	public BugCollection getBugCollection() {
 		return _bugTreePanel.getBugCollection();
+	}
+
+
+	public Map<PsiFile, List<ExtendedProblemDescriptor>> getProblems() {
+		return _bugTreePanel.getProblems();
 	}
 
 

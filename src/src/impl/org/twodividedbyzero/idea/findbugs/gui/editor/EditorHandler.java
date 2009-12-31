@@ -35,10 +35,10 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.gui.tree.model.GroupTreeModel;
 
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -262,8 +262,9 @@ public class EditorHandler implements ProjectComponent {
 			documentChangeTracker.getEditors().add(editor);
 
 			final PsiFile psiFile = IdeaUtilImpl.getPsiFile(project, vFile);
-			if (GroupTreeModel.getProblemCache().containsKey(psiFile)) {
-				for (final ExtendedProblemDescriptor problemDescriptor : GroupTreeModel.getProblemCache().get(psiFile)) {
+			final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = IdeaUtilImpl.getPluginComponent(project).getProblems();
+			if (problems.containsKey(psiFile)) {
+				for (final ExtendedProblemDescriptor problemDescriptor : problems.get(psiFile)) {
 					addMarker(editor, problemDescriptor, false);
 				}
 
@@ -294,8 +295,9 @@ public class EditorHandler implements ProjectComponent {
 			_highlighters.remove(editor);
 
 			final PsiFile psiFile = IdeaUtilImpl.getPsiFile(project, vFile);
-			if (GroupTreeModel.getProblemCache().containsKey(psiFile)) {
-				for (final ExtendedProblemDescriptor problemDescriptor : GroupTreeModel.getProblemCache().get(psiFile)) {
+			final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = IdeaUtilImpl.getPluginComponent(project).getProblems();
+			if (problems.containsKey(psiFile)) {
+				for (final ExtendedProblemDescriptor problemDescriptor : problems.get(psiFile)) {
 					removeMarker(problemDescriptor);
 				}
 

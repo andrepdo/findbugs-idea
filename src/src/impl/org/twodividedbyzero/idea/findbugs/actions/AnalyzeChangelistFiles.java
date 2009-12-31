@@ -61,6 +61,7 @@ public class AnalyzeChangelistFiles extends BaseAction implements EventListener<
 	private boolean _running;
 	private ChangeList _activeChangeList;
 	private Project _project;
+	private ChangeListAdapter _changelistAdapter;
 
 
 	public AnalyzeChangelistFiles() {
@@ -180,8 +181,17 @@ public class AnalyzeChangelistFiles extends BaseAction implements EventListener<
 		if (!isRegistered(projectName)) {
 			EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(projectName), this);
 			addRegisteredProject(projectName);
-			ChangeListManager.getInstance(project).addChangeListListener(new MyChangeListAdapter());
+			ChangeListManager.getInstance(project).addChangeListListener(getChangelistAdapter());
 		}
+	}
+
+
+	public ChangeListAdapter getChangelistAdapter() {
+		if(_changelistAdapter == null) {
+			_changelistAdapter =  new MyChangeListAdapter();
+		}
+
+		return _changelistAdapter;
 	}
 
 

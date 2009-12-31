@@ -20,10 +20,15 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
+
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -54,4 +59,6 @@ public interface FindBugsPlugin extends Configurable, PersistentStateComponent<P
 	public Module getModule();
 
 	public boolean isModuleComponent();
+
+	public Map<PsiFile, List<ExtendedProblemDescriptor>> getProblems();
 }
