@@ -32,7 +32,7 @@ public class VersionManager {
 
 	public static final long _major = 0;
 	public static final long _minor = 9;
-	public static final long _build = 94;
+	public static final long _build = 95;
 
 	public static final String _branch = "";// NON-NLS
 
@@ -89,6 +89,8 @@ public class VersionManager {
 
 
 	/* e.g. "FindBugs-IDEA 0.9.21.26427". */
+
+
 	public static String getFullVersion() {
 		return FULL_VERSION_INTERNAL;
 	}
@@ -121,7 +123,7 @@ public class VersionManager {
 
 	@SuppressWarnings({"UseOfSystemOutOrSystemErr"})
 	public static void main(final String[] args) {
-		if(args.length == 1) {
+		if (args.length == 1) {
 			final File file = new File(args[0]);  // NON-NLS
 			System.out.println("version string file: " + args[0]);
 			FileWriter writer = null;

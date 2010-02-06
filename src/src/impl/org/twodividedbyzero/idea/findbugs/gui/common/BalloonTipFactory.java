@@ -75,7 +75,11 @@ public class BalloonTipFactory {
 
 
 	public static void showToolWindowInfoNotifier(final Project project, final String html) {
-		ToolWindowManager.getInstance(project).notifyByBalloon(IdeaUtilImpl.getPluginComponent(project).getInternalToolWindowId(), MessageType.INFO, html);
+		final ToolWindowManager manager = ToolWindowManager.getInstance(project);
+		if (manager == null) { // this should never happen.
+			return;
+		}
+		manager.notifyByBalloon(IdeaUtilImpl.getPluginComponent(project).getInternalToolWindowId(), MessageType.INFO, html);
 	}
 
 
@@ -85,7 +89,11 @@ public class BalloonTipFactory {
 
 
 	public static void showToolWindowWarnNotifier(final Project project, final String html) {
-		ToolWindowManager.getInstance(project).notifyByBalloon(IdeaUtilImpl.getPluginComponent(project).getInternalToolWindowId(), MessageType.WARNING, html);
+		final ToolWindowManager manager = ToolWindowManager.getInstance(project);
+		if (manager == null) { // this should never happen.
+			return;
+		}
+		manager.notifyByBalloon(IdeaUtilImpl.getPluginComponent(project).getInternalToolWindowId(), MessageType.WARNING, html);
 	}
 
 
@@ -95,7 +103,11 @@ public class BalloonTipFactory {
 
 
 	public static void showToolWindowErrorNotifier(final Project project, final String html) {
-		ToolWindowManager.getInstance(project).notifyByBalloon(IdeaUtilImpl.getPluginComponent(project).getInternalToolWindowId(), MessageType.ERROR, html);
+		final ToolWindowManager manager = ToolWindowManager.getInstance(project);
+		if (manager == null) { // this should never happen.
+			return;
+		}
+		manager.notifyByBalloon(IdeaUtilImpl.getPluginComponent(project).getInternalToolWindowId(), MessageType.ERROR, html);
 	}
 
 

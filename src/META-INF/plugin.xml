@@ -58,6 +58,12 @@
     </description>
     <change-notes>
         <![CDATA[<html>
+        <h3>0.9.95</h3>
+		<ul>
+			<li>add export (xml html) - thanks for your work Amit</li>
+            <li>fix possible npe (balloontip)</li>
+            <li>add support for directory based config format</li>
+		</ul>
         <h3>0.9.94</h3>
 		<ul>
 			<li>fixed ClassCastException (unregister ChangelistAction)</li>
@@ -174,7 +180,8 @@
             <implementation-class>org.twodividedbyzero.idea.findbugs.gui.editor.EditorHandler</implementation-class>
         </component>-->
         <component>
-            <implementation-class>org.twodividedbyzero.idea.findbugs.core.FindBugsCompileAfterHook</implementation-class>
+            <implementation-class>org.twodividedbyzero.idea.findbugs.core.FindBugsCompileAfterHook
+            </implementation-class>
         </component>
     </project-components>
     <application-components>
@@ -429,7 +436,15 @@
                     description="FindBugs plugin preferences page."
                     icon="/general/ideOptions.png"/>
 
+        </group>
 
+        <group id="FindBugs.ToolBarActions.utils" text="FindBugsSubGroup" popup="true">
+
+            <action id="FindBugs.ExportResult"
+                    class="org.twodividedbyzero.idea.findbugs.actions.ExportResult"
+                    text="Export Result to XML/HTML"
+                    description="FindBugs plugin Export to XML/HTML."
+                    icon="/actions/export.png"/>
         </group>
 
 
@@ -438,7 +453,7 @@
                     class="org.twodividedbyzero.idea.findbugs.actions.ShowPreferencesPage"
                     text="Plugin Preferences"
                     description="FindBugs plugin preferences page."
-                    icon="/general/ideOptions.png"/>    
+                    icon="/general/ideOptions.png"/>
         </group>
 
     </actions>

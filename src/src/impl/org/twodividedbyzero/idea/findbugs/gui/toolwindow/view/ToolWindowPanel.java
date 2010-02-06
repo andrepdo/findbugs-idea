@@ -70,6 +70,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 	private ActionToolbar _toolbarLeft;
 	private ActionToolbar _toolbarRight;
 	private ActionToolbar _toolbarNavigation;
+	private ActionToolbar _toolbarUtils;
 	private ToolWindow _toolWindow;
 	private BugTreePanel _bugTreePanel;
 	private transient BugDetailsComponents _bugDetailsComponents;
@@ -99,18 +100,23 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 		final ActionGroup actionGroupRight = (ActionGroup) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTION_GROUP_RIGHT);
 		_toolbarRight = ActionManager.getInstance().createActionToolbar(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId(), actionGroupRight, false);
 
-
 		final ActionGroup actionGroupNavigation = (ActionGroup) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTION_GROUP_NAVIGATION);
 		_toolbarNavigation = ActionManager.getInstance().createActionToolbar(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId(), actionGroupNavigation, false);
+
+		final ActionGroup actionGroupUtils = (ActionGroup) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTION_GROUP_UTILS);
+		_toolbarUtils = ActionManager.getInstance().createActionToolbar(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId(), actionGroupUtils, false);
+
 
 		final Component toolbarLeft = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Analysis...", SwingConstants.VERTICAL, _toolbarLeft, true); // NON-NLS
 		final Component toolbarRight = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Grouping...", SwingConstants.VERTICAL, _toolbarRight, true); // NON-NLS
 		final Component toolbarNavigation = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Navigation...", SwingConstants.VERTICAL, _toolbarNavigation, true); // NON-NLS
+		final Component toolbarUtils = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Utils...", SwingConstants.VERTICAL, _toolbarUtils, true); // NON-NLS
 
 
 		add(toolbarLeft, NDockLayout.WEST);
 		add(toolbarRight, NDockLayout.WEST);
 		add(toolbarNavigation, NDockLayout.WEST);
+		add(toolbarUtils, NDockLayout.WEST);
 
 
 		//final String layoutDef = "(ROW (LEAF name=left weight=0.4) (LEAF name=right weight=0.6))";  // NON-NLS

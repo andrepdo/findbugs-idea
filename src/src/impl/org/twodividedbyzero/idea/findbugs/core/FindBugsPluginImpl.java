@@ -27,6 +27,7 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.components.StorageScheme;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.Configurable;
@@ -84,9 +85,7 @@ import java.util.Set;
  */
 @State(
 		name = FindBugsPluginConstants.PLUGIN_ID,
-		storages = {@Storage(
-				id = "other",
-				file = "$PROJECT_FILE$")})
+		storages = {@Storage(id = "other", file = "$PROJECT_FILE$"), @Storage(id = "dir", file = "$PROJECT_CONFIG_DIR$/findbugs-idea.xml", scheme = StorageScheme.DIRECTORY_BASED)})
 public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Configurable, PersistentStateComponent<PersistencePreferencesBean> {
 
 	/*<category name="org.twodividedbyzero.idea.findbugs">
@@ -117,6 +116,8 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 
 	//@State
+
+
 	public FindBugsPluginImpl(final Project project) {
 		_project = project;
 		_application = ApplicationManager.getApplication();
