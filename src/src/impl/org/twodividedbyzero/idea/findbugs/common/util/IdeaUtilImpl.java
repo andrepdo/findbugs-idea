@@ -844,7 +844,7 @@ public final class IdeaUtilImpl {
 
 
 	public static String getIdeaBuildNumber() {
-		return ApplicationInfo.getInstance().getBuild().asString();
+		return ApplicationInfo.getInstance().getBuildNumber();
 
 	}
 
