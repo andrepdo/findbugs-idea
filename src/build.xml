@@ -51,6 +51,7 @@
 
 
     <target name="getversion" depends="mktargetdirs">
+        <antcall target="print-environment"/>
         <javac srcdir="${src.dir}/impl"
                destdir="${target.dir}/impl"
                debug="${javac.debug}"
@@ -326,6 +327,15 @@
         <mkdir dir="${target.dir}/jar"/>
         <mkdir dir="${target.dir}/tmp"/>
         <mkdir dir="${target.dir}/zip"/>
+    </target>
+
+
+    <target name="print-environment">
+        <echo>
+            JAVA_HOME=${env.JAVA_HOME}
+            JDK_HOME=${env.JDK_HOME}
+            IDEA.LIB=${idea.home}
+        </echo>
     </target>
 
 </project>
