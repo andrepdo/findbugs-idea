@@ -63,6 +63,8 @@
 			<li>add export (xml html) - thanks for your work Amit</li>
             <li>fix possible npe (balloontip)</li>
             <li>add support for directory based config format</li>
+            <li>made openjdk-7 compatible</li>
+            <li><apdated some deprecated usages/li>
 		</ul>
         <h3>0.9.94</h3>
 		<ul>
