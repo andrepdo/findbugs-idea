@@ -416,7 +416,9 @@ public class TreeNodeCellRenderer2 extends JPanel implements TreeCellRenderer {
 
 		setSize(size);
 		setPreferredSize(size);
-		validateTree();
+		synchronized (getTreeLock()) {
+			validateTree();
+		}
 
 		//eturn size;
 	}

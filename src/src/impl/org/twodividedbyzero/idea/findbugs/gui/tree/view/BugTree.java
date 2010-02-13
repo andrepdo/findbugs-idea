@@ -285,7 +285,8 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 			//_bugTree.setHighlightPath(treePath);
 
 			if (treePath != null) {
-				_bugTreePanel.scrollToSource(treePath);
+				_scrollToSourceHandler.scollToSelectionSource();
+				//_bugTreePanel.scrollToSource(treePath);
 			}
 		}
 
@@ -302,10 +303,11 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 			_bugTreePanel.setDetailHtml(path);
 
 			if (_bugTreePanel.isScrollToSource() && path != null) {
-				_bugTreePanel.scrollToSource(path);
+				_scrollToSourceHandler.scollToSelectionSource();
+				//_bugTreePanel.scrollToSource(path);
 			}
 		}
 	}
 
-	
+
 }

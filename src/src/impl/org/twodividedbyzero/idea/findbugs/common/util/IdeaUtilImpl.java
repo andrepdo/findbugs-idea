@@ -172,7 +172,7 @@ public final class IdeaUtilImpl {
 
 	@Nullable
 	public static PsiFile getPsiFile(final PsiElement psiClass) {
-		if(psiClass == null) {
+		if (psiClass == null) {
 			return null;
 		}
 		return psiClass.getContainingFile();
@@ -565,6 +565,8 @@ public final class IdeaUtilImpl {
 
 
 	// TODO: maybe not needed
+
+
 	public static File[] getFileForModules(final Module[] modules, final FileType fileType) {
 		final Collection<File> resolvedFiles = new HashSet<File>();
 
@@ -842,7 +844,7 @@ public final class IdeaUtilImpl {
 
 
 	public static String getIdeaBuildNumber() {
-		return ApplicationInfo.getInstance().getBuildNumber();
+		return ApplicationInfo.getInstance().getBuild().asString();
 
 	}
 
