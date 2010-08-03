@@ -35,5 +35,6 @@ Most Icons are taken from FindBugs and IntelliJ IDEA with slightly modifications
 
 BUILD
 ------
+adapt build.properties - path to idea.home should be something like idea.home=/home/andrep/Apps/dev/idea-8.1-jdk15 to be idea 8 and jdk 1.5 compatible
 execute '. setenv.sh'
 run 'ant assemble-all'

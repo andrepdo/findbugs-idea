@@ -1,26 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ChangeListManager" verified="true">
+  <component name="ChangeListManager">
     <list readonly="true" id="568871fc-8d61-43b5-bf0c-e5ef6942c304" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FindBugs-IDEA.iws" afterPath="$PROJECT_DIR$/FindBugs-IDEA.iws" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/ModuleComponentImpl.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/ModuleComponentImpl.java" />
     </list>
-    <list default="true" id="6f2966c4-618c-4178-9a63-f31dbd7b0852" name="export" comment="* add export (xml html) - thanks for your work Amit&#10;* fix possible npe (balloontip)">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/META-INF/plugin.xml" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/VersionManager.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/VersionManager.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/FindBugs-IDEA.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/BalloonTipFactory.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/BalloonTipFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/FindBugsPluginConstants.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/FindBugsPluginConstants.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ExportFileDialog.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPluginImpl.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPluginImpl.java" />
+    <list default="true" id="6f2966c4-618c-4178-9a63-f31dbd7b0852" name="export" comment="* removed deprecated usages&#10;* made openjdk7 compatible">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FindBugs-IDEA.ipr" afterPath="$PROJECT_DIR$/FindBugs-IDEA.ipr" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ExportResult.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README" afterPath="$PROJECT_DIR$/README" />
     </list>
     <list id="ca0a5d70-975e-4006-b173-7bf519059954" name="ignore" comment="" />
-    <ignored path=".idea/workspace.xml" />
-    <ignored path="FindBugs-IDEA.iws" />
-    <ignored mask=".ipr" />
     <ignored mask=".iml" />
+    <ignored path=".idea/workspace.xml" />
+    <ignored path="$USER_HOME_GRAILS$/" />
+    <ignored mask=".ipr" />
+    <ignored path="FindBugs-IDEA.iws" />
+    <ignored path="$USER_HOME_GRIFFON$/" />
     <file path="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/ModuleComponentImpl.java" changelist="6f2966c4-618c-4178-9a63-f31dbd7b0852" time="1265315135494" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -89,8 +84,8 @@
       <property name="line_breakpoints_flattenPackages" value="true" />
       <property name="method_breakpoints_groupByClasses" value="true" />
       <property name="exception_breakpoints_viewId" value="TABLE" />
-      <property name="field_breakpoints_viewId" value="TABLE" />
       <property name="exception_breakpoints_groupByClasses" value="true" />
+      <property name="field_breakpoints_viewId" value="TABLE" />
       <property name="method_breakpoints_groupByMethods" value="false" />
     </ui_properties>
   </component>
@@ -100,51 +95,11 @@
   <component name="FileColors" enabled="true" enabledForTabs="true" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="ExportResult.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ExportResult.java">
+      <file leaf-file-name="BugInstanceUtil.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/BugInstanceUtil.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="227" column="50" selection-start="7912" selection-end="7912" vertical-scroll-proportion="0.29427794">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FindBugsPreferences.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/preferences/FindBugsPreferences.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="270" column="0" selection-start="8279" selection-end="8279" vertical-scroll-proportion="0.0">
+            <state line="186" column="32" selection-start="5458" selection-end="5458" vertical-scroll-proportion="0.0">
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BalloonTipFactory.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/BalloonTipFactory.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="67" column="28" selection-start="1827" selection-end="1827" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FindBugsPluginImpl.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPluginImpl.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="345" column="31" selection-start="11850" selection-end="11850" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ExportFileDialog.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ExportFileDialog.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="116" column="0" selection-start="3314" selection-end="3314" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -153,6 +108,51 @@
         <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/FindBugsPluginConstants.java">
           <provider selected="true" editor-type-id="text-editor">
             <state line="46" column="82" selection-start="1651" selection-end="1680" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="plugin.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/META-INF/plugin.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BUILD.txt" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/BUILD.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="1" column="65" selection-start="218" selection-end="218" vertical-scroll-proportion="0.021212121">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="setenv.sh" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/setenv.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="12" column="16" selection-start="183" selection-end="192" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="build.properties" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/build.properties">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="4" column="46" selection-start="213" selection-end="259" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="README" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/README">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="37" column="0" selection-start="1648" selection-end="1843" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -204,6 +204,11 @@
         <option value="$PROJECT_DIR$/META-INF/plugin.xml" />
         <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/VersionManager.java" />
         <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ExportResult.java" />
+        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/TreeNodeCellRenderer2.java" />
+        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/IdeaUtilImpl.java" />
+        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/BugTree.java" />
+        <option value="$PROJECT_DIR$/README" />
+        <option value="$PROJECT_DIR$/BUILD.txt" />
       </list>
     </option>
   </component>
@@ -428,6 +433,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="Favorites" />
       <pane id="ProjectPane">
         <subPane>
@@ -457,129 +463,28 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="FindBugs-IDEA" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="FindBugs-IDEA" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="impl" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="findbugs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="FindBugs-IDEA" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="FindBugs-IDEA" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="impl" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="findbugs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="inspection" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="FindBugs-IDEA" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="FindBugs-IDEA" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="impl" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="findbugs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="FindBugs-IDEA" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="FindBugs-IDEA" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="impl" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="findbugs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="actions" />
+              <option name="myItemId" value="META-INF" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
       <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth1" value="154" />
-    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth0" value="110" />
     <property name="project.structure.last.edited" value="Modules" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth0" value="110" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth3" value="35" />
-    <property name="OverrideImplement.combined" value="true" />
-    <property name="project.structure.proportion" value="0.0" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth2" value="130" />
-    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="OverrideImplement.combined" value="true" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder1" value="1" />
+    <property name="options.splitter.main.proportions" value="0.3" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder0" value="0" />
-    <property name="RunManagerConfig.showSettingsBeforeRunnig" value="false" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder3" value="3" />
+    <property name="RunManagerConfig.showSettingsBeforeRunnig" value="false" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder2" value="2" />
     <property name="recentsLimit" value="5" />
     <property name="MemberChooser.sorted" value="false" />
@@ -587,13 +492,13 @@
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder4" value="4" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth1" value="134" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth0" value="104" />
-    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth4" value="903" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth4" value="900" />
     <property name="GoToClass.includeJavaFiles" value="false" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth3" value="104" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
-    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth4" value="924" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth4" value="921" />
     <property name="GoToClass.includeLibraries" value="false" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="GoToFile.includeJavaFiles" value="false" />
@@ -601,12 +506,12 @@
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder3" value="3" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder4" value="4" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder1" value="1" />
-    <property name="project.structure.side.proportion" value="0.0" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder2" value="2" />
-    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="project.structure.side.proportion" value="0.0" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder0" value="0" />
-    <property name="dynamic.classpath" value="false" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="options.searchVisible" value="true" />
+    <property name="dynamic.classpath" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="IntroduceConstantDialog.RECENTS_KEY">
@@ -627,21 +532,16 @@
         <option name="Make" enabled="false" />
       </method>
     </configuration>
-    <configuration default="true" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" break_at_first_line="false" browser="DEFAULT" class_file="" class="" config_file="" directory="" file="" is_config_by_xml="false" is_groups_set="false" method_class="" method_file="" method="" open_page_automatically="false" scope="Class" stop_session_after_first_page="true" web_path="">
+    <configuration default="true" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" class_file="" class="" config_file="" is_config_by_xml="false" session_id="" directory="" file="" is_groups_set="false" max_children="100" max_data="100" max_depth="3" method_class="" method_file="" method="" path="" scope="Class">
       <option name="excludedGroups">
         <set />
       </option>
       <option name="includedGroups">
         <set />
       </option>
-      <option name="mappings">
-        <list />
-      </option>
-      <option name="sessionId" value="" />
       <method>
         <option name="AntTarget" enabled="false" />
         <option name="BuildArtifacts" enabled="false" />
-        <option name="FtpUpload" enabled="false" />
       </method>
     </configuration>
     <configuration default="true" type="Remote" factoryName="Remote">
@@ -852,23 +752,21 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1440" height="872" extended-state="6" />
+    <frame x="0" y="0" width="1436" height="872" extended-state="4" />
     <editor active="true" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32777777" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32686982" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3263889" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24891461" sideWeight="0.5735294" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.39722222" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39722222" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="FindBugs-IDEA" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33194444" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32916668" sideWeight="0.0" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3263889" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32732317" sideWeight="0.0" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2469314" sideWeight="0.59305555" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24692252" sideWeight="0.6629681" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3236111" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Dataflow to this" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -877,6 +775,8 @@
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3263889" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3263889" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="EJB" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Web Preview" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -893,8 +793,10 @@
     <option name="PERFORM_ADD_REMOVE_IN_BACKGROUND" value="true" />
     <option name="PERFORM_ROLLBACK_IN_BACKGROUND" value="false" />
     <option name="CHECK_LOCALLY_CHANGED_CONFLICTS_IN_BACKGROUND" value="true" />
+    <option name="ENABLE_BACKGROUND_PROCESSES" value="true" />
+    <option name="CHANGED_ON_SERVER_INTERVAL" value="60" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="* introduce anonymous class delimiter constant" />
+    <option name="LAST_COMMIT_MESSAGE" value="* removed deprecated usages&#10;* made openjdk7 compatible" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -917,6 +819,8 @@
     <MESSAGE value="* add test target" />
     <MESSAGE value="* add more descriptive plugin text" />
     <MESSAGE value="* introduce anonymous class delimiter constant" />
+    <MESSAGE value="* add export (xml html) - thanks for your work Amit&#10;* fix possible npe (balloontip)" />
+    <MESSAGE value="* removed deprecated usages&#10;* made openjdk7 compatible" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -930,19 +834,54 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/types/BugReporterEventImpl.java">
+    <entry file="jar://$PROJECT_DIR$/../../Apps/dev/idea/lib/openapi.jar!/com/intellij/openapi/application/ApplicationInfo.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="54" column="43" selection-start="1834" selection-end="1834" vertical-scroll-proportion="0.0" />
+        <state line="15" column="28" selection-start="410" selection-end="410" vertical-scroll-proportion="0.33256352" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/EventManagerImpl.java">
+    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/TreeNodeCellRenderer2.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="44" column="13" selection-start="1464" selection-end="1464" vertical-scroll-proportion="0.0" />
+        <state line="418" column="0" selection-start="12382" selection-end="12382" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/EventListener.java">
+    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/BugTree.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="22" selection-start="837" selection-end="837" vertical-scroll-proportion="0.0" />
+        <state line="284" column="28" selection-start="8823" selection-end="8823" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugTreePanel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="174" column="16" selection-start="5378" selection-end="5378" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/ScrollToSourceHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="28" column="13" selection-start="863" selection-end="863" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/IdeaUtilImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="849" column="0" selection-start="27613" selection-end="27613" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/BugInstanceUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="186" column="32" selection-start="5458" selection-end="5458" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/FindBugsPluginConstants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="46" column="82" selection-start="1651" selection-end="1680" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="199" column="0" selection-start="8752" selection-end="8752" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByBugCategory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="141" column="5" selection-start="4217" selection-end="4546" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzeSelectedFiles.java">
@@ -950,91 +889,38 @@
         <state line="49" column="95" selection-start="2118" selection-end="2149" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzePackageFiles.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="67" column="42" selection-start="2624" selection-end="2658" vertical-scroll-proportion="-5.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzeAllModifiedFiles.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="86" column="12" selection-start="3342" selection-end="3495" vertical-scroll-proportion="0.3660287">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/FindBugsPluginConstants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="46" column="82" selection-start="1651" selection-end="1680" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPluginImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="345" column="31" selection-start="11850" selection-end="11850" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByBugCategory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="141" column="5" selection-start="4217" selection-end="4546" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="199" column="0" selection-start="8752" selection-end="8752" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/BalloonTipFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="67" column="28" selection-start="1827" selection-end="1827" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/VersionManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="34" column="41" selection-start="988" selection-end="988" vertical-scroll-proportion="0.46296296">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/META-INF/plugin.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="60" column="23" selection-start="3438" selection-end="3438" vertical-scroll-proportion="0.5755396">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ExportFileDialog.java">
+    <entry file="file://$PROJECT_DIR$/build.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="116" column="0" selection-start="3314" selection-end="3314" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/preferences/FindBugsPreferences.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="270" column="0" selection-start="8279" selection-end="8279" vertical-scroll-proportion="0.0">
+        <state line="4" column="46" selection-start="213" selection-end="259" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ExportResult.java">
+    <entry file="file://$PROJECT_DIR$/README">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="227" column="50" selection-start="7912" selection-end="7912" vertical-scroll-proportion="0.29427794">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state line="37" column="0" selection-start="1648" selection-end="1843" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/setenv.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="12" column="16" selection-start="183" selection-end="192" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/BUILD.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1" column="65" selection-start="218" selection-end="218" vertical-scroll-proportion="0.021212121">
+          <folding />
         </state>
       </provider>
     </entry>

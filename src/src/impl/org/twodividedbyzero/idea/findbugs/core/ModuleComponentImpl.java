@@ -56,9 +56,8 @@ import java.util.Map.Entry;
  */
 @State(
 		name = FindBugsPluginConstants.PLUGIN_ID,
-		storages = {@Storage(
-				id = "other",
-				file = "$MODULE_FILE$")})
+		storages = {@Storage(id = "other", file = "$MODULE_FILE$")
+					/*@Storage(id = "dir", file = "$PROJECT_CONFIG_DIR$/findbugs-idea.xml", scheme = StorageScheme.DIRECTORY_BASED)*/})
 public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Configurable, PersistentStateComponent<PersistencePreferencesBean> {
 
 	private static final Logger LOGGER = Logger.getInstance(FindBugsPluginImpl.class.getName());
@@ -219,7 +218,7 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 		preferencesBean.getDetectors().putAll(_preferences.getDetectors());
 		preferencesBean.getBugCategories().putAll(_preferences.getBugCategories());
 
-	 	preferencesBean.getIncludeFilters().addAll(_preferences.getIncludeFilters());
+		preferencesBean.getIncludeFilters().addAll(_preferences.getIncludeFilters());
 		preferencesBean.getExcludeFilters().addAll(_preferences.getExcludeFilters());
 		preferencesBean.getExcludeBaselineBugs().addAll(_preferences.getExcludeBaselineBugs());
 
@@ -239,7 +238,7 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 			_preferences.setDetectors(detectors);
 			for (final Entry<String, String> entry : detectors.entrySet()) {
 				final DetectorFactory detectorFactory = FindBugsPreferences.getDetectorFactorCollection().getFactory(entry.getKey());
-				if(detectorFactory != null) {
+				if (detectorFactory != null) {
 					_preferences.getUserPreferences().enableDetector(detectorFactory, Boolean.valueOf(entry.getValue()));
 				}
 			}
