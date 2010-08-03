@@ -60,7 +60,7 @@
         <![CDATA[<html>
         <h3>0.9.95</h3>
 		<ul>
-			<li>add export (xml html) - thanks for your work Amit</li>
+			<li>add export (xml html)</li>
             <li>fix possible npe (balloontip)</li>
             <li>add support for directory based config format</li>
             <li>made openjdk-7 compatible</li>
