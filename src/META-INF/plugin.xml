@@ -39,17 +39,17 @@
             <li>load additional detector plugins like fb-contrib.jar</li>
             <li>group results by: bug category, classname, package, priority, bug rank</li>
             <li>intellij local history support</li>
-            <li>run Findbugs anaysis as IntelliJ inspection (experimental)</li>
-            <li>Analyze actions (all actions are also available in the intellij pro0ject tree, toolbar menu, context menu):
+            <li>run Findbugs analysis as IntelliJ inspection (experimental)</li>
+            <li>Analyze actions (all actions are also available in the intellij project tree, toolbar menu, context menu):
                 <ul>
-                    <li>&nbsp;analyze all modfified files</li>
+                    <li>&nbsp;analyze all modified files</li>
                     <li>&nbsp;analyze all files on the active changelist</li>
-                    <li>&nbsp;analyze class under cursor</li>
+                    <li>&nbsp;analyze class under editor caret</li>
                     <li>&nbsp;analyze current editor file</li>
                     <li>&nbsp;analyze all files of an intellij project</li>
                     <li>&nbsp;analyze all files of an intellij module</li>
                     <li>&nbsp;analyze all files of the selected package</li>
-                    <li>&nbsp;analyze a bunch of seleted files (project tree)</li>
+                    <li>&nbsp;analyze a bunch of selected files (project tree)</li>
                 </ul>
             </li>
 		</ul>
