@@ -43,7 +43,7 @@
             <li>Analyze actions (all actions are also available in the intellij pro0ject tree, toolbar menu, context menu):
                 <ul>
                     <li>&nbsp;analyze all modified files</li>
-                    <li>&nbsp;analyze all files on the active changelist</li>
+                    <li>&nbsp;analyze all files on the active changelist (available from FindBugs-IDEA main ToolWindow and the ChangelistToolWindow)</li>
                     <li>&nbsp;analyze class under cursor</li>
                     <li>&nbsp;analyze current editor file</li>
                     <li>&nbsp;analyze all files of an intellij project</li>
