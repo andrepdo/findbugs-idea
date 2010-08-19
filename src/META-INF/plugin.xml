@@ -52,6 +52,10 @@
                     <li>&nbsp;analyze a bunch of selected files (project tree)</li>
                 </ul>
             </li>
+            <li>export a bug collection to html and/or xml with limited configurable dir based archive support</li>
+            <li>import a bug collection from xml</li>
+            <li>configurable : open an exported bug collection html page in the intellij configured browser</li>
+            <li>configurable : preview found bugs in an editor preview panel</li>
 		</ul>
 		</p>
 		]]>
