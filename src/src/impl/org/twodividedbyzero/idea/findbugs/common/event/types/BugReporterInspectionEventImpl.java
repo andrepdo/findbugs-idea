@@ -130,6 +130,6 @@ public class BugReporterInspectionEventImpl extends EventImpl implements BugRepo
 
 	@Override
 	public String toString() {
-		return "BugReporterInspectionEventImpl{" + "_operation=" + _operation + ", _bugInstance=" + _bugInstance + ", _bugCount=" + _bugCount + ", _bugCollection=" + _bugCollection + ", _projectStats=" + _projectStats + ", _projectName=" + _projectName + '}'; // NON-NLS
+		return "BugReporterInspectionEventImpl{" + "_operation=" + _operation + ", _bugInstance=" + _bugInstance + ", _bugCount=" + _bugCount + ", _bugCollection=" + _bugCollection + ", _projectStats=" + _projectStats + ", _projectName=" + _projectName + '}';
 	}
 }

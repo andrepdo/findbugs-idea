@@ -47,6 +47,6 @@ public class EventImpl implements Event {
 
 	@Override
 	public String toString() {
-		return super.toString() + "{_eventType=" + _eventType + '}'; // NON-NLS
+		return super.toString() + "{_eventType=" + _eventType + '}';
 	}
 }

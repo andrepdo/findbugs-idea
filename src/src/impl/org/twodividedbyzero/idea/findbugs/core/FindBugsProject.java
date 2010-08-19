@@ -58,7 +58,7 @@ public class FindBugsProject extends Project {
 				final VirtualFile parent = file.getParent();
 				if (parent != null && parent.isDirectory()) {
 					addSourceDir(parent.getPresentableUrl());
-					LOGGER.debug("adding source dir: " + parent.getPresentableUrl());// NON-NLS
+					LOGGER.debug("adding source dir: " + parent.getPresentableUrl());
 
 					/*ApplicationManager.getApplication().invokeLater(new Runnable() {
 						public void run() {*/
@@ -68,7 +68,7 @@ public class FindBugsProject extends Project {
 				}
 			} else if (file.isDirectory()) { // package dir
 				addSourceDir(file.getPresentableUrl());
-				LOGGER.debug("adding source dir: " + file.getPresentableUrl());// NON-NLS
+				LOGGER.debug("adding source dir: " + file.getPresentableUrl());
 			}
 		}
 	}
@@ -78,7 +78,7 @@ public class FindBugsProject extends Project {
 		for (final VirtualFile file : classpathFiles) {
 			addAuxClasspathEntry(file.getPresentableUrl());
 			//_findBugsTask.getProgressIndicator().setText("Collecting auxiliary classpath entires...");
-			LOGGER.debug("adding aux classpath entry: " + file.getPresentableUrl());// NON-NLS
+			LOGGER.debug("adding aux classpath entry: " + file.getPresentableUrl());
 
 			/*ApplicationManager.getApplication().invokeLater(new Runnable() {
 				public void run() {*/

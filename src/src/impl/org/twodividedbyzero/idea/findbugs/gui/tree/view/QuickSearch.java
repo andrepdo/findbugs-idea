@@ -80,6 +80,7 @@ import java.util.regex.PatternSyntaxException;
  * @version $Revision$
  * @since 0.9.29-dev
  */
+@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_BAD_FIELD_INNER_CLASS"})
 public abstract class QuickSearch<E> {
 
 	private static final Logger LOGGER = Logger.getInstance(QuickSearch.class.getName());
@@ -95,7 +96,7 @@ public abstract class QuickSearch<E> {
 	private FocusListener _focusListener;
 	private ComponentListener _componentListener;
 	private int _cursor = -1;
-	private Color _foregroundColor = UIManager.getColor("ToolTip.foreground");  // NON-NLS
+	private Color _foregroundColor = UIManager.getColor("ToolTip.foreground");
 	private Color _backgroundColor = new Color(255, 255, 200);
 	private final Stack<String> _recentSearches;
 
@@ -593,9 +594,9 @@ public abstract class QuickSearch<E> {
 		private void initGui(final String text) {
 			//addKeyListener(_keyListener);
 
-			_label = new JLabel("Search for: ");  // NON-NLS
+			_label = new JLabel("Search for: ");
 			_label.setFont(new Font(getFont().getName(), Font.BOLD, 12));
-			_label.setForeground(_foregroundColor);  // NON-NLS
+			_label.setForeground(_foregroundColor);
 			_label.setVerticalAlignment(JLabel.BOTTOM);
 
 			_toolBar = new NavigationToolBar("test", false, SwingConstants.HORIZONTAL);
@@ -603,7 +604,7 @@ public abstract class QuickSearch<E> {
 			_toolBar.setVisible(false);
 
 			_searchField = new SearchField();
-			_searchField.setForeground(_foregroundColor);  // NON-NLS
+			_searchField.setForeground(_foregroundColor);
 			_searchField.setFocusable(false);
 			_searchField.setOpaque(false);
 			_searchField.setBorder(BorderFactory.createEmptyBorder());
@@ -643,7 +644,7 @@ public abstract class QuickSearch<E> {
 							remove(_toolBar);
 							updatePopupBounds();
 						} else {
-							_searchField.setForeground(_foregroundColor);  // NON-NLS
+							_searchField.setForeground(_foregroundColor);
 							_toolBar.setVisible(true);
 							add(_toolBar, BorderLayout.LINE_END);
 							QuickSearch.this.setCursor(found);
@@ -745,7 +746,7 @@ public abstract class QuickSearch<E> {
 				if (found == -1) {
 					//_searchField.setForeground(getNoMatchForeground());
 				} else {
-					_searchField.setForeground(UIManager.getColor("Toolip.foreground"));  // NON-NLS
+					_searchField.setForeground(UIManager.getColor("Toolip.foreground"));
 					QuickSearch.this.setCursor(found);
 					setSelectedElement(found);
 				}
@@ -846,7 +847,7 @@ public abstract class QuickSearch<E> {
 
 
 		private void initGui() {
-			_label = new JLabel("Recent Searches");  // NON-NLS
+			_label = new JLabel("Recent Searches");
 			_label.setPreferredSize(new Dimension(getPreferredSize().width, _label.getPreferredSize().height + 5));
 			_label.setForeground(_foregroundColor);
 			_label.setBackground(_backgroundColor);
@@ -893,7 +894,7 @@ public abstract class QuickSearch<E> {
 			setLayout(new BorderLayout());
 			setBackground(_backgroundColor);
 			setOpaque(true);
-			setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));  // NON-NLS
+			setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 
 			add(_label, BorderLayout.NORTH);
 			add(scrollPane, BorderLayout.CENTER);

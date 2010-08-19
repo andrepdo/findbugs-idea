@@ -86,7 +86,7 @@ public class ToggleableButton extends JButton {
 	@Override
 	public String getUIClassID() {
 		if (getToggleMode()) {
-			return "ToggleButtonUI";  // NON-NLS
+			return "ToggleButtonUI";
 		}
 		return super.getUIClassID();
 	}

@@ -963,7 +963,6 @@
         <inspection_tool class="ExtendsThread" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ExtendsUtilityClass" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ExternalizableWithSerializationMethods" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="FaceletsDetectingInspection" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="FacesModelInspection" enabled="true" level="ERROR" enabled_by_default="true" />
         <inspection_tool class="FallthroughInSwitchStatementJS" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="FallthruInSwitchStatement" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -996,12 +995,9 @@
         <inspection_tool class="FinalMethodInFinalClass" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="FinalPrivateMethod" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="FinalStaticMethod" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="Finalize" enabled="false" level="WARNING" enabled_by_default="false">
-          <option name="ignoreTrivialFinalizers" value="true" />
-        </inspection_tool>
+        <inspection_tool class="Finalize" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="FinalizeCallsSuperFinalize" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="ignoreObjectSubclasses" value="false" />
-          <option name="ignoreTrivialFinalizers" value="true" />
+          <option name="m_ignoreForObjectSubclasses" value="false" />
         </inspection_tool>
         <inspection_tool class="FinalizeNotProtected" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="FinallyBlockCannotCompleteNormally" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -1226,8 +1222,6 @@
         <inspection_tool class="GwtServiceNotRegistered" enabled="true" level="ERROR" enabled_by_default="true" />
         <inspection_tool class="GwtSetServiceEntryPointCalls" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="GwtToHtmlReferences" enabled="true" level="ERROR" enabled_by_default="true" />
-        <inspection_tool class="GwtUiFieldErrors" enabled="false" level="ERROR" enabled_by_default="false" />
-        <inspection_tool class="GwtUiHandlerErrors" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="HardCodedStringLiteral" enabled="true" level="INFO" enabled_by_default="true">
           <option name="ignoreForAssertStatements" value="true" />
           <option name="ignoreForExceptionConstructors" value="true" />
@@ -1395,7 +1389,6 @@
         <inspection_tool class="JSUnresolvedVariable" enabled="true" level="INFO" enabled_by_default="true" />
         <inspection_tool class="JSUntypedDeclaration" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="JSUnusedLocalSymbols" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="JSValidateJSON" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JSValidateTypes" enabled="false" level="INFO" enabled_by_default="false" />
         <inspection_tool class="JUnit4AnnotatedMethodInJUnit3TestCase" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="JUnitAbstractTestClassNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
@@ -1527,7 +1520,6 @@
         <inspection_tool class="MalformedFormatString" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MalformedRegex" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="MalformedXPath" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="ManagedBeanClassInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="ManagedBeanInconsistencyInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="ManualArrayCopy" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="ManualArrayToCollectionCopy" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -1687,7 +1679,6 @@
           <option name="REPORT_ANNOTATION_NOT_PROPAGATED_TO_OVERRIDERS" value="true" />
         </inspection_tool>
         <inspection_tool class="NumberEquality" enabled="true" level="WARNING" enabled_by_default="true" />
-        <inspection_tool class="NumericOverflow" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="NumericToString" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ObjectAllocationIgnoredJS" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="ObjectAllocationInLoop" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -1950,7 +1941,10 @@
         <inspection_tool class="SimplifiableConditionalExpression" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="SimplifiableIfStatement" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="SimplifiableJUnitAssertion" enabled="false" level="WARNING" enabled_by_default="false" />
-        <inspection_tool class="Since15" enabled="false" level="ERROR" enabled_by_default="false" />
+        <inspection_tool class="Since15" enabled="false" level="ERROR" enabled_by_default="false">
+          <option name="FORBID_15_API" value="true" />
+          <option name="FORBID_16_API" value="true" />
+        </inspection_tool>
         <inspection_tool class="SingleCharacterStartsWith" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="SingleClassImport" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="Singleton" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -2132,7 +2126,6 @@
           <option name="m_allowConstructorAsInitializer" value="false" />
           <option name="m_onlyLookAtBlocks" value="false" />
         </inspection_tool>
-        <inspection_tool class="TrailingSpacesInProperty" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="TransientFieldInNonSerializableClass" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="TransientFieldNotInitialized" enabled="false" level="WARNING" enabled_by_default="false" />
         <inspection_tool class="TrivialConditionalJS" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -2686,8 +2679,11 @@
         <w>Throwable</w>
         <w>Tooltips</w>
         <w>Util</w>
+        <w>changelist</w>
         <w>classname</w>
         <w>findbugs</w>
+        <w>multi</w>
+        <w>resize</w>
       </words>
     </dictionary>
   </component>

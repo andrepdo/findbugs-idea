@@ -29,9 +29,9 @@ import java.util.Locale;
  */
 public enum AnalysisEffort {
 
-	MIN(UserPreferences.EFFORT_MIN, "Minimal", 10),  // NON-NLS
-	DEFAULT(UserPreferences.EFFORT_DEFAULT, "Default", 20),  // NON-NLS
-	MAX(UserPreferences.EFFORT_MAX, "Maximal", 30);  // NON-NLS
+	MIN(UserPreferences.EFFORT_MIN, "Minimal", 10),
+	DEFAULT(UserPreferences.EFFORT_DEFAULT, "Default", 20),
+	MAX(UserPreferences.EFFORT_MAX, "Maximal", 30);
 
 	private String _effortLevel;
 	private String _message;

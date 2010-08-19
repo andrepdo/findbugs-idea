@@ -73,6 +73,7 @@ public class ConfigurationPanel extends JPanel {
 	private JSlider _effortSlider;
 	private transient FilterConfiguration _filterConfig;
 	private transient PluginConfiguration _pluginConfig;
+	private transient ImportExportConfiguration _importExportConfig;
 
 
 	public ConfigurationPanel(final FindBugsPlugin plugin) {
@@ -87,7 +88,7 @@ public class ConfigurationPanel extends JPanel {
 		initGui();
 
 		final FindBugsPreferences preferences = getPreferences();
-		if (!preferences.getBugCategories().containsValue("true") && !preferences.getDetectors().containsValue("true")) {  // NON-NLS
+		if (!preferences.getBugCategories().containsValue("true") && !preferences.getDetectors().containsValue("true")) {
 			restoreDefaultPreferences();
 		}
 	}
@@ -130,7 +131,7 @@ public class ConfigurationPanel extends JPanel {
 			final Container tabPanel = new JPanel(new BorderLayout());
 			tabPanel.add(getTabbedPane(), BorderLayout.CENTER);
 			_mainPanel.add(tabPanel, "1, 5, 3, 5");
-			_mainPanel.add(getRestoreDefaultsButton(), "3, 7, 3, 7, R, T");  // NON-NLS
+			_mainPanel.add(getRestoreDefaultsButton(), "3, 7, 3, 7, R, T");
 
 		}
 
@@ -142,7 +143,7 @@ public class ConfigurationPanel extends JPanel {
 		getEffortSlider().setValue(AnalysisEffort.valueOfLevel(getPreferences().getProperty(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL, AnalysisEffort.DEFAULT.getEffortLevel())).getValue());
 		getRunInBgCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND, false));
 		getAnalyzeAfterCompileCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.ANALYZE_AFTER_COMPILE, false));
-		getToolwindowToFrontCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.TOOLWINDOW_TOFRONT, true));
+		getToolwindowToFrontCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT, true));
 		getEffortLevelCombobox().setSelectedItem(AnalysisEffort.valueOfLevel(getPreferences().getProperty(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL, AnalysisEffort.DEFAULT.getEffortLevel())));
 		//((FindBugsPluginImpl) _plugin).setPreferences(FindBugsPreferences.createDefaultPreferences());
 		getReporterConfig().updatePreferences();
@@ -150,6 +151,9 @@ public class ConfigurationPanel extends JPanel {
 		getFilterConfig().updatePreferences();
 		if (!_plugin.isModuleComponent()) {
 			getPluginConfig().updatePreferences();
+		}
+		if (!_plugin.isModuleComponent()) {
+			getImportExportConfig().updatePreferences();
 		}
 	}
 
@@ -161,7 +165,7 @@ public class ConfigurationPanel extends JPanel {
 
 	private AbstractButton getRunInBgCheckbox() {
 		if (_runInBackgroundChkb == null) {
-			_runInBackgroundChkb = new JCheckBox("Run analysis in background");  // NON-NLS
+			_runInBackgroundChkb = new JCheckBox("Run analysis in background");
 			_runInBackgroundChkb.setFocusable(false);
 			_runInBackgroundChkb.addItemListener(new ItemListener() {
 				public void itemStateChanged(final ItemEvent e) {
@@ -175,7 +179,7 @@ public class ConfigurationPanel extends JPanel {
 
 	private AbstractButton getAnalyzeAfterCompileCheckbox() {
 		if (_analyzeAfterCompileChkb == null) {
-			_analyzeAfterCompileChkb = new JCheckBox("Analyze affected files after compile");  // NON-NLS
+			_analyzeAfterCompileChkb = new JCheckBox("Analyze affected files after compile");
 			_analyzeAfterCompileChkb.setFocusable(false);
 			_analyzeAfterCompileChkb.addItemListener(new ItemListener() {
 				public void itemStateChanged(final ItemEvent e) {
@@ -189,11 +193,11 @@ public class ConfigurationPanel extends JPanel {
 
 	private AbstractButton getToolwindowToFrontCheckbox() {
 		if (_toolwindowToFront == null) {
-			_toolwindowToFront = new JCheckBox("Activate toolwindow on run");  // NON-NLS
+			_toolwindowToFront = new JCheckBox("Activate toolwindow on run");
 			_toolwindowToFront.setFocusable(false);
 			_toolwindowToFront.addItemListener(new ItemListener() {
 				public void itemStateChanged(final ItemEvent e) {
-					getPreferences().setProperty(FindBugsPreferences.TOOLWINDOW_TOFRONT, e.getStateChange() == ItemEvent.SELECTED);
+					getPreferences().setProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT, e.getStateChange() == ItemEvent.SELECTED);
 				}
 			});
 		}
@@ -212,7 +216,7 @@ public class ConfigurationPanel extends JPanel {
 			final LayoutManager tbl = new TableLayout(size);
 
 			_effortPanel = new JPanel(tbl);
-			_effortPanel.add(new JLabel("Analysis effort"), "1, 1, 1, 1");  // NON-NLS
+			_effortPanel.add(new JLabel("Analysis effort"), "1, 1, 1, 1");
 			_effortPanel.setBorder(null);
 			_effortPanel.add(getEffortSlider(), "3, 1, 3, 1, l, t");
 		}
@@ -268,12 +272,15 @@ public class ConfigurationPanel extends JPanel {
 	private Component getTabbedPane() {
 		if (_tabbedPane == null) {
 			_tabbedPane = new JTabbedPane();
-			_tabbedPane.addTab("Detector configuration", getDetectorConfig().getComponent());  // NON-NLS
-			_tabbedPane.addTab("Reporter configuration", getReporterConfig().getComponent());  // NON-NLS
-			_tabbedPane.addTab("Filter configuration", getFilterConfig().getComponent());  // NON-NLS
+			_tabbedPane.addTab("Detector configuration", getDetectorConfig().getComponent());
+			_tabbedPane.addTab("Reporter configuration", getReporterConfig().getComponent());
+			_tabbedPane.addTab("Filter configuration", getFilterConfig().getComponent());
 
 			if (!_plugin.isModuleComponent()) {
-				_tabbedPane.addTab("Plugin configuration", getPluginConfig().getComponent());  // NON-NLS
+				_tabbedPane.addTab("Plugin configuration", getPluginConfig().getComponent());
+			}
+			if (!_plugin.isModuleComponent()) {
+				_tabbedPane.addTab("Import/Export configuration", getImportExportConfig().getComponent());
 			}
 		}
 		return _tabbedPane;
@@ -312,9 +319,17 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
+	ImportExportConfiguration getImportExportConfig() {
+		if (_importExportConfig == null) {
+			_importExportConfig = new ImportExportConfiguration(this, getPreferences());
+		}
+		return _importExportConfig;
+	}
+
+
 	private Component getRestoreDefaultsButton() {
 		if (_restoreDefaultsButton == null) {
-			_restoreDefaultsButton = new JButton("Restore defaults");  // NON-NLS
+			_restoreDefaultsButton = new JButton("Restore defaults");
 			_restoreDefaultsButton.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
 					restoreDefaultPreferences();
@@ -347,6 +362,9 @@ public class ConfigurationPanel extends JPanel {
 
 		if (!_plugin.isModuleComponent()) {
 			getPluginConfig().setEnabled(enabled);
+		}
+		if (!_plugin.isModuleComponent()) {
+			getImportExportConfig().setEnabled(enabled);
 		}
 
 	}

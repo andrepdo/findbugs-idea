@@ -36,6 +36,7 @@ import java.util.List;
  * @version $Revision$
  * @since 0.9.90-dev
  */
+@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
 public class BugPatternTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 0L;
@@ -269,13 +270,13 @@ public class BugPatternTableModel extends AbstractTableModel {
 	public String getColumnName(final int col) {
 		switch (col) {
 			case 1:
-				return "Detector id";  // NON-NLS
+				return "Detector id";
 			case 2:
-				return "Pattern(s)";  // NON-NLS
+				return "Pattern(s)";
 			case 3:
-				return "Speed";  // NON-NLS
+				return "Speed";
 			case 4:
-				return "Category";  // NON-NLS
+				return "Category";
 			default:
 				return "";
 		}

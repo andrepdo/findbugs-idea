@@ -21,6 +21,8 @@ import org.twodividedbyzero.idea.findbugs.gui.common.ExtensionFileFilter;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.BrowseAction.BrowseActionCallback;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
+import javax.swing.AbstractButton;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -31,6 +33,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -72,7 +75,7 @@ public class FilterConfiguration implements ConfigurationPage {
 									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 
-			final JPanel mainPanel = new JPanel(tbl);
+			final Container mainPanel = new JPanel(tbl);
 			mainPanel.add(getIncludePanel(), "1, 1, 1, 1");
 			mainPanel.add(getExcludePanel(), "1, 3, 1, 3");
 			mainPanel.add(getBaseLinePanel(), "1, 5, 1, 5");
@@ -122,7 +125,7 @@ public class FilterConfiguration implements ConfigurationPage {
 									 {border, TableLayout.FILL, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_includePanel = new JPanel(tbl);
-			_includePanel.setBorder(BorderFactory.createTitledBorder("Include filter files"));  // NON-NLS
+			_includePanel.setBorder(BorderFactory.createTitledBorder("Include filter files"));
 
 			final DefaultListModel model = new DefaultListModel();
 
@@ -130,7 +133,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			_includeList.setVisibleRowCount(7);
 			_includeList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-			final JScrollPane scrollPane = new JScrollPane(_includeList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final Component scrollPane = new JScrollPane(_includeList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			_includePanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 
@@ -138,21 +141,21 @@ public class FilterConfiguration implements ConfigurationPage {
 										   {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout btbl = new TableLayout(bPanelSize);
 
-			final JPanel buttonPanel = new JPanel(btbl);
+			final Container buttonPanel = new JPanel(btbl);
 			_includePanel.add(buttonPanel, "3, 1, 3, 1");
 
-			final JButton addButton = new JButton();
-			final BrowseAction action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTESIONS_SET), new BrowseActionCallback() {
+			final AbstractButton addButton = new JButton();
+			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTESIONS_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
 					((DefaultListModel) _includeList.getModel()).addElement(selectedFile.getAbsolutePath());
 					_preferences.getIncludeFilters().add(selectedFile.getAbsolutePath());
 					_preferences.setModified(true);
 				}
-			});  // NON-NLS
+			});
 			addButton.setAction(action);
 			buttonPanel.add(addButton, "1, 1, 1, 1");
 
-			final JButton removeButton = new JButton("Remove") {  // NON-NLS
+			final JButton removeButton = new JButton("Remove") {
 
 
 				@Override
@@ -169,7 +172,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			});
 			buttonPanel.add(removeButton, "1, 3, 1, 3");
 
-			_includeList.addListSelectionListener(new MyListSelectionListener(removeButton));
+			_includeList.addListSelectionListener(new IncludeListSelectionListener(removeButton));
 		}
 
 		return _includePanel;
@@ -186,7 +189,7 @@ public class FilterConfiguration implements ConfigurationPage {
 									 {border, TableLayout.FILL, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_excludePanel = new JPanel(tbl);
-			_excludePanel.setBorder(BorderFactory.createTitledBorder("Exclude filter files"));  // NON-NLS
+			_excludePanel.setBorder(BorderFactory.createTitledBorder("Exclude filter files"));
 
 			final DefaultListModel model = new DefaultListModel();
 
@@ -194,7 +197,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			_excludeList.setVisibleRowCount(7);
 			_excludeList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-			final JScrollPane scrollPane = new JScrollPane(_excludeList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final Component scrollPane = new JScrollPane(_excludeList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			_excludePanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 
@@ -202,21 +205,21 @@ public class FilterConfiguration implements ConfigurationPage {
 										   {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout btbl = new TableLayout(bPanelSize);
 
-			final JPanel buttonPanel = new JPanel(btbl);
+			final Container buttonPanel = new JPanel(btbl);
 			_excludePanel.add(buttonPanel, "3, 1, 3, 1");
 
-			final JButton addButton = new JButton();
-			final BrowseAction action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTESIONS_SET), new BrowseActionCallback() {
+			final AbstractButton addButton = new JButton();
+			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTESIONS_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
 					((DefaultListModel) _excludeList.getModel()).addElement(selectedFile.getAbsolutePath());
 					_preferences.getExcludeFilters().add(selectedFile.getAbsolutePath());
 					_preferences.setModified(true);
 				}
-			});  // NON-NLS
+			});
 			addButton.setAction(action);
 			buttonPanel.add(addButton, "1, 1, 1, 1");
 
-			final JButton removeButton = new JButton("Remove") {  // NON-NLS
+			final AbstractButton removeButton = new JButton("Remove") {
 
 
 				@Override
@@ -233,12 +236,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			});
 			buttonPanel.add(removeButton, "1, 3, 1, 3");
 
-			_excludeList.addListSelectionListener(new ListSelectionListener() {
-				public void valueChanged(final ListSelectionEvent e) {
-					removeButton.setEnabled(!e.getValueIsAdjusting() && e.getFirstIndex() >= 0);
-
-				}
-			});
+			_excludeList.addListSelectionListener(new ExcludeListSelectionListener(removeButton));
 		}
 
 		return _excludePanel;
@@ -255,7 +253,7 @@ public class FilterConfiguration implements ConfigurationPage {
 									 {border, TableLayout.FILL, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_baselinePanel = new JPanel(tbl);
-			_baselinePanel.setBorder(BorderFactory.createTitledBorder("Exclude baseline bugs"));  // NON-NLS
+			_baselinePanel.setBorder(BorderFactory.createTitledBorder("Exclude baseline bugs"));
 
 			final DefaultListModel model = new DefaultListModel();
 
@@ -263,7 +261,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			_baselineList.setVisibleRowCount(7);
 			_baselineList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-			final JScrollPane scrollPane = new JScrollPane(_baselineList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final Component scrollPane = new JScrollPane(_baselineList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			_baselinePanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 
@@ -271,21 +269,21 @@ public class FilterConfiguration implements ConfigurationPage {
 										   {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout btbl = new TableLayout(bPanelSize);
 
-			final JPanel buttonPanel = new JPanel(btbl);
+			final Container buttonPanel = new JPanel(btbl);
 			_baselinePanel.add(buttonPanel, "3, 1, 3, 1");
 
-			final JButton addButton = new JButton();
-			final BrowseAction action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTESIONS_SET), new BrowseActionCallback() {
+			final AbstractButton addButton = new JButton();
+			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTESIONS_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
 					((DefaultListModel) _baselineList.getModel()).addElement(selectedFile.getAbsolutePath());
 					_preferences.getExcludeBaselineBugs().add(selectedFile.getAbsolutePath());
 					_preferences.setModified(true);
 				}
-			});  // NON-NLS
+			});
 			addButton.setAction(action);
 			buttonPanel.add(addButton, "1, 1, 1, 1");
 
-			final JButton removeButton = new JButton("Remove") {  // NON-NLS
+			final AbstractButton removeButton = new JButton("Remove") {
 
 
 				@Override
@@ -302,11 +300,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			});
 			buttonPanel.add(removeButton, "1, 3, 1, 3");
 
-			_baselineList.addListSelectionListener(new ListSelectionListener() {
-				public void valueChanged(final ListSelectionEvent e) {
-					removeButton.setEnabled(!e.getValueIsAdjusting() && e.getFirstIndex() >= 0);
-				}
-			});
+			_baselineList.addListSelectionListener(new BaselineListSelectionListener(removeButton));
 		}
 
 		return _baselinePanel;
@@ -354,12 +348,12 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	private static class MyListSelectionListener implements ListSelectionListener {
+	private static class IncludeListSelectionListener implements ListSelectionListener {
 
 		private final JButton _removeButton;
 
 
-		public MyListSelectionListener(final JButton removeButton) {
+		public IncludeListSelectionListener(final JButton removeButton) {
 			_removeButton = removeButton;
 		}
 
@@ -367,6 +361,37 @@ public class FilterConfiguration implements ConfigurationPage {
 		public void valueChanged(final ListSelectionEvent e) {
 			_removeButton.setEnabled(!e.getValueIsAdjusting() && e.getFirstIndex() >= 0);
 
+		}
+	}
+
+	private static class ExcludeListSelectionListener implements ListSelectionListener {
+
+		private final AbstractButton _removeButton;
+
+
+		public ExcludeListSelectionListener(final AbstractButton removeButton) {
+			_removeButton = removeButton;
+		}
+
+
+		public void valueChanged(final ListSelectionEvent e) {
+			_removeButton.setEnabled(!e.getValueIsAdjusting() && e.getFirstIndex() >= 0);
+
+		}
+	}
+
+	private static class BaselineListSelectionListener implements ListSelectionListener {
+
+		private final AbstractButton _removeButton;
+
+
+		public BaselineListSelectionListener(final AbstractButton removeButton) {
+			_removeButton = removeButton;
+		}
+
+
+		public void valueChanged(final ListSelectionEvent e) {
+			_removeButton.setEnabled(!e.getValueIsAdjusting() && e.getFirstIndex() >= 0);
 		}
 	}
 }

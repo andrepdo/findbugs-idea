@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+
+        <!-- Implemented by PMD CloneMethodMustImplementCloneable -->
+        <Bug pattern="CN_IDIOM"/>
+
+        <!-- Implemented by PMD ProperCloneImplementation -->
+        <Bug pattern="CN_IDIOM_NO_SUPER_CALL"/>
+
+        <!-- Implemented by PMD UseEqualsToCompareStrings -->
+        <Bug pattern="ES_COMPARING_PARAMETER_STRING_WITH_EQ,ES_COMPARING_STRINGS_WITH_EQ"/>
+
+        <!-- Implemented by PMD EmptyFinalizer -->
+        <Bug pattern="FI_EMPTY"/>
+
+        <!-- Implemented by PMD AvoidCallingFinalize -->
+        <Bug pattern="FI_EXPLICIT_INVOCATION"/>
+
+        <!-- Implemented by PMD FinalizeDoesNotCallSuperFinalize -->
+        <Bug pattern="FI_MISSING_SUPER_CALL"/>
+
+        <!-- Implemented by PMD FinalizeOnlyCallsSuperFinalize -->
+        <Bug pattern="FI_USELESS"/>
+
+        <!-- Implemented by PMD EmptyFinalizer -->
+        <Bug pattern="FI_NULLIFY_SUPER"/>
+        
+        <!-- Implemented by PMD OverrideBothEqualsAndHashcode -->
+        <Bug pattern="HE_EQUALS_NO_HASHCODE,HE_HASHCODE_NO_EQUALS"/>
+        
+        <!-- Implemented by PMD UseSingleton -->
+        <Bug pattern="ISC_INSTANTIATE_STATIC_CLASS"/>
+        
+        <!-- Implemented by PMD ClassNamingConventions -->
+        <Bug pattern="NM_CLASS_NAMING_CONVENTION"/>
+        
+        <!-- Implemented by PMD VariableNamingConventions -->
+        <Bug pattern="NM_FIELD_NAMING_CONVENTION"/>
+        
+        <!-- Implemented by PMD MethodNamingConventions -->
+        <Bug pattern="NM_METHOD_NAMING_CONVENTION"/>
+        
+        <!-- Implemented by PMD CompareObjectsWithEquals -->
+        <Bug pattern="RC_REF_COMPARISON_BAD_PRACTICE,RC_REF_COMPARISON_BAD_PRACTICE_BOOLEAN"/>
+        
+        <!-- Implemented by PMD FinalizeShouldBeProtected -->
+        <Bug pattern="FI_PUBLIC_SHOULD_BE_PROTECTED"/>
+        
+        <!-- Implemented by PMD BooleanInstantiation -->
+        <Bug pattern="DM_BOOLEAN_CTOR"/>
+        
+        <!-- Implemented by PMD UnusedPrivateMethod -->
+        <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD"/>
+        
+        <!-- Implemented by PMD UnusedPrivateField -->
+        <Bug pattern="URF_UNREAD_FIELD,UUF_UNUSED_FIELD"/>
+        
+        <!-- Implemented by PMD UnusedLocalVariable -->
+        <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+        
+        <!-- Implemented by PMD SwitchStmtsShouldHaveDefault -->
+        <Bug pattern="SF_SWITCH_NO_DEFAULT"/>
+</FindBugsFilter>

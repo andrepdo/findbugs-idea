@@ -47,7 +47,7 @@ public class FindBugsTask extends BackgroundableTask {
 
 	public FindBugsTask(@Nullable final Project project, @NotNull final String title, final boolean canBeCancelled, final IFindBugsEngine2 engine, final boolean startInBackground) {
 		super(project, title, canBeCancelled);
-		setCancelText("Cancel");  // NON-NLS
+		setCancelText("Cancel");
 		asBackgroundable();
 		_startInBackground = startInBackground;
 		_engine = engine;
@@ -104,12 +104,12 @@ public class FindBugsTask extends BackgroundableTask {
 		} catch (InterruptedException e) {
 			//LOGGER.error("FindBugsWorker interrupted.", e);
 			//noinspection ThrowableResultOfMethodCallIgnored
-			FindBugsPluginImpl.processError("FindBugsWorker interrupted.", e);// NON-NLS
+			FindBugsPluginImpl.processError("FindBugsWorker interrupted.", e);
 			Thread.currentThread().interrupt();
 		} catch (IOException e) {
 			LOGGER.error("Error performing FindBugs analysis", e);
 			//noinspection ThrowableResultOfMethodCallIgnored
-			FindBugsPluginImpl.processError("Error performing FindBugs analysis", e);// NON-NLS
+			FindBugsPluginImpl.processError("Error performing FindBugs analysis", e);
 		} finally {
 			//final Reporter bugReporter = (Reporter) findBugs.getBugReporter();
 			((FindBugs2) findBugs).dispose();

@@ -46,10 +46,11 @@ import java.util.Properties;
  * @version $Revision$
  * @since 0.9.9
  */
+@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
 @SuppressWarnings({"HardCodedStringLiteral"})
 public class FindBugsPreferences extends Properties {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	private static DetectorFactoryCollection _detectorFactoryCollection;
 
@@ -65,10 +66,20 @@ public class FindBugsPreferences extends Properties {
 	public static final String MIN_PRIORITY_TO_REPORT = PROPERTIES_PREFIX + "minPriorityToReport";
 	public static final String SHOW_HIDDEN_DETECTORS = PROPERTIES_PREFIX + "showHiddenDetectors";
 
-	public static final String TOOLWINDOW_TOFRONT = PROPERTIES_PREFIX + "toolWindowToFront";
+	public static final String TOOLWINDOW_TO_FRONT = PROPERTIES_PREFIX + "toolWindowToFront";
 	public static final String COMPILE_BEFORE_ANALYZE = PROPERTIES_PREFIX + "compileBeforeAnalyse";
 
 	public static final String ANALYZE_AFTER_COMPILE = PROPERTIES_PREFIX + "analyzeAfterCompile";
+
+	public static final String EXPORT_BASE_DIR = PROPERTIES_PREFIX + "exportBaseDir";
+	public static final String EXPORT_CREATE_ARCHIVE_DIR = PROPERTIES_PREFIX + "exportCreateArchiveDir";
+	public static final String EXPORT_AS_HTML = PROPERTIES_PREFIX + "exportAsHtml";
+	public static final String EXPORT_AS_XML = PROPERTIES_PREFIX + "exportAsXml";
+	public static final String EXPORT_OPEN_BROWSER = PROPERTIES_PREFIX + "exportOpenBrowser";
+
+	public static final String TOOLWINDOW_SCROLL_TO_SOURCE = PROPERTIES_PREFIX + "toolWindowScrollToSource";
+	public static final String TOOLWINDOW_EDITOR_PREVIEW = PROPERTIES_PREFIX + "toolWindowEditorPreview";
+
 
 	public transient Map<String, String> _detectors;
 	public transient Map<String, String> _bugCategories;
@@ -537,8 +548,14 @@ public class FindBugsPreferences extends Properties {
 		//_preferences.setProperty(FindBugsPreferences.MIN_PRIORITY_TO_REPORT, ReportConfiguration.DEFAULT_PRIORITY);
 		preferences.setProperty(FindBugsPreferences.MIN_PRIORITY_TO_REPORT, filterSettings.getMinPriority());
 		preferences.setProperty(FindBugsPreferences.SHOW_HIDDEN_DETECTORS, false);
-		preferences.setProperty(FindBugsPreferences.TOOLWINDOW_TOFRONT, true);
+		preferences.setProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT, true);
 		preferences.setProperty(FindBugsPreferences.ANALYZE_AFTER_COMPILE, false);
+
+		preferences.setProperty(FindBugsPreferences.EXPORT_AS_HTML, true);
+		preferences.setProperty(FindBugsPreferences.EXPORT_AS_XML, true);
+		preferences.setProperty(FindBugsPreferences.EXPORT_BASE_DIR, "");
+		preferences.setProperty(FindBugsPreferences.EXPORT_CREATE_ARCHIVE_DIR, false);
+		preferences.setProperty(FindBugsPreferences.EXPORT_OPEN_BROWSER, true);
 
 		final Map<String, String> bugCategories = getDefaultBugCategories(filterSettings);
 		preferences.setBugCategories(bugCategories);

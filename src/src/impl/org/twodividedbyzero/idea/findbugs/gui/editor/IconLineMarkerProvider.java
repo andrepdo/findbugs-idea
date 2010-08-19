@@ -61,7 +61,7 @@ public class IconLineMarkerProvider implements LineMarkerProvider {
 	private static final int ICON_MAX_WEIGHT = 16;
 	private static final int ICON_MAX_HEIGHT = 16;
 	private static final int ICON_MAX_SIZE = 2 * 1024 * 1024; //2Kb
-	private static final List<String> ICON_EXTS = Arrays.asList("png", "ico", "bmp", "gif", "jpg");  // NON-NLS
+	private static final List<String> ICON_EXTS = Arrays.asList("png", "ico", "bmp", "gif", "jpg");
 
 	//TODO: remove old unused icons from the cache
 	private final HashMap<String, Pair<Long, Icon>> _iconsCache = new HashMap<String, Pair<Long, Icon>>();
@@ -204,7 +204,7 @@ public class IconLineMarkerProvider implements LineMarkerProvider {
 				final Icon icon = new ImageIcon(file.contentsToByteArray());
 				iconInfo = new Pair<Long, Icon>(stamp, hasProperSize(icon) ? icon : null);
 				_iconsCache.put(file.getPath(), iconInfo);
-			} catch (final Exception ignore) {//
+			} catch (final Exception ignore) {
 				//noinspection AssignmentToNull
 				iconInfo = null;
 				_iconsCache.remove(path);

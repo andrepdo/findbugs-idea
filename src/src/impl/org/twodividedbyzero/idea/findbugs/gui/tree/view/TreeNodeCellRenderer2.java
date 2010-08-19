@@ -339,7 +339,7 @@ public class TreeNodeCellRenderer2 extends JPanel implements TreeCellRenderer {
 		g.fillRect(offset, 0, (getWidth() - 1 - offset), (getHeight() - 1));
 
 		if (_selected) {
-			g.setColor(UIManager.getColor("Tree.selectionBorderColor"));  // NON-NLS
+			g.setColor(UIManager.getColor("Tree.selectionBorderColor"));
 			g.drawRect(offset, 0, (getWidth() - 1 - offset), (getHeight() - 1));
 		}
 
@@ -556,7 +556,7 @@ public class TreeNodeCellRenderer2 extends JPanel implements TreeCellRenderer {
 	/*@Override
 	protected void firePropertyChange(final String propertyName, final Object oldValue, final Object newValue) {
 		// Strings get interned...
-		if ("text".equals(propertyName)) {  // NON-NLS
+		if ("text".equals(propertyName)) {
 			super.firePropertyChange(propertyName, oldValue, newValue);
 		}
 	}

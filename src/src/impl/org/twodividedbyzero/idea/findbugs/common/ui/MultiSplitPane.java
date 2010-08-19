@@ -119,7 +119,7 @@ public class MultiSplitPane extends JPanel {
 	public void setContinuousLayout(final boolean continuousLayout) {
 		final boolean oldContinuousLayout = continuousLayout;
 		this.continuousLayout = continuousLayout;
-		firePropertyChange("continuousLayout", oldContinuousLayout, continuousLayout); // NON-NLS
+		firePropertyChange("continuousLayout", oldContinuousLayout, continuousLayout);
 	}
 
 

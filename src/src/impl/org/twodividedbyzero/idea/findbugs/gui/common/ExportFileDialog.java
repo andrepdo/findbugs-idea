@@ -34,24 +34,26 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.io.File;
 
 
 /**
  * $Date$
  *
- * @author todo: your name and mail?
  * @version $Revision$
  * @since 0.9.95
  */
+@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
 @SuppressWarnings({"HardCodedStringLiteral"})
 public class ExportFileDialog extends JPanel {
 
 	private JLabel _label;
 	private JTextField _path;
-	private JButton _open;
+	private JButton _browseButton;
 	private File _selectedFile;
-	private final DialogBuilder _dialogBuilder;
+	private final transient DialogBuilder _dialogBuilder;
 
 
 	public ExportFileDialog(final String defaultValue, final DialogBuilder dialogBuilder) {
@@ -60,7 +62,7 @@ public class ExportFileDialog extends JPanel {
 
 		_dialogBuilder = dialogBuilder;
 
-		_label = new JLabel("Export to directory: ");
+		_label = new JLabel("Directory: ");
 		_label.setMinimumSize(new Dimension(100, 20));
 		_label.setMaximumSize(new Dimension(120, 20));
 		_label.setPreferredSize(new Dimension(100, 20));
@@ -75,14 +77,21 @@ public class ExportFileDialog extends JPanel {
 		add(_path);
 		add(Box.createHorizontalStrut(5));
 
-		_open = new JButton("Browse");
-		_open.setPreferredSize(new Dimension(80, 20));
-		_open.addActionListener(new MyFileChooserActionListener());
-		add(_open);
+		_browseButton = new JButton("Browse");
+		_browseButton.setPreferredSize(new Dimension(80, 20));
+		_browseButton.addActionListener(new MyFileChooserActionListener());
+		add(_browseButton);
 		add(Box.createVerticalGlue());
 		dialogBuilder.setCenterPanel(this);
 
 		_path.getDocument().addDocumentListener(new MyDocumentAdapter());
+		_path.addHierarchyListener(new HierarchyListener() {
+			public void hierarchyChanged(final HierarchyEvent e) {
+				if(_path.isVisible()) {
+					_dialogBuilder.setOkActionEnabled(validateDirectory(_path.getDocument()));
+				}
+			}
+		});
 		dialogBuilder.setOkActionEnabled(false);
 	}
 
@@ -97,6 +106,15 @@ public class ExportFileDialog extends JPanel {
 	}
 
 
+	private boolean validateDirectory(final Document doc) {
+		try {
+			return (_selectedFile != null && _selectedFile.isDirectory() && _selectedFile.canWrite()) || doc.getText(0, doc.getLength()).trim().length() > 0;
+		} catch (BadLocationException ignore) {
+			return false;
+		}
+	}
+
+
 	private class MyDocumentAdapter extends DocumentAdapter {
 
 		public MyDocumentAdapter() {
@@ -105,11 +123,8 @@ public class ExportFileDialog extends JPanel {
 
 		@Override
 		protected void textChanged(final DocumentEvent e) {
-			try {
-				final Document doc = e.getDocument();
-				_dialogBuilder.setOkActionEnabled((_selectedFile != null && _selectedFile.isDirectory() && _selectedFile.canWrite()) || doc.getText(0, doc.getLength()).trim().length() > 0);
-			} catch (BadLocationException ignored) {
-			}
+			final Document doc = e.getDocument();
+			_dialogBuilder.setOkActionEnabled(validateDirectory(doc));
 		}
 	}
 

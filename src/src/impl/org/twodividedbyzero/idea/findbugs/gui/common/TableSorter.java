@@ -92,7 +92,7 @@ import java.util.Map;
  * @author Parwinder Sekhon
  * @version 2.0 02/27/04
  */
-
+@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
 public class TableSorter extends AbstractTableModel {
 
 	private static final long serialVersionUID = 0L;

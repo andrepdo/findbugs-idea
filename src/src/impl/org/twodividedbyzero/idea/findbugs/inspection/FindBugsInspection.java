@@ -92,7 +92,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	@Nls
 	@NotNull
 	public String getGroupDisplayName() {
-		return ResourcesLoader.getString("findbugs.inspection.group"); // NON-NLS
+		return ResourcesLoader.getString("findbugs.inspection.group");
 	}
 
 
@@ -100,16 +100,16 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	@Nls
 	@NotNull
 	public String getDisplayName() {
-		return ResourcesLoader.getString("findbugs.inspection.displayName");  // NON-NLS
+		return ResourcesLoader.getString("findbugs.inspection.displayName");
 	}
 
 
 	@Nls
 	@Override
 	public String getStaticDescription() {
-		return "<html><body><p>" + ResourcesLoader.getString("findbugs.inspection.description") +  // NON-NLS
-				"</p><br/><p><font size='8px' color='gray'>Powered by " + VersionManager.getFullVersion() +  // NON-NLS
-				" with Findbugs&trade; version " + FindBugsUtil.getFindBugsFullVersion() + "</font></p></body></html>";  // NON-NLS
+		return "<html><body><p>" + ResourcesLoader.getString("findbugs.inspection.description") +
+				"</p><br/><p><font size='8px' color='gray'>Powered by " + VersionManager.getFullVersion() +
+				" with Findbugs&trade; version " + FindBugsUtil.getFindBugsFullVersion() + "</font></p></body></html>";
 	}
 
 
@@ -139,7 +139,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	private static void isPluginAccessible(final Project project) {
 		final FindBugsPlugin findBugsPlugin = project.getComponent(FindBugsPlugin.class);
 		if (findBugsPlugin == null) {
-			Messages.showWarningDialog("Couldn't get findbugs plugin", "FindBugs");  // NON-NLS
+			Messages.showWarningDialog("Couldn't get findbugs plugin", "FindBugs");
 			throw new IllegalStateException("Couldn't get findbugs plugin");
 		}
 	}
@@ -166,7 +166,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	@Override
 	public ProblemDescriptor[] checkFile(@NotNull final PsiFile psiFile, @NotNull final InspectionManager manager, final boolean isOnTheFly) {
 		LOGGER.debug("Running FindBugs-IDEA inspection on psiFile: " + psiFile.getName());
-		LOGGER.debug("Inspection has been invoked.");  // NON-NLS
+		LOGGER.debug("Inspection has been invoked.");
 
 		if (!psiFile.isValid() || !psiFile.isPhysical() || !IdeaUtilImpl.isValidFileType(psiFile.getFileType())) {
 			LOGGER.debug("Skipping file as invalid: " + psiFile.getName());
@@ -218,7 +218,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 			}
 		}
 		if (lines[0] > -1) {
-			description.append("\r\nLine: ").append(lines[0]).append(" - ").append(lines[1]); // NON-NLS
+			description.append("\r\nLine: ").append(lines[0]).append(" - ").append(lines[1]);
 		}
 
 		final ProblemDescriptor[] problemDescriptor = new ProblemDescriptor[1];

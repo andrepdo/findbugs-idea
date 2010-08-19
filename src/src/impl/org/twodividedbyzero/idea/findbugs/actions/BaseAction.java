@@ -81,7 +81,7 @@ public abstract class BaseAction extends AnAction {
 			presentation.setVisible(true);
 
 		} catch (Throwable e) {
-			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);// NON-NLS
+			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
 			if (processed != null) {
 				LOGGER.error("Action update failed", processed);
 			}
@@ -97,7 +97,7 @@ public abstract class BaseAction extends AnAction {
 	protected void isPluginAccessible(final Project project) {
 		final FindBugsPlugin findBugsPlugin = project.getComponent(FindBugsPlugin.class);
 		if (findBugsPlugin == null) {
-			Messages.showWarningDialog("Couldn't get findbugs plugin", "FindBugs");  // NON-NLS
+			Messages.showWarningDialog("Couldn't get findbugs plugin", "FindBugs");
 			throw new IllegalStateException("Couldn't get findbugs plugin");
 		}
 	}

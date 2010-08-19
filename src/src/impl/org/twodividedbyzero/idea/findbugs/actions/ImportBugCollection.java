@@ -16,6 +16,7 @@
 
 package org.twodividedbyzero.idea.findbugs.actions;
 
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -33,6 +34,7 @@ import edu.umd.cs.findbugs.HTMLBugReporter;
 import org.dom4j.Document;
 import org.dom4j.io.DocumentSource;
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
@@ -43,6 +45,7 @@ import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.ExportFileDialog;
 import org.twodividedbyzero.idea.findbugs.tasks.BackgroundableTask;
 
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -53,11 +56,15 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.awt.EventQueue;
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -65,46 +72,27 @@ import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
- * $Date$
+ * $Date: 2010-02-06 13:58:28 +0100 (Sat, 06 Feb 2010) $
  *
- * @author todo: your name and mail?
- * @version $Revision$
- * @since 0.9.95
+ * @author Andre Pfeiler<andrep@twodividedbyzero.org> and ???
+ * @version $Revision: 81 $
+ * @since 0.9.96
  */
 @SuppressWarnings({"HardCodedStringLiteral"})
-public class ExportResult extends BaseAction implements EventListener<BugReporterEvent> {
+public class ImportBugCollection extends BaseAction implements EventListener<BugReporterEvent> {
 
-	private static final Logger LOGGER = Logger.getInstance(ExportResult.class.getName());
+	private static final Logger LOGGER = Logger.getInstance(ImportBugCollection.class.getName());
+
+	private static String _exportDir = System.getProperty("user.home") + File.separatorChar + FindBugsPluginConstants.TOOL_WINDOW_ID;
 
 	private static final String FINDBUGS_PLAIN_XSL = "plain.xsl";
 	private static final String FINDBUGS_RESULT_PREFIX = "FindBugsResult_";
-	private static final String FINBGUS_RESULT_SUFFIX = ".html";
+	private static final String FINDBUGS_RESULT_HTML_SUFFIX = ".html";
+	private static final String FINDBUGS_RESULT_RAW_SUFFIX = ".xml";
 
-	private static String _exportDir;
 	private boolean _enabled;
 	private BugCollection _bugCollection;
 	private boolean _running;
-
-
-	@SuppressWarnings({"AssignmentToNull"})
-	public void onEvent(@NotNull final BugReporterEvent event) {
-		switch (event.getOperation()) {
-			case ANALYSIS_STARTED:
-				_bugCollection = null;
-				setEnabled(false);
-				setRunning(true);
-				break;
-			case ANALYSIS_ABORTED:
-				_bugCollection = null;
-			case ANALYSIS_FINISHED:
-				_bugCollection = event.getBugCollection();
-				setEnabled(true);
-				setRunning(false);
-				break;
-			case NEW_BUG_INSTANCE:
-				break;
-		}
-	}
 
 
 	@Override
@@ -132,7 +120,7 @@ public class ExportResult extends BaseAction implements EventListener<BugReporte
 
 		// check a project is loaded
 		if (isProjectLoaded(project, presentation)) {
-			Messages.showWarningDialog("Project not loaded.", "FindBugs");  // NON-NLS
+			Messages.showWarningDialog("Project not loaded.", "FindBugs");
 			return;
 		}
 
@@ -152,55 +140,58 @@ public class ExportResult extends BaseAction implements EventListener<BugReporte
 		}
 		_exportDir = path.trim();
 		//Create a unique file name by using time stamp
-		final String timestamp = new SimpleDateFormat().format(new Date()).replaceAll("[/ :]", "_");
-		final String fileName = _exportDir + File.separatorChar + FINDBUGS_RESULT_PREFIX + timestamp + FINBGUS_RESULT_SUFFIX;
+		final String timeStamp = new SimpleDateFormat().format(new Date()).replaceAll("[/ :]", "_");
+		final String fileNameHtml = _exportDir + File.separatorChar + FINDBUGS_RESULT_PREFIX + timeStamp + FINDBUGS_RESULT_HTML_SUFFIX;
+		final String fileNameXml = _exportDir + File.separatorChar + FINDBUGS_RESULT_PREFIX + timeStamp + FINDBUGS_RESULT_RAW_SUFFIX;
+
+		createExportDirIfAbsent();
 
 		//Create a task to export the bug collection to html
-		final AtomicReference<Task> exportTask = new AtomicReference<Task>(new BackgroundableTask(project, "Exporting Findbugs Result", false) {
+		final AtomicReference<Task> exportTask = new AtomicReference<Task>(new BackgroundableTask(project, "Exporting Findbugs-IDEA Result", false) {
 			private ProgressIndicator _indicator;
 
 
 			@SuppressWarnings({"IOResourceOpenedButNotSafelyClosed"})
 			@Override
 			public void run(@NotNull final ProgressIndicator indicator) {
-				indicator.setText2(fileName);
+				indicator.setText2(fileNameXml);
 				setProgressIndicator(indicator);
 				FileWriter writer = null;
 				try {
 					if (_bugCollection != null) {
 						_bugCollection.setWithMessages(true);
+
 						final Document document = _bugCollection.toDocument();
+						writeXmlFile(document, new BufferedOutputStream(new FileOutputStream(fileNameXml)));
+
+						indicator.setText2(fileNameHtml);
 						final Source xsl = new StreamSource(getStylesheetStream(FINDBUGS_PLAIN_XSL));
 						xsl.setSystemId(FINDBUGS_PLAIN_XSL);
 
-						// Create a transformer using the stylesheet
 						final Transformer transformer = TransformerFactory.newInstance().newTransformer(xsl);
-
-						// Source document is the XML generated from the BugCollection
 						final Source source = new DocumentSource(document);
-
-						// Write result to output stream
-						writer = new FileWriter(fileName);
+						writer = new FileWriter(fileNameHtml);
 						final Result result = new StreamResult(writer);
-
-						// Do the transformation
 						transformer.transform(source, result);
 						_bugCollection.setWithMessages(false);
 
-						showToolWindowNotifier("Exported bug collection to " + fileName + '.', MessageType.INFO);
+						showToolWindowNotifier("Exported bug collection to " + fileNameHtml + '.', MessageType.INFO);
+						if(BrowserUtil.canStartDefaultBrowser()) {
+							BrowserUtil.launchBrowser(new File(fileNameHtml).toURI().toURL().toExternalForm());
+						}
 					}
-				} catch (IOException e1) {
-					final String message = "Export failed";
+				} catch (IOException e) {
+					final String message = "Export failed.";
 					showToolWindowNotifier(message, MessageType.ERROR);
-					LOGGER.error(message, e1);
-				} catch (TransformerConfigurationException e1) {
+					LOGGER.error(message, e);
+				} catch (TransformerConfigurationException e) {
 					final String message = "Transform to html failed due to configuration problems.";
 					showToolWindowNotifier(message, MessageType.ERROR);
-					LOGGER.error(message, e1);
-				} catch (TransformerException e1) {
+					LOGGER.error(message, e);
+				} catch (TransformerException e) {
 					final String message = "Transformation to xml failed.";
 					showToolWindowNotifier(message, MessageType.ERROR);
-					LOGGER.error(message, e1);
+					LOGGER.error(message, e);
 				} finally {
 					if (writer != null) {
 						try {
@@ -224,11 +215,23 @@ public class ExportResult extends BaseAction implements EventListener<BugReporte
 			}
 		});
 
-		final File file = new File(fileName);
-		if (file.getParentFile() == null || (file.getParent() != null && !file.getParentFile().canWrite())) {
-			showToolWindowNotifier("Exporting bug collection failed. not a directory or no write access. " + fileName + '.', MessageType.ERROR);
+		final File file = new File(fileNameHtml);
+		if (!file.exists()) {
+			showToolWindowNotifier("Exporting bug collection failed. '" + fileNameHtml + "'.", MessageType.ERROR);
 		} else {
 			exportTask.get().queue();
+		}
+	}
+
+
+	private static void createExportDirIfAbsent() {
+		final File exportDir = new File(_exportDir);
+		if(!exportDir.exists()) {
+			if(!exportDir.mkdir()) {
+				final String message = "Creating the export directory '" + _exportDir + "' failed.";
+				showToolWindowNotifier(message, MessageType.ERROR);
+				LOGGER.error(message);
+			}
 		}
 	}
 
@@ -261,10 +264,51 @@ public class ExportResult extends BaseAction implements EventListener<BugReporte
 	}
 
 
+	public static void writeXmlFile(final Document doc, final OutputStream outputStream) {
+		try {
+			final Source source = new DocumentSource(doc);
+			final Result result = new StreamResult(outputStream);
+			final Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty(OutputKeys.STANDALONE, "no");
+			transformer.transform(source, result);
+		} catch (IllegalArgumentException ignore) {
+			LOGGER.warn("Setting output property to document failed. no problem. may be an empty document.");
+		} catch (TransformerConfigurationException ignore) {
+		} catch (TransformerException ignore) {
+		}
+	}
+
+
+	public static String loadXmlFromDocument(final Document doc) {
+		String xmlString = "";
+
+		try {
+			final Source source = new DocumentSource(doc);
+			final StringWriter out = new StringWriter();
+			final Result result = new StreamResult(out);
+
+			final Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty(OutputKeys.STANDALONE, "no");
+			transformer.transform(source, result);
+			xmlString = out.toString();
+		} catch (IllegalArgumentException ignore) {
+			LOGGER.warn("Setting output property to document failed. no problem. may be an empty document.");
+		} catch (TransformerException e) {
+			LOGGER.error("Loading xml string from org.w3c.dom.Document failed.", e);
+		}
+
+		return xmlString;
+	}
+
+
 	@Override
 	public void update(final AnActionEvent event) {
 		try {
-			final com.intellij.openapi.project.Project project = DataKeys.PROJECT.getData(event.getDataContext());
+			final Project project = DataKeys.PROJECT.getData(event.getDataContext());
 			final Presentation presentation = event.getPresentation();
 
 			// check a project is loaded
@@ -293,10 +337,35 @@ public class ExportResult extends BaseAction implements EventListener<BugReporte
 			presentation.setVisible(true);
 
 		} catch (Throwable e) {
-			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);// NON-NLS
+			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
 			if (processed != null) {
 				LOGGER.error("Action update failed", processed);
 			}
+		}
+	}
+
+
+	@SuppressWarnings({"AssignmentToNull"})
+	public void onEvent(@NotNull final BugReporterEvent event) {
+		switch (event.getOperation()) {
+			case ANALYSIS_STARTED:
+				_bugCollection = null;
+				setEnabled(false);
+				setRunning(true);
+				break;
+			case ANALYSIS_ABORTED:
+				_bugCollection = null;
+				setEnabled(true);
+				setRunning(false);
+				break;
+			case ANALYSIS_FINISHED:
+				_bugCollection = event.getBugCollection();
+				setEnabled(true);
+				setRunning(false);
+				break;
+			case NEW_BUG_INSTANCE:
+				break;
+			default:
 		}
 	}
 

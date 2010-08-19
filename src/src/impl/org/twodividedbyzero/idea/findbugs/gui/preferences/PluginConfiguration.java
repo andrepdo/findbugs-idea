@@ -22,6 +22,8 @@ import org.twodividedbyzero.idea.findbugs.gui.common.ExtensionFileFilter;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.BrowseAction.BrowseActionCallback;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
+import javax.swing.AbstractButton;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -32,6 +34,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -69,7 +72,7 @@ public class PluginConfiguration implements ConfigurationPage {
 									 {border, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 
-			final JPanel mainPanel = new JPanel(tbl);
+			final Container mainPanel = new JPanel(tbl);
 			mainPanel.add(getPluginPanel(), "1, 1, 1, 1");
 
 			_component = mainPanel;
@@ -107,7 +110,7 @@ public class PluginConfiguration implements ConfigurationPage {
 									 {border, TableLayout.FILL, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_pluginsPanel = new JPanel(tbl);
-			_pluginsPanel.setBorder(BorderFactory.createTitledBorder("Plugins"));  // NON-NLS
+			_pluginsPanel.setBorder(BorderFactory.createTitledBorder("Plugins"));
 
 			final DefaultListModel model = new DefaultListModel();
 
@@ -115,49 +118,38 @@ public class PluginConfiguration implements ConfigurationPage {
 			_pluginList.setVisibleRowCount(30);
 			_pluginList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-			final JScrollPane scrollPane = new JScrollPane(_pluginList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final Component scrollPane = new JScrollPane(_pluginList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			_pluginsPanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 
 			final double[][] bPanelSize = {{border, TableLayout.PREFERRED}, // Columns
 									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
-			final TableLayout btbl = new TableLayout(bPanelSize);
+			final TableLayout tableLayout = new TableLayout(bPanelSize);
 
-			final JPanel buttonPanel = new JPanel(btbl);
+			final Container buttonPanel = new JPanel(tableLayout);
 			_pluginsPanel.add(buttonPanel, "3, 1, 3, 1");
 
-			final JButton addButton = new JButton();
-			final BrowseAction action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.ARCHIVE_EXTENSION_SET), new BrowseActionCallback() {
+			final AbstractButton addButton = new JButton();
+			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.ARCHIVE_EXTENSION_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
 					((DefaultListModel) _pluginList.getModel()).addElement(selectedFile.getAbsolutePath());
 					_preferences.getPlugins().add(selectedFile.getAbsolutePath());
 					_preferences.setModified(true);
 				}
-			});  // NON-NLS
+			});
 			addButton.setAction(action);
 			buttonPanel.add(addButton, "1, 1, 1, 1");
 
-			final JButton removeButton = new JButton("Remove") {  // NON-NLS
+			final AbstractButton removeButton = new JButton("Remove") {
 				@Override
 				public boolean isEnabled() {
 					return super.isEnabled() && _pluginList.getSelectedIndex() > -1;
 				}
 			};
-			removeButton.addActionListener(new ActionListener() {
-				public void actionPerformed(final ActionEvent e) {
-					final int index = _pluginList.getSelectedIndex();
-					getModel(_pluginList).remove(index);
-					_preferences.removePlugin(index);
-				}
-			});
+			removeButton.addActionListener(new RemoveActionListener());
 			buttonPanel.add(removeButton, "1, 3, 1, 3");
 
-			_pluginList.addListSelectionListener(new ListSelectionListener() {
-				public void valueChanged(final ListSelectionEvent e) {
-					removeButton.setEnabled(!e.getValueIsAdjusting() && e.getFirstIndex() >= 0);
-
-				}
-			});
+			_pluginList.addListSelectionListener(new PluginListSelectionListener(removeButton));
 		}
 
 		return _pluginsPanel;
@@ -187,5 +179,31 @@ public class PluginConfiguration implements ConfigurationPage {
 
 	public boolean showInModulePreferences() {
 		return false;
+	}
+
+
+	private class RemoveActionListener implements ActionListener {
+
+		public void actionPerformed(final ActionEvent e) {
+			final int index = _pluginList.getSelectedIndex();
+			getModel(_pluginList).remove(index);
+			_preferences.removePlugin(index);
+		}
+	}
+
+	private static class PluginListSelectionListener implements ListSelectionListener {
+
+		private final AbstractButton _removeButton;
+
+
+		public PluginListSelectionListener(final AbstractButton removeButton) {
+			_removeButton = removeButton;
+		}
+
+
+		public void valueChanged(final ListSelectionEvent e) {
+			_removeButton.setEnabled(!e.getValueIsAdjusting() && e.getFirstIndex() >= 0);
+
+		}
 	}
 }

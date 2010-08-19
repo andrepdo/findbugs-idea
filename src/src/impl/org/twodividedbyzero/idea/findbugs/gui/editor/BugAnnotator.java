@@ -67,9 +67,9 @@ public class BugAnnotator implements Annotator {
 
 
 	public static String getAnnotationText(final ExtendedProblemDescriptor problemDescriptor) {
-		final StringBuilder buffer = new StringBuilder("<html><body>");  // NON-NLS
-		buffer.append(BugInstanceUtil.getDetailHtml(problemDescriptor.getBugInstance())).append("<hr/>");  // NON-NLS
-		buffer.append("</body><html>");  // NON-NLS
+		final StringBuilder buffer = new StringBuilder("<html><body>");
+		buffer.append(BugInstanceUtil.getDetailHtml(problemDescriptor.getBugInstance())).append("<hr/>");
+		buffer.append("</body><html>");
 
 		return buffer.toString();
 	}

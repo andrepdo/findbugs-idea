@@ -109,7 +109,7 @@ public class TreeNextOccurence extends BaseAction {
 				presentation.setVisible(true);
 			}
 		} catch (Throwable e) {
-			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);// NON-NLS
+			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
 			if (processed != null) {
 				LOGGER.error("Action update failed", processed);
 			}

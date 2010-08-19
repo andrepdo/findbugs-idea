@@ -130,13 +130,13 @@ class CustomGutterIconRenderer extends com.intellij.openapi.editor.markup.Gutter
 
 	@Override
 	public String getTooltipText() {
-		final StringBuilder buffer = new StringBuilder("<html><body>");  // NON-NLS
+		final StringBuilder buffer = new StringBuilder("<html><body>");
 
 		for (final Entry<ExtendedProblemDescriptor, RangeMarker> entry : _problems.entrySet()) {
-			buffer.append(BugInstanceUtil.getDetailHtml(entry.getKey().getBugInstance())).append("<hr/>");  // NON-NLS
+			buffer.append(BugInstanceUtil.getDetailHtml(entry.getKey().getBugInstance())).append("<hr/>");
 		}
 
-		buffer.append("</body><html>");  // NON-NLS
+		buffer.append("</body><html>");
 
 		return buffer.toString();
 	}

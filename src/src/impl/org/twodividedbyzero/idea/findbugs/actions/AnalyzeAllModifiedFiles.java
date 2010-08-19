@@ -75,15 +75,15 @@ public class AnalyzeAllModifiedFiles extends BaseAction implements EventListener
 
 		// check a project is loaded
 		if (isProjectLoaded(project, presentation)) {
-			Messages.showWarningDialog("Project not loaded.", "FindBugs");  // NON-NLS
+			Messages.showWarningDialog("Project not loaded.", "FindBugs");
 			return;
 		}
 
 		final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
-		if (preferences.getBugCategories().containsValue("true") && preferences.getDetectors().containsValue("true")) {  // NON-NLS
+		if (preferences.getBugCategories().containsValue("true") && preferences.getDetectors().containsValue("true")) {  
 			initWorker();
 		} else {
-			FindBugsPluginImpl.showToolWindowNotifier("No bug categories or bug pattern detectors selected. analysis aborted.", MessageType.WARNING);  // NON-NLS
+			FindBugsPluginImpl.showToolWindowNotifier("No bug categories or bug pattern detectors selected. analysis aborted.", MessageType.WARNING);
 			ShowSettingsUtil.getInstance().editConfigurable(project, IdeaUtilImpl.getPluginComponent(project));
 		}
 	}
@@ -134,7 +134,7 @@ public class AnalyzeAllModifiedFiles extends BaseAction implements EventListener
 			presentation.setVisible(true);
 
 		} catch (Throwable e) {
-			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);// NON-NLS
+			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
 			if (processed != null) {
 				LOGGER.error("Action update failed", processed);
 			}
@@ -146,7 +146,7 @@ public class AnalyzeAllModifiedFiles extends BaseAction implements EventListener
 		final com.intellij.openapi.project.Project project = IdeaUtilImpl.getProject(_dataContext);
 
 		final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
-		if (Boolean.valueOf(preferences.getProperty(FindBugsPreferences.TOOLWINDOW_TOFRONT))) {
+		if (Boolean.valueOf(preferences.getProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT))) {
 			IdeaUtilImpl.activateToolWindow(getPluginInterface(project).getInternalToolWindowId(), _dataContext);
 		}
 

@@ -61,12 +61,12 @@ public class ActionToolbarContainer extends AbstractBar {
 
 			if (_childBar != null) {
 				_childBar.setOrientation(o);
-				_childBar.getComponent().firePropertyChange("orientation", old, o); // NON-NLS
+				_childBar.getComponent().firePropertyChange("orientation", old, o);
 				_childBar.getComponent().repaint();
 				_childBar.getComponent().revalidate();
 			}
 
-			firePropertyChange("orientation", old, o); // NON-NLS
+			firePropertyChange("orientation", old, o);
 			revalidate();
 			repaint();
 		}

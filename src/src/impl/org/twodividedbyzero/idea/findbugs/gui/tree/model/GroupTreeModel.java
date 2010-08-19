@@ -34,6 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -51,17 +54,20 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	private GroupBy[] _groupBy;
 	private final transient Map<String, Map<Integer, List<BugInstanceGroupNode>>> _groups;
 	private transient Grouper<BugInstance> _grouper;
-
-	private int _bugCount;
-
-	private final Map<PsiFile, List<ExtendedProblemDescriptor>> _problems;
+	private AtomicInteger _bugCount;
+	private final transient Map<PsiFile, List<ExtendedProblemDescriptor>> _problems;
+	
+	private final ReentrantLock _lock;
 
 
 	public GroupTreeModel(final VisitableTreeNode root, final GroupBy[] groupBy, final Project project) {
 		_root = root;
+		_bugCount = new AtomicInteger(0);
 		_groupBy = groupBy.clone();
 		_groups = new ConcurrentHashMap<String, Map<Integer, List<BugInstanceGroupNode>>>();
 		_problems = new ConcurrentHashMap<PsiFile, List<ExtendedProblemDescriptor>>();
+
+		_lock = new ReentrantLock();
 	}
 
 
@@ -116,17 +122,22 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	}
 
 
-	public synchronized int getBugCount() {
-		return _bugCount;
+	public int getBugCount() {
+		return _bugCount.get();
 	}
 
 
-	public synchronized void addNode(final BugInstance bugInstance) {
+	public void addNode(final BugInstance bugInstance) {
 		/*if(isHiddenBugGroup(bugInstance)) {
 			return;
 		}*/
-		_bugCount++;
-		group(bugInstance);
+		_lock.lock();
+		try {
+			_bugCount.getAndIncrement();
+			group(bugInstance);
+		} finally {
+			_lock.unlock();
+		}
 	}
 
 
@@ -245,36 +256,54 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	}
 
 
-	public synchronized void clear() {
-		//_sortedCollection.clear();
-		_bugCount = 0;
-		_groups.clear();
-		_problems.clear();
-		((RootNode) _root).removeAllChilds();
-		nodeStructureChanged(_root);
-		reload();
+	public void clear() {
+		try {
+			if (_lock.tryLock(100, TimeUnit.MILLISECONDS)) {
+				try {
+					//_sortedCollection.clear();
+					_bugCount.set(0);
+					_groups.clear();
+					_problems.clear();
+					((RootNode) _root).removeAllChilds();
+					nodeStructureChanged(_root);
+					reload();
+				} finally {
+					_lock.unlock();
+				}
+			} else {
+				//clear();
+			}
+		} catch (InterruptedException e) {
+			LOGGER.warn("could not acquire lock within 500ms. retry...", e);
+			//clear();
+		}
 	}
 
 
 	@Nullable
-	public synchronized BugInstanceNode findNodeByBugInstance(final BugInstance bugInstance) {
-		final String[] fullGroupPath = BugInstanceUtil.getFullGroupPath(bugInstance, _groupBy);
-		final String[] groupNameKey = BugInstanceUtil.getGroupPath(bugInstance, fullGroupPath.length - 1, _groupBy);
+	public BugInstanceNode findNodeByBugInstance(final BugInstance bugInstance) {
+		_lock.lock();
+		try {
+			final String[] fullGroupPath = BugInstanceUtil.getFullGroupPath(bugInstance, _groupBy);
+			final String[] groupNameKey = BugInstanceUtil.getGroupPath(bugInstance, fullGroupPath.length - 1, _groupBy);
 
-		final Map<Integer, List<BugInstanceGroupNode>> map = _groups.get(Arrays.toString(groupNameKey));
-		for (final Entry<Integer, List<BugInstanceGroupNode>> entry : map.entrySet()) {
+			final Map<Integer, List<BugInstanceGroupNode>> map = _groups.get(Arrays.toString(groupNameKey));
+			for (final Entry<Integer, List<BugInstanceGroupNode>> entry : map.entrySet()) {
 
-			final List<BugInstanceGroupNode> groupNodes = entry.getValue();
-			for (final BugInstanceGroupNode groupNode : groupNodes) {
+				final List<BugInstanceGroupNode> groupNodes = entry.getValue();
+				for (final BugInstanceGroupNode groupNode : groupNodes) {
 
-				final List<VisitableTreeNode> bugInstanceNodes = groupNode.getChildsList();
-				for (final VisitableTreeNode node : bugInstanceNodes) {
-					final BugInstance bug = ((BugInstanceNode) node).getBugInstance();
-					if(bug.equals(bugInstance)) {
-						return (BugInstanceNode) node;
+					final List<VisitableTreeNode> bugInstanceNodes = groupNode.getChildsList();
+					for (final VisitableTreeNode node : bugInstanceNodes) {
+						final BugInstance bug = ((BugInstanceNode) node).getBugInstance();
+						if(bug.equals(bugInstance)) {
+							return (BugInstanceNode) node;
+						}
 					}
 				}
 			}
+		} finally {
+			_lock.unlock();
 		}
 
 		return null;

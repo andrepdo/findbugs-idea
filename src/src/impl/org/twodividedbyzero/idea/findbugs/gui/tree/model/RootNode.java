@@ -182,18 +182,18 @@ public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements Vis
 	public String toString() {
 		final StringBuilder buf = new StringBuilder();
 
-		buf.append("<html><body>"); // NON-NLS
+		buf.append("<html><body>");
 		buf.append(_simpleName);
 		if (_bugCount > -1) {
-			buf.append("<font color='gray'>"); // NON-NLS
-			buf.append(" (Found "); // NON-NLS
+			buf.append("<font color='gray'>");
+			buf.append(" (Found ");
 			buf.append(_bugCount);
-			buf.append(" Bug items in "); // NON-NLS
+			buf.append(" Bug items in ");
 			buf.append(_classesCount);
-			buf.append(_classesCount > 1 ? " classes)" : " class)"); // NON-NLS
-			buf.append("</font>"); // NON-NLS
+			buf.append(_classesCount > 1 ? " classes)" : " class)");
+			buf.append("</font>");
 		}
-		buf.append("</body></html>"); // NON-NLS
+		buf.append("</body></html>");
 
 		return buf.toString();
 	}

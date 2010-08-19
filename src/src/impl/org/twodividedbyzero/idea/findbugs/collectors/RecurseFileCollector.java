@@ -39,7 +39,7 @@ public class RecurseFileCollector implements FileFilter {
 			if (IdeaUtilImpl.isValidFileType(type)) {
 				final String filePath = file.getAbsolutePath();
 				_findBugsProject.addFile(filePath);
-				LOGGER.debug("adding class file: " + filePath);// NON-NLS
+				LOGGER.debug("adding class file: " + filePath);
 			}
 		}
 		return false;

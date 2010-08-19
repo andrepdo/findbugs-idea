@@ -66,6 +66,6 @@ public class BugReporterEventFilter implements EventFilter<BugReporterEvent> {
 
 	@Override
 	public String toString() {
-		return "BugReporterEventFilter{" + "_projectName='" + _projectName + '\'' + " EventType=" + getEventType() + '}';  // NON-NLS
+		return "BugReporterEventFilter{" + "_projectName='" + _projectName + '\'' + " EventType=" + getEventType() + '}';
 	}
 }

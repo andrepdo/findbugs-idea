@@ -98,12 +98,12 @@ public final class TreeOccurenceNavigator implements OccurenceNavigator {
 
 
 	public String getNextOccurenceActionName() {
-		return "FindBugs.TreeNextOccurence";  // NON-NLS
+		return "FindBugs.TreeNextOccurence";
 	}
 
 
 	public String getPreviousOccurenceActionName() {
-		return "FindBugs.TreePreviousOccurence";  // NON-NLS
+		return "FindBugs.TreePreviousOccurence";
 	}
 
 

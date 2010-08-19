@@ -75,7 +75,7 @@ public class GroupByFilter extends BaseAction implements EventListener<BugReport
 
 		// check a project is loaded
 		if (isProjectLoaded(project, presentation)) {
-			Messages.showWarningDialog("Project not loaded.", "FindBugs");  // NON-NLS
+			Messages.showWarningDialog("Project not loaded.", "FindBugs");
 			return;
 		}
 
@@ -111,7 +111,7 @@ public class GroupByFilter extends BaseAction implements EventListener<BugReport
 
 
 	private DefaultActionGroup filterApplierGroup() {
-		final DefaultActionGroup group = new DefaultActionGroup("FindBugs.GroupByFilter.PopupGroup", true);  // NON-NLS
+		final DefaultActionGroup group = new DefaultActionGroup("FindBugs.GroupByFilter.PopupGroup", true);
 		group.add(new FilterApplyAction());
 		return group;
 	}
@@ -149,7 +149,7 @@ public class GroupByFilter extends BaseAction implements EventListener<BugReport
 			presentation.setVisible(true);
 
 		} catch (Throwable e) {
-			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);// NON-NLS
+			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
 			if (processed != null) {
 				LOGGER.error("Action update failed", processed);
 			}

@@ -89,7 +89,7 @@ public class MultiSplitLayout implements LayoutManager {
 	 * #see setModel
 	 */
 	public MultiSplitLayout() {
-		this(new Leaf("default"));  // NON-NLS
+		this(new Leaf("default"));
 	}
 
 
@@ -100,7 +100,7 @@ public class MultiSplitLayout implements LayoutManager {
 	 */
 	public MultiSplitLayout(final Node model) {
 		this.model = model;
-		this.dividerSize = UIManager.getInt("SplitPane.dividerSize");  // NON-NLS
+		this.dividerSize = UIManager.getInt("SplitPane.dividerSize");
 		if (this.dividerSize == 0) {
 			this.dividerSize = 7;
 		}

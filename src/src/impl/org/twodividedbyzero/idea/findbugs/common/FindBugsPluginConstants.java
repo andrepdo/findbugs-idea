@@ -28,9 +28,9 @@ import java.io.File;
  */
 public class FindBugsPluginConstants {
 
-	public static final String LOCALE_RESOURCES_PKG = "org.twodividedbyzero.idea.findbugs.resources.i18n.Messages";// NON-NLS
+	public static final String LOCALE_RESOURCES_PKG = "org.twodividedbyzero.idea.findbugs.resources.i18n.Messages";
 
-	public static final String ICON_RESOURCES_PKG = "/org/twodividedbyzero/idea/findbugs/resources/icons";// NON-NLS
+	public static final String ICON_RESOURCES_PKG = "/org/twodividedbyzero/idea/findbugs/resources/icons";
 
 	public static final String TOOL_WINDOW_ID = "FindBugs-IDEA";
 

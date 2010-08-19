@@ -135,6 +135,6 @@ public class BugReporterEventImpl extends EventImpl implements BugReporterEvent 
 
 	@Override
 	public String toString() {
-		return "BugReporterEventImpl{" + "_operation=" + _operation + ", _bugInstance=" + _bugInstance + ", _bugCount=" + _bugCount + ", _bugCollection=" + _bugCollection + ", _projectStats=" + _projectStats + ", _projectName=" + _projectName + '}'; // NON-NLS
+		return "BugReporterEventImpl{" + "_operation=" + _operation + ", _bugInstance=" + _bugInstance + ", _bugCount=" + _bugCount + ", _bugCollection=" + _bugCollection + ", _projectStats=" + _projectStats + ", _projectName=" + _projectName + '}';
 	}
 }

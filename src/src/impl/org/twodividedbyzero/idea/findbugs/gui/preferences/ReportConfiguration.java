@@ -75,13 +75,13 @@ public class ReportConfiguration implements ConfigurationPage {
 			final TableLayout tbl = new TableLayout(size);
 
 			final JPanel mainPanel = new JPanel(tbl);
-			mainPanel.add(new JLabel("Minimum priority to report"), "1, 1, 1, 1");  // NON-NLS
+			mainPanel.add(new JLabel("Minimum priority to report"), "1, 1, 1, 1");
 			final JPanel comp = new JPanel(new FlowLayout(FlowLayout.LEFT));
 			comp.add(getPriorityCombobox());
 			mainPanel.add(comp, "3, 1, 3, 1");
 
 			final JPanel categoryPanel = new JPanel();
-			categoryPanel.setBorder(BorderFactory.createTitledBorder("Reported (visible) bug categories"));  // NON-NLS
+			categoryPanel.setBorder(BorderFactory.createTitledBorder("Reported (visible) bug categories"));
 			categoryPanel.add(new JScrollPane(getBugCategoriesTable(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
 			mainPanel.add(categoryPanel, "1, 3, 3, 3");

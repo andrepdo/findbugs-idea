@@ -24,11 +24,14 @@ import org.twodividedbyzero.idea.findbugs.gui.common.TableSorter;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.model.BugPatternTableModel;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
@@ -41,17 +44,19 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Rectangle;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeSet;
 
 
@@ -92,18 +97,18 @@ public class DetectorConfiguration implements ConfigurationPage {
 			final double rowsGap = 5;
 			final double colsGap = 10;
 			final double[][] size = {{border, TableLayout.FILL, border}, // Columns
-									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, rowsGap, TableLayout.FILL, 15, 150, border}};// Rows
+									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, rowsGap, TableLayout.FILL, 15, 0, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 
-			final JPanel mainPanel = new JPanel(tbl);
-			mainPanel.add(new JLabel("Disabled detectors will not participate in the analysis."), "1, 1, 1, 1");  // NON-NLS
-			mainPanel.add(new JLabel("'Grayed out' detector will run, however they will not report any result to the UI."), "1, 3, 1, 3");  // NON-NLS
+			final Container mainPanel = new JPanel(tbl);
+			mainPanel.add(new JLabel("Disabled detectors will not participate in the analysis."), "1, 1, 1, 1");
+			mainPanel.add(new JLabel("'Grayed out' detector will run, however they will not report any result to the UI."), "1, 3, 1, 3");
 
 
-			final JPanel checkboxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+			final Container checkboxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 			checkboxPanel.add(getHiddenCheckBox());
 			checkboxPanel.add(getEnableAllBox());
-			mainPanel.add(checkboxPanel, "1, 5, 1, 5");  // NON-NLS
+			mainPanel.add(checkboxPanel, "1, 5, 1, 5");
 
 
 			final double[][] size1 = {{TableLayout.FILL}, // Columns
@@ -111,13 +116,18 @@ public class DetectorConfiguration implements ConfigurationPage {
 			final TableLayout tbl1 = new TableLayout(size1);
 			final JPanel detectorPanel = new JPanel(tbl1);
 			detectorPanel.add(new JScrollPane(getDetectorsTable(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), "0, 0, 0, 0");
+			//mainPanel.add(detectorPanel, "1, 7, 1, 7");
 
-			mainPanel.add(detectorPanel, "1, 7, 1, 7");
-
-			final JScrollPane scrollPane = new JScrollPane(getTextArea(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final JComponent scrollPane = new JScrollPane(getTextArea(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			getDetectorTextPanel().add(scrollPane, BorderLayout.CENTER);
+			final Dimension preferredSize = getDetectorTextPanel().getPreferredSize();
+			preferredSize.height = 150;
+			getDetectorTextPanel().setPreferredSize(preferredSize);
 			scrollPane.setBorder(null);
-			mainPanel.add(getDetectorTextPanel(), "1, 9, 1, 9");
+			//mainPanel.add(getDetectorTextPanel(), "1, 9, 1, 9");
+
+			final Component splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, detectorPanel, getDetectorTextPanel());
+			mainPanel.add(splitPane, "1, 7, 1, 7");
 
 			_component = mainPanel;
 		}
@@ -138,7 +148,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 	}
 
 
-	private JCheckBox getHiddenCheckBox() {
+	private AbstractButton getHiddenCheckBox() {
 		if (_hiddenCheckbox == null) {
 			_hiddenCheckbox = new JCheckBox("show hidden detector");
 			_hiddenCheckbox.addItemListener(new ItemListener() {
@@ -153,9 +163,9 @@ public class DetectorConfiguration implements ConfigurationPage {
 	}
 
 
-	private JCheckBox getEnableAllBox() {
+	private Component getEnableAllBox() {
 		if (_enableAllCheckbox == null) {
-			_enableAllCheckbox = new JCheckBox("enable/disable all detectors");  // NON-NLS
+			_enableAllCheckbox = new JCheckBox("enable/disable all detectors");
 			_enableAllCheckbox.addItemListener(new ItemListener() {
 				public void itemStateChanged(final ItemEvent e) {
 					getModel().selectAll(e.getStateChange() == ItemEvent.SELECTED);
@@ -173,7 +183,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 
 			_detectorsTable = new JTable(_tableSorter);
 
-			final ColorRenderer colorRenderer = new ColorRenderer(getModel(), _preferences);
+			final TableCellRenderer colorRenderer = new ColorRenderer(getModel(), _preferences);
 			_detectorsTable.setDefaultRenderer(String.class, colorRenderer);
 
 			_bugPatternModel.addTableModelListener(new TableModelListener() {
@@ -229,7 +239,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 	private JPanel getDetectorTextPanel() {
 		if (_detailsPanel == null) {
 			_detailsPanel = new JPanel(new BorderLayout());
-			_detailsPanel.setBorder(BorderFactory.createTitledBorder("Detector details"));  // NON-NLS
+			_detailsPanel.setBorder(BorderFactory.createTitledBorder("Detector details"));
 		}
 		return _detailsPanel;
 	}
@@ -358,7 +368,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 	public static String getBugsCategories(final DetectorFactory factory) {
 		final Collection<BugPattern> patterns = factory.getReportedBugPatterns();
 		String category = null;
-		final Set<String> categories = new TreeSet<String>();
+		final Collection<String> categories = new TreeSet<String>();
 		for (final BugPattern bugPattern : patterns) {
 			final String category2 = bugPattern.getCategory();
 			if (category == null) {
@@ -398,7 +408,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 	public static String createBugsAbbreviation(final DetectorFactory factory) {
 		final StringBuilder sb = new StringBuilder();
 		final Collection<BugPattern> patterns = factory.getReportedBugPatterns();
-		final LinkedHashSet<String> abbrs = new LinkedHashSet<String>();
+		final HashSet<String> abbrs = new LinkedHashSet<String>();
 		for (final BugPattern pattern : patterns) {
 			final String abbr = pattern.getAbbrev();
 			abbrs.add(abbr);

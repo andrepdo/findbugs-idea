@@ -200,7 +200,7 @@ public class RecurseClassCollector {
 			final PsiClass psiClass = (PsiClass) element;
 			final String className = psiClass.getName();
 
-			if (!"null".equals(className)) { // NON-NLS
+			if (!"null".equals(className)) {
 				final String fqp = fullQualifiedPath + ANONYMOUSE_CLASS_DELIMITER + anonymousClassPrefix + className;
 
 				if (findClass != null && String.valueOf(anonymousClassPrefix).equals(findClass)) {
@@ -278,7 +278,7 @@ public class RecurseClassCollector {
 
 
 		//fqn.append(getParentClassNotation(psiClass));
-		fqn.append(psiClass.getName());		//fqn.append(".class");// NON-NLS
+		fqn.append(psiClass.getName());		//fqn.append(".class");
 
 		return fqn.toString();
 	}
@@ -306,7 +306,7 @@ public class RecurseClassCollector {
 	public void addFile(final String fullQualifiedName) {
 		if (new File(fullQualifiedName).exists()) {
 			_findBugsProject.addFile(fullQualifiedName);
-			LOGGER.debug("adding class file: " + fullQualifiedName);// NON-NLS
+			LOGGER.debug("adding class file: " + fullQualifiedName);
 
 			/*ApplicationManager.getApplication().invokeLater(new Runnable() {
 				public void run() {*/
@@ -315,7 +315,7 @@ public class RecurseClassCollector {
 			});*/
 
 		} else {
-			LOGGER.debug("class file: " + fullQualifiedName + " does not exists. maybe an inner/anonymous class? try to recompile your sources.");// NON-NLS
+			LOGGER.debug("class file: " + fullQualifiedName + " does not exists. maybe an inner/anonymous class? try to recompile your sources.");
 		}
 	}
 

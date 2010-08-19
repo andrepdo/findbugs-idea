@@ -2,19 +2,13 @@ package org.twodividedbyzero.idea.findbugs.gui.tree;
 
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.I18N;
+import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstanceBugRankComparator;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstanceCategoryComparator;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstanceClassComparator;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstancePackageComparator;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstancePriorityComparator;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstanceShortDescrComparator;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstanceTypeComparator;
-import static org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.getBugInstanceCategoryComparator;
-import static org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.getBugInstanceClassComparator;
-import static org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.getBugInstancePackageComparator;
-import static org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.getBugInstancePriorityComparator;
-import static org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.getBugInstanceShortDescrComparator;
-import static org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.getBugInstanceTypeComparator;
-import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstanceBugRankComparator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,13 +25,13 @@ import java.util.Locale;
  */
 public enum GroupBy {
 
-	BugShortDescription("by bug short description"), // NON-NLS
-	BugCategory("by bug category"), // NON-NLS
-	BugType("by bug type"), // NON-NLS
-	Class("by class"), // NON-NLS
-	Package("by package"), // NON-NLS
-	Priority("by priority"),  // NON-NLS
-	BugRank("by bug rank");  // NON-NLS
+	BugShortDescription("by bug short description"),
+	BugCategory("by bug category"),
+	BugType("by bug type"),
+	Class("by class"),
+	Package("by package"),
+	Priority("by priority"),
+	BugRank("by bug rank");
 
 
 	private final String _description;

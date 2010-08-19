@@ -141,18 +141,18 @@ public abstract class AbstractBar extends JToolBar {
 
 
 	public void addActionComponent(final String name, final Action actionComponent) {
-		_actionComponents.put(name, actionComponent);// NON-NLS
+		_actionComponents.put(name, actionComponent);
 	}
 
 
 	public void addActionComponent(final Action actionComponent) {
-		_actionComponents.put((String) actionComponent.getValue("Name"), actionComponent);// NON-NLS
+		_actionComponents.put((String) actionComponent.getValue("Name"), actionComponent);
 	}
 
 
 	public void removeActionComponent(final Action actionComponent) {
 		//noinspection SuspiciousMethodCalls
-		_actionComponents.remove(actionComponent.getValue("Name"));// NON-NLS
+		_actionComponents.remove(actionComponent.getValue("Name"));
 	}
 
 
@@ -253,10 +253,10 @@ public abstract class AbstractBar extends JToolBar {
 				final char c = (char) key.getKeyCode();
 				final int mod = key.getModifiers();
 				if (mod == InputEvent.CTRL_MASK) {
-					controlKeyStr = "Ctrl+" + c;// NON-NLS
+					controlKeyStr = "Ctrl+" + c;
 					break;
 				} else if (mod == InputEvent.ALT_MASK) {
-					controlKeyStr = "Alt+" + c;// NON-NLS
+					controlKeyStr = "Alt+" + c;
 					break;
 				}
 			}
@@ -270,7 +270,7 @@ public abstract class AbstractBar extends JToolBar {
 		// This method is called whenever the orientation of the toolbar is changed
 		public void propertyChange(final java.beans.PropertyChangeEvent evt) {
 			/*final String propName = evt.getPropertyName();
-			if ("orientation".equals(propName)) { // NON-NLS
+			if ("orientation".equals(propName)) {
 				// Get the old orientation
 				@SuppressWarnings({"UnusedDeclaration"})
 				final Integer oldValue = (Integer) evt.getOldValue();

@@ -231,7 +231,7 @@ public class EventManagerImpl implements EventManager {
 
 		@Override
 		public String toString() {
-			return "MulticastEventFilter{" + "_eventListener=" + _eventListener + ", _eventType=" + _eventFilter.getEventType() + '}'; // NON-NLS
+			return "MulticastEventFilter{" + "_eventListener=" + _eventListener + ", _eventType=" + _eventFilter.getEventType() + '}';
 		}
 	}
 

@@ -52,7 +52,7 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	private BugInstance _bugInstance;
 	private ArrayList<VisitableTreeNode> _childs;
 
-	private static final Icon _expandedIcon = new MaskIcon(ResourcesLoader.findIcon("/nodes/class.png", BugInstanceNode.class), Color.BLACK); // NON-NLS
+	private static final Icon _expandedIcon = new MaskIcon(ResourcesLoader.findIcon("/nodes/class.png", BugInstanceNode.class), Color.BLACK);
 	private static final Icon _collapsedIcon = _expandedIcon;
 
 
@@ -119,7 +119,7 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 
 
 	public static String getJavaClassType(final BugInstance bugInstance) {
-		return "abstract|default";  // NON-NLS // todo: ... icon 
+		return "abstract|default";   // todo: ... icon
 	}
 
 
@@ -260,9 +260,9 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	@Override
 	public String toString() {
 		final StringBuilder buf = new StringBuilder();
-		buf.append("<html><body>");  // NON-NLS
+		buf.append("<html><body>");
 		buf.append(_simpleName);
-		buf.append("</html></body>");  // NON-NLS
+		buf.append("</html></body>");
 
 
 		if (_simpleName != null && _problem == null) {

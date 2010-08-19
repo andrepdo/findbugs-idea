@@ -129,7 +129,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 			_bugDetailsPane.setBorder(new EmptyBorder(10, 10, 10, 10));
 			_bugDetailsPane.setEditable(false);
 			_bugDetailsPane.setBackground(Color.white);
-			_bugDetailsPane.setContentType("text/html");  // NON-NLS
+			_bugDetailsPane.setContentType("text/html");
 			_bugDetailsPane.addHyperlinkListener(new BugDetailsPaneHyperlinkListener());
 		}
 
@@ -161,7 +161,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 			//_explanationPane.setPreferredSize(new Dimension(_parent.getPreferredSize().width, 150));
 			_explanationPane.setEditable(false);
 			_explanationPane.setBackground(Color.white);
-			_explanationPane.setContentType("text/html");  // NON-NLS
+			_explanationPane.setContentType("text/html");
 
 			_explanationPane.addHyperlinkListener(new HyperlinkListener() {
 				public void hyperlinkUpdate(final HyperlinkEvent evt) {
@@ -176,18 +176,18 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 	private void setStyleSheets() {
 		final StyleSheet styleSheet = new StyleSheet();
-		styleSheet.addRule("body {font-size: 12pt}"); // NON-NLS
-		styleSheet.addRule("H1 {color: #005555;  font-size: 120%; font-weight: bold;}"); // NON-NLS
-		styleSheet.addRule("H2 {color: #005555;  font-size: 12pt; font-weight: bold;}"); // NON-NLS
-		styleSheet.addRule("H3 {color: #005555;  font-size: 12pt; font-weight: bold;}"); // NON-NLS
-		styleSheet.addRule("code {font-family: courier; font-size: 12pt}");  // NON-NLS
-		styleSheet.addRule("pre {color: gray; font-family: courier; font-size: 12pt}");  // NON-NLS
-		styleSheet.addRule("a {color: blue; font-decoration: underline}");  // NON-NLS
-		styleSheet.addRule("li {margin-left: 10px; list-style-type: none}");  // NON-NLS
-		styleSheet.addRule("#Low {background-color: green; width: 15px; height: 15px;}");  // NON-NLS
-		styleSheet.addRule("#Medium {background-color: yellow; width: 15px; height: 15px;}");  // NON-NLS
-		styleSheet.addRule("#High {background-color: red; width: 15px; height: 15px;}");  // NON-NLS
-		styleSheet.addRule("#Exp {background-color: black; width: 15px; height: 15px;}");  // NON-NLS
+		styleSheet.addRule("body {font-size: 12pt}");
+		styleSheet.addRule("H1 {color: #005555;  font-size: 120%; font-weight: bold;}");
+		styleSheet.addRule("H2 {color: #005555;  font-size: 12pt; font-weight: bold;}");
+		styleSheet.addRule("H3 {color: #005555;  font-size: 12pt; font-weight: bold;}");
+		styleSheet.addRule("code {font-family: courier; font-size: 12pt}");
+		styleSheet.addRule("pre {color: gray; font-family: courier; font-size: 12pt}");
+		styleSheet.addRule("a {color: blue; font-decoration: underline}");
+		styleSheet.addRule("li {margin-left: 10px; list-style-type: none}");
+		styleSheet.addRule("#Low {background-color: green; width: 15px; height: 15px;}");
+		styleSheet.addRule("#Medium {background-color: yellow; width: 15px; height: 15px;}");
+		styleSheet.addRule("#High {background-color: red; width: 15px; height: 15px;}");
+		styleSheet.addRule("#Exp {background-color: black; width: 15px; height: 15px;}");
 
 		_htmlEditorKit.setStyleSheet(styleSheet);
 	}
@@ -321,10 +321,10 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		final String html = BugInstanceUtil.getDetailHtml(bugInstance);
 		final StringReader reader = new StringReader(html); // no need for BufferedReader
 		try {
-			_explanationPane.setToolTipText(edu.umd.cs.findbugs.L10N.getLocalString("tooltip.longer_description", "This gives a longer description of the detected bug pattern")); // NON-NLS
-			_explanationPane.read(reader, "html bug description");  // NON-NLS
+			_explanationPane.setToolTipText(edu.umd.cs.findbugs.L10N.getLocalString("tooltip.longer_description", "This gives a longer description of the detected bug pattern"));
+			_explanationPane.read(reader, "html bug description");
 		} catch (IOException e) {
-			_explanationPane.setText("Could not find bug description: " + e.getMessage());  // NON-NLS
+			_explanationPane.setText("Could not find bug description: " + e.getMessage());
 			LOGGER.warn(e.getMessage(), e);
 		} finally {
 			reader.close(); // polite, but doesn't do much in StringReader
@@ -344,22 +344,22 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	}
 
 
-	public void resizeComponents(final int width, final int height) {
-		final int newWidth = (int) (width * _splitPaneHorizontalWeight);
+	public void adaptSize(final int width, final int height) {
+		//final int newWidth = (int) (width * _splitPaneHorizontalWeight);
 		final int expHeight = (int) (height * 0.4);
 		final int detailsHeight = (int) (height * 0.6);
 
 		//if(_bugDetailsPanel.getPreferredSize().width != newWidth && _bugDetailsPanel.getPreferredSize().height != detailsHeight) {
-		_bugDetailsPanel.setPreferredSize(new Dimension(newWidth, detailsHeight));
-		_bugDetailsPanel.setSize(new Dimension(newWidth, detailsHeight));
+		_bugDetailsPanel.setPreferredSize(new Dimension(width, detailsHeight));
+		_bugDetailsPanel.setSize(new Dimension(width, detailsHeight));
 		//_bugDetailsPanel.doLayout();
 		_bugDetailsPanel.validate();
 		//_parent.validate();
 		//}
 
 		//if(_explanationPanel.getPreferredSize().width != newWidth && _explanationPanel.getPreferredSize().height != expHeight) {
-		_explanationPanel.setPreferredSize(new Dimension(newWidth, expHeight));
-		_explanationPanel.setSize(new Dimension(newWidth, expHeight));
+		_explanationPanel.setPreferredSize(new Dimension(width, expHeight));
+		_explanationPanel.setSize(new Dimension(width, expHeight));
 		//_explanationPanel.doLayout();
 		_explanationPanel.validate();
 		//_parent.validate();

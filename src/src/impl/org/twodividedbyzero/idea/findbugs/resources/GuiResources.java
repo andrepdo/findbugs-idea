@@ -37,6 +37,9 @@ public class GuiResources {
 	public static final Icon FINDBUGS_CONFIGURATION_ICON = ResourcesLoader.loadIcon("smallBuggy.png");
 	public static final Icon FINDBUGS_EXECUTE_ICON = ResourcesLoader.loadIcon("actions/bug18x18.png");
 
+	public static final Icon CLOSE_EDITOR_ICON = ResourcesLoader.loadIcon("close.png");
+	public static final Icon CLOSE_EDITOR_HOVER_ICON = ResourcesLoader.loadIcon("closeHovered.png");
+
 	public static final int fontSize = 12;
 	public static final Font SOURCE_FONT = new java.awt.Font("Monospaced", 0, fontSize);
 	public static final Font JTREE_FONT = new java.awt.Font("SansSerif", 0, fontSize);
@@ -88,6 +91,7 @@ public class GuiResources {
 	 */
 	public static final Icon NAVIGATION_MOVEUP_ICON = ResourcesLoader.loadIcon("actions/moveUp.png");
 	public static final Icon NAVIGATION_MOVEDOWN_ICON = ResourcesLoader.loadIcon("actions/moveDown.png");
+
 
 
 	private GuiResources() {

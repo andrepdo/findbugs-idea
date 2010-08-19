@@ -107,7 +107,7 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 		defaultactiongroup.add(ActionManager.getInstance().getAction("EditSource"));
 		defaultactiongroup.addSeparator();
 		defaultactiongroup.add(ActionManager.getInstance().getAction("VersionControlsGroup"));
-		PopupHandler.installPopupHandler(this, defaultactiongroup, "FoudBugsViewPopup", ActionManager.getInstance());  // NON-NLS
+		PopupHandler.installPopupHandler(this, defaultactiongroup, "FoudBugsViewPopup", ActionManager.getInstance());
 		_treeKeyAdapter = createKeyAdapter();
 		addKeyListener(_treeKeyAdapter);
 
@@ -157,27 +157,11 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 			node = (BugInstanceNode) treeNode;
 		}
 
-		if ("virtualFile".equals(s)) { // NON-NLS
+		if ("virtualFile".equals(s)) {
 			final PsiFile psiFile = _treeHelper.getSelectedFile();
 			return psiFile == null ? null : psiFile.getVirtualFile();
 		}
 		if ("Navigatable".equals(s)) {
-
-			/*final AbstractNodeDescriptor<VisitableTreeNode> nodedescriptor = treeNode.getElement();
-			if (nodedescriptor == null) {
-				return null;
-			}*/
-			/*final Object obj = nodedescriptor.getElement();
-			if (!(obj instanceof TodoFileNode) && !(obj instanceof TodoItemNode)) {
-				return null;
-			}
-			final TodoItemNode todoitemnode = myTodoTreeBuilder.getFirstPointerForElement(obj);*/
-			/*if (todoitemnode != null) {
-				return new OpenFileDescriptor(_project, ((SmartTodoItemPointer) todoitemnode.getValue()).getTodoItem().getFile().getVirtualFile(), ((SmartTodoItemPointer) todoitemnode.getValue()).getRangeMarker().getStartOffset());
-
-			} else {
-				return null;
-			}*/
 			final PsiFile psiFile = _treeHelper.getSelectedFile();
 			if (psiFile != null) {
 				final VirtualFile virtualFile = psiFile.getVirtualFile();
@@ -191,10 +175,10 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 				return null;
 			}
 		}
-		if ("psi.Element".equals(s)) { // NON-NLS
+		if ("psi.Element".equals(s)) {
 			return _treeHelper.getSelectedElement();
 		}
-		if ("virtualFileArray".equals(s)) {  // NON-NLS
+		if ("virtualFileArray".equals(s)) {
 			final PsiFile psiFile = _treeHelper.getSelectedFile();
 			if (psiFile != null) {
 				LOGGER.debug("PsiFile: " + psiFile);
@@ -278,6 +262,10 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 		@Override
 		public void mouseClicked(final MouseEvent e) {
 			if (!_bugTreePanel.isScrollToSource() && e.getClickCount() < 2) {
+				final TreePath treePath = getPathForLocation(e.getX(), e.getY());
+				if (_bugTreePanel.isPreviewEnabled() && treePath != null) {
+					_bugTreePanel.setPreview(treePath);
+				}
 				return;
 			}
 
@@ -305,6 +293,9 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 			if (_bugTreePanel.isScrollToSource() && path != null) {
 				_scrollToSourceHandler.scollToSelectionSource();
 				//_bugTreePanel.scrollToSource(path);
+			}
+			if (_bugTreePanel.isPreviewEnabled() && path != null) {
+				_bugTreePanel.setPreview(path);
 			}
 		}
 	}

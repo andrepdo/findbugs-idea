@@ -75,7 +75,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 	private int _goal;
 	@NonNls
 	private String _currentStageName;
-	private static final String ANALYZING_CLASSES_i18N = "Analyzing classes: ";  // NON-NLS
+	private static final String ANALYZING_CLASSES_i18N = "Analyzing classes: ";
 	private boolean _isInspectionRun;
 	private boolean _isRunning;
 	private FindBugsPreferences _preferences;
@@ -129,7 +129,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 	public boolean isHiddenBugGroup(final BugInstance bug) {
 		final Map<String, String> categories = _preferences.getBugCategories();
 		final String category = bug.getBugPattern().getCategory();
-		return categories.containsKey(category) && "false".equals(categories.get(category));  // NON-NLS
+		return categories.containsKey(category) && "false".equals(categories.get(category));
 	}
 
 
@@ -152,9 +152,9 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 		if (errorList.size() > 0) {
 			Collections.sort(errorList, new QueuedErrorsComparator());
 
-			final Map<String, Map<String, Throwable>> status = new HashMap<String, Map<String, Throwable>>();// NON-NLS
-			final String key = "The following errors occurred during FindBugs analysis:";  // NON-NLS
-			status.put(key, new HashMap<String, Throwable>());// NON-NLS
+			final Map<String, Map<String, Throwable>> status = new HashMap<String, Map<String, Throwable>>();
+			final String key = "The following errors occurred during FindBugs analysis:";
+			status.put(key, new HashMap<String, Throwable>());
 
 			final Map<String, Throwable> map = status.get(key);
 			for (final Error error : errorList) {
@@ -167,9 +167,9 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 
 		final Set<String> missingClasses = getMissingClasses();
 		if (missingClasses.size() > 0) {
-			final Map<String, Map<String, Throwable>> status = new HashMap<String, Map<String, Throwable>>();// NON-NLS
-			final String key = "The following classes needed for FindBugs analysis were missing:"; // NON-NLS
-			status.put(key, new HashMap<String, Throwable>());// NON-NLS
+			final Map<String, Map<String, Throwable>> status = new HashMap<String, Map<String, Throwable>>();
+			final String key = "The following classes needed for FindBugs analysis were missing:";
+			status.put(key, new HashMap<String, Throwable>());
 
 			final Map<String, Throwable> map = status.get(key);
 			for (final String missingClass : missingClasses) {
@@ -184,7 +184,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 
 	/** @see edu.umd.cs.findbugs.BugReporter#finish() */
 	public void finish() {
-		final String message = "Finished: Found " + _filteredBugCount + " bugs."; // NON-NLS
+		final String message = "Finished: Found " + _filteredBugCount + " bugs.";
 		_findBugsTask.setIndicatorText(message);
 		//LOGGER.debug(message);
 
@@ -296,7 +296,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 
 
 	public void finishPerClassAnalysis() {
-		_findBugsTask.setIndicatorText("Finishing analysis..."); // NON-NLS
+		_findBugsTask.setIndicatorText("Finishing analysis...");
 		/*SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				stageNameLabel.setText(L10N.getLocalString("msg.finishedanalysis_txt", "Finishing analysis"));
@@ -307,14 +307,14 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 
 	public void reportNumberOfArchives(final int numArchives) {
 		//_findBugsTask.setIndicatorText("Scanning archives: " + numArchives);
-		beginStage("Scanning archives: ", numArchives); // NON-NLS
+		beginStage("Scanning archives: ", numArchives);
 	}
 
 
 	public void startAnalysis(final int numClasses) {
 		_pass++;
 		//_findBugsTask.setIndicatorText("Analyzing classes: " + numClasses);
-		beginStage(ANALYZING_CLASSES_i18N, numClasses); // NON-NLS
+		beginStage(ANALYZING_CLASSES_i18N, numClasses);
 
 		if (_isInspectionRun) {
 			EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent.Operation.ANALYSIS_STARTED, null, 0, _project.getName()));
@@ -350,7 +350,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 				//stageNameLabel.setText(stageName);
 				//_findBugsTask.setTitle(stageName + " 0/" + goal);
 				_currentStageName = stageName;
-				_findBugsTask.setIndicatorText2(stageName + " 0/" + goal);  // NON-NLS
+				_findBugsTask.setIndicatorText2(stageName + " 0/" + goal);
 				//_findBugsTask.setIndicatorText("0/" + goal);
 				//countValueLabel.setText("0/" + goal);
 				//progressBar.setMaximum(goal);
@@ -373,7 +373,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 				final int work = _pass == 0 ? 1 : 2;
 
 				//EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.NEW_BUG_INSTANCE, null, _filteredBugCount, getProjectStats()));
-				_findBugsTask.setIndicatorText2(_currentStageName + " " + count + "/" + goal + (ANALYZING_CLASSES_i18N.equals(_currentStageName) ? " (pass #" + work + "/2)" : "")); // NON-NLS
+				_findBugsTask.setIndicatorText2(_currentStageName + " " + count + "/" + goal + (ANALYZING_CLASSES_i18N.equals(_currentStageName) ? " (pass #" + work + "/2)" : ""));
 				//countValueLabel.setText(count + "/" + goal);
 				//progressBar.setValue(count);
 				//_findBugsTask.getProgressIndicator().setFraction(100/(double) count);

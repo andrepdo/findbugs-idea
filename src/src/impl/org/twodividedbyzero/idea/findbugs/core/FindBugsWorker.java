@@ -29,9 +29,11 @@ import com.intellij.psi.PsiClass;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import edu.umd.cs.findbugs.FindBugs2;
+import edu.umd.cs.findbugs.IFindBugsEngine;
 import edu.umd.cs.findbugs.IFindBugsEngine2;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import edu.umd.cs.findbugs.config.UserPreferences;
+import org.dom4j.DocumentException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
@@ -45,6 +47,7 @@ import org.twodividedbyzero.idea.findbugs.report.BugReporter;
 import org.twodividedbyzero.idea.findbugs.tasks.FindBugsTask;
 
 import java.awt.EventQueue;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Map.Entry;
@@ -67,6 +70,7 @@ import java.util.Map.Entry;
  * @version $Revision$
  * @since 0.0.1
  */
+@SuppressWarnings({"HardCodedStringLiteral"})
 public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileStatusNotification {
 
 	protected static final Logger LOGGER = Logger.getInstance(FindBugsWorker.class.getName());
@@ -144,7 +148,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 
 	private static void configureSelectedCategories(final FindBugsPreferences preferences, final ProjectFilterSettings projectFilterSettings) {
 		for (final Entry<String, String> category : preferences.getBugCategories().entrySet()) {
-			if ("true".equals(category.getValue())) {  // NON-NLS
+			if ("true".equals(category.getValue())) {
 				projectFilterSettings.addCategory(category.getKey());
 			} else {
 				projectFilterSettings.removeCategory(category.getKey());
@@ -172,7 +176,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 			final IFindBugsEngine2 engine = createFindBugsEngine();
 
 			// Create FindBugsTask
-			final FindBugsTask findBugsTask = new FindBugsTask(_project, "Running FindBugs analysis...", true, engine, _startInBackground);  // NON-NLS
+			final FindBugsTask findBugsTask = new FindBugsTask(_project, "Running FindBugs analysis...", true, engine, _startInBackground);
 			_bugReporter.setFindBugsTask(findBugsTask);
 			queue(findBugsTask);
 
@@ -248,20 +252,54 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 		// Create IFindBugsEngine
 		final IFindBugsEngine2 engine = new FindBugs2();
 		engine.setNoClassOk(true);
+		engine.setMergeSimilarWarnings(false);
 		engine.setBugReporter(_bugReporter);
 		engine.setProject(_findBugsProject);
 		engine.setProgressCallback(_bugReporter);
 		//engine.setScanNestedArchives(true); // todo: prefrences Bean
 		//engine.setRelaxedReportingMode(true); // todo: prefrences Bean
 		//engine.setRankThreshold(99);
+		configureFilter(engine);
+
 
 		// add plugins to detector collection
 		final DetectorFactoryCollection factoryCollection = FindBugsPreferences.getDetectorFactorCollection();
 		engine.setDetectorFactoryCollection(factoryCollection);
 
+		//engine.excludeBaselineBugs(_userPrefs.getExcludeBugsFiles());
 		// configure detectors.
 		engine.setUserPreferences(_userPrefs);
 		return engine;
+	}
+
+
+	private void configureFilter(final IFindBugsEngine engine) {
+		final Collection<String> excludeFilterFiles = _userPrefs.getExcludeFilterFiles();
+		for (final String excludeFileName : excludeFilterFiles) {
+			try {
+				engine.addFilter(excludeFileName, false);
+			} catch (IOException e) {
+				LOGGER.error("ExcludeFilter configuration failed.", e);
+			}
+		}
+		final Collection<String> includeFilterFiles = _userPrefs.getIncludeFilterFiles();
+		for (final String includeFileName : includeFilterFiles) {
+			try {
+				engine.addFilter(includeFileName, true);
+			} catch (IOException e) {
+				LOGGER.error("IncludeFilter configuration failed.", e);
+			}
+		}
+		final Collection<String> excludeBugFiles = _userPrefs.getExcludeBugsFiles();
+		for (final String excludeBugFile : excludeBugFiles) {
+			try {
+				engine.excludeBaselineBugs(excludeBugFile);
+			} catch (IOException e) {
+				LOGGER.error("ExcludeBaseLineBug files configuration failed.", e);
+			} catch (DocumentException e) {
+				LOGGER.error("ExcludeBaseLineBug files configuration failed.", e);
+			}
+		}
 	}
 
 

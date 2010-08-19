@@ -72,7 +72,7 @@ public class FindBugsPluginLoader {
 			}
 
 			for (final File aContentList : contentList) {
-				if (aContentList.getName().endsWith(".jar")) { // NON-NLS
+				if (aContentList.getName().endsWith(".jar")) {
 
 					try {
 						arr.add(aContentList.toURI().toURL());

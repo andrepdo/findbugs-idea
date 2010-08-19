@@ -1,3 +1,19 @@
+/*
+ * Copyright 2010 Andre Pfeiler
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.twodividedbyzero.idea.findbugs.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -16,9 +32,9 @@ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
  * @version $Revision$
- * @since 0.0.1
+ * @since 0.9.96
  */
-public class ScrollToSource extends BaseToggleAction {
+public class PreviewSelectBugInstance extends BaseToggleAction {
 
 
 	@Override
@@ -39,10 +55,11 @@ public class ScrollToSource extends BaseToggleAction {
 		final Content content = toolWindow.getContentManager().getContent(0);
 		if (content != null) {
 			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
+			//return panel.isPreviewEnabled();
 			final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
-			final boolean enabled = preferences.getBooleanProperty(FindBugsPreferences.TOOLWINDOW_SCROLL_TO_SOURCE, panel.getBugTreePanel().isScrollToSource());
-			if(enabled != panel.getBugTreePanel().isScrollToSource()) {
-				panel.getBugTreePanel().setScrollToSource(enabled);
+			final boolean enabled = preferences.getBooleanProperty(FindBugsPreferences.TOOLWINDOW_EDITOR_PREVIEW, panel.isPreviewEnabled());
+			if(enabled != panel.isPreviewEnabled()) {
+				panel.setPreviewEnabled(enabled);
 			}
 			return enabled;
 		}
@@ -70,8 +87,8 @@ public class ScrollToSource extends BaseToggleAction {
 		if (content != null) {
 			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
 			final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
-			preferences.setProperty(FindBugsPreferences.TOOLWINDOW_SCROLL_TO_SOURCE, selected);
-			panel.getBugTreePanel().setScrollToSource(selected);
+			preferences.setProperty(FindBugsPreferences.TOOLWINDOW_EDITOR_PREVIEW, selected);
+			panel.setPreviewEnabled(selected);
 		}
 	}
 

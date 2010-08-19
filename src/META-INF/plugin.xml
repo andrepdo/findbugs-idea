@@ -40,11 +40,11 @@
             <li>group results by: bug category, classname, package, priority, bug rank</li>
             <li>intellij local history support</li>
             <li>run Findbugs analysis as IntelliJ inspection (experimental)</li>
-            <li>Analyze actions (all actions are also available in the intellij project tree, toolbar menu, context menu):
+            <li>Analyze actions (all actions are also available in the intellij pro0ject tree, toolbar menu, context menu):
                 <ul>
                     <li>&nbsp;analyze all modified files</li>
                     <li>&nbsp;analyze all files on the active changelist</li>
-                    <li>&nbsp;analyze class under editor caret</li>
+                    <li>&nbsp;analyze class under cursor</li>
                     <li>&nbsp;analyze current editor file</li>
                     <li>&nbsp;analyze all files of an intellij project</li>
                     <li>&nbsp;analyze all files of an intellij module</li>
@@ -58,13 +58,21 @@
     </description>
     <change-notes>
         <![CDATA[<html>
+        <h3>0.9.96</h3>
+		<ul>
+		    <li>add import bug collection from xml</li>
+			<li>fix export (xml html)</li>
+            <li>fix Issue 14 (Inspection ID must satisfy [a-zA-Z_0-9.]+ pattern)</li>
+            <li>fix exclude- include filter sttings and exclude base line bugs</li>
+            <li>fix issue 15 IDEA hangs when user closes FindBugs tab.</li>
+		</ul>
         <h3>0.9.95</h3>
 		<ul>
 			<li>add export (xml html)</li>
             <li>fix possible npe (balloontip)</li>
             <li>add support for directory based config format</li>
             <li>made openjdk-7 compatible</li>
-            <li>apdated some deprecated usages/li>
+            <li>apdated some deprecated usages</li>
 		</ul>
         <h3>0.9.94</h3>
 		<ul>
@@ -171,7 +179,7 @@
     <resource-bundle>org.twodividedbyzero.idea.findbugs.resources.i18n.Messages</resource-bundle>
     <!--<extensions defaultExtensionNs="com.intellij">
          <annotator language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugAnnotator"/>
-        &lt;!&ndash;<codeInsight.lineMarkerProvider language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugsLineMarkerProvider"/>&ndash;&gt;
+        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugsLineMarkerProvider"/>
     </extensions>-->
     <project-components>
         <component>
@@ -402,6 +410,12 @@
                     description="Autoscroll to the source location of possible bugs."
                     icon="/general/autoscrollToSource.png"/>
 
+            <action id="FindBugs.PreviewSelectBugInstance"
+                    class="org.twodividedbyzero.idea.findbugs.actions.PreviewSelectBugInstance"
+                    text="Preview the current selected bug."
+                    description="Preview the current selected bug."
+                    icon="/actions/preview.png"/>
+
             <action id="FindBugs.ExpandAllAction"
                     class="org.twodividedbyzero.idea.findbugs.actions.ExpandAll"
                     text="Expand All"
@@ -442,11 +456,18 @@
 
         <group id="FindBugs.ToolBarActions.utils" text="FindBugsSubGroup" popup="true">
 
-            <action id="FindBugs.ExportResult"
-                    class="org.twodividedbyzero.idea.findbugs.actions.ExportResult"
-                    text="Export Result to XML/HTML"
+            <action id="FindBugs.ExportBugCollection"
+                    class="org.twodividedbyzero.idea.findbugs.actions.ExportBugCollection"
+                    text="Export Bug Collection to XML/HTML"
                     description="FindBugs plugin Export to XML/HTML."
                     icon="/actions/export.png"/>
+
+            <action id="FindBugs.ImportBugCollection"
+                    class="org.twodividedbyzero.idea.findbugs.actions.ImportBugCollection"
+                    text="Import previous saved Bug Collection"
+                    description="FindBugs plugin import previous saved bug collection."
+                    icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/import.png"/>
+
         </group>
 
 

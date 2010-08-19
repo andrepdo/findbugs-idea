@@ -53,11 +53,7 @@ public class BugsLineMarkerProvider implements LineMarkerProvider {
 
 				final Icon icon = getIcon();
 				if (icon != null) {
-					final GutterIconNavigationHandler<PsiElement> navHandler = new GutterIconNavigationHandler<PsiElement>() {
-						public void navigate(final MouseEvent e, final PsiElement psiElement) {
-							//psiFileSystemItem.navigate(true);
-						}
-					};
+					final GutterIconNavigationHandler<PsiElement> navHandler = new BugGutterIconNavigationHandler();
 					return new LineMarkerInfo<PsiElement>(problemDescriptor.getPsiElement(),
 														  problemDescriptor.getLineStart(),
 														  icon,
@@ -104,5 +100,13 @@ public class BugsLineMarkerProvider implements LineMarkerProvider {
 	@Nullable
 	private static Icon getIcon() {
 		return GuiResources.FINDBUGS_ICON;
+	}
+
+
+	private static class BugGutterIconNavigationHandler implements GutterIconNavigationHandler<PsiElement> {
+
+		public void navigate(final MouseEvent e, final PsiElement psiElement) {
+			//psiFileSystemItem.navigate(true);
+		}
 	}
 }

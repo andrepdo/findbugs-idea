@@ -62,7 +62,7 @@ public class FindBugsInspector extends FindBugsWorker implements CompileTask {
 			_inspection.registerEventListener();
 			final IFindBugsEngine2 engine = createFindBugsEngine();
 			// Create FindBugsTask
-			final FindBugsTask findBugsTask = new FindBugsTask(_project, "Runnig FindBugs inspection...", true, engine, true);  // NON-NLS
+			final FindBugsTask findBugsTask = new FindBugsTask(_project, "Runnig FindBugs inspection...", true, engine, true);
 			_bugReporter.setFindBugsTask(findBugsTask);
 			findBugsTask.runFindBugs(engine);
 			return true;

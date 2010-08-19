@@ -44,7 +44,7 @@ public class MaskIcon implements Icon {
 
 
 	public MaskIcon(@NotNull final Icon delegate) {
-		this(delegate, UIManager.getColor("textHighlight"), 0.5F); // NON-NLS
+		this(delegate, UIManager.getColor("textHighlight"), 0.5F);
 	}
 
 

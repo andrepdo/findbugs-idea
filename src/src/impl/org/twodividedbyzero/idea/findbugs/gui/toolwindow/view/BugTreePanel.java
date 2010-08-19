@@ -16,13 +16,26 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.toolwindow.view;
 
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.EditorSettings;
 import com.intellij.openapi.editor.LogicalPosition;
+import com.intellij.openapi.editor.RangeMarker;
 import com.intellij.openapi.editor.ScrollType;
+import com.intellij.openapi.editor.colors.EditorColorsScheme;
+import com.intellij.openapi.editor.markup.EffectType;
+import com.intellij.openapi.editor.markup.HighlighterLayer;
+import com.intellij.openapi.editor.markup.HighlighterTargetArea;
+import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.TextEditor;
+import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.BugInstance;
@@ -43,9 +56,10 @@ import javax.swing.JScrollPane;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.BorderLayout;
-import java.awt.Component;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -71,12 +85,13 @@ public class BugTreePanel extends JPanel {
 	private final FindBugsPreferences _preferences;
 	private transient SortedBugCollection _bugCollection;
 	private GroupBy[] _groupBy;
-	private final Component _parent;
+	private final ToolWindowPanel _parent;
 	private double _splitPaneVerticalWeight = 1.0;
 	private final double _splitPaneHorizontalWeight = 0.4;
+	private boolean _bugPreviewEnabled;
 
 
-	public BugTreePanel(final Component parent, final Project project) {
+	public BugTreePanel(final ToolWindowPanel parent, final Project project) {
 		super();
 		setLayout(new BorderLayout());
 
@@ -160,7 +175,7 @@ public class BugTreePanel extends JPanel {
 	boolean isHiddenBugGroup(final BugInstance node) {
 		final Map<String, String> categories = _preferences.getBugCategories();
 		final String category = node.getBugPattern().getCategory();
-		return categories.containsKey(category) && "false".equals(categories.get(category));  // NON-NLS
+		return categories.containsKey(category) && "false".equals(categories.get(category));
 	}
 
 
@@ -206,6 +221,83 @@ public class BugTreePanel extends JPanel {
 	}
 
 
+	private static void scrollToPreviewSource(final BugInstanceNode bugInstanceNode, final Editor editor) {
+		final int line = bugInstanceNode.getSourceLines()[0] - 1;
+		final LogicalPosition problemPos = new LogicalPosition(line, 0);
+		editor.getCaretModel().moveToLogicalPosition(problemPos);
+		editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
+	}
+
+
+	public void setPreviewEnabled(final boolean enabled) {
+		_bugPreviewEnabled = enabled;
+		if(enabled) {
+			setPreview(getBugTree().getSelectionPath());
+		}
+	}
+
+
+	public boolean isPreviewEnabled() {
+		return _bugPreviewEnabled;
+	}
+
+
+	public void setPreview(final TreePath treePath) {
+		if (treePath != null && treePath.getLastPathComponent() instanceof BugInstanceNode) {
+			final BugInstanceNode bugInstanceNode = (BugInstanceNode) getTreeNodeFromPath(treePath);
+			if (bugInstanceNode == null) {
+				return;
+			}
+
+			if (bugInstanceNode.getPsiFile() == null) {
+				return; // no problem here
+			}
+
+			final PsiFile psiFile = bugInstanceNode.getPsiFile();
+			if (psiFile != null) {
+				final Document document = PsiDocumentManager.getInstance(_project).getDocument(psiFile);
+				if (document != null) {
+					final Editor editor = createEditor(bugInstanceNode, document);
+					_parent.setPreviewEditor(editor, psiFile);
+					scrollToPreviewSource(bugInstanceNode, editor);
+				}
+			}
+		}
+	}
+
+
+	private Editor createEditor(final BugInstanceNode bugInstanceNode, final Document document) {
+		final Editor editor = EditorFactory.getInstance().createEditor(document, _project, StdFileTypes.JAVA, false);
+		final EditorColorsScheme scheme = editor.getColorsScheme();
+		scheme.setEditorFontSize(scheme.getEditorFontSize() - 1);
+
+		final EditorSettings editorSettings = editor.getSettings();
+		editorSettings.setLineMarkerAreaShown(true);
+		editorSettings.setLineNumbersShown(true);
+		editorSettings.setFoldingOutlineShown(true);
+		editorSettings.setAnimatedScrolling(true);
+		editorSettings.setWheelFontChangeEnabled(true);
+		editorSettings.setVariableInplaceRenameEnabled(true);
+
+		final int lineStart = bugInstanceNode.getSourceLines()[0] - 1;
+		final int lineEnd = bugInstanceNode.getSourceLines()[1];
+		final PsiElement element = IdeaUtilImpl.getElementAtLine(bugInstanceNode.getPsiFile(), lineStart);
+
+		RangeMarker marker = null;
+		if (element != null) {
+			marker = document.createRangeMarker(element.getTextRange());
+		} else if (lineStart >= 0 && lineEnd >= 0) {
+			marker = document.createRangeMarker(document.getLineStartOffset(lineStart), document.getLineEndOffset(lineEnd));
+		}
+
+		if(marker != null) {
+			editor.getMarkupModel().addRangeHighlighter(marker.getStartOffset(), marker.getEndOffset(), HighlighterLayer.FIRST - 1, new TextAttributes(null, null, Color.RED, EffectType.BOXED, Font.BOLD), HighlighterTargetArea.EXACT_RANGE);
+		}
+
+		return editor;
+	}
+
+
 	private static TreeNode getTreeNodeFromPath(final TreePath treePath) {
 		return (TreeNode) treePath.getLastPathComponent();
 	}
@@ -218,8 +310,8 @@ public class BugTreePanel extends JPanel {
 			final BugInstanceNode bugNode = (BugInstanceNode) treeNode;
 			final BugInstance bugInstance = bugNode.getBugInstance();
 
-			if (_parent instanceof ToolWindowPanel) {
-				((ToolWindowPanel) _parent).getBugDetailsComponents().setBugExplanation(bugInstance);
+			if (_parent != null) {
+				_parent.getBugDetailsComponents().setBugExplanation(bugInstance);
 			}
 		}
 	}
@@ -232,8 +324,8 @@ public class BugTreePanel extends JPanel {
 			final BugInstanceNode bugNode = (BugInstanceNode) treeNode;
 			final BugInstance bugInstance = bugNode.getBugInstance();
 
-			if (_parent instanceof ToolWindowPanel) {
-				((ToolWindowPanel) _parent).getBugDetailsComponents().setBugsDetails(bugInstance, treePath);
+			if (_parent != null) {
+				_parent.getBugDetailsComponents().setBugsDetails(bugInstance, treePath);
 			}
 		}
 	}
@@ -312,10 +404,10 @@ public class BugTreePanel extends JPanel {
 	}
 
 
-	public void resizeComponent(final int width, final int height) {
-		final int newWidth = (int) (width * _splitPaneHorizontalWeight);
-		setPreferredSize(new Dimension(newWidth, height));
-		setSize(new Dimension(newWidth, height));
+	public void adaptSize(final int width, final int height) {
+		//final int newWidth = (int) (width * _splitPaneHorizontalWeight);
+		setPreferredSize(new Dimension(width, height));
+		setSize(new Dimension(width, height));
 		validate();
 	}
 

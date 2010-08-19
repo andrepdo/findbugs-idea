@@ -54,7 +54,7 @@ public class ModuleConfigurationPanel extends JPanel {
 
 		_plugin = plugin;
 
-		add(getEnableCheckbox(), BorderLayout.NORTH);  // NON-NLS
+		add(getEnableCheckbox(), BorderLayout.NORTH);
 		add(getConfigPanel(), BorderLayout.CENTER);
 	}
 
@@ -76,7 +76,7 @@ public class ModuleConfigurationPanel extends JPanel {
 
 	private AbstractButton getEnableCheckbox() {
 		if (_checkBox == null) {
-			_checkBox = new JCheckBox("Override FindBugs-IDEA project settings");  // NON-NLS
+			_checkBox = new JCheckBox("Override FindBugs-IDEA project settings");
 			_checkBox.setFocusable(false);
 			_checkBox.addItemListener(new ItemListener() {
 				public void itemStateChanged(final ItemEvent e) {

@@ -45,8 +45,8 @@ public final class ResourcesLoader {
 	private static final Logger LOGGER = Logger.getInstance(ResourcesLoader.class.getName());
 
 	private static volatile ResourceBundle _bundle;
-	private static final String LOCALE_RESOURCES_PKG = "org.twodividedbyzero.idea.findbugs.resources.i18n.Messages";// NON-NLS
-	private static final String ICON_RESOURCES_PKG = "/org/twodividedbyzero/idea/findbugs/resources/icons";// NON-NLS
+	private static final String LOCALE_RESOURCES_PKG = "org.twodividedbyzero.idea.findbugs.resources.i18n.Messages";
+	private static final String ICON_RESOURCES_PKG = "/org/twodividedbyzero/idea/findbugs/resources/icons";
 	private static final byte[] BYTE = new byte[0];
 	private static final SoftHashMap<String, Object> _iconCache = new SoftHashMap<String, Object>();
 
@@ -56,7 +56,7 @@ public final class ResourcesLoader {
 
 
 	public static ResourceBundle getResourceBundle() {
-		LOGGER.info("Loading locale properties for '" + Locale.getDefault() + ")");// NON-NLS
+		LOGGER.info("Loading locale properties for '" + Locale.getDefault() + ")");
 
 		if (_bundle != null) {
 			return _bundle;
@@ -74,7 +74,7 @@ public final class ResourcesLoader {
 
 
 	public static ResourceBundle getResourceBundle(final String localeResourceFolder) {
-		LOGGER.info("Loading locale properties for '" + Locale.getDefault() + "'");// NON-NLS
+		LOGGER.info("Loading locale properties for '" + Locale.getDefault() + "'");
 		//noinspection UnusedCatchParameter
 		try {
 			_bundle = ResourceBundle.getBundle(localeResourceFolder, Locale.getDefault());
@@ -119,10 +119,10 @@ public final class ResourcesLoader {
 	private static Object queryIconChache(final String pkgName, final String filename) {
 		final String key = pkgName + "/" + filename;
 		if (_iconCache.containsKey(key)) {
-			LOGGER.debug("IconCache (size: " + _iconCache.size() + ") hit for '" + key + "'");// NON-NLS
+			LOGGER.debug("IconCache (size: " + _iconCache.size() + ") hit for '" + key + "'");
 			return _iconCache.get(key);
 		}
-		LOGGER.debug("IconCache (size: " + _iconCache.size() + ") miss for '" + key + "'");// NON-NLS
+		LOGGER.debug("IconCache (size: " + _iconCache.size() + ") miss for '" + key + "'");
 
 		return null;
 	}
@@ -164,7 +164,7 @@ public final class ResourcesLoader {
 				try {
 					c = is.read();
 				} catch (IOException e) {
-					LOGGER.error("InputStream read failure!", e);// NON-NLS
+					LOGGER.error("InputStream read failure!", e);
 				}
 				if (c == -1) {
 					break;
@@ -176,7 +176,7 @@ public final class ResourcesLoader {
 			try {
 				is.close();
 			} catch (IOException e) {
-				LOGGER.error("Couldn't close InputStream.", e);// NON-NLS
+				LOGGER.error("Couldn't close InputStream.", e);
 			}
 			ret = sb.toString();
 		}
@@ -234,7 +234,7 @@ public final class ResourcesLoader {
 				try {
 					len = is.read(tmpbuf);
 				} catch (IOException e) {
-					LOGGER.error("InputStream read failure!", e);// NON-NLS
+					LOGGER.error("InputStream read failure!", e);
 				}
 
 				if (len <= 0) {
@@ -252,7 +252,7 @@ public final class ResourcesLoader {
 			try {
 				is.close();
 			} catch (IOException e) {
-				LOGGER.error("Couldn't close InputStream.", e);// NON-NLS
+				LOGGER.error("Couldn't close InputStream.", e);
 			}
 		}
 
@@ -305,7 +305,7 @@ public final class ResourcesLoader {
 				try {
 					len = is.read(tmpbuf);
 				} catch (IOException e) {
-					LOGGER.error("InputStream read failure!", e);// NON-NLS
+					LOGGER.error("InputStream read failure!", e);
 				}
 
 				if (len <= 0) {
@@ -323,7 +323,7 @@ public final class ResourcesLoader {
 			try {
 				is.close();
 			} catch (IOException e) {
-				LOGGER.error("Couldn't close InputStream.", e);// NON-NLS
+				LOGGER.error("Couldn't close InputStream.", e);
 			}
 		}
 

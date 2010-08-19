@@ -25,13 +25,13 @@ public class FindBugsUtil {
 
 
 	static {
-		ARCHIVE_EXTENSION_SET.add(".jar");  // NON-NLS
-		ARCHIVE_EXTENSION_SET.add(".zip"); // NON-NLS
-		ARCHIVE_EXTENSION_SET.add(".ear"); // NON-NLS
-		ARCHIVE_EXTENSION_SET.add(".war"); // NON-NLS
-		ARCHIVE_EXTENSION_SET.add(".sar"); // NON-NLS
+		ARCHIVE_EXTENSION_SET.add(".jar");
+		ARCHIVE_EXTENSION_SET.add(".zip");
+		ARCHIVE_EXTENSION_SET.add(".ear");
+		ARCHIVE_EXTENSION_SET.add(".war");
+		ARCHIVE_EXTENSION_SET.add(".sar");
 
-		XML_EXTESIONS_SET.add(".xml");  // NON-NLS
+		XML_EXTESIONS_SET.add(".xml");
 	}
 
 

@@ -20,12 +20,14 @@ import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiFile;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.ProjectStats;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
@@ -61,27 +63,32 @@ import java.util.Map;
  * @version $Revision$
  * @since 0.0.1
  */
+@SuppressWarnings({"HardCodedStringLiteral"})
+@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_BAD_FIELD"})
 public class ToolWindowPanel extends JPanel implements EventListener<BugReporterEvent> {
 
 	private static final Logger LOGGER = Logger.getInstance(ToolWindowPanel.class.getName());
 
+	private static final String DEFAULT_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.4) (COLUMN weight=0.6 right.top right.bottom) wight=0.6)";
+	private static final String PREVIEW_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (LEAF name=middle weight=0.4) (COLUMN weight=0.3 right.top right.bottom))";
+	//private static final String PREVIEW_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.4) (COLUMN weight=0.6 right.top right.bottom)  (LEAF name=right))";
+
 	private Project _project;
-	private boolean _scrollToSource;
-	private ActionToolbar _toolbarLeft;
-	private ActionToolbar _toolbarRight;
-	private ActionToolbar _toolbarNavigation;
-	private ActionToolbar _toolbarUtils;
-	private ToolWindow _toolWindow;
 	private BugTreePanel _bugTreePanel;
 	private transient BugDetailsComponents _bugDetailsComponents;
 	private ComponentListener _componentListener;
 	private MultiSplitPane _multiSplitPane;
 
+	private boolean _previewEnabled;
+	private boolean _isPreviewLayoutEnabled;
+	private transient PreviewPanel _previewPanel;
+	private transient ToolWindow _parent;
+
 
 	public ToolWindowPanel(final Project project, final ToolWindow parent) {
 		super();
 		_project = project;
-		_toolWindow = parent;
+		_parent = parent;
 		checkFindBugsPlugin();
 		initGui();
 	}
@@ -95,22 +102,22 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 		//final DefaultActionGroup actionGroupLeft = new DefaultActionGroup();
 		//actionGroupLeft.add(new AnalyzeCurrentEditorFile());
 		final ActionGroup actionGroupLeft = (ActionGroup) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTION_GROUP_LEFT);
-		_toolbarLeft = ActionManager.getInstance().createActionToolbar(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId(), actionGroupLeft, false);
+		final ActionToolbar toolbarLeft1 = ActionManager.getInstance().createActionToolbar(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId(), actionGroupLeft, false);
 
 		final ActionGroup actionGroupRight = (ActionGroup) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTION_GROUP_RIGHT);
-		_toolbarRight = ActionManager.getInstance().createActionToolbar(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId(), actionGroupRight, false);
+		final ActionToolbar toolbarRight1 = ActionManager.getInstance().createActionToolbar(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId(), actionGroupRight, false);
 
 		final ActionGroup actionGroupNavigation = (ActionGroup) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTION_GROUP_NAVIGATION);
-		_toolbarNavigation = ActionManager.getInstance().createActionToolbar(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId(), actionGroupNavigation, false);
+		final ActionToolbar toolbarNavigation1 = ActionManager.getInstance().createActionToolbar(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId(), actionGroupNavigation, false);
 
 		final ActionGroup actionGroupUtils = (ActionGroup) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTION_GROUP_UTILS);
-		_toolbarUtils = ActionManager.getInstance().createActionToolbar(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId(), actionGroupUtils, false);
+		final ActionToolbar toolbarUtils1 = ActionManager.getInstance().createActionToolbar(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId(), actionGroupUtils, false);
 
 
-		final Component toolbarLeft = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Analysis...", SwingConstants.VERTICAL, _toolbarLeft, true); // NON-NLS
-		final Component toolbarRight = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Grouping...", SwingConstants.VERTICAL, _toolbarRight, true); // NON-NLS
-		final Component toolbarNavigation = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Navigation...", SwingConstants.VERTICAL, _toolbarNavigation, true); // NON-NLS
-		final Component toolbarUtils = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Utils...", SwingConstants.VERTICAL, _toolbarUtils, true); // NON-NLS
+		final Component toolbarLeft = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Analysis...", SwingConstants.VERTICAL, toolbarLeft1, true);
+		final Component toolbarRight = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Grouping...", SwingConstants.VERTICAL, toolbarRight1, true);
+		final Component toolbarNavigation = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Navigation...", SwingConstants.VERTICAL, toolbarNavigation1, true);
+		final Component toolbarUtils = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Utils...", SwingConstants.VERTICAL, toolbarUtils1, true);
 
 
 		add(toolbarLeft, NDockLayout.WEST);
@@ -118,29 +125,91 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 		add(toolbarNavigation, NDockLayout.WEST);
 		add(toolbarUtils, NDockLayout.WEST);
 
+		updateLayout(false);
 
-		//final String layoutDef = "(ROW (LEAF name=left weight=0.4) (LEAF name=right weight=0.6))";  // NON-NLS
-		final String layoutDef = "(ROW (LEAF name=left weight=0.4) (COLUMN weight=0.6 right.top right.bottom) weight=0.6)";  // NON-NLS
+		add(getMultiSplitPane(), NDockLayout.CENTER);
+	}
+
+
+	private MultiSplitPane getMultiSplitPane() {
+		if(_multiSplitPane == null) {
+			_multiSplitPane = new MultiSplitPane();
+			_multiSplitPane.setContinuousLayout(true);
+		}
+		return _multiSplitPane;
+	}
+
+
+	private void _updateMultiSplitLayout(final String layoutDef) {
 		final MultiSplitLayout.Node modelRoot = MultiSplitLayout.parseModel(layoutDef);
-		_multiSplitPane = new MultiSplitPane();
-		_multiSplitPane.setContinuousLayout(true);
-		final MultiSplitLayout multiSplitLayout = _multiSplitPane.getMultiSplitLayout();
+		final MultiSplitLayout multiSplitLayout = getMultiSplitPane().getMultiSplitLayout();
 		multiSplitLayout.setDividerSize(5);
 		multiSplitLayout.setModel(modelRoot);
 		multiSplitLayout.setFloatingDividers(true);
-		//multiSplitLayout.printModel(modelRoot);
+	}
 
 
-		_bugTreePanel = new BugTreePanel(this, _project);
-		//splitPane.setLeftComponent(_bugTreePanel);
-		_multiSplitPane.add(_bugTreePanel, "left"); // NON-NLS
+	private void updateLayout(final boolean enablePreviewLayout) {
+		if(!_isPreviewLayoutEnabled && enablePreviewLayout) {
+			_updateMultiSplitLayout(PREVIEW_LAYOUT_DEF);
+			getMultiSplitPane().add(getBugTreePanel(), "left");
+			_multiSplitPane.add(getPreviewPanel().getComponent(), "middle");
+			getMultiSplitPane().add(getBugDetailsComponents().getBugDetailsPanel(), "right.top");
+			getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
+			_isPreviewLayoutEnabled = true;
+			
+		} else if (!enablePreviewLayout) {
+			getPreviewPanel().release();
+			/*getPreviewPanel().getComponent().setVisible(false);
+			getPreviewPanel().getComponent().removeAll();*/
+			/*getPreviewPanel().revalidate();
+			getPreviewPanel().repaint();*/
+			
+			_updateMultiSplitLayout(DEFAULT_LAYOUT_DEF);
+			getMultiSplitPane().add(getBugTreePanel(), "left");
+			getMultiSplitPane().add(getBugDetailsComponents().getBugDetailsPanel(), "right.top");
+			getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
 
-		_bugDetailsComponents = new BugDetailsComponents(this);
-		//splitPane.setRightComponent(_bugDetailsComponents);
-		_multiSplitPane.add(_bugDetailsComponents.getBugDetailsPanel(), "right.top"); // NON-NLS
-		_multiSplitPane.add(_bugDetailsComponents.getBugExplanationPanel(), "right.bottom"); // NON-NLS
+			if(getPreviewPanel().getEditor() != null) {
+				resizeSplitNodes(this);
+			}
+			_previewPanel = null;
+			/*getMultiSplitPane().revalidate();
+			getMultiSplitPane().repaint();*/
+			/*revalidate();
+			repaint();*/
+			_isPreviewLayoutEnabled = false;
+		}
+	}
 
-		add(_multiSplitPane, NDockLayout.CENTER);
+
+	private PreviewPanel getPreviewPanel() {
+		if(_previewPanel == null) {
+			_previewPanel = new PreviewPanel();
+		}
+		return _previewPanel;
+	}
+
+	
+	public void setPreviewEditor(@Nullable final Editor editor, final PsiFile psiFile) {
+		if(editor != null) {
+			//getPreviewPanel().releaseEditor();
+			updateLayout(true);
+			getPreviewPanel().add(editor, psiFile);
+			resizeSplitNodes(this);
+		}
+	}
+
+
+	public void setPreviewEnabled(final boolean enabled) {
+		updateLayout(false);
+		_previewEnabled = enabled;
+		getBugTreePanel().setPreviewEnabled(enabled);
+	}
+
+
+	public boolean isPreviewEnabled() {
+		return _previewEnabled;
 	}
 
 
@@ -173,13 +242,18 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 	}
 
 
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON"})
 	public void onEvent(@NotNull final BugReporterEvent event) {
 		///LOGGER.debug(event.toString());
 
 		switch (event.getOperation()) {
 			case ANALYSIS_STARTED:
-				//_bugDetailsComponents.getBugDetailsPanel().setPreferredSize(new Dimension((int) (getPreferredSize().width * 0.6), getHeight()));
-				//_bugDetailsComponents.getBugDetailsPanel().validate();
+				EventQueue.invokeLater(new Runnable() {
+					public void run() {
+						updateLayout(false);
+					}
+				});
+
 				_bugTreePanel.clear(true);
 				_bugTreePanel.updateRootNode(event.getProjectStats());
 				break;
@@ -187,7 +261,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 				_bugTreePanel.setBugCollection(event.getBugCollection());
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
-						final String text = "Analysis aborted..."; // NON-NLS
+						final String text = "Analysis aborted..."; 
 						BalloonTipFactory.showToolWindowInfoNotifier(text);
 					}
 				});
@@ -202,7 +276,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 				EventQueue.invokeLater(new Runnable() {
 					public void run() {
 						_bugTreePanel.getBugTree().validate();
-						final String text = VersionManager.getName() + ": <b>found " + _bugTreePanel.getGroupModel().getBugCount() + " bugs in " + projectStats.getNumClasses() + (projectStats.getNumClasses() > 1 ? " classes" : " class") + "</b><br/>" + "<font size='10px'>using " + VersionManager.getFullVersion() + " with Findbugs version " + FindBugsUtil.getFindBugsFullVersion() + "</font>"; // NON-NLS
+						final String text = VersionManager.getName() + ": <b>found " + _bugTreePanel.getGroupModel().getBugCount() + " bugs in " + projectStats.getNumClasses() + (projectStats.getNumClasses() > 1 ? " classes" : " class") + "</b><br/>" + "<font size='10px'>using " + VersionManager.getFullVersion() + " with Findbugs version " + FindBugsUtil.getFindBugsFullVersion() + "</font>"; 
 						BalloonTipFactory.showToolWindowInfoNotifier(text);
 					}
 				});
@@ -219,47 +293,56 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 
 	private ComponentListener createComponentListener() {
-		return new ToolWindowComponentAdapter();
+		return new ToolWindowComponentAdapter(this);
 	}
 
 
 	private void resizeSplitNodes(final Component component) {
 		final int width = component.getWidth();
 		final int height = component.getHeight();
-		_bugDetailsComponents.resizeComponents(width, height);
-		_bugTreePanel.resizeComponent(width, height);
+		if(isPreviewEnabled() && getPreviewPanel().getEditor() != null) {
+			_bugDetailsComponents.adaptSize((int) (width * 0.3), height);
+			_bugTreePanel.adaptSize((int) (width * 0.3), height);
+		} else {
+			_bugDetailsComponents.adaptSize((int) (width * 0.6), height);
+			_bugTreePanel.adaptSize((int) (width * 0.4), height);
+		}
+		getPreviewPanel().adaptSize((int) (width * 0.4), height);
 		_multiSplitPane.validate();
 	}
 
 
-	public ActionToolbar getToolbarLeft() {
-		return _toolbarLeft;
-	}
-
-
-	public ActionToolbar getToolbarRight() {
-		return _toolbarLeft;
-	}
-
-
 	public BugTreePanel getBugTreePanel() {
+		if(_bugTreePanel == null) {
+			_bugTreePanel = new BugTreePanel(this, _project);
+		}
 		return _bugTreePanel;
 	}
 
 
 	public BugDetailsComponents getBugDetailsComponents() {
+		if(_bugDetailsComponents == null) {
+			_bugDetailsComponents = new BugDetailsComponents(this);
+		}
 		return _bugDetailsComponents;
 	}
 
 
-	private class ToolWindowComponentAdapter extends ComponentAdapter {
+	private static class ToolWindowComponentAdapter extends ComponentAdapter {
+
+		private final ToolWindowPanel _toolWindowPanel;
+
+
+		private ToolWindowComponentAdapter(final ToolWindowPanel toolWindowPanel) {
+			_toolWindowPanel = toolWindowPanel;
+		}
+
 
 		@Override
 		public void componentShown(final ComponentEvent e) {
 			super.componentShown(e);
 			final Component component = e.getComponent();
-			resizeSplitNodes(component);
-			//_multiSplitPane.getMultiSplitLayout().setFloatingDividers(true);
+			_toolWindowPanel.resizeSplitNodes(component);
 		}
 
 
@@ -267,8 +350,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 		public void componentResized(final ComponentEvent e) {
 			super.componentResized(e);
 			final Component component = e.getComponent();
-			resizeSplitNodes(component);
-			//_multiSplitPane.getMultiSplitLayout().setFloatingDividers(true);
+			_toolWindowPanel.resizeSplitNodes(component);
 		}
 
 
@@ -276,12 +358,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 		public void componentMoved(final ComponentEvent e) {
 			super.componentMoved(e);
 			final Component component = e.getComponent();
-			resizeSplitNodes(component);
-			//_multiSplitPane.getMultiSplitLayout().layoutContainer(_bugTreePanel);
-			//_multiSplitPane.getMultiSplitLayout().layoutContainer(_bugDetailsComponents.getBugDetailsPanel());
-			//_multiSplitPane.getMultiSplitLayout().layoutContainer(_bugDetailsComponents.getBugExplanationPanel());
-			//_multiSplitPane.getMultiSplitLayout().setFloatingDividers(true);
-			//_multiSplitPane.doLayout();
+			_toolWindowPanel.resizeSplitNodes(component);
 		}
 	}
 }

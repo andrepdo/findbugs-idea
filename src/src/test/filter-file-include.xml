@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <Match>
+        <Bug category="BAD_PRACTICE" />
+        <Priority value="1" />
+    </Match>
+    <Match>
+        <Bug category="CORRECTNESS" />
+        <Priority value="1" />
+    </Match>
+    <Match>
+        <Bug category="I18N" />
+        <Priority value="1" />
+    </Match>
+    <Match>
+        <Bug category="MALICIOUS_CODE" />
+        <Priority value="1" />
+    </Match>
+    <Match>
+        <Bug category="MT_CORRECTNESS" />
+        <Priority value="1" />
+    </Match>
+    <Match>
+        <Bug category="PERFORMANCE" />
+        <Priority value="1" />
+    </Match>
+    <Match>
+        <Bug category="SECURITY" />
+        <Priority value="1" />
+    </Match>
+    <Match>
+        <Bug category="STYLE" />
+        <Priority value="1" />
+    </Match>
+</FindBugsFilter>

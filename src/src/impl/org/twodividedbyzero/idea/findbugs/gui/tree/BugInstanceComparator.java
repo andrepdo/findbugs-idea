@@ -32,6 +32,7 @@ import java.util.List;
  * @version $Revision$
  * @since 0.0.1
  */
+@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
 public class BugInstanceComparator {
 
 	private BugInstanceComparator() {

@@ -61,7 +61,7 @@ public class TreeNodeCellRenderer extends JLabel implements TreeCellRenderer {
 		g.fillRect(offset, 0, (getWidth() - 1 - offset), (getHeight() - 1));
 
 		if (_selected) {
-			g.setColor(UIManager.getColor("Tree.selectionBorderColor"));  // NON-NLS
+			g.setColor(UIManager.getColor("Tree.selectionBorderColor"));
 			g.drawRect(offset, 0, (getWidth() - 1 - offset), (getHeight() - 1));
 		}
 
@@ -137,8 +137,8 @@ public class TreeNodeCellRenderer extends JLabel implements TreeCellRenderer {
 		//repaint();
 		validate();
 
-		setForeground(UIManager.getColor(selected ? "Tree.selectionForeground" : "Tree.textForegound"));  // NON-NLS
-		setBackground(UIManager.getColor(selected ? "Tree.selectionBackground" : "Tree.textBackground")); // NON-NLS
+		setForeground(UIManager.getColor(selected ? "Tree.selectionForeground" : "Tree.textForegound"));
+		setBackground(UIManager.getColor(selected ? "Tree.selectionBackground" : "Tree.textBackground"));
 
 
 		return this;
@@ -149,7 +149,7 @@ public class TreeNodeCellRenderer extends JLabel implements TreeCellRenderer {
 	@Override
 	protected void firePropertyChange(final String propertyName, final Object oldValue, final Object newValue) {
 		// Strings get interned...
-		if ("text".equals(propertyName)) {  // NON-NLS
+		if ("text".equals(propertyName)) {
 			super.firePropertyChange(propertyName, oldValue, newValue);
 		}
 	}

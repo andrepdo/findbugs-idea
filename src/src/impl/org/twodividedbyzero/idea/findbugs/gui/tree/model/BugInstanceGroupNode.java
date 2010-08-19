@@ -344,7 +344,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 	private String getToString(final GroupBy groupBy) {
 		final String toString;
 		final StringBuilder buf = new StringBuilder();
-		buf.append("<html><body>");  // NON-NLS
+		buf.append("<html><body>");
 
 		switch (groupBy) {
 
@@ -352,41 +352,41 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 				if (getParent() instanceof BugInstanceGroupNode) {
 					buf.append(_groupName);
 				} else {
-					buf.append("<b>"); // NON-NLS
+					buf.append("<b>");
 					buf.append(_groupName);
-					buf.append("</b>"); // NON-NLS
+					buf.append("</b>");
 				}
-				buf.append("<font color='gray'>"); // NON-NLS
+				buf.append("<font color='gray'>");
 				buf.append(" (");
-				buf.append(_memberCount).append((_memberCount > 1) || (_memberCount == 0) ? " items" : " item"); // NON-NLS
+				buf.append(_memberCount).append((_memberCount > 1) || (_memberCount == 0) ? " items" : " item");
 				buf.append(")");
-				buf.append("</font>"); // NON-NLS
+				buf.append("</font>");
 				toString = buf.toString();
 				break;
 			case Class:
 			case Package:
 			case Priority:
-				buf.append("<b>"); // NON-NLS
+				buf.append("<b>");
 				buf.append(_groupName);
-				buf.append("</b>"); // NON-NLS
-				buf.append("<font color='gray'>"); // NON-NLS
+				buf.append("</b>");
+				buf.append("<font color='gray'>");
 				buf.append(" (");
-				buf.append(_memberCount).append((_memberCount > 1) || (_memberCount == 0) ? " items" : " item"); // NON-NLS
+				buf.append(_memberCount).append((_memberCount > 1) || (_memberCount == 0) ? " items" : " item");
 				buf.append(")");
-				buf.append("</font>"); // NON-NLS
+				buf.append("</font>");
 				toString = buf.toString();
 				break;
 			default:
 				buf.append(_groupName);
-				buf.append("<font color='gray'>"); // NON-NLS
+				buf.append("<font color='gray'>");
 				buf.append(" (");
-				buf.append(_memberCount).append((_memberCount > 1) || (_memberCount == 0) ? " items" : " item"); // NON-NLS
+				buf.append(_memberCount).append((_memberCount > 1) || (_memberCount == 0) ? " items" : " item");
 				buf.append(")");
-				buf.append("</font>"); // NON-NLS
+				buf.append("</font>");
 				toString = buf.toString();
 		}
 
-		buf.append("</body></html>"); // NON-NLS
+		buf.append("</body></html>");
 
 		return toString;
 	}

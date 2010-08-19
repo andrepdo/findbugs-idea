@@ -93,7 +93,7 @@ public class SuppressWarningFix /*extends SuppressIntentionAction*/ implements L
 
 	@NotNull
 	public String getName() {
-		return ResourcesLoader.getString("findbugs.inspection.quickfix.supress.warning") + " '" + _bugType + "' waring";  // NON-NLS
+		return ResourcesLoader.getString("findbugs.inspection.quickfix.supress.warning") + " '" + _bugType + "' waring";
 	}
 
 

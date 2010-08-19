@@ -110,7 +110,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 		_toolbarActions = new HashSet<AnAction>();
 		final AnAction action = new AnalyzeCurrentEditorFile();
 		_toolbarActions.add(action);
-		action.getTemplatePresentation().setText("Run FindBugs analysis on the current editor file", true);  // NON-NLS
+		action.getTemplatePresentation().setText("Run FindBugs analysis on the current editor file", true);
 		action.getTemplatePresentation().setIcon(GuiResources.FINDBUGS_EXECUTE_ICON);
 	}
 
@@ -145,12 +145,12 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 		//ExecutionRegistry.getInstance().registerRunner(new MyRunner());
 
-		LOGGER.debug("initComponent");// NON-NLS
+		LOGGER.debug("initComponent");
 	}
 
 
 	public void disposeComponent() {
-		LOGGER.debug("disposeComponent");// NON-NLS
+		LOGGER.debug("disposeComponent");
 	}
 
 
@@ -162,7 +162,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 	public void projectOpened() {
 		// called when project is opened
-		LOGGER.debug("project is opened");// NON-NLS
+		LOGGER.debug("project is opened");
 		initToolWindow();
 		setActionGroupsIcon();
 		registerToolbarActions();
@@ -171,7 +171,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 	public void projectClosed() {
 		// called when project is being closed
-		LOGGER.debug("project is being closed");// NON-NLS
+		LOGGER.debug("project is being closed");
 		EventManagerImpl.getInstance().removeEventListener(_project);
 		final AnalyzeChangelistFiles action = (AnalyzeChangelistFiles) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTIVE_CHANGELIST_ACTION);
 		ChangeListManager.getInstance(_project).removeChangeListListener(action.getChangelistAdapter());
@@ -194,11 +194,16 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 		final JComponent toolWindowPanel = new ToolWindowPanel(_project, _toolWindow);
 		final Content content = contentFactory.createContent(toolWindowPanel, "Found Bugs View", false);
+		//final Content content1 = contentFactory.createContent(toolWindowPanel, "Found Bugs View", false);
 		//final Content content1 = contentFactory.createContent(_contentPanel1, "Bug Details", false);
+		//final JComponent toolWindowPanel1 = new ToolWindowPanel(_project, _toolWindow);
+		//final Content content1 = contentFactory.createContent(toolWindowPanel1, "Found Bugs View (import)", true);
+		//content1.setPinned();
 
 		_toolWindow.getContentManager().addContent(content);
 		//_toolWindow.getContentManager().addContent(content1);
-		_toolWindow.setIcon(GuiResources.FINDBUGS_ICON);// NON-NLS
+		//_toolWindow.getContentManager().addContent(content1);
+		_toolWindow.setIcon(GuiResources.FINDBUGS_ICON);
 	}
 
 
@@ -265,7 +270,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 	private static void registerToolbarActions() {
 		final DefaultActionGroup mainToolbar = (DefaultActionGroup) ActionManager.getInstance().getAction("MainToolBar");
 
-		//ActionManager.getInstance().registerAction("FindBugs.CurrentFileAction", action);// NON-NLS
+		//ActionManager.getInstance().registerAction("FindBugs.CurrentFileAction", action);
 		for (final AnAction anAction : _toolbarActions) {
 			if (!isActionRegistered(anAction)) {
 				_registeredActions.add(anAction);

@@ -60,6 +60,6 @@ public abstract class AbstractEvent<T> implements Event<T> {
 
 	@Override
 	public String toString() {
-		return "AbstractEvent{" + "_description='" + _description + '\'' + ", _result=" + _result + '}';  // NON-NLS
+		return "AbstractEvent{" + "_description='" + _description + '\'' + ", _result=" + _result + '}';
 	}
 }

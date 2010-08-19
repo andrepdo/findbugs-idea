@@ -74,15 +74,15 @@ public class AnalyzeModuleFiles extends BaseAction implements EventListener<BugR
 
 		// check a project is loaded
 		if (isProjectLoaded(project, presentation)) {
-			Messages.showWarningDialog("Project not loaded.", "FindBugs");  // NON-NLS
+			Messages.showWarningDialog("Project not loaded.", "FindBugs");
 			return;
 		}
 
 		final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
-		if (preferences.getBugCategories().containsValue("true") && preferences.getDetectors().containsValue("true")) {  // NON-NLS
+		if (preferences.getBugCategories().containsValue("true") && preferences.getDetectors().containsValue("true")) {
 			initWorker();
 		} else {
-			FindBugsPluginImpl.showToolWindowNotifier("No bug categories or bug pattern detectors selected. analysis aborted.", MessageType.WARNING);  // NON-NLS
+			FindBugsPluginImpl.showToolWindowNotifier("No bug categories or bug pattern detectors selected. analysis aborted.", MessageType.WARNING);
 			ShowSettingsUtil.getInstance().editConfigurable(project, IdeaUtilImpl.getPluginComponent(project));
 		}
 	}
@@ -124,7 +124,7 @@ public class AnalyzeModuleFiles extends BaseAction implements EventListener<BugR
 			presentation.setVisible(true);
 
 		} catch (Throwable e) {
-			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);// NON-NLS
+			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
 			if (processed != null) {
 				LOGGER.error("Action update failed", processed);
 			}
@@ -137,7 +137,7 @@ public class AnalyzeModuleFiles extends BaseAction implements EventListener<BugR
 		final Module module = IdeaUtilImpl.getModule(_dataContext);
 
 		final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
-		if (Boolean.valueOf(preferences.getProperty(FindBugsPreferences.TOOLWINDOW_TOFRONT))) {
+		if (Boolean.valueOf(preferences.getProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT))) {
 			IdeaUtilImpl.activateToolWindow(getPluginInterface(project).getInternalToolWindowId(), _dataContext);
 		}
 
@@ -154,7 +154,7 @@ public class AnalyzeModuleFiles extends BaseAction implements EventListener<BugR
 		// set class files
 		final VirtualFile compilerOutpath = IdeaUtilImpl.getCompilerOutputPath(module);
 		if (compilerOutpath == null) {
-			FindBugsPluginImpl.showToolWindowNotifier("Compiler output path for module can not be null. check your module/project settings", MessageType.ERROR);  // NON-NLS
+			FindBugsPluginImpl.showToolWindowNotifier("Compiler output path for module can not be null. check your module/project settings", MessageType.ERROR);
 			return;
 		}
 

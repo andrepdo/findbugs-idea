@@ -77,17 +77,17 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 
 
 	public void projectOpened() {
-		LOGGER.debug("project is opened");// NON-NLS
+		LOGGER.debug("project is opened");
 	}
 
 
 	public void projectClosed() {
-		LOGGER.debug("project is being closed");// NON-NLS
+		LOGGER.debug("project is being closed");
 	}
 
 
 	public void moduleAdded() {
-		LOGGER.debug("module added");// NON-NLS
+		LOGGER.debug("module added");
 	}
 
 
@@ -98,12 +98,12 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 
 
 	public void initComponent() {
-		LOGGER.debug("initComponent");// NON-NLS
+		LOGGER.debug("initComponent");
 	}
 
 
 	public void disposeComponent() {
-		LOGGER.debug("disposeComponent");// NON-NLS
+		LOGGER.debug("disposeComponent");
 	}
 
 

@@ -51,7 +51,7 @@ public class FindBugsInspectionPanel extends JPanel {
 
 
 		// fake a multi-line label with a text area
-		_descriptionLabel.setText(i18n.getString("findbugs.inspection.description.config"));  // NON-NLS
+		_descriptionLabel.setText(i18n.getString("findbugs.inspection.description.config"));
 		_descriptionLabel.setEditable(false);
 		_descriptionLabel.setEnabled(false);
 		_descriptionLabel.setWrapStyleWord(true);
