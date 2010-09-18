@@ -8,7 +8,9 @@
 		FindBugs is a defect detection tool for Java that uses static analysis to look for more than 200 bug patterns,
 		such as null pointer dereferences, infinite recursive loops, bad uses of the Java libraries and deadlocks.
 		FindBugs can identify hundreds of serious defects in large applications (typically about 1 defect per 1000-2000
-		lines of non-commenting source statements). FindBugs is open source, and has been downloaded more than 230,000 times,
+		lines of non-commenting source statements). The name FindBugs™ and the FindBugs logo are trademarked by The University of Maryland.
+		As of July, 2008, FindBugs has been downloaded more than 700,000 times.
+        FindBugs requires JRE (or JDK) 1.5.0 or later to run.  However, it can analyze programs compiled for any version of Java
 		and is used by many major companies and financial institutions.
 		FindBugs-IDEA uses FindBugs&trade; under the hood. for more information
 		see <a href="http://findbugs.sourceforge.net/">http://findbugs.sourceforge.net/</a>.
