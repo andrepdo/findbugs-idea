@@ -22,6 +22,7 @@ import edu.umd.cs.findbugs.FieldAnnotation;
 import edu.umd.cs.findbugs.MethodAnnotation;
 import edu.umd.cs.findbugs.util.LaunchBrowser;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
+import org.twodividedbyzero.idea.findbugs.gui.preferences.DetectorConfiguration;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.BugTree;
 
 import javax.swing.JEditorPane;
@@ -303,6 +304,13 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		html.append(BugInstanceUtil.getBugType(bugInstance));
 		html.append(" <font color='gray'>(");
 		html.append(BugInstanceUtil.getBugPatternShortDescription(bugInstance));
+		html.append(")</font>");
+		html.append("</li>");
+		html.append("<ul>");
+		html.append("<li>");
+		html.append(bugInstance.getDetectorFactory().getShortName());
+		html.append(" <font color='gray'>(");
+		html.append(DetectorConfiguration.createBugsAbbreviation(bugInstance.getDetectorFactory()));
 		html.append(")</font>");
 		html.append("</li>");
 		html.append("</ul>");
