@@ -75,7 +75,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 	private Project _project;
 	private BugTreePanel _bugTreePanel;
-	private transient BugDetailsComponents _bugDetailsComponents;
+	private transient BugDetailsComponentsPanel _bugDetailsComponents;
 	private ComponentListener _componentListener;
 	private MultiSplitPane _multiSplitPane;
 
@@ -320,9 +320,9 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 	}
 
 
-	public BugDetailsComponents getBugDetailsComponents() {
+	public BugDetailsComponentsPanel getBugDetailsComponents() {
 		if(_bugDetailsComponents == null) {
-			_bugDetailsComponents = new BugDetailsComponents(this);
+			_bugDetailsComponents = new BugDetailsComponentsPanel(this);
 		}
 		return _bugDetailsComponents;
 	}

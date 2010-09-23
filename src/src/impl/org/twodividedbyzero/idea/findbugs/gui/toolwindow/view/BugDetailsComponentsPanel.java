@@ -55,9 +55,9 @@ import java.net.URL;
  * @version $Revision$
  * @since 0.0.1
  */
-public class BugDetailsComponents /*extends JPanel*/ {
+public class BugDetailsComponentsPanel /*extends JPanel*/ {
 
-	private static final Logger LOGGER = Logger.getInstance(BugDetailsComponents.class.getName());
+	private static final Logger LOGGER = Logger.getInstance(BugDetailsComponentsPanel.class.getName());
 
 	private HTMLEditorKit _htmlEditorKit;
 	private JEditorPane _bugDetailsPane;
@@ -69,7 +69,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	private double _splitPaneHorizontalWeight = 0.6;
 
 
-	public BugDetailsComponents(final Component parent) {
+	public BugDetailsComponentsPanel(final Component parent) {
 		//super();
 		_parent = parent;
 		init();
