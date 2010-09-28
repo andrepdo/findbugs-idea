@@ -16,11 +16,11 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.toolwindow.view;
 
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.FieldAnnotation;
 import edu.umd.cs.findbugs.MethodAnnotation;
-import edu.umd.cs.findbugs.util.LaunchBrowser;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.DetectorConfiguration;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.BugTree;
@@ -55,7 +55,7 @@ import java.net.URL;
  * @version $Revision$
  * @since 0.0.1
  */
-public class BugDetailsComponentsPanel /*extends JPanel*/ {
+public class BugDetailsComponentsPanel {
 
 	private static final Logger LOGGER = Logger.getInstance(BugDetailsComponentsPanel.class.getName());
 
@@ -70,41 +70,14 @@ public class BugDetailsComponentsPanel /*extends JPanel*/ {
 
 
 	public BugDetailsComponentsPanel(final Component parent) {
-		//super();
 		_parent = parent;
 		init();
 	}
 
 
 	public void init() {
-		//setLayout(new BorderLayout());
-
 		_htmlEditorKit = new HTMLEditorKit();
 		setStyleSheets();
-
-		/*final JSplitPane splitPane = new JSplitPane() {
-			// overridden to map divider snap while dragging
-			@Override
-			public void setDividerLocation(final int location) {
-				final Dimension prefSize = getLeftComponent().getPreferredSize();
-				final int pref = (getOrientation() == HORIZONTAL_SPLIT ? prefSize.width : prefSize.height) + getDividerSize() / 2;
-				super.setDividerLocation(Math.abs(pref - location) <= 10 ? pref : location);
-			}
-		};
-
-		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		splitPane.setContinuousLayout(true);
-		splitPane.setOneTouchExpandable(true);
-		splitPane.setBorder(new EmptyBorder(0 ,0 ,0 ,0));
-
-		splitPane.setDividerLocation(160);
-
-		splitPane.setTopComponent(getDetailTextPanel());
-		splitPane.setBottomComponent(getDetailHtmlPanel());
-		setStyleSheets();
-
-		add(splitPane, BorderLayout.CENTER);*/
-
 	}
 
 
@@ -218,8 +191,8 @@ public class BugDetailsComponentsPanel /*extends JPanel*/ {
 			if (evt.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
 				final URL url = evt.getURL();
 				//showInBrowser(url.toString());
-				LaunchBrowser.showDocument(url);
-				//BrowserUtil.launchBrowser(url.get);
+				//LaunchBrowser.showDocument(url);
+				BrowserUtil.launchBrowser(url.toExternalForm());
 				_explanationPane.setPage(url);
 			}
 		} catch (Exception e) {
