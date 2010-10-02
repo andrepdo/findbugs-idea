@@ -31,8 +31,6 @@ import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
-import java.util.Arrays;
-
 
 /**
  * $Date$
@@ -70,12 +68,12 @@ public class GroupByRank extends BaseToggleAction implements EventListener<BugRe
 			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
 			final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
 
-			final boolean isEnabled = Arrays.equals(GroupBy.getSortOrderGroup(GroupBy.BugRank), panel.getBugTreePanel().getGroupBy());
-			final String groupByProperty = preferences.getProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, GroupBy.BugRank.name());
+			//final boolean isEnabled = Arrays.equals(GroupBy.getSortOrderGroup(GroupBy.BugRank), panel.getBugTreePanel().getGroupBy());
+			final String groupByProperty = preferences.getProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, GroupBy.BugCategory.name());
 			final boolean groupByPropertyEnabled = GroupBy.BugRank.name().equals(groupByProperty);
-			if(groupByPropertyEnabled != isEnabled) {
+			/*if(groupByPropertyEnabled != isEnabled) {
 				panel.getBugTreePanel().setGroupBy(GroupBy.getSortOrderGroup(GroupBy.BugRank));
-			}
+			}*/
 			return groupByPropertyEnabled;
 		}
 

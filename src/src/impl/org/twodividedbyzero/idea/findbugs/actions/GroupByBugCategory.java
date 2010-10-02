@@ -74,9 +74,9 @@ public class GroupByBugCategory extends BaseToggleAction implements EventListene
 			final boolean isEnabled = Arrays.equals(GroupBy.getSortOrderGroup(GroupBy.BugCategory), panel.getBugTreePanel().getGroupBy());
 			final String groupByProperty = preferences.getProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, GroupBy.BugCategory.name());
 			final boolean groupByPropertyEnabled = GroupBy.BugCategory.name().equals(groupByProperty);
-			if(groupByPropertyEnabled != isEnabled) {
+			/*if(groupByPropertyEnabled != isEnabled) {
 				panel.getBugTreePanel().setGroupBy(GroupBy.getSortOrderGroup(GroupBy.BugCategory));
-			}
+			}*/
 			return groupByPropertyEnabled;
 		}
 
