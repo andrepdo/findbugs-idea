@@ -19,12 +19,12 @@ package org.twodividedbyzero.idea.findbugs.gui.common;
 import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.ui.DocumentAdapter;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -32,6 +32,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
@@ -42,8 +45,10 @@ import java.io.File;
 /**
  * $Date$
  *
+ * @author Andre Pfeiler<andrep@twodividedbyzero.org>
+ * @author Keith Lea <keithl@gmail.com>
  * @version $Revision$
- * @since 0.9.95
+ * @since 0.9.96
  */
 @edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
 @SuppressWarnings({"HardCodedStringLiteral"})
@@ -54,11 +59,17 @@ public class ExportFileDialog extends JPanel {
 	private JButton _browseButton;
 	private File _selectedFile;
 	private final transient DialogBuilder _dialogBuilder;
+	private JRadioButton _html;
+	private JRadioButton _xml;
 
 
 	public ExportFileDialog(final String defaultValue, final DialogBuilder dialogBuilder) {
 		super();
-		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridy = 1;
+		c.insets = new Insets(5, 5, 5, 5);
+		c.anchor = GridBagConstraints.NORTHWEST;
 
 		_dialogBuilder = dialogBuilder;
 
@@ -71,28 +82,52 @@ public class ExportFileDialog extends JPanel {
 		_label.setMinimumSize(new Dimension(50, 20));
 		_label.setMaximumSize(new Dimension(150, 20));
 
-		add(_label);
+		c.weightx = 0;
+		c.gridwidth = 2;
+		add(_label, c);
 		_path = new JTextField(defaultValue);
 		_path.setPreferredSize(new Dimension(200, 20));
-		add(_path);
-		add(Box.createHorizontalStrut(5));
+		c.weightx = 1;
+		c.gridwidth = 1;
+		add(_path, c);
 
 		_browseButton = new JButton("Browse");
 		_browseButton.setPreferredSize(new Dimension(80, 20));
 		_browseButton.addActionListener(new MyFileChooserActionListener());
-		add(_browseButton);
-		add(Box.createVerticalGlue());
+		c.weightx = 0;
+		add(_browseButton, c);
+
+		c.gridx = GridBagConstraints.RELATIVE;
+		c.gridy = 2;
+		c.gridheight = 2;
+		add(new JLabel("Format:"), c);
+		c.insets = new Insets(0, 0, 0, 0);
+
+		_html = new JRadioButton("HTML", true);
+		_xml = new JRadioButton("XML", false);
+		ButtonGroup group = new ButtonGroup();
+		group.add(_html);
+		group.add(_xml);
+
+		c.gridheight = 1;
+		add(_html, c);
+		c.gridy = 3;
+		add(_xml, c);
+
 		dialogBuilder.setCenterPanel(this);
 
 		_path.getDocument().addDocumentListener(new MyDocumentAdapter());
+		if (_path.getText().length() > 0) {
+			_selectedFile = new File(_path.getText());
+		}
 		_path.addHierarchyListener(new HierarchyListener() {
 			public void hierarchyChanged(final HierarchyEvent e) {
-				if(_path.isVisible()) {
+				if (_path.isVisible()) {
 					_dialogBuilder.setOkActionEnabled(validateDirectory(_path.getDocument()));
 				}
 			}
 		});
-		dialogBuilder.setOkActionEnabled(false);
+		_dialogBuilder.setOkActionEnabled(_selectedFile != null && _selectedFile.isDirectory());
 	}
 
 
@@ -103,6 +138,11 @@ public class ExportFileDialog extends JPanel {
 
 	public void setText(final String s) {
 		_path.setText(s);
+	}
+
+
+	public boolean isXml() {
+		return _xml.isSelected();
 	}
 
 
@@ -136,7 +176,7 @@ public class ExportFileDialog extends JPanel {
 			final Component parent = SwingUtilities.getRoot(_path);
 			fc.showDialog(parent, "Select");
 			_selectedFile = fc.getSelectedFile();
-			if (_selectedFile != null && _selectedFile.isDirectory() && _selectedFile.canWrite()) {
+			if (_selectedFile != null && _selectedFile.isDirectory()) {
 				final String newLocation = _selectedFile.getPath();
 				_path.setText(newLocation);
 				_dialogBuilder.setOkActionEnabled(true);

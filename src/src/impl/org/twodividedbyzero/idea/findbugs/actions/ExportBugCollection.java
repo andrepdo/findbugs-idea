@@ -56,10 +56,8 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.awt.EventQueue;
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,7 +72,8 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * $Date$
  *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org> and ???
+ * @author Andre Pfeiler<andrep@twodividedbyzero.org>
+ * @author Keith Lea <keithl@gmail.com>
  * @version $Revision$
  * @since 0.9.95
  */
@@ -84,7 +83,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 	private static final Logger LOGGER = Logger.getInstance(ExportBugCollection.class.getName());
 
 	private static String _exportDir = System.getProperty("user.home") + File.separatorChar + FindBugsPluginConstants.TOOL_WINDOW_ID;
-	
+
 	private static final String FINDBUGS_PLAIN_XSL = "plain.xsl";
 	private static final String FINDBUGS_RESULT_PREFIX = "FindBugsResult_";
 	private static final String FINDBUGS_RESULT_HTML_SUFFIX = ".html";
@@ -120,7 +119,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 
 		// check a project is loaded
 		if (isProjectLoaded(project, presentation)) {
-			Messages.showWarningDialog("Project not loaded.", "FindBugs");
+			Messages.showWarningDialog("Project not loaded.", "FindBugs");  // NON-NLS
 			return;
 		}
 
@@ -138,60 +137,67 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 		if (path == null || path.trim().length() == 0) {
 			return;
 		}
+		final boolean exportXml = exportDialog.isXml();
 		_exportDir = path.trim();
 		//Create a unique file name by using time stamp
-		final String timeStamp = new SimpleDateFormat().format(new Date()).replaceAll("[/ :]", "_");
-		final String fileNameHtml = _exportDir + File.separatorChar + FINDBUGS_RESULT_PREFIX + timeStamp + FINDBUGS_RESULT_HTML_SUFFIX;
-		final String fileNameXml = _exportDir + File.separatorChar + FINDBUGS_RESULT_PREFIX + timeStamp + FINDBUGS_RESULT_RAW_SUFFIX;
+		final String timestamp = new SimpleDateFormat().format(new Date()).replaceAll("[/ :]", "_");
+		final String fileName = _exportDir + File.separatorChar + FINDBUGS_RESULT_PREFIX + timestamp + (exportXml ? FINDBUGS_RESULT_RAW_SUFFIX : FINDBUGS_RESULT_HTML_SUFFIX);
 
 		createExportDirIfAbsent();
 
 		//Create a task to export the bug collection to html
-		final AtomicReference<Task> exportTask = new AtomicReference<Task>(new BackgroundableTask(project, "Exporting Findbugs-IDEA Result", false) {
+		final AtomicReference<Task> exportTask = new AtomicReference<Task>(new BackgroundableTask(project, "Exporting Findbugs Result", false) {
 			private ProgressIndicator _indicator;
 
 
 			@SuppressWarnings({"IOResourceOpenedButNotSafelyClosed"})
 			@Override
 			public void run(@NotNull final ProgressIndicator indicator) {
-				indicator.setText2(fileNameXml);
+				indicator.setText2(fileName);
 				setProgressIndicator(indicator);
 				FileWriter writer = null;
 				try {
 					if (_bugCollection != null) {
 						_bugCollection.setWithMessages(true);
+						if (exportXml) {
+							_bugCollection.writeXML(fileName);
+						} else {
+							final Document document = _bugCollection.toDocument();
+							final Source xsl = new StreamSource(getStylesheetStream(FINDBUGS_PLAIN_XSL));
+							xsl.setSystemId(FINDBUGS_PLAIN_XSL);
 
-						final Document document = _bugCollection.toDocument();
-						writeXmlFile(document, new BufferedOutputStream(new FileOutputStream(fileNameXml)));
+							// Create a transformer using the stylesheet
+							final Transformer transformer = TransformerFactory.newInstance().newTransformer(xsl);
 
-						indicator.setText2(fileNameHtml);
-						final Source xsl = new StreamSource(getStylesheetStream(FINDBUGS_PLAIN_XSL));
-						xsl.setSystemId(FINDBUGS_PLAIN_XSL);
+							// Source document is the XML generated from the BugCollection
+							final Source source = new DocumentSource(document);
 
-						final Transformer transformer = TransformerFactory.newInstance().newTransformer(xsl);
-						final Source source = new DocumentSource(document);
-						writer = new FileWriter(fileNameHtml);
-						final Result result = new StreamResult(writer);
-						transformer.transform(source, result);
+							// Write result to output stream
+							writer = new FileWriter(fileName);
+							final Result result = new StreamResult(writer);
+
+							// Do the transformation
+							transformer.transform(source, result);
+						}
 						_bugCollection.setWithMessages(false);
 
-						showToolWindowNotifier("Exported bug collection to " + fileNameHtml + '.', MessageType.INFO);
-						if(BrowserUtil.canStartDefaultBrowser()) {
-							BrowserUtil.launchBrowser(new File(fileNameHtml).toURI().toURL().toExternalForm());
+						showToolWindowNotifier("Exported bug collection to " + fileName + '.', MessageType.INFO);
+						if(!exportXml) {
+							BrowserUtil.launchBrowser(new File(fileName).getAbsolutePath());
 						}
 					}
-				} catch (IOException e) {
-					final String message = "Export failed.";
+				} catch (IOException e1) {
+					final String message = "Export failed";
 					showToolWindowNotifier(message, MessageType.ERROR);
-					LOGGER.error(message, e);
-				} catch (TransformerConfigurationException e) {
+					LOGGER.error(message, e1);
+				} catch (TransformerConfigurationException e1) {
 					final String message = "Transform to html failed due to configuration problems.";
 					showToolWindowNotifier(message, MessageType.ERROR);
-					LOGGER.error(message, e);
-				} catch (TransformerException e) {
-					final String message = "Transformation to xml failed.";
+					LOGGER.error(message, e1);
+				} catch (TransformerException e1) {
+					final String message = "Transformation to exportXml failed.";
 					showToolWindowNotifier(message, MessageType.ERROR);
-					LOGGER.error(message, e);
+					LOGGER.error(message, e1);
 				} finally {
 					if (writer != null) {
 						try {
@@ -215,9 +221,9 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 			}
 		});
 
-		final File file = new File(fileNameHtml);
-		if (!file.exists()) {
-			showToolWindowNotifier("Exporting bug collection failed. '" + fileNameHtml + "'.", MessageType.ERROR);
+		final File file = new File(fileName);
+		if (file.getParentFile() == null) {
+			showToolWindowNotifier("Exporting bug collection failed. not a directory. " + fileName + '.', MessageType.ERROR);
 		} else {
 			exportTask.get().queue();
 		}
@@ -337,7 +343,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 			presentation.setVisible(true);
 
 		} catch (Throwable e) {
-			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
+			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);// NON-NLS
 			if (processed != null) {
 				LOGGER.error("Action update failed", processed);
 			}
