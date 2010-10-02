@@ -235,7 +235,7 @@ public class RecurseClassCollector {
 
 	private void addAnonymousClasses(final PsiElement psiElement, final String fullQualifiedPath, @Nullable final String findClass) {
 
-		final PsiElement[] classes = PsiTreeUtil.collectElements(psiElement, new AnonymouseClassesPsiElementFilter(psiElement));
+		final PsiElement[] classes = PsiTreeUtil.collectElements(psiElement, new AnonymousClassPsiElementFilter(psiElement));
 
 		for (int i = 0; i < classes.length; i++) {
 
@@ -338,12 +338,12 @@ public class RecurseClassCollector {
 	}
 
 
-	private static class AnonymouseClassesPsiElementFilter implements PsiElementFilter {
+	private static class AnonymousClassPsiElementFilter implements PsiElementFilter {
 
 		private final PsiElement _psiElement;
 
 
-		public AnonymouseClassesPsiElementFilter(final PsiElement psiElement) {
+		public AnonymousClassPsiElementFilter(final PsiElement psiElement) {
 			_psiElement = psiElement;
 		}
 
