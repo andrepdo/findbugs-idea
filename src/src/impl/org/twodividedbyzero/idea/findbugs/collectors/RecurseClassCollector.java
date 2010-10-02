@@ -194,7 +194,7 @@ public class RecurseClassCollector {
 
 	private void addInnerClasses(final PsiElement psiElement, final String fullQualifiedPath, final int anonymousClassPrefix, @Nullable final String findClass) {
 
-		final PsiElement[] classes = PsiTreeUtil.collectElements(psiElement, new InnerClassesPsiElementFilter(psiElement));
+		final PsiElement[] classes = PsiTreeUtil.collectElements(psiElement, new InnerClassPsiElementFilter(psiElement));
 
 		for (final PsiElement element : classes) {
 			final PsiClass psiClass = (PsiClass) element;
@@ -353,12 +353,12 @@ public class RecurseClassCollector {
 		}
 	}
 
-	private static class InnerClassesPsiElementFilter implements PsiElementFilter {
+	private static class InnerClassPsiElementFilter implements PsiElementFilter {
 
 		private final PsiElement _psiElement;
 
 
-		public InnerClassesPsiElementFilter(final PsiElement psiElement) {
+		public InnerClassPsiElementFilter(final PsiElement psiElement) {
 			_psiElement = psiElement;
 		}
 
