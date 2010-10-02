@@ -40,8 +40,9 @@ public class ScrollToSource extends BaseToggleAction {
 		if (content != null) {
 			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
 			final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
-			final boolean enabled = preferences.getBooleanProperty(FindBugsPreferences.TOOLWINDOW_SCROLL_TO_SOURCE, panel.getBugTreePanel().isScrollToSource());
-			if(enabled != panel.getBugTreePanel().isScrollToSource()) {
+			final boolean isEnabled = panel.getBugTreePanel().isScrollToSource();
+			final boolean enabled = preferences.getBooleanProperty(FindBugsPreferences.TOOLWINDOW_SCROLL_TO_SOURCE, isEnabled);
+			if(enabled != isEnabled) {
 				panel.getBugTreePanel().setScrollToSource(enabled);
 			}
 			return enabled;

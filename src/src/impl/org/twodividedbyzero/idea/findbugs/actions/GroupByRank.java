@@ -29,6 +29,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
+import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import java.util.Arrays;
 
@@ -67,7 +68,15 @@ public class GroupByRank extends BaseToggleAction implements EventListener<BugRe
 		final Content content = toolWindow.getContentManager().getContent(0);
 		if (content != null) {
 			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
-			return Arrays.equals(GroupBy.getSortOrderGroup(GroupBy.BugRank), panel.getBugTreePanel().getGroupBy());
+			final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
+
+			final boolean isEnabled = Arrays.equals(GroupBy.getSortOrderGroup(GroupBy.BugRank), panel.getBugTreePanel().getGroupBy());
+			final String groupByProperty = preferences.getProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, GroupBy.BugRank.name());
+			final boolean groupByPropertyEnabled = GroupBy.BugRank.name().equals(groupByProperty);
+			if(groupByPropertyEnabled != isEnabled) {
+				panel.getBugTreePanel().setGroupBy(GroupBy.getSortOrderGroup(GroupBy.BugRank));
+			}
+			return groupByPropertyEnabled;
 		}
 
 		return false;
@@ -92,7 +101,11 @@ public class GroupByRank extends BaseToggleAction implements EventListener<BugRe
 		final Content content = toolWindow.getContentManager().getContent(0);
 		if (content != null) {
 			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
-			panel.getBugTreePanel().setGroupBy(GroupBy.getSortOrderGroup(GroupBy.BugRank));
+			final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
+			if (selected) {
+				preferences.setProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, GroupBy.BugRank.name());
+				panel.getBugTreePanel().setGroupBy(GroupBy.getSortOrderGroup(GroupBy.BugRank));
+			}
 		}
 	}
 

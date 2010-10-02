@@ -71,6 +71,8 @@
             <li>fix Issue 14 (Inspection ID must satisfy [a-zA-Z_0-9.]+ pattern)</li>
             <li>fix exclude- include filter sttings and exclude base line bugs</li>
             <li>fix issue 15 IDEA hangs when user closes FindBugs tab.</li>
+            <li>add persistence action states (scrolltosource, GroupBy, preview)</li>
+            <li>add bug pattern abbr to bug pattern result explanation view matching preference bug pattern category </li>
 		</ul>
         <h3>0.9.95</h3>
 		<ul>

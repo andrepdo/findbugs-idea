@@ -30,6 +30,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
+import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import java.util.Arrays;
 
@@ -68,7 +69,15 @@ public class GroupByPackage extends BaseToggleAction implements EventListener<Bu
 		final Content content = toolWindow.getContentManager().getContent(0);
 		if (content != null) {
 			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
-			return Arrays.equals(GroupBy.getSortOrderGroup(GroupBy.Package), panel.getBugTreePanel().getGroupBy());
+			final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
+
+			final boolean isEnabled = Arrays.equals(GroupBy.getSortOrderGroup(GroupBy.Package), panel.getBugTreePanel().getGroupBy());
+			final String groupByProperty = preferences.getProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, GroupBy.Package.name());
+			final boolean groupByPropertyEnabled = GroupBy.Package.name().equals(groupByProperty);
+			if(groupByPropertyEnabled != isEnabled) {
+				panel.getBugTreePanel().setGroupBy(GroupBy.getSortOrderGroup(GroupBy.Package));
+			}
+			return groupByPropertyEnabled;
 		}
 
 		return false;
@@ -93,7 +102,11 @@ public class GroupByPackage extends BaseToggleAction implements EventListener<Bu
 		final Content content = toolWindow.getContentManager().getContent(0);
 		if (content != null) {
 			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
-			panel.getBugTreePanel().setGroupBy(GroupBy.getSortOrderGroup(GroupBy.Package));
+			final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
+			if (selected) {
+				preferences.setProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, GroupBy.Package.name());
+				panel.getBugTreePanel().setGroupBy(GroupBy.getSortOrderGroup(GroupBy.Package));
+			}
 		}
 	}
 
