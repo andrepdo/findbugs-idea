@@ -86,7 +86,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 
 
 	public FindBugsWorker(final com.intellij.openapi.project.Project project) {
-		this(project, false);
+		this(project, IdeaUtilImpl.getPluginComponent(project).getPreferences().getBooleanProperty(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND, false));
 	}
 
 
