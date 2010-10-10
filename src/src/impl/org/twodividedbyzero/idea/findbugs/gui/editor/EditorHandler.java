@@ -201,7 +201,7 @@ public class EditorHandler implements ProjectComponent {
 		}
 
 		RangeMarker marker = findMarker(problem);
-		if ((marker == null) && (checkEvenIfEditorNotAvailable)) {
+		if (marker == null && checkEvenIfEditorNotAvailable) {
 			final Document document = IdeaUtilImpl.getDocument(_project, problem);
 			if (document != null) {
 				marker = document.createRangeMarker(document.getLineStartOffset(problem.getLineStart()), document.getLineEndOffset(problem.getLineEnd()));
@@ -227,7 +227,7 @@ public class EditorHandler implements ProjectComponent {
 
 		final CharSequence fragment = marker.getDocument().getCharsSequence().subSequence(marker.getStartOffset(), marker.getEndOffset());
 
-		return (problem.getHash() == fragment.toString().hashCode());
+		return problem.getHash() == fragment.toString().hashCode();
 	}
 
 

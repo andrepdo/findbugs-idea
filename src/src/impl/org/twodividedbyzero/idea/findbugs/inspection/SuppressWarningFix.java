@@ -45,8 +45,8 @@ public class SuppressWarningFix /*extends SuppressIntentionAction*/ implements L
 
 	private static final Logger LOGGER = Logger.getInstance(SuppressWarningFix.class.getName());
 
-	private String _bugType;
-	private String _annotation;
+	private final String _bugType;
+	private final String _annotation;
 
 
 	public SuppressWarningFix(final String annotationFqn, final String bugType) {

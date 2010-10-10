@@ -80,6 +80,7 @@ import java.util.regex.PatternSyntaxException;
  * @version $Revision$
  * @since 0.9.29-dev
  */
+@SuppressWarnings({"HardCodedStringLiteral", "MagicCharacter", "AnonymousInnerClass", "AnonymousInnerClass"})
 @edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_BAD_FIELD_INNER_CLASS"})
 public abstract class QuickSearch<E> {
 
@@ -180,7 +181,7 @@ public abstract class QuickSearch<E> {
 		return new FocusAdapter() {
 			@Override
 			public void focusGained(final FocusEvent e) {
-				QuickSearch.this._searchActivated = true;
+				_searchActivated = true;
 			}
 
 
@@ -198,7 +199,7 @@ public abstract class QuickSearch<E> {
 					}
 				}*/
 
-				QuickSearch.this._searchActivated = false;
+				_searchActivated = false;
 				hidePopup();
 
 			}
@@ -235,7 +236,7 @@ public abstract class QuickSearch<E> {
 		if (e != null && (isActivationKey(e) || _searchActivated) && !isDeactivationKey(e)) {
 			String searchingText = "";
 			if (e.getID() == KeyEvent.KEY_TYPED) {
-				if (((e.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) != 0)) { // alt mask
+				if ((e.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) != 0) { // alt mask
 					return;
 				}
 				if (e.isAltDown()) {
@@ -305,15 +306,15 @@ public abstract class QuickSearch<E> {
 
 
 	private Point relocateAndResize() {
-		final Point componentLocation;
-		final Dimension popupSize;
 		if (_popup != null) {
+			final Dimension popupSize;
+			final Point componentLocation;
 			try {
 				popupSize = _popup.getPreferredSize();
 				componentLocation = _component.getLocationOnScreen();
 				SwingUtilities.convertPointFromScreen(componentLocation, _layerPane);
 				componentLocation.y -= popupSize.height;
-				if ((componentLocation.y < 0)) {
+				if (componentLocation.y < 0) {
 					componentLocation.y = 0;
 				}
 			} catch (IllegalComponentStateException ignore) {
@@ -586,7 +587,7 @@ public abstract class QuickSearch<E> {
 		private NavigationToolBar _toolBar;
 
 
-		public SearchPopup(final String searchText) {
+		private SearchPopup(final String searchText) {
 			initGui(searchText);
 		}
 
@@ -771,6 +772,18 @@ public abstract class QuickSearch<E> {
 		public NavigationToolBar getToolbar() {
 			return _toolBar;
 		}
+
+
+		@Override
+		public String toString() {
+			final StringBuilder sb = new StringBuilder();
+			sb.append("SearchPopup");
+			sb.append("{_label=").append(_label);
+			sb.append(", _searchField=").append(_searchField);
+			sb.append(", _toolBar=").append(_toolBar);
+			sb.append('}');
+			return sb.toString();
+		}
 	}
 
 
@@ -830,6 +843,19 @@ public abstract class QuickSearch<E> {
 		public void setNextEnabled(final boolean enable) {
 			_nextButton.setEnabled(enable);
 		}
+
+
+		@Override
+		public String toString() {
+			final StringBuilder sb = new StringBuilder();
+			sb.append("NavigationToolBar");
+			sb.append("{_prevIcon=").append(_prevIcon);
+			sb.append(", _nextIcon=").append(_nextIcon);
+			sb.append(", _prevButton=").append(_prevButton);
+			sb.append(", _nextButton=").append(_nextButton);
+			sb.append('}');
+			return sb.toString();
+		}
 	}
 
 
@@ -880,7 +906,7 @@ public abstract class QuickSearch<E> {
 					}
 
 					if (_list.getSelectedIndex() > -1) {
-						QuickSearch.this._popup.getSearchField().setText((String) _list.getSelectedValue());
+						_popup.getSearchField().setText((String) _list.getSelectedValue());
 					}
 				}
 			});
@@ -961,6 +987,17 @@ public abstract class QuickSearch<E> {
 		}
 
 
+		@Override
+		public String toString() {
+			final StringBuilder sb = new StringBuilder();
+			sb.append("RecentSearchesPopup");
+			sb.append("{_label=").append(_label);
+			sb.append(", _listModel=").append(_listModel);
+			sb.append(", _list=").append(_list);
+			sb.append(", _mouseOverIndex=").append(_mouseOverIndex);
+			sb.append('}');
+			return sb.toString();
+		}
 	}
 
 
@@ -1005,15 +1042,15 @@ public abstract class QuickSearch<E> {
 
 
 	private Point relocateAndResizeRecentSearches() {
-		final Point componentLocation;
-		final Dimension popupSize;
 		if (_recentSearchesPopup != null && _popup != null) {
+			final Dimension popupSize;
+			final Point componentLocation;
 			try {
 				popupSize = _recentSearchesPopup.getPreferredSize();
 				componentLocation = _popup.getLocationOnScreen();
 				SwingUtilities.convertPointFromScreen(componentLocation, _layerPane);
 				componentLocation.y -= popupSize.height + 2;
-				if ((componentLocation.y < 0)) {
+				if (componentLocation.y < 0) {
 					componentLocation.y = 2;
 				}
 			} catch (IllegalComponentStateException ignore) {
@@ -1061,4 +1098,24 @@ public abstract class QuickSearch<E> {
 	}
 
 
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("QuickSearch");
+		sb.append("{_searchDelay=").append(_searchDelay);
+		sb.append(", _searchActivated=").append(_searchActivated);
+		sb.append(", _layerPane=").append(_layerPane);
+		sb.append(", _popup=").append(_popup);
+		sb.append(", _recentSearchesPopup=").append(_recentSearchesPopup);
+		sb.append(", _component=").append(_component);
+		sb.append(", _noMatchForeground=").append(_noMatchForeground);
+		sb.append(", _keyListener=").append(_keyListener);
+		sb.append(", _focusListener=").append(_focusListener);
+		sb.append(", _componentListener=").append(_componentListener);
+		sb.append(", _cursor=").append(_cursor);
+		sb.append(", _foregroundColor=").append(_foregroundColor);
+		sb.append(", _backgroundColor=").append(_backgroundColor);
+		sb.append(", _recentSearches=").append(_recentSearches);
+		sb.append('}');
+		return sb.toString();
+	}
 }

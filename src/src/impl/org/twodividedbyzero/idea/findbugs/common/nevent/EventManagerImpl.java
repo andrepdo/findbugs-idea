@@ -33,7 +33,7 @@ package org.twodividedbyzero.idea.findbugs.common.nevent;
  * @version $Revision$
  * @since 0.9.7-dev
  */
-public class EventManagerImpl {
+class EventManagerImpl {
 
 }
 /*@SuppressWarnings("unchecked")

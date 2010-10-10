@@ -43,7 +43,7 @@ import java.awt.event.ActionListener;
  * @version $Revision$
  * @since 0.9.96
  */
-@SuppressWarnings({"HardCodedStringLiteral"})
+@SuppressWarnings({"HardCodedStringLiteral", "AnonymousInnerClass"})
 class PreviewPanel {
 
 	private final JPanel _delegate;

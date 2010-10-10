@@ -67,7 +67,7 @@ public class BugInstanceUtil {
 	}
 
 
-	public static ClassAnnotation getPrimaryClass(final BugInstance bugInstance) {
+	private static ClassAnnotation getPrimaryClass(final BugInstance bugInstance) {
 		return bugInstance.getPrimaryClass();
 	}
 
@@ -182,7 +182,7 @@ public class BugInstanceUtil {
 	}
 
 
-	public static List<String> getBugInstanceGroupPath(final BugInstance bugInstance, final GroupBy[] groupBy) {
+	private static List<String> getBugInstanceGroupPath(final BugInstance bugInstance, final GroupBy[] groupBy) {
 		final List<String> result = new ArrayList<String>();
 		for (final GroupBy group : groupBy) {
 			result.add(GroupBy.getGroupName(group, bugInstance));

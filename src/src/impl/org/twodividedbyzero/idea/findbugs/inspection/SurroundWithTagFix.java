@@ -37,9 +37,9 @@ import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 public class SurroundWithTagFix implements LocalQuickFix {
 
 	private final PsiElement _parent;
-	private PsiElement _firstChild;
-	private PsiElement _lastChild;
-	private String _tagName;
+	private final PsiElement _firstChild;
+	private final PsiElement _lastChild;
+	private final String _tagName;
 
 
 	public SurroundWithTagFix(final PsiElement parent, final PsiElement firstChild, final PsiElement lastChild, final String tagName) {

@@ -49,47 +49,46 @@ import java.util.Map;
 @SuppressWarnings({"HardCodedStringLiteral"})
 public class TreeNodeCellRenderer2 extends JPanel implements TreeCellRenderer {
 
-	public static final BasicStroke _stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1, new float[] {1, 1}, 0);
+	private static final BasicStroke _stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1, new float[] {1, 1}, 0);
 
 	/** Is the value currently selected. */
-	protected boolean _selected;
+	private boolean _selected;
 
 	/** True if has focus. */
-	protected boolean _hasFocus;
+	private boolean _hasFocus;
 	/** True if draws focus border around icon as well. */
-	protected boolean _drawsFocusBorderAroundIcon;
+	private final boolean _drawsFocusBorderAroundIcon;
 
 	// Colors
 	/** Color to use for the foreground for selected nodes. */
-	protected Color _textSelectionColor;
+	private Color _textSelectionColor;
 
 	/** Color to use for the foreground for non-selected nodes. */
-	protected Color _textNonSelectionColor;
+	private Color _textNonSelectionColor;
 
 	/** Color to use for the background when a node is selected. */
-	protected Color _backgroundSelectionColor;
+	private Color _backgroundSelectionColor;
 
 	/** Color to use for the background when the node is not selected. */
-	protected Color _backgroundNonSelectionColor;
+	private Color _backgroundNonSelectionColor;
 
 	/** Color to use for the background when the node is not selected. */
-	protected Color _borderSelectionColor;
+	private Color _borderSelectionColor;
 
-	protected Color _hitsForegroundColor;
+	private Color _hitsForegroundColor;
 
 	/** Map to use for rendering included images. */
 	protected Map<?, ?> _map;
 
-	protected int _hGap = 4;
+	private final int _hGap = 4;
 
-	protected JLabel _icon;
-	protected ValueLabel _title;
-	protected ValueLabel _hits;
+	private final JLabel _icon;
+	private final ValueLabel _title;
+	private final ValueLabel _hits;
 
 
 	/** Create a new cell renderer. */
 	public TreeNodeCellRenderer2() {
-		super();
 		setOpaque(false);
 		//_map = map;
 
@@ -100,7 +99,7 @@ public class TreeNodeCellRenderer2 extends JPanel implements TreeCellRenderer {
 		setBorderSelectionColor(UIManager.getColor("Tree.selectionBorderColor"));
 		final Object value = UIManager.get("Tree.drawsFocusBorderAroundIcon");
 		setHitsForegroundColor(Color.GRAY);
-		_drawsFocusBorderAroundIcon = (value != null && (Boolean) value);
+		_drawsFocusBorderAroundIcon = value != null && (Boolean) value;
 
 		//noinspection ThisEscapedInObjectConstruction
 		//setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -135,71 +134,81 @@ public class TreeNodeCellRenderer2 extends JPanel implements TreeCellRenderer {
 	}*/
 
 
-	public void setHitsForegroundColor(final Color color) {
+	final void setHitsForegroundColor(final Color color) {
 		_hitsForegroundColor = color;
 	}
 
 
-	public Color getHitsForegroundColor() {
+	Color getHitsForegroundColor() {
 		return _hitsForegroundColor;
 	}
 
 
-	/** Sets the color the text is drawn with when the node is selected. */
-	public void setTextSelectionColor(final Color newColor) {
+	/** Sets the color the text is drawn with when the node is selected.
+	 * @param newColor*/
+	final void setTextSelectionColor(final Color newColor) {
 		_textSelectionColor = newColor;
 	}
 
 
-	/** Returns the color the text is drawn with when the node is selected. */
-	public Color getTextSelectionColor() {
+	/** Returns the color the text is drawn with when the node is selected.
+	 * @return*/
+	Color getTextSelectionColor() {
 		return _textSelectionColor;
 	}
 
 
-	/** Sets the color the text is drawn with when the node is not selected. */
-	public void setTextNonSelectionColor(final Color newColor) {
+	/** Sets the color the text is drawn with when the node is not selected.
+	 * @param newColor*/
+	final void setTextNonSelectionColor(final Color newColor) {
 		_textNonSelectionColor = newColor;
 	}
 
 
-	/** Returns the color the text is drawn with when the node is not selected. */
-	public Color getTextNonSelectionColor() {
+	/** Returns the color the text is drawn with when the node is not selected.
+	 * @return*/
+	Color getTextNonSelectionColor() {
 		return _textNonSelectionColor;
 	}
 
 
-	/** Sets the color to use for the background if the node is selected. */
-	public void setBackgroundSelectionColor(final Color newColor) {
+	/** Sets the color to use for the background if the node is selected.
+	 * @param newColor*/
+	final void setBackgroundSelectionColor(final Color newColor) {
 		_backgroundSelectionColor = newColor;
 	}
 
 
-	/** Returns the color to use for the background if the node is selected. */
-	public Color getBackgroundSelectionColor() {
+	/** Returns the color to use for the background if the node is selected.
+	 * @return*/
+	Color getBackgroundSelectionColor() {
 		return _backgroundSelectionColor;
 	}
 
 
-	/** Sets the background color to be used for unselected nodes. */
-	public void setBackgroundNonSelectionColor(final Color newColor) {
+	/** Sets the background color to be used for unselected nodes.
+	 * @param newColor*/
+	final void setBackgroundNonSelectionColor(final Color newColor) {
 		_backgroundNonSelectionColor = newColor;
 	}
 
 
-	/** Returns the background color to be used for unselected nodes. */
-	public Color getBackgroundNonSelectionColor() {
+	/** Returns the background color to be used for unselected nodes.
+	 * @return*/
+	Color getBackgroundNonSelectionColor() {
 		return _backgroundNonSelectionColor;
 	}
 
 
-	/** Sets the color to use for the border. */
-	public void setBorderSelectionColor(final Color newColor) {
+	/** Sets the color to use for the border.
+	 * @param newColor*/
+	final void setBorderSelectionColor(final Color newColor) {
 		_borderSelectionColor = newColor;
 	}
 
 
-	/** Returns the the border color. */
+	/** Returns the the border color.
+	 * @return*/
 	public Color getBorderSelectionColor() {
 		return _borderSelectionColor;
 	}
@@ -236,7 +245,6 @@ public class TreeNodeCellRenderer2 extends JPanel implements TreeCellRenderer {
 	}*/
 
 
-	/** {@inheritDoc} */
 	public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
 		if (_title.getFont().getStyle() == Font.BOLD) {
 			_title.setFont(getFont());
@@ -353,13 +361,13 @@ public class TreeNodeCellRenderer2 extends JPanel implements TreeCellRenderer {
 			justification = "")
 	@Override
 	public void paint(final Graphics g) {
-		Color bColor;
 		final Graphics2D g2d = (Graphics2D) g;
 
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		g2d.setStroke(_stroke);
 
+		Color bColor;
 		if (_selected && _hasFocus) {
 			bColor = getBackgroundSelectionColor();
 		} else {
@@ -425,7 +433,7 @@ public class TreeNodeCellRenderer2 extends JPanel implements TreeCellRenderer {
 
 
 	private int getIconLabelStart() {
-		return _icon.getWidth() + (_hGap - 2); // _icon.getX();
+		return _icon.getWidth() + _hGap - 2; // _icon.getX();
 	}
 
 
@@ -541,9 +549,9 @@ public class TreeNodeCellRenderer2 extends JPanel implements TreeCellRenderer {
 
 		for (int i = 0, b = 0; i < s.length(); i++) {
 			if (s.charAt(i) == ' ' || i == s.length() - 1) {
-				final int w = g.getFontMetrics().stringWidth(s.substring(b, i + ((i == s.length() - 1) ? 1 : 0)));
+				final int w = g.getFontMetrics().stringWidth(s.substring(b, i + (i == s.length() - 1 ? 1 : 0)));
 
-				maxWidth = (maxWidth > w) ? maxWidth : w;
+				maxWidth = maxWidth > w ? maxWidth : w;
 
 				b = i + 1;
 			}

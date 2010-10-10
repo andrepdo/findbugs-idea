@@ -95,7 +95,7 @@ public abstract class AbstractBar extends JToolBar {
 	}
 
 
-	public void installListener() {
+	public final void installListener() {
 		addPropertyChangeListener(new InstallPropertyChangeListener());
 	}
 
@@ -125,7 +125,7 @@ public abstract class AbstractBar extends JToolBar {
 
 
 	@Override
-	public void setFloatable(final boolean floatable) {
+	public final void setFloatable(final boolean floatable) {
 		super.setFloatable(floatable);
 	}
 

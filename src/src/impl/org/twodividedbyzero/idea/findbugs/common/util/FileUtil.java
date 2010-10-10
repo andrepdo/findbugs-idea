@@ -27,7 +27,7 @@ import java.io.IOException;
  * @version $Revision$
  * @since 0.9.96
  */
-public final class FileUtil {
+final class FileUtil {
 
 	private FileUtil() {
 	}

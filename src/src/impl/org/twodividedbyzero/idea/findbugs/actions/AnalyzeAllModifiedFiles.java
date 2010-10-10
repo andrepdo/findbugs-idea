@@ -58,11 +58,6 @@ public class AnalyzeAllModifiedFiles extends BaseAction implements EventListener
 	private boolean _running;
 
 
-	public AnalyzeAllModifiedFiles() {
-		//EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(IdeaUtilImpl.getProject().getName()), this);
-	}
-
-
 	@Override
 	public void actionPerformed(final AnActionEvent e) {
 		_actionEvent = e;

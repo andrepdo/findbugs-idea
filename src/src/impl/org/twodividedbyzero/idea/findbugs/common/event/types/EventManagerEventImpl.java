@@ -12,7 +12,7 @@ public class EventManagerEventImpl extends EventImpl implements EventManagerEven
 
 	private static final long serialVersionUID = 0L;
 
-	private Operation _operation;
+	private final Operation _operation;
 
 
 	public EventManagerEventImpl(final Operation operation) {

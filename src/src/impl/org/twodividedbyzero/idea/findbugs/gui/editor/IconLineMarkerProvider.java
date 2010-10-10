@@ -53,7 +53,7 @@ import java.util.Locale;
  * @version $Revision$
  * @since 0.9.9
  */
-public class IconLineMarkerProvider implements LineMarkerProvider {
+class IconLineMarkerProvider implements LineMarkerProvider {
 
 	@NonNls
 	private static final

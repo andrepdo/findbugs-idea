@@ -81,12 +81,12 @@ public abstract class BackgroundableTask extends Backgroundable {
 	public void setIndicatorText2(final String text2) {
 		final ProgressIndicator progressIndicator = getProgressIndicator();
 		if (progressIndicator != null) {
-			getProgressIndicator().setText2(text2);
+			progressIndicator.setText2(text2);
 		}
 	}
 
 
-	public void setIndicatorText(final String text, @Nullable final String text2) {
+	void setIndicatorText(final String text, @Nullable final String text2) {
 		final ProgressIndicator progressIndicator = getProgressIndicator();
 		if (progressIndicator != null) {
 			progressIndicator.setText(text);

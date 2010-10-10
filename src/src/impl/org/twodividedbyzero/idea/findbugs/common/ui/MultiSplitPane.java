@@ -48,7 +48,7 @@ import java.awt.event.MouseEvent;
  */
 public class MultiSplitPane extends JPanel {
 
-	private AccessibleContext accessibleContext = null;
+	private AccessibleContext accessibleContext;
 	private boolean continuousLayout = true;
 	private transient DividerPainter dividerPainter = new DefaultDividerPainter();
 
@@ -172,7 +172,7 @@ public class MultiSplitPane extends JPanel {
 				justification = "")
 		@Override
 		public void paint(final Graphics g, final Divider divider) {
-			if ((divider == activeDivider()) && !isContinuousLayout()) {
+			if (divider == activeDivider() && !isContinuousLayout()) {
 				final Graphics2D g2d = (Graphics2D) g;
 				g2d.setColor(Color.black);
 				g2d.fill(divider.getBounds());
@@ -224,7 +224,7 @@ public class MultiSplitPane extends JPanel {
 		super.paintChildren(g);
 		final DividerPainter dp = getDividerPainter();
 		final Rectangle clipR = g.getClipBounds();
-		if ((dp != null) && (clipR != null)) {
+		if (dp != null && clipR != null) {
 			final Graphics dpg = g.create();
 			try {
 				final MultiSplitLayout msl = getMultiSplitLayout();
@@ -238,12 +238,12 @@ public class MultiSplitPane extends JPanel {
 	}
 
 
-	private boolean dragUnderway = false;
-	private transient MultiSplitLayout.Divider dragDivider = null;
-	private Rectangle initialDividerBounds = null;
+	private boolean dragUnderway;
+	private transient MultiSplitLayout.Divider dragDivider;
+	private Rectangle initialDividerBounds;
 	private boolean oldFloatingDividers = true;
-	private int dragOffsetX = 0;
-	private int dragOffsetY = 0;
+	private int dragOffsetX;
+	private int dragOffsetY;
 	private int dragMin = -1;
 	private int dragMax = -1;
 
@@ -255,7 +255,7 @@ public class MultiSplitPane extends JPanel {
 		if (divider != null) {
 			final MultiSplitLayout.Node prevNode = divider.previousSibling();
 			final MultiSplitLayout.Node nextNode = divider.nextSibling();
-			if ((prevNode == null) || (nextNode == null)) {
+			if (prevNode == null || nextNode == null) {
 				dragUnderway = false;
 			} else {
 				initialDividerBounds = divider.getBounds();
@@ -363,7 +363,7 @@ public class MultiSplitPane extends JPanel {
 		if (show) {
 			final MultiSplitLayout.Divider divider = getMultiSplitLayout().dividerAt(x, y);
 			if (divider != null) {
-				cursorID = (divider.isVertical()) ? Cursor.E_RESIZE_CURSOR : Cursor.N_RESIZE_CURSOR;
+				cursorID = divider.isVertical() ? Cursor.E_RESIZE_CURSOR : Cursor.N_RESIZE_CURSOR;
 			}
 		}
 		setCursor(Cursor.getPredefinedCursor(cursorID));

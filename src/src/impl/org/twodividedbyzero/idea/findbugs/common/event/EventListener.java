@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface EventListener<T extends Event> {
 
-	public void onEvent(@NotNull T event);
+	void onEvent(@NotNull T event);
 
 	//public Class<Event>[] initEventTypes();
 }

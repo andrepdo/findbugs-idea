@@ -10,14 +10,14 @@ import org.twodividedbyzero.idea.findbugs.common.event.Event;
  */
 public interface EventManagerEvent extends Event {
 
-	public enum Operation {
+	enum Operation {
 
 		LISTENER_ADDED,
 		LISTENER_REMOVED
 	}
 
 
-	public Operation getOperation();
+	Operation getOperation();
 
 
 }

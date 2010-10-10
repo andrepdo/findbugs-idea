@@ -152,7 +152,7 @@ public final class ResourcesLoader {
 	 * @param filename the filename string
 	 * @return the text <code>String</code>
 	 */
-	public static String loadTextResource(final String pkgName, final String filename) {
+	private static String loadTextResource(final String pkgName, final String filename) {
 		String ret = null;
 		final InputStream is = getResourceStream(pkgName, filename);
 
@@ -217,7 +217,7 @@ public final class ResourcesLoader {
 	 * @param filename the image filename <code>String</code>
 	 * @return java.awt.Image
 	 */
-	public static Image loadImage(final String pkgName, final String filename) {
+	private static Image loadImage(final String pkgName, final String filename) {
 		final Object cacheHit = queryIconChache(pkgName, filename);
 		if (cacheHit != null) {
 			return (Image) cacheHit;
@@ -288,7 +288,7 @@ public final class ResourcesLoader {
 	 * @param filename the image filename <code>String</code>
 	 * @return javax.swing.Icon
 	 */
-	public static Icon loadIcon(final String pkgName, final String filename) {
+	private static Icon loadIcon(final String pkgName, final String filename) {
 		final Object cacheHit = queryIconChache(pkgName, filename);
 		if (cacheHit != null) {
 			return (Icon) cacheHit;

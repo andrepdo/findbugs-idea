@@ -35,8 +35,7 @@ public class ToggleableButton extends JButton {
 	protected int _modifiers;
 
 
-	public ToggleableButton() {
-		super();
+	ToggleableButton() {
 	}
 
 
@@ -78,7 +77,7 @@ public class ToggleableButton extends JButton {
 	}
 
 
-	public boolean getToggleMode() {
+	boolean getToggleMode() {
 		return getModel() instanceof JToggleButton.ToggleButtonModel;
 	}
 

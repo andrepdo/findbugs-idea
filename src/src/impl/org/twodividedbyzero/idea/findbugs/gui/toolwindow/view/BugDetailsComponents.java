@@ -64,7 +64,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	private JEditorPane _explanationPane;
 	private JPanel _bugDetailsPanel;
 	private JPanel _explanationPanel;
-	private Component _parent;
+	private final Component _parent;
 	private TreePath _currentTreePath;
 	private double _splitPaneHorizontalWeight = 0.6;
 
@@ -75,7 +75,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	}
 
 
-	public void init() {
+	public final void init() {
 		_htmlEditorKit = new HTMLEditorKit();
 		setStyleSheets();
 	}

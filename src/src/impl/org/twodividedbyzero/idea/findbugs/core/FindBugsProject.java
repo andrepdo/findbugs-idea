@@ -41,13 +41,8 @@ public class FindBugsProject extends Project {
 	//private RecurseCollectorTask _collectorTask;
 
 
-	public FindBugsProject() {
-		super();
-	}
-
-
 	public void configureSourceDirectories(final VirtualFile file) {
-		final VirtualFile[] files = new VirtualFile[] {file};
+		final VirtualFile[] files = {file};
 		configureSourceDirectories(files);
 	}
 

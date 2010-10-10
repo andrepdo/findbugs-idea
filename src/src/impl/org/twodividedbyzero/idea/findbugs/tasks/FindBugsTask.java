@@ -41,8 +41,8 @@ public class FindBugsTask extends BackgroundableTask {
 	private static final Logger LOGGER = Logger.getInstance(FindBugsTask.class.getName());
 
 	private ProgressIndicator _indicator;
-	private IFindBugsEngine2 _engine;
-	private boolean _startInBackground;
+	private final IFindBugsEngine2 _engine;
+	private final boolean _startInBackground;
 
 
 	public FindBugsTask(@Nullable final Project project, @NotNull final String title, final boolean canBeCancelled, final IFindBugsEngine2 engine, final boolean startInBackground) {

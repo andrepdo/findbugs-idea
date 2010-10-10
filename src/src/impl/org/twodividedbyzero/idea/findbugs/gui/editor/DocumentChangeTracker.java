@@ -52,8 +52,8 @@ class DocumentChangeTracker implements DocumentListener {
 	private final Map<ExtendedProblemDescriptor, RangeMarker> _markers;
 
 
-	public DocumentChangeTracker(final Document document) {
-		this._document = document;
+	DocumentChangeTracker(final Document document) {
+		_document = document;
 
 		_editors = new HashSet<Editor>();
 		_markers = new IdentityHashMap<ExtendedProblemDescriptor, RangeMarker>();
@@ -115,7 +115,7 @@ class DocumentChangeTracker implements DocumentListener {
 
 
 	private void updateProblem(@NotNull final ExtendedProblemDescriptor problem, @NotNull final RangeMarker marker) {
-		if ((marker.isValid()) && (!isOrphanMarker(marker))) {
+		if (marker.isValid() && !isOrphanMarker(marker)) {
 			final CharSequence fragment = marker.getDocument().getCharsSequence().subSequence(marker.getStartOffset(), marker.getEndOffset());
 			final int lineStart = marker.getDocument().getLineNumber(marker.getStartOffset());
 			int lineEnd = marker.getDocument().getLineNumber(marker.getEndOffset());

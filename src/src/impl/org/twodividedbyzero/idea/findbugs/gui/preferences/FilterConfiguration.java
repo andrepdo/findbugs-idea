@@ -115,11 +115,10 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	public JPanel getIncludePanel() {
+	JPanel getIncludePanel() {
 		if (_includePanel == null) {
 
 			final double border = 5;
-			final double rowsGap = 5;
 			final double colsGap = 10;
 			final double[][] size = {{border, TableLayout.FILL, colsGap, TableLayout.PREFERRED, border}, // Columns
 									 {border, TableLayout.FILL, border}};// Rows
@@ -137,6 +136,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			_includePanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 
+			final double rowsGap = 5;
 			final double[][] bPanelSize = {{border, TableLayout.PREFERRED}, // Columns
 										   {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout btbl = new TableLayout(bPanelSize);
@@ -179,11 +179,10 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	public JPanel getExcludePanel() {
+	JPanel getExcludePanel() {
 		if (_excludePanel == null) {
 
 			final double border = 5;
-			final double rowsGap = 5;
 			final double colsGap = 10;
 			final double[][] size = {{border, TableLayout.FILL, colsGap, TableLayout.PREFERRED, border}, // Columns
 									 {border, TableLayout.FILL, border}};// Rows
@@ -201,6 +200,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			_excludePanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 
+			final double rowsGap = 5;
 			final double[][] bPanelSize = {{border, TableLayout.PREFERRED}, // Columns
 										   {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout btbl = new TableLayout(bPanelSize);
@@ -243,11 +243,10 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	public JPanel getBaseLinePanel() {
+	JPanel getBaseLinePanel() {
 		if (_baselinePanel == null) {
 
 			final double border = 5;
-			final double rowsGap = 5;
 			final double colsGap = 10;
 			final double[][] size = {{border, TableLayout.FILL, colsGap, TableLayout.PREFERRED, border}, // Columns
 									 {border, TableLayout.FILL, border}};// Rows
@@ -265,6 +264,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			_baselinePanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 
+			final double rowsGap = 5;
 			final double[][] bPanelSize = {{border, TableLayout.PREFERRED}, // Columns
 										   {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout btbl = new TableLayout(bPanelSize);
@@ -307,7 +307,7 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	public JList getIncludeList() {
+	JList getIncludeList() {
 		if (_includeList == null) {
 			getIncludePanel();
 		}
@@ -315,7 +315,7 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	public JList getExcludeList() {
+	JList getExcludeList() {
 		if (_excludeList == null) {
 			getExcludePanel();
 		}
@@ -323,7 +323,7 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	public JList getBaselineList() {
+	JList getBaselineList() {
 		if (_baselineList == null) {
 			getBaseLinePanel();
 		}
@@ -331,7 +331,7 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	static DefaultListModel getModel(final JList list) {
+	private static DefaultListModel getModel(final JList list) {
 		return (DefaultListModel) list.getModel();
 	}
 
@@ -353,7 +353,7 @@ public class FilterConfiguration implements ConfigurationPage {
 		private final JButton _removeButton;
 
 
-		public IncludeListSelectionListener(final JButton removeButton) {
+		private IncludeListSelectionListener(final JButton removeButton) {
 			_removeButton = removeButton;
 		}
 
@@ -369,7 +369,7 @@ public class FilterConfiguration implements ConfigurationPage {
 		private final AbstractButton _removeButton;
 
 
-		public ExcludeListSelectionListener(final AbstractButton removeButton) {
+		private ExcludeListSelectionListener(final AbstractButton removeButton) {
 			_removeButton = removeButton;
 		}
 
@@ -385,7 +385,7 @@ public class FilterConfiguration implements ConfigurationPage {
 		private final AbstractButton _removeButton;
 
 
-		public BaselineListSelectionListener(final AbstractButton removeButton) {
+		private BaselineListSelectionListener(final AbstractButton removeButton) {
 			_removeButton = removeButton;
 		}
 

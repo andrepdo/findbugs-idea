@@ -30,11 +30,11 @@ import org.twodividedbyzero.idea.findbugs.common.event.Event.EventType;
  */
 public interface EventFilter<T extends Event> /*extends Serializable*/ {
 
-	public boolean acceptEvent(@NotNull T event);
+	boolean acceptEvent(@NotNull T event);
 
-	public EventType getEventType();
+	EventType getEventType();
 
-	public boolean acceptProject(@NotNull final String projectName);
+	boolean acceptProject(@NotNull final String projectName);
 
-	public String getProjectName();
+	String getProjectName();
 }

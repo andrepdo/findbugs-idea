@@ -43,11 +43,6 @@ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 public class GroupByPriority extends BaseToggleAction implements EventListener<BugReporterEvent> {
 
 
-	public GroupByPriority() {
-		//EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(IdeaUtilImpl.getProject().getName()), this);
-	}
-
-
 	@Override
 	public boolean isSelected(final AnActionEvent event) {
 		final Project project = DataKeys.PROJECT.getData(event.getDataContext());

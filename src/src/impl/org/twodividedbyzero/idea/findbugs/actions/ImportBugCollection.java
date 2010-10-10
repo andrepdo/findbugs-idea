@@ -264,7 +264,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 	}
 
 
-	public static void writeXmlFile(final Document doc, final OutputStream outputStream) {
+	private static void writeXmlFile(final Document doc, final OutputStream outputStream) {
 		try {
 			final Source source = new DocumentSource(doc);
 			final Result result = new StreamResult(outputStream);
@@ -384,7 +384,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 	}
 
 
-	protected boolean setRunning(final boolean running) {
+	boolean setRunning(final boolean running) {
 		final boolean was = _running;
 		if (_running != running) {
 			_running = running;

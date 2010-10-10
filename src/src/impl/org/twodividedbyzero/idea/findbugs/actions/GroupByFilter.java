@@ -58,13 +58,6 @@ public class GroupByFilter extends BaseAction implements EventListener<BugReport
 	private boolean _running;
 
 
-	public GroupByFilter() {
-		//EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(IdeaUtilImpl.getProject().getName()), this);
-		//getTemplatePresentation().putClientProperty("button", getTemplatePresentation());
-
-	}
-
-
 	@Override
 	public void actionPerformed(final AnActionEvent e) {
 		_actionEvent = e;
@@ -215,7 +208,7 @@ public class GroupByFilter extends BaseAction implements EventListener<BugReport
 
 	private static class FilterApplyAction extends AnAction {
 
-		public FilterApplyAction() {
+		private FilterApplyAction() {
 			super("test1", "test description", IconLoader.getIcon("/general/ideOptions.png"));
 		}
 
@@ -228,9 +221,9 @@ public class GroupByFilter extends BaseAction implements EventListener<BugReport
 		//final MySetTodoFilterAction this$1;
 
 
-		{
+		//{
 			// this$1 = MySetTodoFilterAction.this;
 			//super(s, s1, icon);
-		}
+		//}
 	}
 }

@@ -27,11 +27,11 @@ import java.awt.Component;
  */
 public interface ConfigurationPage {
 
-	public Component getComponent();
+	Component getComponent();
 
-	public void updatePreferences();
+	void updatePreferences();
 
-	public void setEnabled(final boolean enabled);
+	void setEnabled(final boolean enabled);
 
-	public boolean showInModulePreferences();
+	boolean showInModulePreferences();
 }

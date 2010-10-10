@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * @version $Revision$
  * @since 0.0.1
  */
-public class FindBugsPluginLoader {
+class FindBugsPluginLoader {
 
 	private static final Logger LOGGER = Logger.getInstance(FindBugsPluginLoader.class.getName());
 
@@ -56,7 +56,7 @@ public class FindBugsPluginLoader {
 	 * @param dirPaths a direcotry paths string array
 	 * @return a URL[] List
 	 */
-	public static URL[] determinePlugins(@NotNull final String[] dirPaths) {
+	private static URL[] determinePlugins(@NotNull final String[] dirPaths) {
 		dirPaths[dirPaths.length - 1] = FindBugsPluginConstants.FINDBUGS_PLUGIN_PATH;
 		final ArrayList<URL> arr = new ArrayList<URL>();
 		final URL[] pluginList;

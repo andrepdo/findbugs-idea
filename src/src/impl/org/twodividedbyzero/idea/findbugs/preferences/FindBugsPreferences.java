@@ -97,7 +97,6 @@ public class FindBugsPreferences extends Properties {
 
 
 	private FindBugsPreferences() {
-		super();
 		initDefaults();
 	}
 
@@ -151,7 +150,7 @@ public class FindBugsPreferences extends Properties {
 
 
 	public void setDefinedProperies(final Map<String, String> properties) {
-		if (properties == null || properties.size() == 0) {
+		if (properties == null || properties.isEmpty()) {
 			return;
 		}
 
@@ -237,7 +236,7 @@ public class FindBugsPreferences extends Properties {
 
 
 	@Override
-	public Object setProperty(final String key, @NotNull final String value) {
+	public synchronized Object setProperty(final String key, @NotNull final String value) {
 		setModified(true);
 		return super.setProperty(key, value);
 	}
@@ -495,7 +494,7 @@ public class FindBugsPreferences extends Properties {
 
 
 	@Override
-	public void clear() {
+	public synchronized void clear() {
 		super.clear();
 
 		getDetectors().clear();
@@ -510,7 +509,7 @@ public class FindBugsPreferences extends Properties {
 
 
 	@Override
-	public boolean equals(final Object o) {
+	public synchronized boolean equals(final Object o) {
 		if (this == o) {
 			return true;
 		}
@@ -529,7 +528,7 @@ public class FindBugsPreferences extends Properties {
 
 
 	@Override
-	public int hashCode() {
+	public synchronized int hashCode() {
 		int result = super.hashCode();
 		result = 31 * result;
 		return result;

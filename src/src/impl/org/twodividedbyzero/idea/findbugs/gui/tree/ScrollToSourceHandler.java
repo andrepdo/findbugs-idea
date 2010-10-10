@@ -32,7 +32,6 @@ public class ScrollToSourceHandler extends com.intellij.ui.AutoScrollToSourceHan
 
 
 	public ScrollToSourceHandler(final BugTreePanel panel) {
-		super();
 		_panel = panel;
 	}
 

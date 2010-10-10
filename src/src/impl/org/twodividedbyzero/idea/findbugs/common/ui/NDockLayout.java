@@ -47,17 +47,17 @@ public class NDockLayout extends BorderLayout {
 	private final ArrayList<Component> _south = new ArrayList<Component>(1);
 	private final ArrayList<Component> _east = new ArrayList<Component>(1);
 	private final ArrayList<Component> _west = new ArrayList<Component>(1);
-	private Component _center = null;
+	private Component _center;
 	private int _northHeight;
 	private int _southHeight;
 	private int _eastWidth;
 	private int _westWidth;
 
-	public Object[] _embeddedComponents = new Object[4];
-	public static final int TOP = SwingConstants.TOP;
-	public static final int BOTTOM = SwingConstants.BOTTOM;
-	public static final int LEFT = SwingConstants.LEFT;
-	public static final int RIGHT = SwingConstants.RIGHT;
+	private final Object[] _embeddedComponents = new Object[4];
+	private static final int TOP = SwingConstants.TOP;
+	private static final int BOTTOM = SwingConstants.BOTTOM;
+	private static final int LEFT = SwingConstants.LEFT;
+	private static final int RIGHT = SwingConstants.RIGHT;
 
 
 	public NDockLayout() {
@@ -71,9 +71,8 @@ public class NDockLayout extends BorderLayout {
 	@Override
 	public void addLayoutComponent(final Component component, final Object con) {
 		synchronized (component.getTreeLock()) {
-			String s = null;
 			if (con != null) {
-				s = con.toString();
+				final String s = con.toString();
 				component.setVisible(true);
 				if (s.equals(NORTH)) {
 					_north.add(component);
@@ -128,16 +127,16 @@ public class NDockLayout extends BorderLayout {
 			_westWidth = getPreferredDimension(_west).width;
 
 			layoutComponents(target, _north, left, top, right - left, _northHeight, TOP);
-			top += (_northHeight + getVgap());
+			top += _northHeight + getVgap();
 
 			layoutComponents(target, _south, left, bottom - _southHeight, right - left, _southHeight, BOTTOM);
-			bottom -= (_southHeight + getVgap());
+			bottom -= _southHeight + getVgap();
 
 			layoutComponents(target, _east, right - _eastWidth, top, _eastWidth, bottom - top, RIGHT);
-			right -= (_eastWidth + getHgap());
+			right -= _eastWidth + getHgap();
 
 			layoutComponents(target, _west, left, top, _westWidth, bottom - top, LEFT);
-			left += (_westWidth + getHgap());
+			left += _westWidth + getHgap();
 
 			if (_center != null) {
 				_center.setBounds(left, top, right - left, bottom - top);
@@ -152,7 +151,7 @@ public class NDockLayout extends BorderLayout {
 	 * @param components the <code>Component<code>(s) to get the ideal <code>Dimension</code> for
 	 * @return Returns the ideal width for a vertically oriented toolbar and the ideal height for a horizontally oriented tollbar.
 	 */
-	private static Dimension getPreferredDimension(final ArrayList<Component> components) {
+	private static Dimension getPreferredDimension(final Iterable<Component> components) {
 		int w = 0, h = 0;
 
 		for (final Component comp : components) {

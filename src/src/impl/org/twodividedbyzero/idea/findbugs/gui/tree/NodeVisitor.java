@@ -25,7 +25,7 @@ package org.twodividedbyzero.idea.findbugs.gui.tree;
  */
 public interface NodeVisitor<VisitableTreeNode> {
 
-	public void visitGroupNode(VisitableTreeNode node);
+	void visitGroupNode(VisitableTreeNode node);
 
 	//public void visitLeafNode(T node);
 	// todo: visitor cache

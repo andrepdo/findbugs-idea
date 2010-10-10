@@ -26,6 +26,7 @@ import java.io.File;
  * @version $Revision$
  * @since 0.0.1
  */
+@SuppressWarnings({"HardCodedStringLiteral"})
 public class FindBugsPluginConstants {
 
 	public static final String LOCALE_RESOURCES_PKG = "org.twodividedbyzero.idea.findbugs.resources.i18n.Messages";

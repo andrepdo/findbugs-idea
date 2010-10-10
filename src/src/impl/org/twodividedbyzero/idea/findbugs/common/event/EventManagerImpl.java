@@ -42,13 +42,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @version $Revision$
  * @since 0.0.1
  */
+@SuppressWarnings({"RawUseOfParameterizedType", "HardCodedStringLiteral"})
 public class EventManagerImpl implements EventManager {
 
 	private static final Logger LOGGER = Logger.getInstance(EventManager.class.getName());
 
 	//protected LinkedBlockingQueue<Event> eventQueue = new LinkedBlockingQueue<Event>();
-	private static EventManager _instance = new EventManagerImpl();
-	private Map<EventType, Collection<MulticastEventFilter>> _eventFilters;
+	private static final EventManager _instance = new EventManagerImpl();
+	private final Map<EventType, Collection<MulticastEventFilter>> _eventFilters;
 
 
 	private EventManagerImpl() {
@@ -73,7 +74,7 @@ public class EventManagerImpl implements EventManager {
 	}
 
 
-	public void initialize() {
+	public final void initialize() {
 		for (final EventType eventType : EventType.values()) {
 			_eventFilters.put(eventType, new ConcurrentLinkedQueue<MulticastEventFilter>());
 		}
@@ -195,8 +196,8 @@ public class EventManagerImpl implements EventManager {
 
 	private static class MulticastEventFilter {
 
-		private EventListener<? extends Event> _eventListener;
-		private EventFilter<? extends Event> _eventFilter;
+		private final EventListener<? extends Event> _eventListener;
+		private final EventFilter<? extends Event> _eventFilter;
 
 
 		MulticastEventFilter(@NotNull final EventFilter<? extends Event> eventFilter, @NotNull final EventListener<? extends Event> eventListener) {
@@ -217,7 +218,7 @@ public class EventManagerImpl implements EventManager {
 
 		@Override
 		public boolean equals(final Object obj) {
-			return (obj instanceof MulticastEventFilter && ((MulticastEventFilter) obj).getEventListener().equals(_eventListener));
+			return obj instanceof MulticastEventFilter && ((MulticastEventFilter) obj).getEventListener().equals(_eventListener);
 		}
 
 

@@ -46,7 +46,7 @@ public class FindBugsInspectionPanel extends JPanel {
 	}
 
 
-	protected void initialize() {
+	void initialize() {
 		final ResourceBundle i18n = ResourcesLoader.getResourceBundle();
 
 

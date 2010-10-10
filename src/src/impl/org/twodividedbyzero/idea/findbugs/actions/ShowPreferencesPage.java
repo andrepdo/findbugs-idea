@@ -50,10 +50,6 @@ public class ShowPreferencesPage extends BaseAction implements EventListener<Bug
 	private boolean _running;
 
 
-	public ShowPreferencesPage() {
-	}
-
-
 	@Override
 	public void actionPerformed(final AnActionEvent e) {
 		_actionEvent = e;

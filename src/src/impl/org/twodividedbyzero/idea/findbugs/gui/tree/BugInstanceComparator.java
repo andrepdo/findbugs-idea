@@ -250,22 +250,23 @@ public class BugInstanceComparator {
 
 
 	public static Comparator<BugInstance> getBugInstanceComparator(final GroupBy groupBy) {
-		if (groupBy.equals(GroupBy.Class)) {
-			return getBugInstanceClassComparator();
-		} else if (groupBy.equals(GroupBy.Package)) {
-			return getBugInstancePackageComparator();
-		} else if (groupBy.equals(GroupBy.BugCategory)) {
-			return getBugInstanceCategoryComparator();
-		} else if (groupBy.equals(GroupBy.BugType)) {
-			return getBugInstanceTypeComparator();
-		} else if (groupBy.equals(GroupBy.BugShortDescription)) {
-			return getBugInstanceShortDescrComparator();
-		} else if (groupBy.equals(GroupBy.Priority)) {
-			return getBugInstancePriorityComparator();
-		} else if (groupBy.equals(GroupBy.BugRank)) {
-			return getBugInstanceBugRankComparator();
-		} else {
-			throw new IllegalArgumentException("Bad sort order: " + groupBy);
+		switch (groupBy) {
+			case Class:
+				return getBugInstanceClassComparator();
+			case Package:
+				return getBugInstancePackageComparator();
+			case BugCategory:
+				return getBugInstanceCategoryComparator();
+			case BugType:
+				return getBugInstanceTypeComparator();
+			case BugShortDescription:
+				return getBugInstanceShortDescrComparator();
+			case Priority:
+				return getBugInstancePriorityComparator();
+			case BugRank:
+				return getBugInstanceBugRankComparator();
+			default:
+				throw new IllegalArgumentException("Bad sort order: " + groupBy);
 		}
 	}
 

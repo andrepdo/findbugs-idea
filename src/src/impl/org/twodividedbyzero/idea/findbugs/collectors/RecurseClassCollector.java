@@ -34,6 +34,7 @@ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,6 +46,7 @@ import java.util.Set;
  * @version $Revision$
  * @since 0.0.1
  */
+@SuppressWarnings({"StringConcatenation", "DuplicateStringLiteralInspection"})
 public class RecurseClassCollector {
 
 	private static final Logger LOGGER = Logger.getInstance(RecurseClassCollector.class.getName());
@@ -334,7 +336,7 @@ public class RecurseClassCollector {
 	 * @return the collected full qualified class names and path in the file system
 	 */
 	public Set<String> getResult() {
-		return _classes;
+		return Collections.unmodifiableSet(_classes);
 	}
 
 
@@ -343,13 +345,13 @@ public class RecurseClassCollector {
 		private final PsiElement _psiElement;
 
 
-		public AnonymousClassPsiElementFilter(final PsiElement psiElement) {
+		private AnonymousClassPsiElementFilter(final PsiElement psiElement) {
 			_psiElement = psiElement;
 		}
 
 
 		public boolean isAccepted(final PsiElement e) {
-			return (e instanceof PsiAnonymousClass) && _psiElement.equals(PsiTreeUtil.getParentOfType(e, PsiClass.class));
+			return e instanceof PsiAnonymousClass && _psiElement.equals(PsiTreeUtil.getParentOfType(e, PsiClass.class));
 		}
 	}
 
@@ -358,13 +360,13 @@ public class RecurseClassCollector {
 		private final PsiElement _psiElement;
 
 
-		public InnerClassPsiElementFilter(final PsiElement psiElement) {
+		private InnerClassPsiElementFilter(final PsiElement psiElement) {
 			_psiElement = psiElement;
 		}
 
 
 		public boolean isAccepted(final PsiElement e) {
-			return (e instanceof PsiClass) && _psiElement.equals(PsiTreeUtil.getParentOfType(e, PsiClass.class));
+			return e instanceof PsiClass && _psiElement.equals(PsiTreeUtil.getParentOfType(e, PsiClass.class));
 		}
 	}
 }

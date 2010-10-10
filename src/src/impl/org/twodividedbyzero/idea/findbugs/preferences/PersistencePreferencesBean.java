@@ -29,19 +29,21 @@ import java.util.Map;
  * @version $Revision$
  * @since 0.9.90-dev
  */
+@SuppressWarnings({"FieldMayBeFinal"})
 public class PersistencePreferencesBean {
 
-	public Map<String, String> _basePreferences;
+	// do not make field final - initialized per reflection from intellij persistence framework
+	private Map<String, String> _basePreferences;
 
-	public Map<String, String> _detectors;
-	public Map<String, String> _reportCategories;
+	private Map<String, String> _detectors;
+	private Map<String, String> _reportCategories;
 
-	public List<String> _includeFilters;
-	public List<String> _excludeFilters;
-	public List<String> _excludeBaselineBugs;
-	public List<String> _plugins;
+	private List<String> _includeFilters;
+	private List<String> _excludeFilters;
+	private List<String> _excludeBaselineBugs;
+	private List<String> _plugins;
 
-	public List<String> _enabledModuleConfigs;
+	private List<String> _enabledModuleConfigs;
 
 
 	public PersistencePreferencesBean() {

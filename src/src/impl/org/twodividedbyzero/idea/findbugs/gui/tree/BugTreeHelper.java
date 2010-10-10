@@ -78,20 +78,19 @@ public class BugTreeHelper {
 
 		if (treeNode == null) {
 			return null;
-		} else {
-			if (treeNode instanceof BugInstanceNode) {
-				final BugInstanceNode node = (BugInstanceNode) treeNode;
-				if (node.getPsiFile() != null) {
-					return node.getPsiFile();
-				} else {
-					final PsiClass psiClass = IdeaUtilImpl.findJavaPsiClass(_project, node.getSourcePath());
-					LOGGER.debug("BugTreeHelper#getSeletedElement(" + _project + ", " + node.getSourcePath() + ")");
-					if (psiClass != null) {
-						LOGGER.debug("Found: psiClass (" + psiClass.getName() + ")");
-						psiElement = IdeaUtilImpl.getPsiFile(psiClass);
-						LOGGER.debug("BugTreeHelper - IdeaUtilImpl.getPsiFile(psiClass) - found - psiElement: [" + psiElement.getText() + "]");
-						node.setPsiFile((PsiFile) psiElement);
-					}
+		}
+		if (treeNode instanceof BugInstanceNode) {
+			final BugInstanceNode node = (BugInstanceNode) treeNode;
+			if (node.getPsiFile() != null) {
+				return node.getPsiFile();
+			} else {
+				final PsiClass psiClass = IdeaUtilImpl.findJavaPsiClass(_project, node.getSourcePath());
+				LOGGER.debug("BugTreeHelper#getSeletedElement(" + _project + ", " + node.getSourcePath() + ")");
+				if (psiClass != null) {
+					LOGGER.debug("Found: psiClass (" + psiClass.getName() + ")");
+					psiElement = IdeaUtilImpl.getPsiFile(psiClass);
+					LOGGER.debug("BugTreeHelper - IdeaUtilImpl.getPsiFile(psiClass) - found - psiElement: [" + psiElement.getText() + "]");
+					node.setPsiFile((PsiFile) psiElement);
 				}
 			}
 		}
@@ -160,10 +159,8 @@ public class BugTreeHelper {
 
 		final BugInstanceNode bugInstanceNode = findPreviousBugNode(treeNode, treepath, _tree.getModel());
 
-		final TreePath path;
-
 		if (bugInstanceNode != null) {
-			path = getPath(bugInstanceNode);
+			final TreePath path = getPath(bugInstanceNode);
 			_tree.setExpandsSelectedPaths(true);
 			_tree.setSelectionPath(path);
 			scrollPathToVisible(path);

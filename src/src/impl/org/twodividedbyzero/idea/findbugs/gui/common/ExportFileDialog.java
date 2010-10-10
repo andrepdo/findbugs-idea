@@ -54,19 +54,18 @@ import java.io.File;
 @SuppressWarnings({"HardCodedStringLiteral"})
 public class ExportFileDialog extends JPanel {
 
-	private JLabel _label;
-	private JTextField _path;
-	private JButton _browseButton;
+	private final JLabel _label;
+	private final JTextField _path;
+	private final JButton _browseButton;
 	private File _selectedFile;
 	private final transient DialogBuilder _dialogBuilder;
-	private JRadioButton _html;
-	private JRadioButton _xml;
+	private final JRadioButton _html;
+	private final JRadioButton _xml;
 
 
 	public ExportFileDialog(final String defaultValue, final DialogBuilder dialogBuilder) {
-		super();
 		setLayout(new GridBagLayout());
-		GridBagConstraints c = new GridBagConstraints();
+		final GridBagConstraints c = new GridBagConstraints();
 		c.gridy = 1;
 		c.insets = new Insets(5, 5, 5, 5);
 		c.anchor = GridBagConstraints.NORTHWEST;
@@ -105,7 +104,7 @@ public class ExportFileDialog extends JPanel {
 
 		_html = new JRadioButton("HTML", true);
 		_xml = new JRadioButton("XML", false);
-		ButtonGroup group = new ButtonGroup();
+		final ButtonGroup group = new ButtonGroup();
 		group.add(_html);
 		group.add(_xml);
 
@@ -148,7 +147,7 @@ public class ExportFileDialog extends JPanel {
 
 	private boolean validateDirectory(final Document doc) {
 		try {
-			return (_selectedFile != null && _selectedFile.isDirectory() && _selectedFile.canWrite()) || doc.getText(0, doc.getLength()).trim().length() > 0;
+			return _selectedFile != null && _selectedFile.isDirectory() && _selectedFile.canWrite() || doc.getText(0, doc.getLength()).trim().length() > 0;
 		} catch (BadLocationException ignore) {
 			return false;
 		}
@@ -157,7 +156,7 @@ public class ExportFileDialog extends JPanel {
 
 	private class MyDocumentAdapter extends DocumentAdapter {
 
-		public MyDocumentAdapter() {
+		private MyDocumentAdapter() {
 		}
 
 

@@ -45,20 +45,20 @@ public interface FindBugsPlugin extends Configurable, PersistentStateComponent<P
 	 *
 	 * @return the tool window panel.
 	 */
-	public ToolWindowPanel getToolWindowPanel();
+	ToolWindowPanel getToolWindowPanel();
 
-	public void activateToolWindow(boolean activate);
+	void activateToolWindow(boolean activate);
 
-	public String getInternalToolWindowId();
+	String getInternalToolWindowId();
 
-	public FindBugsPreferences getPreferences();
+	FindBugsPreferences getPreferences();
 
-	public Project getProject();
+	Project getProject();
 
 	@Nullable
-	public Module getModule();
+	Module getModule();
 
-	public boolean isModuleComponent();
+	boolean isModuleComponent();
 
-	public Map<PsiFile, List<ExtendedProblemDescriptor>> getProblems();
+	Map<PsiFile, List<ExtendedProblemDescriptor>> getProblems();
 }

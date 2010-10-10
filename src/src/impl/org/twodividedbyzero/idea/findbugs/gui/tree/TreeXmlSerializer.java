@@ -34,7 +34,7 @@ import java.io.IOException;
  * @version $Revision$
  * @since 0.9.29-dev
  */
-public class TreeXmlSerializer {
+class TreeXmlSerializer {
 
 	public static void write(final DefaultTreeModel model, final String filename) {
 		XMLEncoder encoder = null;

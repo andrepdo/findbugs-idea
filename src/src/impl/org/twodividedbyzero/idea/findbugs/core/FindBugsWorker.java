@@ -76,11 +76,11 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	protected static final Logger LOGGER = Logger.getInstance(FindBugsWorker.class.getName());
 
 	protected FindBugsProject _findBugsProject;
-	protected com.intellij.openapi.project.Project _project;
+	protected final com.intellij.openapi.project.Project _project;
 	protected UserPreferences _userPrefs;
 	protected BugReporter _bugReporter;
 	private CompilerManager _compilerManager;
-	protected boolean _startInBackground;
+	private final boolean _startInBackground;
 	private Module _module;
 	//private RecurseCollectorTask _collectorTask;
 
@@ -226,7 +226,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	}
 
 
-	public static void addCompileAfterTask(@NotNull final Project project, @NotNull final CompileTask afterTask) {
+	private static void addCompileAfterTask(@NotNull final Project project, @NotNull final CompileTask afterTask) {
 		final CompilerManager compilerManager = CompilerManager.getInstance(project);
 		//compilerManager.make();
 		compilerManager.addAfterTask(afterTask);
@@ -380,12 +380,12 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	}
 
 
-	protected void registerEventListner() {
+	void registerEventListner() {
 		EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(_project.getName()), this);
 	}
 
 
-	protected void unregisterEventListener() {
+	void unregisterEventListener() {
 		EventManagerImpl.getInstance().removeEventListener(this);
 	}
 

@@ -43,12 +43,10 @@ public class TreeNodeCellRenderer extends JLabel implements TreeCellRenderer {
 
 	/** Create a new cell renderer. */
 	public TreeNodeCellRenderer() {
-		super();
 		setOpaque(false);
 	}
 
 
-	/** {@inheritDoc} */
 	@Override
 	public void paintComponent(final Graphics g) {
 		g.setColor(getBackground());
@@ -58,18 +56,17 @@ public class TreeNodeCellRenderer extends JLabel implements TreeCellRenderer {
 			offset = getIcon().getIconWidth() + getIconTextGap();
 		}
 
-		g.fillRect(offset, 0, (getWidth() - 1 - offset), (getHeight() - 1));
+		g.fillRect(offset, 0, getWidth() - 1 - offset, getHeight() - 1);
 
 		if (_selected) {
 			g.setColor(UIManager.getColor("Tree.selectionBorderColor"));
-			g.drawRect(offset, 0, (getWidth() - 1 - offset), (getHeight() - 1));
+			g.drawRect(offset, 0, getWidth() - 1 - offset, getHeight() - 1);
 		}
 
 		super.paintComponent(g);
 	}
 
 
-	/** {@inheritDoc} */
 	public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
 		_selected = selected;
 

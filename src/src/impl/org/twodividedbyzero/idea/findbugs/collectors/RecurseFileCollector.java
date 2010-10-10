@@ -7,6 +7,7 @@ import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Collections;
 import java.util.Set;
 
 
@@ -62,6 +63,6 @@ public class RecurseFileCollector implements FileFilter {
 
 
 	public Set<String> getResult() {
-		return _classes;
+		return Collections.unmodifiableSet(_classes);
 	}
 }

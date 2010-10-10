@@ -33,32 +33,32 @@ import java.util.Set;
  */
 public interface EventManager {
 
-	public static final String NAME = "EventManager";
+	String NAME = "EventManager";
 
 
-	public void fireEvent(@NotNull final Event event);
+	void fireEvent(@NotNull final Event event);
 
 
-	public <T extends Event> void addEventListener(@NotNull final EventFilter<T> eventFilter, @NotNull EventListener<T> listener);
+	<T extends Event> void addEventListener(@NotNull final EventFilter<T> eventFilter, @NotNull EventListener<T> listener);
 
 
-	public void removeEventListener(@NotNull final EventListener<?> listener);
+	void removeEventListener(@NotNull final EventListener<?> listener);
 
 
-	public void removeEventListener(@NotNull final Project project);
+	void removeEventListener(@NotNull final Project project);
 
 
-	public void removeAllListeners();
+	void removeAllListeners();
 
 
-	public Set<EventListener<?>> getListeners();
+	Set<EventListener<?>> getListeners();
 
 
-	public boolean hasListeners(final Event event);
+	boolean hasListeners(final Event event);
 
 
-	public boolean hasListeners(final EventType type);
+	boolean hasListeners(final EventType type);
 
 
-	public boolean hasListener(@NotNull final EventFilter<?> eventFilter, @NotNull final EventListener<?> listener);
+	boolean hasListener(@NotNull final EventFilter<?> eventFilter, @NotNull final EventListener<?> listener);
 }

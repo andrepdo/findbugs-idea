@@ -50,7 +50,7 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	private ProblemDescriptor _problem;
 	private String _description;
 	private BugInstance _bugInstance;
-	private ArrayList<VisitableTreeNode> _childs;
+	private List<VisitableTreeNode> _childs;
 
 	private static final Icon _expandedIcon = new MaskIcon(ResourcesLoader.findIcon("/nodes/class.png", BugInstanceNode.class), Color.BLACK);
 	private static final Icon _collapsedIcon = _expandedIcon;
@@ -63,7 +63,6 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	 * @param parent	 the parent tree node
 	 */
 	public BugInstanceNode(final String simpleName, @Nullable final VisitableTreeNode parent) {
-		super();
 
 		//_parent = parent;
 		setParent(parent);
@@ -82,13 +81,12 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 
 
 	public BugInstanceNode(@Nullable final String simpleName, @NotNull final BugInstance bugInstance, @Nullable final VisitableTreeNode parent) {
-		super();
 
 		//_parent = parent;
 		setParent(parent);
 		_childs = new ArrayList<VisitableTreeNode>();
 		_bugInstance = bugInstance;
-		_simpleName = (simpleName == null ? bugInstance.getMessageWithoutPrefix() : simpleName);
+		_simpleName = simpleName == null ? bugInstance.getMessageWithoutPrefix() : simpleName;
 
 		setTooltip(_simpleName);
 		setCollapsedIcon(_collapsedIcon);
@@ -259,18 +257,15 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 
 	@Override
 	public String toString() {
-		final StringBuilder buf = new StringBuilder();
-		buf.append("<html><body>");
-		buf.append(_simpleName);
-		buf.append("</html></body>");
-
-
-		if (_simpleName != null && _problem == null) {
-			return buf.toString();
-		}
-
-
-		return _simpleName == null ? "null" : _simpleName;
+		final StringBuilder sb = new StringBuilder();
+		sb.append("BugInstanceNode");
+		sb.append("{_file=").append(_file);
+		sb.append(", _problem=").append(_problem);
+		sb.append(", _description='").append(_description).append('\'');
+		sb.append(", _bugInstance=").append(_bugInstance);
+		sb.append(", _childs=").append(_childs);
+		sb.append('}');
+		return sb.toString();
 	}
 
 

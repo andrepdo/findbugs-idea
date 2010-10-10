@@ -33,12 +33,12 @@ public enum AnalysisEffort {
 	DEFAULT(UserPreferences.EFFORT_DEFAULT, "Default", 20),
 	MAX(UserPreferences.EFFORT_MAX, "Maximal", 30);
 
-	private String _effortLevel;
-	private String _message;
-	private int _value;
+	private final String _effortLevel;
+	private final String _message;
+	private final int _value;
 
 
-	private AnalysisEffort(final String effortLevel, final String message, final int value) {
+	AnalysisEffort(final String effortLevel, final String message, final int value) {
 		_effortLevel = effortLevel;
 		_message = message;
 		_value = value;
@@ -62,7 +62,13 @@ public enum AnalysisEffort {
 
 	@Override
 	public String toString() {
-		return _message;
+		final StringBuilder sb = new StringBuilder();
+		sb.append("AnalysisEffort");
+		sb.append("{_effortLevel='").append(_effortLevel).append('\'');
+		sb.append(", _message='").append(_message).append('\'');
+		sb.append(", _value=").append(_value);
+		sb.append('}');
+		return sb.toString();
 	}
 
 

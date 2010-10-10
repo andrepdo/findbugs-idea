@@ -39,7 +39,7 @@ public class RecurseCollectorTask extends BackgroundableTask {
 	private static final Logger LOGGER = Logger.getInstance(FindBugsTask.class.getName());
 
 	private ProgressIndicator _indicator;
-	private FindBugsProject _findBugsProject;
+	private final FindBugsProject _findBugsProject;
 	private VirtualFile[] _auxClasspathEntries;
 	private VirtualFile[] _sourceDirectories;
 	private Project _project;

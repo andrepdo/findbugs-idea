@@ -30,7 +30,7 @@ import java.awt.Component;
  */
 public class ActionToolbarContainer extends AbstractBar {
 
-	private ActionToolbar _childBar;
+	private final ActionToolbar _childBar;
 	private int _orientation;
 
 
@@ -46,13 +46,13 @@ public class ActionToolbarContainer extends AbstractBar {
 
 
 	@Override
-	public Component add(final Component comp) {
+	public final Component add(final Component comp) {
 		return super.add(comp);
 	}
 
 
 	@Override
-	public void setOrientation(final int o) {
+	public final void setOrientation(final int o) {
 		super.setOrientation(o);
 
 		if (_orientation != o) {

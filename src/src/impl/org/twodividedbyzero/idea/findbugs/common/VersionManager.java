@@ -28,13 +28,14 @@ import java.io.IOException;
  * @version $Revision$
  * @since 0.0.1
  */
+@SuppressWarnings({"HardCodedStringLiteral", "UseOfSystemOutOrSystemErr", "StringConcatenation", "CallToPrintStackTrace", "CallToPrintStackTrace"})
 public class VersionManager {
 
-	public static final long _major = 0;
-	public static final long _minor = 9;
-	public static final long _build = 96;
+	private static final long _major = 0;
+	private static final long _minor = 9;
+	private static final long _build = 96;
 
-	public static final String _branch = "";
+	private static final String _branch = "";
 
 
 	private static final String NAME = "FindBugs-IDEA";
@@ -66,18 +67,20 @@ public class VersionManager {
 			}
 		}
 		REVISION = parsedRevision;
-		MAJOR_MINOR_BUILD_REVISION = MAJOR_MINOR_BUILD + ((REVISION == -1) ? "" : "." + REVISION);
+		MAJOR_MINOR_BUILD_REVISION = MAJOR_MINOR_BUILD + (REVISION == -1 ? "" : "." + REVISION);
 		FULL_VERSION_INTERNAL = NAME + " " + MAJOR_MINOR_BUILD_REVISION + ("".equals(_branch) ? "" : "-" + _branch);
 	}
 
 
-	/** e.g. "0.9.21". */
-	public static String getVersion() {
+	/** e.g. "0.9.21".
+	 * @return*/
+	private static String getVersion() {
 		return MAJOR_MINOR_BUILD;
 	}
 
 
-	/** e.g. "0.9.21.26427" if revision is available, else "0.9.21". */
+	/** e.g. "0.9.21.26427" if revision is available, else "0.9.21".
+	 * @return*/
 	public static String getVersionWithRevision() {
 		return MAJOR_MINOR_BUILD_REVISION;
 	}

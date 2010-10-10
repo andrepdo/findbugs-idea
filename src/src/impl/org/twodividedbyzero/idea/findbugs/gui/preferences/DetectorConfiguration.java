@@ -67,9 +67,10 @@ import java.util.TreeSet;
  * @version $Revision$
  * @since 0.9.90-dev
  */
+@SuppressWarnings({"HardCodedStringLiteral", "AnonymousInnerClass", "AnonymousInnerClassMayBeStatic"})
 public class DetectorConfiguration implements ConfigurationPage {
 
-	private FindBugsPreferences _preferences;
+	private final FindBugsPreferences _preferences;
 	private JTable _detectorsTable;
 	private Component _component;
 	private JTextArea _textArea;
@@ -80,7 +81,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 	private Map<DetectorFactory, String> _factoriesToBugAbbrev;
 	private JCheckBox _hiddenCheckbox;
 	private JCheckBox _enableAllCheckbox;
-	private ConfigurationPanel _parent;
+	private final ConfigurationPanel _parent;
 
 
 	public DetectorConfiguration(final ConfigurationPanel parent, final FindBugsPreferences preferences) {
@@ -245,7 +246,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 	}
 
 
-	public JTextArea getTextArea() {
+	JTextArea getTextArea() {
 		if (_textArea == null) {
 			_textArea = new JTextArea();
 			_textArea.setEditable(false);
@@ -307,7 +308,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 	}*/
 
 
-	public static String getDetailedText(final DetectorFactory factory) {
+	private static String getDetailedText(final DetectorFactory factory) {
 		if (factory == null) {
 			return "";
 		}
@@ -334,8 +335,10 @@ public class DetectorConfiguration implements ConfigurationPage {
 	/**
 	 * Tries to trim all the html out of the {@link DetectorFactory#getDetailHTML()}
 	 * return value. See also private PluginLoader .init() method.
+	 * @param factory
+	 * @return
 	 */
-	public static String getDescriptionWithoutHtml(final DetectorFactory factory) {
+	private static String getDescriptionWithoutHtml(final DetectorFactory factory) {
 		String detailHTML = factory.getDetailHTML();
 		// cut beginning and the end of the html document
 		detailHTML = trimHtml(detailHTML, "<BODY>", "</BODY>");
@@ -353,7 +356,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 	}
 
 
-	public static String trimHtml(final String detailHTML, final String startTag, final String endTag) {
+	private static String trimHtml(final String detailHTML, final String startTag, final String endTag) {
 		String detailHTML1 = detailHTML;
 		if (detailHTML1.contains(startTag)) {
 			detailHTML1 = detailHTML1.substring(detailHTML1.indexOf(startTag) + startTag.length());
@@ -448,7 +451,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 		private final FindBugsPreferences _preferences;
 
 
-		public ColorRenderer(final BugPatternTableModel model, final FindBugsPreferences preferences) {
+		private ColorRenderer(final BugPatternTableModel model, final FindBugsPreferences preferences) {
 			_model = model;
 			//noinspection AssignmentToCollectionOrArrayFieldFromParameter
 			_preferences = preferences;

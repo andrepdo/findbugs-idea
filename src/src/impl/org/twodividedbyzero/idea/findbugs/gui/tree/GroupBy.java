@@ -37,7 +37,7 @@ public enum GroupBy {
 	private final String _description;
 
 
-	private GroupBy(final String description) {
+	GroupBy(final String description) {
 		_description = description;
 	}
 
@@ -48,7 +48,7 @@ public enum GroupBy {
 
 
 	public static List<GroupBy> getGroupByList() {
-		final ArrayList<GroupBy> list = new ArrayList<GroupBy>();
+		final List<GroupBy> list = new ArrayList<GroupBy>();
 		list.addAll(Arrays.asList(GroupBy.values()));
 
 		return list;
@@ -62,12 +62,12 @@ public enum GroupBy {
 	
 
 	public static String getGroupName(final GroupBy groupBy, final BugInstance bugInstance) {
-		final String groupName;
 
 		if (!Locale.ENGLISH.equals(Locale.getDefault())) {
 			Locale.setDefault(Locale.ENGLISH);
 		}
 
+		final String groupName;
 		switch (groupBy) {
 
 			case BugCategory:

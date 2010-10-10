@@ -178,7 +178,7 @@ public class TableSorter extends AbstractTableModel {
 	}
 
 
-	public void setTableModel(final TableModel tableModel) {
+	public final void setTableModel(final TableModel tableModel) {
 		if (_tableModel != null) {
 			_tableModel.removeTableModelListener(_tableModelListener);
 		}
@@ -216,7 +216,7 @@ public class TableSorter extends AbstractTableModel {
 	}
 
 
-	public void setTableHeader(final JTableHeader tableHeader) {
+	public final void setTableHeader(final JTableHeader tableHeader) {
 		if (_tableHeader != null) {
 			_tableHeader.removeMouseListener(_mouseListener);
 			final TableCellRenderer defaultRenderer = _tableHeader.getDefaultRenderer();
@@ -233,7 +233,7 @@ public class TableSorter extends AbstractTableModel {
 
 
 	public boolean isSorting() {
-		return _sortingColumns.size() != 0;
+		return !_sortingColumns.isEmpty();
 	}
 
 
@@ -365,12 +365,12 @@ public class TableSorter extends AbstractTableModel {
 
 
 	public int getRowCount() {
-		return (_tableModel == null) ? 0 : _tableModel.getRowCount();
+		return _tableModel == null ? 0 : _tableModel.getRowCount();
 	}
 
 
 	public int getColumnCount() {
-		return (_tableModel == null) ? 0 : _tableModel.getColumnCount();
+		return _tableModel == null ? 0 : _tableModel.getColumnCount();
 	}
 
 
@@ -420,7 +420,7 @@ public class TableSorter extends AbstractTableModel {
 		private final int _modelIndex;
 
 
-		public Row(final int index) {
+		private Row(final int index) {
 			_modelIndex = index;
 		}
 
@@ -578,7 +578,7 @@ public class TableSorter extends AbstractTableModel {
 		private final int _priority;
 
 
-		public Arrow(final boolean descending, final int size, final int priority) {
+		private Arrow(final boolean descending, final int size, final int priority) {
 			_descending = descending;
 			_size = size;
 			_priority = priority;
@@ -634,7 +634,7 @@ public class TableSorter extends AbstractTableModel {
 		private final TableCellRenderer _tableCellRenderer;
 
 
-		public SortableHeaderRenderer(final TableCellRenderer tableCellRenderer) {
+		private SortableHeaderRenderer(final TableCellRenderer tableCellRenderer) {
 			_tableCellRenderer = tableCellRenderer;
 		}
 
@@ -657,14 +657,14 @@ public class TableSorter extends AbstractTableModel {
 		private final int _direction;
 
 
-		public Directive(final int column, final int direction) {
+		private Directive(final int column, final int direction) {
 			_column = column;
 			_direction = direction;
 		}
 	}
 
 
-	public static interface TableColumnComparator<T> extends Comparator<T> {
+	public interface TableColumnComparator<T> extends Comparator<T> {
 
 		int compare(int column, T o1, T o2);
 	}

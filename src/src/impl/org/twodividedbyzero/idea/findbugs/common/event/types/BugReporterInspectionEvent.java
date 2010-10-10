@@ -33,7 +33,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.Event;
  */
 public interface BugReporterInspectionEvent extends Event {
 
-	public enum Operation {
+	enum Operation {
 
 		ANALYSIS_STARTED,
 		ANALYSIS_ABORTED,
@@ -42,22 +42,22 @@ public interface BugReporterInspectionEvent extends Event {
 	}
 
 	@NotNull
-	public Operation getOperation();
+	Operation getOperation();
 
 
 	@Nullable
-	public BugInstance getBugInstance();
+	BugInstance getBugInstance();
 
 
-	public Integer getBugCount();
-
-
-	@Nullable
-	public BugCollection getBugCollection();
+	Integer getBugCount();
 
 
 	@Nullable
-	public ProjectStats getProjectStats();
+	BugCollection getBugCollection();
+
+
+	@Nullable
+	ProjectStats getProjectStats();
 
 	/**
 	 * The Intellij-IDEA project name.
@@ -65,6 +65,6 @@ public interface BugReporterInspectionEvent extends Event {
 	 * @return the project name or empty string for all projects
 	 */
 	@NotNull
-	public String getProjectName();
+	String getProjectName();
 }
 

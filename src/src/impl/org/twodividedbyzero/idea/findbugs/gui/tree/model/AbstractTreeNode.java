@@ -93,22 +93,22 @@ public abstract class AbstractTreeNode<T extends VisitableTreeNode & TreeNode> e
 	}
 
 
-	public void setParent(final T parent) {
+	void setParent(final T parent) {
 		_parent = parent;
 	}
 
 
-	public void setExpandedIcon(final Icon expandedIcon) {
+	void setExpandedIcon(final Icon expandedIcon) {
 		_expandedIcon = expandedIcon;
 	}
 
 
-	public void setCollapsedIcon(final Icon collapsedIcon) {
+	void setCollapsedIcon(final Icon collapsedIcon) {
 		_collapsedIcon = collapsedIcon;
 	}
 
 
-	public void setTooltip(final String tooltip) {
+	void setTooltip(final String tooltip) {
 		_tooltip = tooltip;
 	}
 

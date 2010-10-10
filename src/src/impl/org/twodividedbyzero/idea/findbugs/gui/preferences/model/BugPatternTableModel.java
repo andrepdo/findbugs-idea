@@ -124,7 +124,7 @@ public class BugPatternTableModel extends AbstractTableModel {
 	}
 
 
-	public void remove(final Collection<DetectorFactory> entries) {
+	void remove(final Collection<DetectorFactory> entries) {
 		synchronized (_guardedLock) {
 			if (!entries.isEmpty()) {
 				_entries.removeAll(entries);
@@ -135,7 +135,7 @@ public class BugPatternTableModel extends AbstractTableModel {
 	}
 
 
-	public void remove(final int[] rows) {
+	void remove(final int[] rows) {
 		final Collection<DetectorFactory> result = new ArrayList<DetectorFactory>();
 		synchronized (_guardedLock) {
 			for (final int row : rows) {
@@ -162,7 +162,7 @@ public class BugPatternTableModel extends AbstractTableModel {
 	}
 
 
-	public int[] getCheckedRows() {
+	int[] getCheckedRows() {
 		synchronized (_guardedLock) {
 			final int[] result = new int[_entries.size()];
 			for (int i = 0; i < _entries.size(); i++) {

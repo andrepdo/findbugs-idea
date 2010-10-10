@@ -28,7 +28,7 @@ import java.io.Serializable;
  */
 public interface Event extends Serializable {
 
-	public enum EventType {
+	enum EventType {
 
 		EVENT_MANAGER,
 		FINDBUGS,
@@ -38,7 +38,7 @@ public interface Event extends Serializable {
 	}
 
 
-	public EventType getType();
+	EventType getType();
 
 	//public String getDescription();
 }

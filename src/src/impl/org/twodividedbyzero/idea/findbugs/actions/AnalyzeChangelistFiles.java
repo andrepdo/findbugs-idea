@@ -64,11 +64,6 @@ public class AnalyzeChangelistFiles extends BaseAction implements EventListener<
 	private ChangeListAdapter _changelistAdapter;
 
 
-	public AnalyzeChangelistFiles() {
-		//EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(IdeaUtilImpl.getProject().getName()), this);
-	}
-
-
 	@Override
 	public void actionPerformed(final AnActionEvent e) {
 		_actionEvent = e;

@@ -69,7 +69,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 	private final SortedBugCollection _bugCollection;
 
 	private int _pass = -1;
-	private int _filteredBugCount = 0;
+	private int _filteredBugCount;
 	private FindBugsTask _findBugsTask;
 	private int _count;
 	private int _goal;
@@ -92,7 +92,6 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 
 
 	public BugReporter(final Project project, final boolean isInspectionRun) {
-		super();
 		//this.monitor = monitor;
 		_project = project;
 		_preferences = IdeaUtilImpl.getPluginComponent(project).getPreferences();
@@ -144,12 +143,11 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 	}
 
 
-	/** @see edu.umd.cs.findbugs.AbstractBugReporter#reportQueuedErrors() */
 	@Override
 	public void reportQueuedErrors() {
 		// Report unique errors in order of their sequence
 		final List<Error> errorList = new ArrayList<Error>(getQueuedErrors());
-		if (errorList.size() > 0) {
+		if (!errorList.isEmpty()) {
 			Collections.sort(errorList, new QueuedErrorsComparator());
 
 			final Map<String, Map<String, Throwable>> status = new HashMap<String, Map<String, Throwable>>();
@@ -166,7 +164,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 		}
 
 		final Set<String> missingClasses = getMissingClasses();
-		if (missingClasses.size() > 0) {
+		if (!missingClasses.isEmpty()) {
 			final Map<String, Map<String, Throwable>> status = new HashMap<String, Map<String, Throwable>>();
 			final String key = "The following classes needed for FindBugs analysis were missing:";
 			status.put(key, new HashMap<String, Throwable>());

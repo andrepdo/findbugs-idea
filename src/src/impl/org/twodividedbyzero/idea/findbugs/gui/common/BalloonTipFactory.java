@@ -49,10 +49,10 @@ public class BalloonTipFactory {
 		ABOVE(Balloon.Position.above),
 		BELOW(Balloon.Position.below);
 
-		private Balloon.Position _orientation;
+		private final Balloon.Position _orientation;
 
 
-		private Orientation(final Position orientation) {
+		Orientation(final Position orientation) {
 			_orientation = orientation;
 		}
 

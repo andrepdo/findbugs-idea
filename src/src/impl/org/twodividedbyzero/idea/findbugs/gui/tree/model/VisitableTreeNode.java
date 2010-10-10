@@ -31,10 +31,10 @@ import java.util.Collection;
  */
 public interface VisitableTreeNode extends TreeNode {
 
-	public void accept(NodeVisitor<? extends VisitableTreeNode> visitor);
+	void accept(NodeVisitor<? extends VisitableTreeNode> visitor);
 
-	public Collection<? extends VisitableTreeNode> getChildsList();
+	Collection<? extends VisitableTreeNode> getChildsList();
 
-	public AbstractTreeNode<VisitableTreeNode> getTreeNode();
+	AbstractTreeNode<VisitableTreeNode> getTreeNode();
 
 }

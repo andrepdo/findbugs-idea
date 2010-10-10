@@ -46,7 +46,7 @@ public class IOHandler extends InputStream {
 	}
 
 
-	public IOHandler(final String name, final InputStream delegate) {
+	private IOHandler(final String name, final InputStream delegate) {
 		_name = name;
 		_delegate = delegate;
 	}
@@ -107,7 +107,7 @@ public class IOHandler extends InputStream {
 	}
 
 
-	public long copyTo(final File dest) throws IOException {
+	long copyTo(final File dest) throws IOException {
 		File dest1 = dest;
 		if (dest1.isDirectory()) {
 			dest1 = new File(dest1, _name);
@@ -121,7 +121,7 @@ public class IOHandler extends InputStream {
 	}
 
 
-	public long copyTo(final OutputStream out) throws IOException {
+	long copyTo(final OutputStream out) throws IOException {
 		_outputStream = out;
 		long total = 0;
 		final byte[] buffer = new byte[_bufferSize];
@@ -169,7 +169,7 @@ public class IOHandler extends InputStream {
 	}
 
 
-	public void closeInput() {
+	void closeInput() {
 		try {
 			close();
 		} catch (IOException ignore) {
@@ -177,7 +177,7 @@ public class IOHandler extends InputStream {
 	}
 
 
-	public void closeOutput() {
+	void closeOutput() {
 		try {
 			_outputStream.close();
 		} catch (IOException ignore) {

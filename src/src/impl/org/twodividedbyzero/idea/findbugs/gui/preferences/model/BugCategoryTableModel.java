@@ -283,8 +283,8 @@ public class BugCategoryTableModel extends AbstractTableModel {
 
 	public static class BugCategory {
 
-		private String _name;
-		private String _description;
+		private final String _name;
+		private final String _description;
 		private boolean _enabled;
 
 

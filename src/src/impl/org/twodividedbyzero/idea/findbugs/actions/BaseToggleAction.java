@@ -51,10 +51,9 @@ public abstract class BaseToggleAction extends ToggleAction {
 
 	protected boolean _enabled;
 	protected boolean _running;
-	private Set<String> _registeredProjects = new HashSet<String>();
+	private final Set<String> _registeredProjects = new HashSet<String>();
 
 
-	/** {@inheritDoc} */
 	@Override
 	public final void update(final AnActionEvent event) {
 		try {

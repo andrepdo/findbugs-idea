@@ -49,7 +49,6 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 	 * @param depth	   the category depth from root category
 	 */
 	public BugInstanceGroupNode(final GroupBy groupBy, final String groupName, final VisitableTreeNode parent, final BugInstance bugInstance, final int depth) {
-		super();
 
 		//_parent = parent;
 		setParent(parent);
@@ -77,7 +76,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 
 			incrementMemberCount();
 			TreeNode treeNode = getParent();
-			while ((treeNode != null) && (treeNode instanceof BugInstanceGroupNode)) {
+			while (treeNode != null && treeNode instanceof BugInstanceGroupNode) {
 				((BugInstanceGroupNode) treeNode).incrementMemberCount();
 				treeNode = treeNode.getParent();
 			}
@@ -96,12 +95,12 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 	@Deprecated
 	@Nullable
 	public BugInstanceGroupNode getChildByGroupName(final String groupName, final int depth) {
-		BugInstanceGroupNode resultNode = null;
 
 		if (groupName.equals(_groupName) && depth == _depthFromRoot) {
 			return this;
 		}
 
+		BugInstanceGroupNode resultNode = null;
 		for (final TreeNode node : _childs) {
 			if (node instanceof BugInstanceGroupNode) {
 				final BugInstanceGroupNode groupNode = (BugInstanceGroupNode) node;
@@ -225,7 +224,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 	}
 
 
-	public String[] getPath(final int depth) {
+	String[] getPath(final int depth) {
 		final List<String> path = _getPath();
 		final String[] result = new String[depth];
 
@@ -275,7 +274,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 	}
 
 
-	public void incrementMemberCount() {
+	void incrementMemberCount() {
 		++_memberCount;
 	}
 
@@ -342,10 +341,10 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 
 
 	private String getToString(final GroupBy groupBy) {
-		final String toString;
 		final StringBuilder buf = new StringBuilder();
 		buf.append("<html><body>");
 
+		final String toString;
 		switch (groupBy) {
 
 			case BugCategory:
@@ -358,7 +357,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 				}
 				buf.append("<font color='gray'>");
 				buf.append(" (");
-				buf.append(_memberCount).append((_memberCount > 1) || (_memberCount == 0) ? " items" : " item");
+				buf.append(_memberCount).append(_memberCount > 1 || _memberCount == 0 ? " items" : " item");
 				buf.append(")");
 				buf.append("</font>");
 				toString = buf.toString();
@@ -371,7 +370,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 				buf.append("</b>");
 				buf.append("<font color='gray'>");
 				buf.append(" (");
-				buf.append(_memberCount).append((_memberCount > 1) || (_memberCount == 0) ? " items" : " item");
+				buf.append(_memberCount).append(_memberCount > 1 || _memberCount == 0 ? " items" : " item");
 				buf.append(")");
 				buf.append("</font>");
 				toString = buf.toString();
@@ -380,7 +379,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 				buf.append(_groupName);
 				buf.append("<font color='gray'>");
 				buf.append(" (");
-				buf.append(_memberCount).append((_memberCount > 1) || (_memberCount == 0) ? " items" : " item");
+				buf.append(_memberCount).append(_memberCount > 1 || _memberCount == 0 ? " items" : " item");
 				buf.append(")");
 				buf.append("</font>");
 				toString = buf.toString();
@@ -394,7 +393,13 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 
 	@Override
 	public String toString() {
-		return getToString(_groupBy);
+		final StringBuilder sb = new StringBuilder();
+		sb.append("BugInstanceGroupNode");
+		sb.append("{_childs=").append(_childs);
+		sb.append(", _bugInstance=").append(_bugInstance);
+		sb.append(", _recurseNodeVisitor=").append(_recurseNodeVisitor);
+		sb.append('}');
+		return sb.toString();
 	}
 
 

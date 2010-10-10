@@ -41,13 +41,12 @@ import java.util.List;
  */
 public class TreeQuickSearch extends QuickSearch<AbstractTreeNode<VisitableTreeNode>> implements TreeModelListener {
 
-	private static TreeQuickSearch _instance = new TreeQuickSearch();
+	private static final TreeQuickSearch _instance = new TreeQuickSearch();
 	private JTree _tree;
 	private List<TreePath> _elementsCache;
 
 
 	private TreeQuickSearch() {
-		super();
 	}
 
 
@@ -103,7 +102,7 @@ public class TreeQuickSearch extends QuickSearch<AbstractTreeNode<VisitableTreeN
 	}
 
 
-	protected void buildElementsCache() {
+	void buildElementsCache() {
 		_elementsCache = new ArrayList<TreePath>();
 		final Object root = _tree.getModel().getRoot();
 		_buildElementsCache(root, new TreePath(root), _tree.getModel());

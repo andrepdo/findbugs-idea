@@ -33,8 +33,8 @@ import java.awt.Rectangle;
  */
 public abstract class Tree extends JTree {
 
-	private TreePath _highlightPath = null;
-	private Color _highlightColor = new Color(255, 255, 204);
+	private TreePath _highlightPath;
+	private final Color _highlightColor = new Color(255, 255, 204);
 
 
 	public Tree(final TreeModel treeModel) {

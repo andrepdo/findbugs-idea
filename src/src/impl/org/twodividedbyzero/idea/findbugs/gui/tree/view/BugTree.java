@@ -80,7 +80,7 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 	}
 
 
-	public void init() {
+	public final void init() {
 
 		_treeHelper = BugTreeHelper.create(this, _project);
 
@@ -150,12 +150,10 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 
 		@SuppressWarnings({"unchecked"})
 		final AbstractTreeNode<VisitableTreeNode> treeNode = (AbstractTreeNode<VisitableTreeNode>) treepath.getLastPathComponent();
-		final BugInstanceNode node;
 		if (!(treeNode instanceof BugInstanceNode)) {
 			return null;
-		} else {
-			node = (BugInstanceNode) treeNode;
 		}
+		final BugInstanceNode node = (BugInstanceNode) treeNode;
 
 		if ("virtualFile".equals(s)) {
 			final PsiFile psiFile = _treeHelper.getSelectedFile();
@@ -182,7 +180,7 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 			final PsiFile psiFile = _treeHelper.getSelectedFile();
 			if (psiFile != null) {
 				LOGGER.debug("PsiFile: " + psiFile);
-				return (new VirtualFile[] {psiFile.getVirtualFile()});
+				return new VirtualFile[] {psiFile.getVirtualFile()};
 			} else {
 				return VirtualFile.EMPTY_ARRAY;
 			}

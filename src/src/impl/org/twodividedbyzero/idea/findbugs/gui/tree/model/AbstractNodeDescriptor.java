@@ -31,15 +31,15 @@ import javax.swing.Icon;
  */
 public abstract class AbstractNodeDescriptor<E> {
 
-	protected GroupBy _groupBy;
-	protected int _depthFromRoot;
-	protected String _simpleName;
-	protected String _groupName;
-	protected int _memberCount; // todo: ??? needed ???
-	protected String _tooltip;
+	GroupBy _groupBy;
+	int _depthFromRoot;
+	String _simpleName;
+	String _groupName;
+	int _memberCount; // todo: ??? needed ???
+	String _tooltip;
 
-	protected Icon _expandedIcon = GuiResources.TREENODE_OPEN_ICON;
-	protected Icon _collapsedIcon = GuiResources.TREENODE_CLOSED_ICON;
+	Icon _expandedIcon = GuiResources.TREENODE_OPEN_ICON;
+	Icon _collapsedIcon = GuiResources.TREENODE_CLOSED_ICON;
 
 
 	public final GroupBy getGroupBy() {

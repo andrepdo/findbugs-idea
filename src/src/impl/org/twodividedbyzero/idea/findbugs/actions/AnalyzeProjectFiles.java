@@ -40,11 +40,6 @@ public class AnalyzeProjectFiles extends BaseAction implements EventListener<Bug
 	private boolean _running;
 
 
-	public AnalyzeProjectFiles() {
-		//EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(IdeaUtilImpl.getProject().getName()), this);
-	}
-
-
 	@Override
 	public void actionPerformed(final AnActionEvent e) {
 		_actionEvent = e;
@@ -97,7 +92,7 @@ public class AnalyzeProjectFiles extends BaseAction implements EventListener<Bug
 
 			// enable ?
 			if (!_running) {
-				_enabled = ((project != null) && project.isInitialized() && project.isInitialized());
+				_enabled = project != null && project.isInitialized() && project.isInitialized();
 			}
 			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
 			presentation.setVisible(true);

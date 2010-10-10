@@ -71,7 +71,6 @@ public class ToolBarButton extends ToggleableButton {
 
 
 	public ToolBarButton(@Nullable final Action action, final Icon icon, final boolean decorateEmpty) {
-		super();
 		if (action != null) {
 			setAction(action);
 		}
@@ -109,7 +108,7 @@ public class ToolBarButton extends ToggleableButton {
 
 
 	@Override
-	public void setIcon(final Icon icon) {
+	public final void setIcon(final Icon icon) {
 		_icon = icon;
 		_selectedIcon = icon;
 
@@ -169,8 +168,7 @@ public class ToolBarButton extends ToggleableButton {
 		if (_imageSize != null) {
 			return _imageSize;
 		}
-		final Icon icon;
-		icon = ResourcesLoader.loadIcon("actions/button-empty.png");
+		final Icon icon = ResourcesLoader.loadIcon("actions/button-empty.png");
 
 		return setIconSize(icon.getIconWidth(), icon.getIconHeight());
 	}
@@ -221,12 +219,12 @@ public class ToolBarButton extends ToggleableButton {
 		private boolean _disabledOpacity;
 
 
-		public ButtonIcon(final Dimension dimension, final Icon... icons) {
+		private ButtonIcon(final Dimension dimension, final Icon... icons) {
 			this(false, dimension, icons);
 		}
 
 
-		public ButtonIcon(final boolean disabledOpacity, final Dimension dimension, final Icon... icons) {
+		private ButtonIcon(final boolean disabledOpacity, final Dimension dimension, final Icon... icons) {
 			_disabledOpacity = disabledOpacity;
 			_icons = icons;
 			_maxWidth = (int) dimension.getWidth();

@@ -57,14 +57,6 @@ public class AnalyzeCurrentEditorFile extends BaseAction implements EventListene
 	private boolean _running;
 
 
-	public AnalyzeCurrentEditorFile() {
-		//final Presentation presentation = ActionManager.getInstance().getAction(FindBugsPluginConstants.CURRENT_FILE_ACTION).getTemplatePresentation();
-		//getTemplatePresentation().setText("123");
-		//getTemplatePresentation().setDescription("12345");
-		//getTemplatePresentation().setIcon(presentation.getIcon());
-	}
-
-
 	@Override
 	public void actionPerformed(final AnActionEvent e) {
 		_actionEvent = e;
@@ -118,7 +110,7 @@ public class AnalyzeCurrentEditorFile extends BaseAction implements EventListene
 			final VirtualFile[] selectedSourceFiles = IdeaUtilImpl.getVirtualFiles(_dataContext);
 
 			if (!_running) {
-				_enabled = (selectedSourceFiles != null) && (selectedSourceFiles.length > 0) && selectedSourceFiles[0].isValid() && IdeaUtilImpl.isValidFileType(selectedSourceFiles[0].getFileType());
+				_enabled = selectedSourceFiles != null && selectedSourceFiles.length > 0 && selectedSourceFiles[0].isValid() && IdeaUtilImpl.isValidFileType(selectedSourceFiles[0].getFileType());
 			}
 
 			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());

@@ -99,11 +99,11 @@ import java.beans.PropertyChangeListener;
 public final class ViewTooltips extends MouseAdapter implements MouseMotionListener {
 
 	/** The default instance, reference counted */
-	private static ViewTooltips INSTANCE = null;
+	private static ViewTooltips INSTANCE;
 	/** A reference count for number of comps listened to */
-	private int refcount = 0;
+	private int refcount;
 	/** The last known component we were invoked against, nulled on hide() */
-	private JComponent inner = null;
+	private JComponent inner;
 	/** The last row we were invoked against */
 	private int row = -1;
 	/** An array of currently visible popups */
@@ -302,7 +302,7 @@ public final class ViewTooltips extends MouseAdapter implements MouseMotionListe
 		final boolean compChanged = inner != this.inner;
 		this.inner = inner;
 		this.row = row;
-		return (rowChanged || compChanged);
+		return rowChanged || compChanged;
 	}
 
 
@@ -377,19 +377,19 @@ public final class ViewTooltips extends MouseAdapter implements MouseMotionListe
 	 * @bds The cell's bounds, in the coordinate space of the tree or list
 	 * @vis The visible area of the tree or list, in the tree or list's coordinate space
 	 */
-	private static final Rectangle[] getRects(final Rectangle bds, final Rectangle vis) {
+	private static Rectangle[] getRects(final Rectangle bds, final Rectangle vis) {
 		final Rectangle[] result;
 		if (vis.contains(bds)) {
 			result = new Rectangle[0];
 		} else {
 			if (bds.x < vis.x && bds.x + bds.width > vis.x + vis.width) {
 				final Rectangle a = new Rectangle(bds.x, bds.y, vis.x - bds.x, bds.height);
-				final Rectangle b = new Rectangle(vis.x + vis.width, bds.y, (bds.x + bds.width) - (vis.x + vis.width), bds.height);
+				final Rectangle b = new Rectangle(vis.x + vis.width, bds.y, bds.x + bds.width - (vis.x + vis.width), bds.height);
 				result = new Rectangle[] {a, b};
 			} else if (bds.x < vis.x) {
 				result = new Rectangle[] {new Rectangle(bds.x, bds.y, vis.x - bds.x, bds.height)};
 			} else if (bds.x + bds.width > vis.x + vis.width) {
-				result = new Rectangle[] {new Rectangle(vis.x + vis.width, bds.y, (bds.x + bds.width) - (vis.x + vis.width), bds.height)};
+				result = new Rectangle[] {new Rectangle(vis.x + vis.width, bds.y, bds.x + bds.width - (vis.x + vis.width), bds.height)};
 			} else {
 				result = new Rectangle[0];
 			}
@@ -464,7 +464,7 @@ public final class ViewTooltips extends MouseAdapter implements MouseMotionListe
 	}
 
 
-	private Hider hider = null;
+	private Hider hider;
 
 
 	/**
@@ -500,15 +500,15 @@ public final class ViewTooltips extends MouseAdapter implements MouseMotionListe
 	private static final class ImgComp extends JComponent {
 
 		private transient BufferedImage img;
-		private Dimension d = null;
+		private Dimension d;
 
 		private Color bg = Color.WHITE;
-		private JScrollPane comp = null;
+		private JScrollPane comp;
 
-		private Object node = null;
+		private Object node;
 
 		private AffineTransform at = AffineTransform.getTranslateInstance(0d, 0d);
-		boolean isRight = false;
+		boolean isRight;
 
 
 		ImgComp() {
@@ -550,13 +550,12 @@ public final class ViewTooltips extends MouseAdapter implements MouseMotionListe
 		public boolean configure(final Object nd, final JScrollPane tv, final JTree tree, final TreePath path, final int row) {
 			//final boolean sameVn = setLastRendereredObject(nd);
 			//final boolean sameComp = setLastRenderedScrollPane(tv);
-			Component renderer;
 			bg = tree.getBackground();
 			final boolean sel = tree.isSelectionEmpty() ? false : tree.getSelectionModel().isPathSelected(path);
 			final boolean exp = tree.isExpanded(path);
 			final boolean leaf = !exp && tree.getModel().isLeaf(nd);
 			final boolean lead = path.equals(tree.getSelectionModel().getLeadSelectionPath());
-			renderer = tree.getCellRenderer().getTreeCellRendererComponent(tree, nd, sel, exp, leaf, row, lead);
+			final Component renderer = tree.getCellRenderer().getTreeCellRendererComponent(tree, nd, sel, exp, leaf, row, lead);
 			if (renderer != null) {
 				setComponent(renderer);
 			}
@@ -577,10 +576,9 @@ public final class ViewTooltips extends MouseAdapter implements MouseMotionListe
 		public boolean configure(final Object nd, final JScrollPane tv, final JList list, final int row) {
 			//final boolean sameVn = setLastRendereredObject(nd);
 			//final boolean sameComp = setLastRenderedScrollPane(tv);
-			Component renderer = null;
 			bg = list.getBackground();
 			final boolean sel = list.isSelectionEmpty() ? false : list.getSelectionModel().isSelectedIndex(row);
-			renderer = list.getCellRenderer().getListCellRendererComponent(list, nd, row, sel, false);
+			final Component renderer = list.getCellRenderer().getListCellRendererComponent(list, nd, row, sel, false);
 			if (renderer != null) {
 				setComponent(renderer);
 			}
@@ -690,13 +688,13 @@ public final class ViewTooltips extends MouseAdapter implements MouseMotionListe
 		@edu.umd.cs.findbugs.annotations.SuppressWarnings(
 				value = "BC_UNCONFIRMED_CAST",
 				justification = "")
-		public Hider(final JComponent comp, final JScrollPane pane) {
+		private Hider(final JComponent comp, final JScrollPane pane) {
 			if (comp instanceof JTree) {
-				this.tree = (JTree) comp;
-				this.list = null;
+				tree = (JTree) comp;
+				list = null;
 			} else {
-				this.list = (JList) comp;
-				this.tree = null;
+				list = (JList) comp;
+				tree = null;
 			}
 			assert tree != null || list != null;
 			this.pane = pane;
@@ -729,7 +727,7 @@ public final class ViewTooltips extends MouseAdapter implements MouseMotionListe
 		}
 
 
-		private boolean detached = false;
+		private boolean detached;
 
 
 		private void detach() {

@@ -16,6 +16,9 @@
  */
 package org.twodividedbyzero.idea.findbugs.common.annotations;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.LOCAL_VARIABLE;
@@ -23,9 +26,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PACKAGE;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE;
-import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.CLASS;
-import java.lang.annotation.Target;
 
 
 /**
@@ -53,6 +54,7 @@ public @interface SuppressWarnings {
 	 * <p>Compiler vendors should document the warning names they support in
 	 * conjunction with this annotation type. They are encouraged to cooperate
 	 * to ensure that the same names work across multiple compilers.
+	 * @return
 	 */
 	String[] value() default {};
 

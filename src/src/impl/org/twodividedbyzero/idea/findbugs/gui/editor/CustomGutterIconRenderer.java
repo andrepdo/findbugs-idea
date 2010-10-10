@@ -61,7 +61,7 @@ class CustomGutterIconRenderer extends com.intellij.openapi.editor.markup.Gutter
 	private final EditorHandler _editorHandler;
 
 
-	public CustomGutterIconRenderer(final EditorHandler editorHandler, final Integer lineStart) {
+	CustomGutterIconRenderer(final EditorHandler editorHandler, final Integer lineStart) {
 		_editorHandler = editorHandler;
 		_lineStart = lineStart;
 
@@ -96,7 +96,7 @@ class CustomGutterIconRenderer extends com.intellij.openapi.editor.markup.Gutter
 
 	public void addProblem(@NotNull final ExtendedProblemDescriptor problem, @NotNull final RangeMarker marker) {
 		_problems.put(problem, marker);
-		_fullySynchronized = ((_fullySynchronized) && (_editorHandler.isSynchronized(problem, marker)));
+		_fullySynchronized = _fullySynchronized && _editorHandler.isSynchronized(problem, marker);
 	}
 
 
@@ -222,7 +222,7 @@ class CustomGutterIconRenderer extends com.intellij.openapi.editor.markup.Gutter
 		private final AnActionEvent _e;
 
 
-		public MyDataContext(final AnActionEvent e) {
+		private MyDataContext(final AnActionEvent e) {
 			_e = e;
 		}
 
@@ -237,7 +237,7 @@ class CustomGutterIconRenderer extends com.intellij.openapi.editor.markup.Gutter
 		private final AnAction _templateAction;
 
 
-		public ActionProxy(final AnAction templateAction) {
+		private ActionProxy(final AnAction templateAction) {
 			_templateAction = templateAction;
 		}
 

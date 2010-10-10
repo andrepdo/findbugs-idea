@@ -32,11 +32,12 @@ import java.util.List;
  * @version $Revision$
  * @since 0.0.1
  */
-public class Grouper<T> {
+@SuppressWarnings({"UseOfSystemOutOrSystemErr"})
+class Grouper<T> {
 
 	public interface GrouperCallback<E> {
 
-		public void startGroup(E firstMember, int depth);
+		void startGroup(E firstMember, int depth);
 
 		/**
 		 * Start a new sub group.
@@ -45,13 +46,13 @@ public class Grouper<T> {
 		 * @param member the member to compare at index (depth)
 		 * @param parent
 		 */
-		public void startSubGroup(int depth, E member, E parent);
+		void startSubGroup(int depth, E member, E parent);
 
-		public void addToGroup(int depth, E member, E parent);
+		void addToGroup(int depth, E member, E parent);
 
-		public List<E> availableGroups(int depth, E member);
+		List<E> availableGroups(int depth, E member);
 
-		public Comparator<E> currentGroupComparatorChain(int depth);
+		Comparator<E> currentGroupComparatorChain(int depth);
 	}
 
 	private static final Logger LOGGER = Logger.getInstance(Grouper.class.getName());
@@ -64,7 +65,7 @@ public class Grouper<T> {
 	 *
 	 * @param callback the callback which receives the groups and elements
 	 */
-	public Grouper(final GrouperCallback<T> callback) {
+	Grouper(final GrouperCallback<T> callback) {
 		_callback = callback;
 	}
 
@@ -83,7 +84,6 @@ public class Grouper<T> {
 	public synchronized void group(final T comparable, final List<Comparator<T>> comparators) {
 
 		int depth = -1;
-		int parentIndex = -1;
 		int index = -1;
 		int j = 0;
 
@@ -126,6 +126,7 @@ public class Grouper<T> {
 					System.err.println("Type: " + I18N.instance().getBugTypeDescription(((BugInstance) comparable).getBugPattern().getAbbrev()));
 					System.err.println("Short: " + ((BugInstance) comparable).getBugPattern().getShortDescription());*/
 
+		int parentIndex = -1;
 		if (index < 0 && depth == 0) { // top level group ##  && level == -1
 			//System.err.println("\n= StartGroup =\nindex: " + index + " depth: " + depth + " i: " + j);
 			//System.err.println("Classname: " + ((BugInstance) comparable).getPrimaryClass().getClassName().split("\\$")[0]);

@@ -58,7 +58,7 @@ public abstract class AbstractListener implements Listener {
 		if (getClass().getAnnotation(EventFilter.class) != null) {
 			eventTypes = (Class<Event<?>>[]) getClass().getAnnotation(EventFilter.class).value();
 		} else {
-			; // no filter
+			// no filter
 		}
 
 		return eventTypes;

@@ -73,7 +73,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 	private static final String PREVIEW_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (LEAF name=middle weight=0.4) (COLUMN weight=0.3 right.top right.bottom))";
 	//private static final String PREVIEW_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.4) (COLUMN weight=0.6 right.top right.bottom)  (LEAF name=right))";
 
-	private Project _project;
+	private final Project _project;
 	private BugTreePanel _bugTreePanel;
 	private transient BugDetailsComponents _bugDetailsComponents;
 	private ComponentListener _componentListener;
@@ -82,11 +82,10 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 	private boolean _previewEnabled;
 	private boolean _isPreviewLayoutEnabled;
 	private transient PreviewPanel _previewPanel;
-	private transient ToolWindow _parent;
+	private final transient ToolWindow _parent;
 
 
 	public ToolWindowPanel(final Project project, final ToolWindow parent) {
-		super();
 		_project = project;
 		_parent = parent;
 		checkFindBugsPlugin();

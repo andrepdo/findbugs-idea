@@ -38,7 +38,7 @@ public abstract class AbstractEvent<T> implements Event<T> {
 	//private Utils utils_ = new Utils();
 
 
-	public AbstractEvent(final String description) {
+	AbstractEvent(final String description) {
 		_description = description;
 	}
 

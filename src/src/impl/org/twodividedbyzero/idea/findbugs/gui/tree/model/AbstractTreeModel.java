@@ -33,7 +33,7 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 	protected N _root;
 
 	/** Listeners. */
-	protected EventListenerList _treeModelListeners = new EventListenerList();
+	protected final EventListenerList _treeModelListeners = new EventListenerList();
 	//protected ArrayList<TreeModelListener> _treeModelListener = new ArrayList<TreeModelListener>();
 
 
@@ -52,7 +52,6 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 	 * @param root a R object that is the root of the tree
 	 */
 	public AbstractTreeModel(final N root) {
-		super();
 		setRoot(root);
 	}
 
@@ -234,7 +233,6 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 	 *
 	 * @param node the node to check
 	 * @return true if the node has no child nodes
-	 * @see TreeModel#isLeaf
 	 */
 	@SuppressWarnings("unchecked")
 	public final boolean isLeaf(final Object node) {
@@ -432,11 +430,11 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 		final N oldRoot = _root;
 		if (oldRoot != newRoot) {
 			if (oldRoot != null) {
-				this.deinstall(oldRoot);
+				deinstall(oldRoot);
 			}
 			_root = newRoot;
 			if (newRoot != null) {
-				this.install(newRoot);
+				install(newRoot);
 			}
 			if (newRoot == null && oldRoot != null) {
 				fireTreeStructureChanged(this, null);
@@ -488,7 +486,7 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 		int indexCounter = 0;
 		final int maxCounter = values.size();
 
-		if (indexCounter < maxCounter && values.elementAt(indexCounter).equals("root")) {
+		if (indexCounter < maxCounter && "root".equals(values.elementAt(indexCounter))) {
 			_root = (N) values.elementAt(++indexCounter);
 			//indexCounter++;
 		}
@@ -695,7 +693,7 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 
 
 	public void valueForPathChanged(final TreePath path, final Object newValue) {
-		if ((_treeModelListeners.getListenerCount() > 0) && !path.getLastPathComponent().equals(newValue)) {
+		if (_treeModelListeners.getListenerCount() > 0 && !path.getLastPathComponent().equals(newValue)) {
 			final TreePath parentPath = path.getParentPath();
 			final int index = getIndexOfChild(parentPath.getLastPathComponent(), newValue);
 			if (index != -1) {

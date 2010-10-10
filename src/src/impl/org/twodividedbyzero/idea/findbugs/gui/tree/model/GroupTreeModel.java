@@ -54,7 +54,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	private GroupBy[] _groupBy;
 	private final transient Map<String, Map<Integer, List<BugInstanceGroupNode>>> _groups;
 	private transient Grouper<BugInstance> _grouper;
-	private AtomicInteger _bugCount;
+	private final AtomicInteger _bugCount;
 	private final transient Map<PsiFile, List<ExtendedProblemDescriptor>> _problems;
 	
 	private final ReentrantLock _lock;
@@ -151,10 +151,9 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 
 
 	public void startGroup(final BugInstance member, final int depth) {
-		final BugInstanceGroupNode groupNode;
 		final GroupBy groupBy = _groupBy[depth];
 		final String groupName = GroupBy.getGroupName(groupBy, member);
-		groupNode = new BugInstanceGroupNode(groupBy, groupName, _root, member, depth);
+		final BugInstanceGroupNode groupNode = new BugInstanceGroupNode(groupBy, groupName, _root, member, depth);
 
 		addGroupIfAbsent(Arrays.toString(BugInstanceUtil.getGroupPath(member, depth, _groupBy)), depth, groupNode);
 

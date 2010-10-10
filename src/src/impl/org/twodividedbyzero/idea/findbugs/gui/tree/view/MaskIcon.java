@@ -38,7 +38,7 @@ import java.awt.image.BufferedImage;
  */
 public class MaskIcon implements Icon {
 
-	private Icon _delegate;
+	private final Icon _delegate;
 	private BufferedImage _mask;
 	private boolean _colorPainted = true;
 
@@ -53,7 +53,7 @@ public class MaskIcon implements Icon {
 	}
 
 
-	public MaskIcon(@NotNull final Icon delegate, final Color color, final float alpha) {
+	private MaskIcon(@NotNull final Icon delegate, final Color color, final float alpha) {
 		_delegate = delegate;
 		createMask(color, alpha);
 	}

@@ -35,7 +35,7 @@ public class DashedBorder extends LineBorder {
 
 	private static final long serialVersionUID = 0L;
 
-	public static final BasicStroke _stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1, new float[] {5, 5}, 0);
+	private static final BasicStroke _stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1, new float[] {5, 5}, 0);
 
 
 	public DashedBorder(final Color color, final int thickness) {

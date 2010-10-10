@@ -73,6 +73,7 @@ import java.util.Map;
  * @version $Revision$
  * @since 0.0.1
  */
+@SuppressWarnings({"AnonymousInnerClass"})
 public class BugTreePanel extends JPanel {
 
 	private final Project _project;
@@ -92,7 +93,6 @@ public class BugTreePanel extends JPanel {
 
 
 	public BugTreePanel(final ToolWindowPanel parent, final Project project) {
-		super();
 		setLayout(new BorderLayout());
 
 		_parent = parent;
@@ -167,7 +167,7 @@ public class BugTreePanel extends JPanel {
 	}
 
 
-	public GroupTreeModel getTreeModel() {
+	GroupTreeModel getTreeModel() {
 		return _treeModel;
 	}
 
@@ -386,7 +386,7 @@ public class BugTreePanel extends JPanel {
 	}
 
 
-	public GroupBy[] getGroupBy() {
+	GroupBy[] getGroupBy() {
 		return _groupBy.clone();
 	}
 

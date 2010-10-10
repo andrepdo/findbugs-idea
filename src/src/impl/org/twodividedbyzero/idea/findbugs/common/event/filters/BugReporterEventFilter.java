@@ -45,12 +45,12 @@ public class BugReporterEventFilter implements EventFilter<BugReporterEvent> {
 
 
 	public boolean acceptEvent(@NotNull final BugReporterEvent event) {
-		return (event.getProjectName().equals(_projectName)) || (ALL_PROJECTS.equals(_projectName));
+		return event.getProjectName().equals(_projectName) || ALL_PROJECTS.equals(_projectName);
 	}
 
 
 	public boolean acceptProject(@NotNull final String projectName) {
-		return (projectName.equals(_projectName));
+		return projectName.equals(_projectName);
 	}
 
 

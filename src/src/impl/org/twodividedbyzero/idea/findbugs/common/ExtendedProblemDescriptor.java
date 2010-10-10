@@ -112,50 +112,42 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor {
 	}
 
 
-	/** {@inheritDoc} */
 	public PsiElement getEndElement() {
 		return _delegate.getEndElement();
 	}
 
 
-	/** {@inheritDoc} */
 	public ProblemHighlightType getHighlightType() {
 		return _delegate.getHighlightType();
 	}
 
 
-	/** {@inheritDoc} */
 	public int getLineNumber() {
 		return getLine();
 	}
 
 
-	/** {@inheritDoc} */
 	public PsiElement getPsiElement() {
 		return _delegate.getPsiElement();
 	}
 
 
-	/** {@inheritDoc} */
 	public PsiElement getStartElement() {
 		return _delegate.getStartElement();
 	}
 
 
-	/** {@inheritDoc} */
 	public boolean isAfterEndOfLine() {
 		return _delegate.isAfterEndOfLine();
 	}
 
 
-	/** {@inheritDoc} */
 	@NotNull
 	public String getDescriptionTemplate() {
 		return _delegate.getDescriptionTemplate();
 	}
 
 
-	/** {@inheritDoc} */
 	@Nullable
 	public QuickFix<?>[] getFixes() {
 		return _delegate.getFixes();

@@ -390,7 +390,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 	}
 
 
-	protected boolean setRunning(final boolean running) {
+	boolean setRunning(final boolean running) {
 		final boolean was = _running;
 		if (_running != running) {
 			_running = running;

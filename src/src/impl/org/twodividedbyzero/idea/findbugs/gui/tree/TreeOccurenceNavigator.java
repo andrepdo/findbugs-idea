@@ -38,11 +38,10 @@ public final class TreeOccurenceNavigator implements OccurenceNavigator {
 
 	private static final Logger LOGGER = Logger.getInstance(TreeOccurenceNavigator.class.getName());
 
-	private BugTree _tree;
+	private final BugTree _tree;
 
 
 	public TreeOccurenceNavigator(final BugTree tree) {
-		super();
 		_tree = tree;
 	}
 

@@ -57,11 +57,6 @@ public class AnalyzePackageFiles extends BaseAction implements EventListener<Bug
 	private boolean _running;
 
 
-	public AnalyzePackageFiles() {
-		//EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(IdeaUtilImpl.getProject().getName()), this);
-	}
-
-
 	@Override
 	public void actionPerformed(final AnActionEvent e) {
 		_actionEvent = e;

@@ -53,8 +53,8 @@ public class ReportConfiguration implements ConfigurationPage {
 	private JTable _categoryTable;
 	private Component _component;
 
-	private FindBugsPreferences _preferences;
-	private ConfigurationPanel _parent;
+	private final FindBugsPreferences _preferences;
+	private final ConfigurationPanel _parent;
 
 
 	public ReportConfiguration(final ConfigurationPanel parent, final FindBugsPreferences preferences) {

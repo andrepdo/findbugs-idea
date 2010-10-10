@@ -26,7 +26,7 @@ import java.util.Arrays;
  * @version $Revision$
  * @since 0.9.29-dev
  */
-public class HashCodeBuilder {
+class HashCodeBuilder {
 
 	/**
 	 * Returns true if given two objects are same.
@@ -84,7 +84,7 @@ public class HashCodeBuilder {
 	 * @param obj the Object ot build a hashcode from
 	 * @return return 0 if argument is null
 	 */
-	public static int hashCode(final Object obj) {
+	private static int hashCode(final Object obj) {
 		if (obj == null) {
 			return 0;
 		} else if (obj.getClass().isArray()) {

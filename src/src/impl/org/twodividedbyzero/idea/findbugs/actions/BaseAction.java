@@ -50,10 +50,9 @@ public abstract class BaseAction extends AnAction {
 	/** Logger for this class. */
 	private static final Logger LOGGER = Logger.getInstance(BaseAction.class.getName());
 
-	private Set<String> _registeredProjects = new HashSet<String>();
+	private final Set<String> _registeredProjects = new HashSet<String>();
 
 
-	/** {@inheritDoc} */
 	@Override
 	public void update(final AnActionEvent event) {
 		try {

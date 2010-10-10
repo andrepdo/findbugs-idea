@@ -400,6 +400,14 @@
   </component>
   <component name="AntConfiguration">
     <defaultAnt bundledAnt="true" />
+    <buildFile url="file://$PROJECT_DIR$/build.xml">
+      <additionalClassPath />
+      <antReference projectDefault="true" />
+      <customJdkName value="" />
+      <maximumHeapSize value="128" />
+      <maximumStackSize value="2" />
+      <properties />
+    </buildFile>
   </component>
   <component name="BSFConsole">
     <sendcommandbycontrolenter>false</sendcommandbycontrolenter>
@@ -2513,8 +2521,8 @@
         <inspection_tool class="ZeroLengthArrayInitialization" enabled="true" level="WARNING" enabled_by_default="true" />
       </profile>
     </profiles>
-    <option name="PROJECT_PROFILE" value="Project Default" />
-    <option name="USE_PROJECT_PROFILE" value="true" />
+    <option name="PROJECT_PROFILE" />
+    <option name="USE_PROJECT_PROFILE" value="false" />
     <version value="1.0" />
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="INFO" />
@@ -2683,6 +2691,8 @@
         <w>classname</w>
         <w>findbugs</w>
         <w>multi</w>
+        <w>multicast</w>
+        <w>navigatable</w>
         <w>resize</w>
       </words>
     </dictionary>

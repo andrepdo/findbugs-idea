@@ -30,12 +30,12 @@ public class EventImpl implements Event {
 	private final EventType _eventType;
 
 
-	public EventImpl() {
+	protected EventImpl() {
 		this(EventType.TEST);
 	}
 
 
-	public EventImpl(final EventType eventType) {
+	protected EventImpl(final EventType eventType) {
 		_eventType = eventType;
 	}
 

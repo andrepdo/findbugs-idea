@@ -44,7 +44,7 @@ import java.util.Collection;
  */
 public class FindBugsCompileAfterHook implements CompilationStatusListener, ProjectComponent {
 
-	private Project _project;
+	private final Project _project;
 
 
 	public FindBugsCompileAfterHook(final Project project) {

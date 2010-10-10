@@ -100,11 +100,10 @@ public class PluginConfiguration implements ConfigurationPage {
 	}
 
 
-	public JPanel getPluginPanel() {
+	JPanel getPluginPanel() {
 		if (_pluginsPanel == null) {
 
 			final double border = 5;
-			final double rowsGap = 5;
 			final double colsGap = 10;
 			final double[][] size = {{border, TableLayout.FILL, colsGap, TableLayout.PREFERRED, border}, // Columns
 									 {border, TableLayout.FILL, border}};// Rows
@@ -122,6 +121,7 @@ public class PluginConfiguration implements ConfigurationPage {
 			_pluginsPanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 
+			final double rowsGap = 5;
 			final double[][] bPanelSize = {{border, TableLayout.PREFERRED}, // Columns
 									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout tableLayout = new TableLayout(bPanelSize);
@@ -159,7 +159,7 @@ public class PluginConfiguration implements ConfigurationPage {
 
 
 
-	public JList getPluginList() {
+	JList getPluginList() {
 		if(_pluginList == null) {
 			getPluginPanel();
 		}
@@ -167,7 +167,7 @@ public class PluginConfiguration implements ConfigurationPage {
 	}
 
 
-	static DefaultListModel getModel(final JList list) {
+	private static DefaultListModel getModel(final JList list) {
 		return (DefaultListModel) list.getModel();
 	}
 
@@ -196,7 +196,7 @@ public class PluginConfiguration implements ConfigurationPage {
 		private final AbstractButton _removeButton;
 
 
-		public PluginListSelectionListener(final AbstractButton removeButton) {
+		private PluginListSelectionListener(final AbstractButton removeButton) {
 			_removeButton = removeButton;
 		}
 

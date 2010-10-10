@@ -54,7 +54,7 @@ import java.io.File;
 @SuppressWarnings({"HardCodedStringLiteral"})
 public class ImportExportConfiguration implements ConfigurationPage {
 
-	private static String _defaultExportDir = System.getProperty("user.home") + File.separatorChar + FindBugsPluginConstants.TOOL_WINDOW_ID;
+	private static final String _defaultExportDir = System.getProperty("user.home") + File.separatorChar + FindBugsPluginConstants.TOOL_WINDOW_ID;
 
 	private final FindBugsPreferences _preferences;
 	private final ConfigurationPanel _parent;

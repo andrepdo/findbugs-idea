@@ -72,7 +72,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	private boolean _isListener;
 	private final List<ProblemDescriptor> _problems;
 	private PsiFile _psiFile;
-	private static final ProblemDescriptor[] EMPTY_PROBLEM_DESCRIPTOR = new ProblemDescriptor[] {};
+	private static final ProblemDescriptor[] EMPTY_PROBLEM_DESCRIPTOR = {};
 
 
 	public FindBugsInspection() {
@@ -126,12 +126,12 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
-	public static InspectionManager getManager() {
+	private static InspectionManager getManager() {
 		return getManager(IdeaUtilImpl.getProject());
 	}
 
 
-	public static InspectionManager getManager(final Project project) {
+	private static InspectionManager getManager(final Project project) {
 		return InspectionManager.getInstance(project);
 	}
 
@@ -189,9 +189,11 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	/**
 	 * See {@link InspectionManager#createProblemDescriptor(PsiElement, String, LocalQuickFix, ProblemHighlightType) } for method descriptions.
 	 *
+	 * @param psiFile
+	 * @param bugInstance
 	 * @return the created ProblemDescriptor
 	 */
-	public static ProblemDescriptor createProblemDescriptor(final PsiFile psiFile, final BugInstance bugInstance) {
+	private static ProblemDescriptor createProblemDescriptor(final PsiFile psiFile, final BugInstance bugInstance) {
 		final int[] lines = BugInstanceUtil.getSourceLines(bugInstance);
 		final MethodAnnotation methodAnnotation = BugInstanceUtil.getPrimaryMethod(bugInstance);
 		final FieldAnnotation fieldAnnotation = BugInstanceUtil.getPrimaryField(bugInstance);
@@ -257,9 +259,10 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	/**
 	 * See {@link InspectionManager#createProblemDescriptor(PsiElement, String, LocalQuickFix, ProblemHighlightType) } for method descriptions.
 	 *
+	 * @param bugInstance
 	 * @return the created ProblemDescriptor
 	 */
-	public ProblemDescriptor createProblemDescriptor(final BugInstance bugInstance) {
+	ProblemDescriptor createProblemDescriptor(final BugInstance bugInstance) {
 		return createProblemDescriptor(_psiFile, bugInstance);
 	}
 

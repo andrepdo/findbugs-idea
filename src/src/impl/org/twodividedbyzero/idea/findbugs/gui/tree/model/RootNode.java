@@ -24,15 +24,14 @@ public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements Vis
 
 	private int _bugCount;
 	private int _classesCount;
-	private List<VisitableTreeNode> _childs;
+	private final List<VisitableTreeNode> _childs;
 
-	private static Icon _expandedIcon = new MaskIcon(ResourcesLoader.findIcon("/general/ijLogo.png", RootNode.class), Color.BLACK);
-	private static Icon _collapsedIcon = _expandedIcon;
+	private static final Icon _expandedIcon = new MaskIcon(ResourcesLoader.findIcon("/general/ijLogo.png", RootNode.class), Color.BLACK);
+	private static final Icon _collapsedIcon = _expandedIcon;
 	private final RecurseNodeVisitor<RootNode> _recurseNodeVisitor = new RecurseNodeVisitor<RootNode>(this);
 
 
 	public RootNode(final String simpleName) {
-		super();
 
 		//noinspection AssignmentToNull
 		setParent(null);
@@ -180,22 +179,14 @@ public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements Vis
 
 	@Override
 	public String toString() {
-		final StringBuilder buf = new StringBuilder();
-
-		buf.append("<html><body>");
-		buf.append(_simpleName);
-		if (_bugCount > -1) {
-			buf.append("<font color='gray'>");
-			buf.append(" (Found ");
-			buf.append(_bugCount);
-			buf.append(" Bug items in ");
-			buf.append(_classesCount);
-			buf.append(_classesCount > 1 ? " classes)" : " class)");
-			buf.append("</font>");
-		}
-		buf.append("</body></html>");
-
-		return buf.toString();
+		final StringBuilder sb = new StringBuilder();
+		sb.append("RootNode");
+		sb.append("{_bugCount=").append(_bugCount);
+		sb.append(", _classesCount=").append(_classesCount);
+		sb.append(", _childs=").append(_childs);
+		sb.append(", _recurseNodeVisitor=").append(_recurseNodeVisitor);
+		sb.append('}');
+		return sb.toString();
 	}
 
 

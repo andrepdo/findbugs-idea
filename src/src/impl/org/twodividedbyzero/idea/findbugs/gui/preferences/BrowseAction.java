@@ -48,7 +48,6 @@ public final class BrowseAction extends AbstractAction {
 
 
 	public BrowseAction(final ConfigurationPanel parent, final String name, final FileFilter fileFilter, final BrowseActionCallback callback) {
-		super();
 
 		_callback = callback;
 		_fileFilter = fileFilter;
@@ -74,6 +73,6 @@ public final class BrowseAction extends AbstractAction {
 
 	public interface BrowseActionCallback {
 
-		public void addSelection(final File selectedFile);
+		void addSelection(final File selectedFile);
 	}
 }

@@ -242,7 +242,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 	public ToolWindowPanel getToolWindowPanel() {
 		final Content content = _toolWindow.getContentManager().getContent(0);
 		if (content != null) {
-			return ((ToolWindowPanel) content.getComponent());
+			return (ToolWindowPanel) content.getComponent();
 		}
 		return null;
 	}

@@ -35,7 +35,7 @@ public class NotificationImpl implements Notification {
 	//private final static Log LOG = LogFactory.getLog(NotificationImpl.class);
 
 	@SuppressWarnings("unchecked")
-	private List<Event> events_ = new ArrayList<Event>();
+	private final List<Event> events_ = new ArrayList<Event>();
 
 
 	@SuppressWarnings("unchecked")

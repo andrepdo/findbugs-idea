@@ -154,7 +154,7 @@ public final class IdeaUtilImpl {
 	 * @param dataContext The IntelliJ DataContext (can usually be obtained from the action-event).
 	 * @return The current PsiFile or null if not found.
 	 */
-	public static PsiFile getPsiFile(final DataContext dataContext) {
+	private static PsiFile getPsiFile(final DataContext dataContext) {
 		return (PsiFile) dataContext.getData("psi.File");
 	}
 
@@ -180,7 +180,7 @@ public final class IdeaUtilImpl {
 
 
 	@Nullable
-	public static VirtualFile getSelectedFile(final DataContext dataContext) {
+	private static VirtualFile getSelectedFile(final DataContext dataContext) {
 		final VirtualFile[] selectedFiles = getSelectedFiles(dataContext);
 		if (selectedFiles.length == 0) {
 			return null;
@@ -190,7 +190,7 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static VirtualFile[] getSelectedFiles(final DataContext dataContext) {
+	private static VirtualFile[] getSelectedFiles(final DataContext dataContext) {
 		final Project project = getProject(dataContext);
 		return FileEditorManager.getInstance(project).getSelectedFiles();
 	}
@@ -327,13 +327,17 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static VirtualFile[] getCompilerOutputPaths(final Project project) {
+	private static VirtualFile[] getCompilerOutputPaths(final Project project) {
 		final Module[] modules = getModules(project);
 		final VirtualFile[] vFiles = new VirtualFile[modules.length];
 
 		for (int i = 0; i < modules.length; i++) {
 			final Module module = modules[i];
-			VirtualFile path = CompilerModuleExtension.getInstance(module).getCompilerOutputPath();
+			final CompilerModuleExtension extension = CompilerModuleExtension.getInstance(module);
+			VirtualFile path = null;
+			if (extension != null) {
+				path = extension.getCompilerOutputPath();
+			}
 			if (path == null) {
 				//throw new FindBugsPluginException("Make sure your module compiler output path configuration points to a existing directory in module (" + module.getName() + ")");
 				path = getProjectOutputPath(module);
@@ -371,13 +375,13 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static VirtualFile getProjectOutputPath(final Module module) {
+	private static VirtualFile getProjectOutputPath(final Module module) {
 		final Project project = module.getProject();
 		return CompilerProjectExtension.getInstance(project).getCompilerOutput();
 	}
 
 
-	public static String getPackage(final PsiClass psiClass) {
+	private static String getPackage(final PsiClass psiClass) {
 		return ((PsiJavaFile) psiClass.getContainingFile()).getPackageName();
 	}
 
@@ -408,7 +412,7 @@ public final class IdeaUtilImpl {
 	}*/
 
 
-	public static void getSubPackages(final PsiPackage psiPackage, final GlobalSearchScope scope, final Set<PsiPackage> result) {
+	private static void getSubPackages(final PsiPackage psiPackage, final GlobalSearchScope scope, final Set<PsiPackage> result) {
 		for (final PsiPackage child : psiPackage.getSubPackages(scope)) {
 			result.add(child);
 			getSubPackages(child, scope, result);
@@ -431,14 +435,12 @@ public final class IdeaUtilImpl {
 			result.append(dir);
 		}
 
-		System.err.println("parentPath: " + result.toString());
 		return result.toString();
 	}
 
 
-	public static List<String> getPackagePathAsList(final com.intellij.openapi.project.Project project, final VirtualFile packagePath, final VirtualFile[] sourceRoots) {
+	private static List<String> getPackagePathAsList(final com.intellij.openapi.project.Project project, final VirtualFile packagePath, final VirtualFile[] sourceRoots) {
 		final Module module = IdeaUtilImpl.findModuleForFile(packagePath, project);
-		VirtualFile parent = null;
 		final List<String> parentPath = new ArrayList<String>();
 		final List<String> sourcesDirs = new ArrayList<String>();
 
@@ -446,6 +448,7 @@ public final class IdeaUtilImpl {
 			sourcesDirs.add(vFile.getName());
 		}
 
+		VirtualFile parent = null;
 		if (packagePath != null) {
 			parent = packagePath;
 		}
@@ -475,11 +478,9 @@ public final class IdeaUtilImpl {
 
 
 	public static VirtualFile[] getProjectClasspath(final DataContext dataContext) {
-		final VirtualFile[] files;
 		final Module module = getModule(dataContext);
-		files = getProjectClasspath(module);
 
-		return files;
+		return getProjectClasspath(module);
 	}
 
 
@@ -558,7 +559,7 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static Module[] getModules(final Project project) {
+	private static Module[] getModules(final Project project) {
 		final ModuleManager moduleManager = ModuleManager.getInstance(project);
 		return moduleManager.getModules();
 	}
@@ -686,8 +687,8 @@ public final class IdeaUtilImpl {
 	 * @param element The PsiElement to locate the class for.
 	 * @return The PsiClass you're looking for or null if not found.
 	 */
-	public static PsiClass findClass(final PsiElement element) {
-		final PsiClass psiClass = (element instanceof PsiClass) ? (PsiClass) element : PsiTreeUtil.getParentOfType(element, PsiClass.class);
+	private static PsiClass findClass(final PsiElement element) {
+		final PsiClass psiClass = element instanceof PsiClass ? (PsiClass) element : PsiTreeUtil.getParentOfType(element, PsiClass.class);
 		if (psiClass instanceof PsiAnonymousClass) {
 			return findClass(psiClass.getParent());
 		}
@@ -701,8 +702,8 @@ public final class IdeaUtilImpl {
 	 * @param element The PsiElement to locate the field for.
 	 * @return The PsiField you're looking for or null if not found.
 	 */
-	public static PsiField findField(final PsiElement element) {
-		final PsiField psiField = (element instanceof PsiField) ? (PsiField) element : PsiTreeUtil.getParentOfType(element, PsiField.class);
+	private static PsiField findField(final PsiElement element) {
+		final PsiField psiField = element instanceof PsiField ? (PsiField) element : PsiTreeUtil.getParentOfType(element, PsiField.class);
 		if (psiField != null && psiField.getContainingClass() instanceof PsiAnonymousClass) {
 			return findField(psiField.getParent());
 		}
@@ -716,8 +717,8 @@ public final class IdeaUtilImpl {
 	 * @param element The PsiElement to locate the method for.
 	 * @return The PsiMethod you're looking for or null if not found.
 	 */
-	public static PsiMethod findMethod(final PsiElement element) {
-		final PsiMethod method = (element instanceof PsiMethod) ? (PsiMethod) element : PsiTreeUtil.getParentOfType(element, PsiMethod.class);
+	private static PsiMethod findMethod(final PsiElement element) {
+		final PsiMethod method = element instanceof PsiMethod ? (PsiMethod) element : PsiTreeUtil.getParentOfType(element, PsiMethod.class);
 		if (method != null && method.getContainingClass() instanceof PsiAnonymousClass) {
 			return findMethod(method.getParent());
 		}
@@ -753,7 +754,7 @@ public final class IdeaUtilImpl {
 
 
 	@Nullable
-	public static PsiClass findJavaPsiClass(final Project project, final String dottedFqClassName, final GlobalSearchScope searchScope) {
+	private static PsiClass findJavaPsiClass(final Project project, final String dottedFqClassName, final GlobalSearchScope searchScope) {
 		return JavaPsiFacade.getInstance(project).findClass(dottedFqClassName, searchScope);
 	}
 
@@ -810,7 +811,7 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static ToolWindow getToolWindowById(final String uniqueIdentifier, final DataContext dataContext) {
+	private static ToolWindow getToolWindowById(final String uniqueIdentifier, final DataContext dataContext) {
 		final Project project = getProject(dataContext);
 		return ToolWindowManager.getInstance(project).getToolWindow(uniqueIdentifier);
 	}
@@ -855,7 +856,7 @@ public final class IdeaUtilImpl {
 
 
 	@Nullable
-	public static PsiFile getPsiFile(@NotNull final Project project, @NotNull final ExtendedProblemDescriptor problem) {
+	private static PsiFile getPsiFile(@NotNull final Project project, @NotNull final ExtendedProblemDescriptor problem) {
 		final PsiFile file = problem.getFile();
 		return file == null ? null : PsiManager.getInstance(project).findFile(file.getVirtualFile());
 	}
@@ -864,6 +865,6 @@ public final class IdeaUtilImpl {
 	@Nullable
 	public static Document getDocument(@NotNull final Project project, @NotNull final ExtendedProblemDescriptor issue) {
 		final PsiFile psiFile = getPsiFile(project, issue);
-		return (psiFile == null) ? null : PsiDocumentManager.getInstance(project).getDocument(psiFile);
+		return psiFile == null ? null : PsiDocumentManager.getInstance(project).getDocument(psiFile);
 	}
 }
