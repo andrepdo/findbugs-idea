@@ -34,7 +34,6 @@ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,7 +45,6 @@ import java.util.Set;
  * @version $Revision$
  * @since 0.0.1
  */
-@SuppressWarnings({"StringConcatenation", "DuplicateStringLiteralInspection"})
 public class RecurseClassCollector {
 
 	private static final Logger LOGGER = Logger.getInstance(RecurseClassCollector.class.getName());
@@ -335,8 +333,9 @@ public class RecurseClassCollector {
 	 *
 	 * @return the collected full qualified class names and path in the file system
 	 */
+	@SuppressWarnings({"ReturnOfCollectionOrArrayField"})
 	public Set<String> getResult() {
-		return Collections.unmodifiableSet(_classes);
+		return _classes;
 	}
 
 
