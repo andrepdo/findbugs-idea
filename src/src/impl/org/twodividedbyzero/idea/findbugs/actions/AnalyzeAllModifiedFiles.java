@@ -48,7 +48,7 @@ import java.util.List;
  * @version $Revision$
  * @since 0.0.1
  */
-public class AnalyzeAllModifiedFiles extends BaseAction implements EventListener<BugReporterEvent>/*, ChangeListListener*/ /*Adapter*/ {
+public class AnalyzeAllModifiedFiles extends BaseAction implements EventListener<BugReporterEvent> {
 
 	private static final Logger LOGGER = Logger.getInstance(AnalyzeSelectedFiles.class.getName());
 
@@ -217,55 +217,4 @@ public class AnalyzeAllModifiedFiles extends BaseAction implements EventListener
 				break;
 		}
 	}
-
-
-	/*public void changeListAdded(final ChangeList list) {
-		//TODO: implement
-	}
-
-
-	public void changeListRemoved(final ChangeList list) {
-		//TODO: implement
-	}
-
-
-	public void changeListChanged(final ChangeList list) {
-		System.err.println("List: " + list.getName());
-		//TODO: implement
-	}
-
-
-	public void changeListRenamed(final ChangeList list, final String oldName) {
-		//TODO: implement
-	}
-
-
-	public void changeListCommentChanged(final ChangeList list, final String oldComment) {
-		//TODO: implement
-	}
-
-
-	public void defaultListChanged(final ChangeList oldDefaultList, final ChangeList newDefaultList) {
-		//TODO: implement
-	}
-
-
-	public void unchangedFileStatusChanged() {
-		//TODO: implement
-	}
-
-
-	public void changeListUpdateDone() {
-		//TODO: implement
-	}
-
-
-	public void changesMoved(final Collection<Change> changes, final ChangeList fromList, final ChangeList toList) {
-		//TODO: implement
-	}
-
-
-	public void changesRemoved(final Collection<Change> changes, final ChangeList fromList) {
-		//TODO: implement
-	}*/
 }
