@@ -63,7 +63,7 @@ public class GroupByRank extends BaseToggleAction implements EventListener<BugRe
 		final Content content = toolWindow.getContentManager().getContent(0);
 		if (content != null) {
 			final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
-			final String groupByProperty = preferences.getProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, GroupBy.BugRank.name());
+			final String groupByProperty = preferences.getProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, GroupBy.BugCategory.name());
 
 			final boolean equals = GroupBy.BugRank.name().equals(groupByProperty);
 			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();

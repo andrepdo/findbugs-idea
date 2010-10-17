@@ -64,7 +64,7 @@ public class GroupByPackage extends BaseToggleAction implements EventListener<Bu
 		final Content content = toolWindow.getContentManager().getContent(0);
 		if (content != null) {
 			final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
-			final String groupByProperty = preferences.getProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, GroupBy.Package.name());
+			final String groupByProperty = preferences.getProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, GroupBy.BugCategory.name());
 
 			final boolean equals = GroupBy.Package.name().equals(groupByProperty);
 			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();

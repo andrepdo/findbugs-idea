@@ -64,7 +64,7 @@ public class GroupByPriority extends BaseToggleAction implements EventListener<B
 		final Content content = toolWindow.getContentManager().getContent(0);
 		if (content != null) {
 			final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
-			final String groupByProperty = preferences.getProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, GroupBy.Priority.name());
+			final String groupByProperty = preferences.getProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, GroupBy.BugCategory.name());
 
 			final boolean equals = GroupBy.Priority.name().equals(groupByProperty);
 			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
