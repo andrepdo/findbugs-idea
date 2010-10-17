@@ -55,6 +55,7 @@ import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
+import org.twodividedbyzero.idea.findbugs.common.ui.CheckThreadViolationRepaintManager;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
@@ -130,9 +131,6 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 				LOGGER.info(VersionManager.getFullVersion() + " Plugin loaded with no project.");
 			}
 
-			//noinspection ThisEscapedInObjectConstruction
-			//_configPanel = new FindBugsConfigurationPanel(this);
-
 		} catch (Throwable t) {
 			LOGGER.error("Project initialisation failed.", t);
 		}
@@ -141,10 +139,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 
 	public void initComponent() {
-		// TODO: insert component initialization logic here
-
-		//ExecutionRegistry.getInstance().registerRunner(new MyRunner());
-
+		CheckThreadViolationRepaintManager.install();
 		LOGGER.debug("initComponent");
 	}
 

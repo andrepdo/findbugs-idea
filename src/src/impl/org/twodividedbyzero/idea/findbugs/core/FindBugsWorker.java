@@ -40,15 +40,15 @@ import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
+import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
+import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper.OperationAdapter;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.report.BugReporter;
 import org.twodividedbyzero.idea.findbugs.tasks.FindBugsTask;
 
-import java.awt.EventQueue;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Map.Entry;
 
@@ -203,26 +203,15 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 
 	public void compile(final VirtualFile[] virtualFiles, final Project project, @Nullable final CompileTask afterTask) {
 		//TODO: use make() with CompilerScope
-		if (EventQueue.isDispatchThread()) {
-			final CompilerManager compilerManager = CompilerManager.getInstance(project);
-			if (afterTask != null) {
-				addCompileAfterTask(project, afterTask);
+		EventDispatchThreadHelper.invokeAndWait(new OperationAdapter() {
+			public void run() {
+				final CompilerManager compilerManager = CompilerManager.getInstance(project);
+				if (afterTask != null) {
+					addCompileAfterTask(project, afterTask);
+				}
+				compilerManager.compile(virtualFiles, afterTask != null ? null : FindBugsWorker.this, false);
 			}
-			compilerManager.compile(virtualFiles, afterTask != null ? null : this, false);
-		} else {
-			try {
-				EventQueue.invokeAndWait(new Runnable() {
-					public void run() {
-						compile(virtualFiles, project, afterTask);
-					}
-				});
-			} catch (InterruptedException ignore) {
-				Thread.interrupted();
-			} catch (InvocationTargetException e) {
-				LOGGER.debug(e.getTargetException());
-			}
-		}
-
+		});
 	}
 
 
@@ -304,15 +293,11 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 
 
 	private static void queue(final FindBugsTask findBugsTask) {
-		if (EventQueue.isDispatchThread()) {
-			findBugsTask.queue();
-		} else {
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					queue(findBugsTask);
-				}
-			});
-		}
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			public void run() {
+				findBugsTask.queue();
+			}
+		});
 	}
 
 
