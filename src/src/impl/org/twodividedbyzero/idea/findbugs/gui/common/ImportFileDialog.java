@@ -17,17 +17,18 @@
 package org.twodividedbyzero.idea.findbugs.gui.common;
 
 import com.intellij.openapi.ui.DialogBuilder;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.ui.DocumentAdapter;
 
-import javax.swing.ButtonGroup;
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.Component;
@@ -52,19 +53,19 @@ import java.io.File;
  */
 @edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
 @SuppressWarnings({"HardCodedStringLiteral"})
-public class ExportFileDialog extends JPanel {
+public class ImportFileDialog extends JPanel {
 
-	private final JLabel _label;
-	private final JTextField _path;
-	private final JButton _browseButton;
+	private final JTextField _importFile;
 	private File _selectedFile;
 	private final transient DialogBuilder _dialogBuilder;
-	private final JRadioButton _html;
-	private final JRadioButton _xml;
+	private final String _importDir;
 
 
-	public ExportFileDialog(final String defaultValue, final DialogBuilder dialogBuilder) {
+	public ImportFileDialog(final String defaultValue, final DialogBuilder dialogBuilder) {
 		setLayout(new GridBagLayout());
+
+		_importDir = defaultValue;
+
 		final GridBagConstraints c = new GridBagConstraints();
 		c.gridy = 1;
 		c.insets = new Insets(5, 5, 5, 5);
@@ -72,49 +73,37 @@ public class ExportFileDialog extends JPanel {
 
 		_dialogBuilder = dialogBuilder;
 
-		_label = new JLabel("Directory: ");
+		final Component label = new JLabel("Import BugCollection from: ");
 
 		c.weightx = 0;
 		c.gridwidth = 2;
-		add(_label, c);
-		_path = new JTextField(defaultValue);
-		_path.setPreferredSize(new Dimension(200, 20));
+		add(label, c);
+		_importFile = new JTextField("");
+		_importFile.setEditable(false);
+		_importFile.setPreferredSize(new Dimension(200, 20));
 		c.weightx = 1;
 		c.gridwidth = 1;
-		add(_path, c);
+		add(_importFile, c);
 
-		_browseButton = new JButton("Browse");
-		_browseButton.addActionListener(new MyFileChooserActionListener());
+		final AbstractButton browseButton = new JButton("Browse");
+		browseButton.addActionListener(new MyFileChooserActionListener());
 		c.weightx = 0;
-		add(_browseButton, c);
+		add(browseButton, c);
 
 		c.gridx = GridBagConstraints.RELATIVE;
 		c.gridy = 2;
 		c.gridheight = 2;
-		add(new JLabel("Format:"), c);
-		c.insets = new Insets(0, 0, 0, 0);
-
-		_html = new JRadioButton("HTML", true);
-		_xml = new JRadioButton("XML", false);
-		final ButtonGroup group = new ButtonGroup();
-		group.add(_html);
-		group.add(_xml);
-
-		c.gridheight = 1;
-		add(_html, c);
-		c.gridy = 3;
-		add(_xml, c);
 
 		dialogBuilder.setCenterPanel(this);
 
-		_path.getDocument().addDocumentListener(new MyDocumentAdapter());
-		if (_path.getText().length() > 0) {
-			_selectedFile = new File(_path.getText());
+		_importFile.getDocument().addDocumentListener(new MyDocumentAdapter());
+		if (_importFile.getText().length() > 0) {
+			_selectedFile = new File(_importFile.getText());
 		}
-		_path.addHierarchyListener(new HierarchyListener() {
+		_importFile.addHierarchyListener(new HierarchyListener() {
 			public void hierarchyChanged(final HierarchyEvent e) {
-				if (_path.isVisible()) {
-					_dialogBuilder.setOkActionEnabled(validateDirectory(_path.getDocument()));
+				if (_importFile.isVisible()) {
+					_dialogBuilder.setOkActionEnabled(validateFile(_importFile.getDocument()));
 				}
 			}
 		});
@@ -123,23 +112,18 @@ public class ExportFileDialog extends JPanel {
 
 
 	public String getText() {
-		return _path.getText();
+		return _importFile.getText();
 	}
 
 
 	public void setText(final String s) {
-		_path.setText(s);
+		_importFile.setText(s);
 	}
 
 
-	public boolean isXml() {
-		return _xml.isSelected();
-	}
-
-
-	private boolean validateDirectory(final Document doc) {
+	private boolean validateFile(final Document doc) {
 		try {
-			return _selectedFile != null && _selectedFile.isDirectory() && _selectedFile.canWrite() || doc.getText(0, doc.getLength()).trim().length() > 0;
+			return _selectedFile != null && _selectedFile.isFile() && _selectedFile.canRead() && "xml".equals(FileUtil.getExtension(_selectedFile.getAbsolutePath())) && doc.getText(0, doc.getLength()).trim().length() > 0;
 		} catch (BadLocationException ignore) {
 			return false;
 		}
@@ -152,21 +136,32 @@ public class ExportFileDialog extends JPanel {
 		@Override
 		protected void textChanged(final DocumentEvent e) {
 			final Document doc = e.getDocument();
-			_dialogBuilder.setOkActionEnabled(validateDirectory(doc));
+			_dialogBuilder.setOkActionEnabled(validateFile(doc));
 		}
 	}
 
 	private class MyFileChooserActionListener implements ActionListener {
 
 		public void actionPerformed(final ActionEvent e) {
-			final JFileChooser fc = new JFileChooser();
-			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			final Component parent = SwingUtilities.getRoot(_path);
+			final JFileChooser fc = new JFileChooser(_importDir);
+			fc.setFileFilter(new FileFilter() {
+				@Override
+				public boolean accept(final File f) {
+					return f.isDirectory() || "xml".equals(FileUtil.getExtension(f.getAbsolutePath()));
+				}
+
+
+				@Override
+				public String getDescription() {
+					return "*.xml";
+				}
+			});
+			final Component parent = SwingUtilities.getRoot(_importFile);
 			fc.showDialog(parent, "Select");
 			_selectedFile = fc.getSelectedFile();
-			if (_selectedFile != null && _selectedFile.isDirectory()) {
+			if (_selectedFile != null && _selectedFile.isFile() && "xml".equals(FileUtil.getExtension(_selectedFile.getAbsolutePath()))) {
 				final String newLocation = _selectedFile.getPath();
-				_path.setText(newLocation);
+				_importFile.setText(newLocation);
 				_dialogBuilder.setOkActionEnabled(true);
 
 			}

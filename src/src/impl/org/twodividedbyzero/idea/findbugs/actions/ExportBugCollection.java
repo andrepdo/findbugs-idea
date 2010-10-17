@@ -40,6 +40,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
+import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.ExportFileDialog;
@@ -54,7 +55,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.awt.EventQueue;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -70,11 +70,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
- * $Date$
+ * $Date: 2010-10-10 16:30:08 +0200 (Sun, 10 Oct 2010) $
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
  * @author Keith Lea <keithl@gmail.com>
- * @version $Revision$
+ * @version $Revision: 107 $
  * @since 0.9.95
  */
 @SuppressWarnings({"HardCodedStringLiteral"})
@@ -82,7 +82,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 
 	private static final Logger LOGGER = Logger.getInstance(ExportBugCollection.class.getName());
 
-	private static String _exportDir = System.getProperty("user.home") + File.separatorChar + FindBugsPluginConstants.TOOL_WINDOW_ID;
+	static String _exportDir = System.getProperty("user.home") + File.separatorChar + FindBugsPluginConstants.TOOL_WINDOW_ID;
 
 	private static final String FINDBUGS_PLAIN_XSL = "plain.xsl";
 	private static final String FINDBUGS_RESULT_PREFIX = "FindBugsResult_";
@@ -243,7 +243,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 
 
 	private static void showToolWindowNotifier(final String message, final MessageType type) {
-		EventQueue.invokeLater(new Runnable() {
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
 				FindBugsPluginImpl.showToolWindowNotifier(message, type);
 			}

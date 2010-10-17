@@ -20,416 +20,22 @@
     <option name="historyRevisionsNumber" value="4" />
   </component>
   <component name="ChangeListManager" verified="true">
-    <list default="true" readonly="true" id="9f87ce23-bf54-46a5-ae44-8b4c58f76368" name="Default" comment="* set svn-keyword recursive">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/bin/antRun.bat" afterPath="$PROJECT_DIR$/bin/ant/bin/antRun.bat" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LICENSE-ASM.txt" afterPath="$PROJECT_DIR$/LICENSE-ASM.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/StopAction.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/StopAction.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FindBugs-IDEA.ipr" afterPath="$PROJECT_DIR$/FindBugs-IDEA.ipr" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByPriority.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByPriority.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-commons-logging-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-commons-logging-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/IdeaUtilImpl.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/IdeaUtilImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/button-empty_pressed.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/button-empty_pressed.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-jai-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-jai-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/tasks/FindBugsTask.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/tasks/FindBugsTask.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/commons-lang-2.4.jar" afterPath="$PROJECT_DIR$/lib/commons-lang-2.4.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/PluginConfiguration.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/PluginConfiguration.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/ScrollToSourceHandler.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/ScrollToSourceHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-starteam-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-starteam-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-stylebook-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-stylebook-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/etc/ant-bootstrap.jar" afterPath="$PROJECT_DIR$/bin/ant/etc/ant-bootstrap.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LICENSE-jcip.txt" afterPath="$PROJECT_DIR$/LICENSE-jcip.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LICENSE-jFormatString.txt" afterPath="$PROJECT_DIR$/LICENSE-jFormatString.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-jsch-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-jsch-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/TableLayout-bin-jdk1.5-2009-06-10.jar" afterPath="$PROJECT_DIR$/lib/TableLayout-bin-jdk1.5-2009-06-10.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/etc/jdepend-frames.xsl" afterPath="$PROJECT_DIR$/bin/ant/etc/jdepend-frames.xsl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/jsr305.jar" afterPath="$PROJECT_DIR$/lib/jsr305.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/setenv.sh" afterPath="$PROJECT_DIR$/setenv.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-trax-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-trax-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/PreviewPanel.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/PreviewPanel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LICENSE-docbook.txt" afterPath="$PROJECT_DIR$/LICENSE-docbook.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/bug.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/bug.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/patch/cloud-8-22/webCloudClient-full.jar" afterPath="$PROJECT_DIR$/patch/cloud-8-22/webCloudClient-full.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/annotations/SuppressWarnings.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/annotations/SuppressWarnings.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/etc/coverage-frames.xsl" afterPath="$PROJECT_DIR$/bin/ant/etc/coverage-frames.xsl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByPackage.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByPackage.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/Event.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/Event.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/RootNode.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/RootNode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/guava-r06.jar" afterPath="$PROJECT_DIR$/lib/guava-r06.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/jdepend-2.9.jar" afterPath="$PROJECT_DIR$/lib/jdepend-2.9.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/filter-file-include.xml" afterPath="$PROJECT_DIR$/src/test/filter-file-include.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ConfigurationPanel.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ConfigurationPanel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.number" afterPath="$PROJECT_DIR$/build.number" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/preferences/AnalysisEffort.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/preferences/AnalysisEffort.java" />
+    <list default="true" readonly="true" id="9f87ce23-bf54-46a5-ae44-8b4c58f76368" name="Default" comment="* add ImportBugCollection (Action, Dialog)&#10;* removed invokdeAndWait call getPsiElement uses DoneCallback now&#10;* fix button persistence inint state&#10;* improved ui peformance (DispatchThreadHelper)&#10;* removed some GroupModel locks in EDT and ApplicationImpl Thread">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/META-INF/plugin.xml" afterPath="$PROJECT_DIR$/META-INF/plugin.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/MultiSplitPane.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/MultiSplitPane.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/editor/BugAnnotator.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/editor/BugAnnotator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-netrexx.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-netrexx.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-stylebook.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-stylebook.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-javamail-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-javamail-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/BaseToggleAction.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/BaseToggleAction.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/closeHovered.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/closeHovered.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-jmf-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-jmf-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-javamail-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-javamail-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-resolver-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-resolver-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/editor/BugsLineMarkerProvider.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/editor/BugsLineMarkerProvider.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/ToolBarButton.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/ToolBarButton.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/AbstractTreeModel.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/AbstractTreeModel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/Notification.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/Notification.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/NOTICE" afterPath="$PROJECT_DIR$/bin/ant/NOTICE" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByRank.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByRank.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/AbstractTreeNode.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/AbstractTreeNode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ExportFileDialog.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ExportFileDialog.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ExpandAll.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ExpandAll.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/TreePreviousOccurence.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/TreePreviousOccurence.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ExtensionFileFilter.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ExtensionFileFilter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-bsf-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-bsf-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPlugin.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPlugin.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/tasks/RecurseCollectorTask.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/tasks/RecurseCollectorTask.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/patch/cloud-8-22/fb-idea-cloud-8-22.patch" afterPath="$PROJECT_DIR$/patch/cloud-8-22/fb-idea-cloud-8-22.patch" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/patch/cloud-8-22/findbugs-full-1.3.10-dev-20100822.jar" afterPath="$PROJECT_DIR$/patch/cloud-8-22/findbugs-full-1.3.10-dev-20100822.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/BrowseAction.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/BrowseAction.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/asm-tree-3.1.jar" afterPath="$PROJECT_DIR$/lib/asm-tree-3.1.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/LICENSE.sax" afterPath="$PROJECT_DIR$/bin/ant/LICENSE.sax" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-jmf.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-jmf.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/EventListener.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/EventListener.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-testutil.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-testutil.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/inspection/FindBugsInspection.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/inspection/FindBugsInspection.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/README" afterPath="$PROJECT_DIR$/bin/ant/README" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/preferences/PersistencePreferencesBean.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/preferences/PersistencePreferencesBean.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/MultiSplitLayout.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/MultiSplitLayout.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/bin/ant.bat" afterPath="$PROJECT_DIR$/bin/ant/bin/ant.bat" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-bsf-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-bsf-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LICENSE-bcel.txt" afterPath="$PROJECT_DIR$/LICENSE-bcel.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-starteam-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-starteam-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/AbstractBar.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/AbstractBar.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/toolWindow-2.png" afterPath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/toolWindow-2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/swing-worker-1.2.jar" afterPath="$PROJECT_DIR$/lib/swing-worker-1.2.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/types/BugReporterInspectionEventImpl.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/types/BugReporterInspectionEventImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/class.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/class.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/ModuleComponentImpl.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/ModuleComponentImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/QuickSearch.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/QuickSearch.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ExtendedProblemDescriptor.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ExtendedProblemDescriptor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/EventManager.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/EventManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/LICENSE.xerces" afterPath="$PROJECT_DIR$/bin/ant/LICENSE.xerces" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/NodeVisitor.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/NodeVisitor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/xml-apis.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/xml-apis.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/asm-xml-3.1.jar" afterPath="$PROJECT_DIR$/lib/asm-xml-3.1.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsWorker.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsWorker.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/SplashBug2reverseB.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/SplashBug2reverseB.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/source_java.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/source_java.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzeAllModifiedFiles.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzeAllModifiedFiles.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-jdepend-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-jdepend-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/ToggleableButton.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/ToggleableButton.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/bin/antRun.pl" afterPath="$PROJECT_DIR$/bin/ant/bin/antRun.pl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/etc/junit-noframes.xsl" afterPath="$PROJECT_DIR$/bin/ant/etc/junit-noframes.xsl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-launcher-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-launcher-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-jai-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-jai-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/editor/IconLineMarkerProvider.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/editor/IconLineMarkerProvider.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-commons-net.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-commons-net.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/inspection/FindBugsInspector.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/inspection/FindBugsInspector.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-netrexx-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-netrexx-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-oro.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-oro.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/FindBugsUtil.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/FindBugsUtil.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/asm-analysis-3.1.jar" afterPath="$PROJECT_DIR$/lib/asm-analysis-3.1.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-jdepend-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-jdepend-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/nodes/TreeOpen.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/nodes/TreeOpen.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ModuleConfigurationPanel.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ModuleConfigurationPanel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/bin/runant.py" afterPath="$PROJECT_DIR$/bin/ant/bin/runant.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/ViewTooltips.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/ViewTooltips.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzeChangelistFiles.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzeChangelistFiles.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-testutil-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-testutil-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/asm-util-3.1.jar" afterPath="$PROJECT_DIR$/lib/asm-util-3.1.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-oro-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-oro-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.properties" afterPath="$PROJECT_DIR$/build.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/LookUp.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/LookUp.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/Tree.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/Tree.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/smallBuggy.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/smallBuggy.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/progress-1.png" afterPath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/progress-1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/Listener.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/Listener.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-log4j-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-log4j-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/filter-file-exclude.xml" afterPath="$PROJECT_DIR$/src/test/filter-file-exclude.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/GuiUtil.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/GuiUtil.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/bin/lcp.bat" afterPath="$PROJECT_DIR$/bin/ant/bin/lcp.bat" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/tasks/BackgroundableTask.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/tasks/BackgroundableTask.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/i18n/Messages.properties" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/i18n/Messages.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByTemplate.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByTemplate.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-weblogic-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-weblogic-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/NDockLayout.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/NDockLayout.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/toolWindow-3.png" afterPath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/toolWindow-3.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/asm-commons-3.1.jar" afterPath="$PROJECT_DIR$/lib/asm-commons-3.1.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-bcel-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-bcel-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsProject.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsProject.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/etc/changelog.xsl" afterPath="$PROJECT_DIR$/bin/ant/etc/changelog.xsl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/report/BugReporter.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/report/BugReporter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-bcel-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-bcel-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/WHATSNEW" afterPath="$PROJECT_DIR$/bin/ant/WHATSNEW" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-oro-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-oro-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/TreeQuickSearch.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/TreeQuickSearch.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/AbstractNodeDescriptor.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/AbstractNodeDescriptor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/EventManagerImpl.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/EventManagerImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-swing-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-swing-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/README" afterPath="$PROJECT_DIR$/bin/ant/lib/README" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-netrexx-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-netrexx-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-resolver-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-resolver-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-stylebook-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-stylebook-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/SplashBug1.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/SplashBug1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-trax-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-trax-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ImportExportConfiguration.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ImportExportConfiguration.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/LICENSE" afterPath="$PROJECT_DIR$/bin/ant/LICENSE" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LICENSE-AppleJavaExtensions.txt" afterPath="$PROJECT_DIR$/LICENSE-AppleJavaExtensions.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeActiveChangelist.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeActiveChangelist.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/etc/maudit-frames.xsl" afterPath="$PROJECT_DIR$/bin/ant/etc/maudit-frames.xsl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-junit-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-junit-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/etc/checkstyle/checkstyle-frames.xsl" afterPath="$PROJECT_DIR$/bin/ant/etc/checkstyle/checkstyle-frames.xsl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-launcher-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-launcher-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/types/AbstractEvent.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/types/AbstractEvent.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByPriority.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByPriority.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/bugSplash3.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/bugSplash3.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-jmf-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-jmf-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugDetailsComponents.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugDetailsComponents.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/NOTICE" afterPath="$PROJECT_DIR$/NOTICE" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/etc/tagdiff.xsl" afterPath="$PROJECT_DIR$/bin/ant/etc/tagdiff.xsl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-javamail-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-javamail-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/NotificationImpl.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/NotificationImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-swing-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-swing-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-bcel-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-bcel-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-commons-net-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-commons-net-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-weblogic-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-weblogic-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugTreePanel.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugTreePanel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/annotation/EventFilter.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/annotation/EventFilter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/toolWindow-4.png" afterPath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/toolWindow-4.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-nodeps-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-nodeps-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/jFormatString.jar" afterPath="$PROJECT_DIR$/lib/jFormatString.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/TreeNodeCellRenderer.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/TreeNodeCellRenderer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LICENSE-FindBugs.txt" afterPath="$PROJECT_DIR$/LICENSE-FindBugs.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsCompileAfterHook.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsCompileAfterHook.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/BUILD.txt" afterPath="$PROJECT_DIR$/BUILD.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/priority/priorityExp.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/priority/priorityExp.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByBugCategory.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByBugCategory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/method.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/method.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/priority/priorityLow.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/priority/priorityLow.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/down.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/down.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/toolWindow-5.png" afterPath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/toolWindow-5.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPluginImpl.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPluginImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/toolWindow-1.png" afterPath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/toolWindow-1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README" afterPath="$PROJECT_DIR$/README" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/EventManagerImpl.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/EventManagerImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-jai.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-jai.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/etc/junit-frames.xsl" afterPath="$PROJECT_DIR$/bin/ant/etc/junit-frames.xsl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-trax.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-trax.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-commons-logging.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-commons-logging.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-commons-logging-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-commons-logging-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/FindBugsPluginConstants.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/FindBugsPluginConstants.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/ResourcesLoader.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/ResourcesLoader.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/JumpToSource.png" afterPath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/JumpToSource.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-jdepend.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-jdepend.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeSelectedFile.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeSelectedFile.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzeCurrentEditorFile.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzeCurrentEditorFile.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/annotations.jar" afterPath="$PROJECT_DIR$/lib/annotations.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/toolWindow-6.png" afterPath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/toolWindow-6.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/libraries.properties" afterPath="$PROJECT_DIR$/bin/ant/lib/libraries.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-stylebook-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-stylebook-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-parent-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-parent-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/bcel.jar" afterPath="$PROJECT_DIR$/lib/bcel.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ScrollToSource.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ScrollToSource.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/bin/envset.cmd" afterPath="$PROJECT_DIR$/bin/ant/bin/envset.cmd" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-jai-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-jai-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/filters/BugReporterInspectionEventFilter.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/filters/BugReporterInspectionEventFilter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-launcher.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-launcher.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/priority/priorityIgnore.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/priority/priorityIgnore.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/SplashBug2B.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/SplashBug2B.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/model/BugPatternTableModel.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/model/BugPatternTableModel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ReportConfiguration.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ReportConfiguration.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-junit-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-junit-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/up.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/up.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByRank.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByRank.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/etc/junit-frames-xalan1.xsl" afterPath="$PROJECT_DIR$/bin/ant/etc/junit-frames-xalan1.xsl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-launcher-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-launcher-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/annotation/Notify.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/annotation/Notify.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/BaseAction.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/BaseAction.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/import.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/import.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/etc/checkstyle/checkstyle-xdoc.xsl" afterPath="$PROJECT_DIR$/bin/ant/etc/checkstyle/checkstyle-xdoc.xsl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/editor/CustomGutterIconRenderer.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/editor/CustomGutterIconRenderer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/HashCodeBuilder.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/HashCodeBuilder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/GroupTreeModel.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/GroupTreeModel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-junit.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-junit.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/inspection/FindBugsInspectionProvider.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/inspection/FindBugsInspectionProvider.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-commons-logging-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-commons-logging-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-swing.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-swing.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/etc/checkstyle/checkstyle-text.xsl" afterPath="$PROJECT_DIR$/bin/ant/etc/checkstyle/checkstyle-text.xsl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/DashedBorder.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/DashedBorder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/types/BugReporterEvent.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/types/BugReporterEvent.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzePackageFiles.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzePackageFiles.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.xml" afterPath="$PROJECT_DIR$/build.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/LICENSE.dom" afterPath="$PROJECT_DIR$/bin/ant/LICENSE.dom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/TestListener.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/TestListener.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/IOHandler.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/IOHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-antlr-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-antlr-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/etc/jdepend.xsl" afterPath="$PROJECT_DIR$/bin/ant/etc/jdepend.xsl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/BugTreeHelper.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/BugTreeHelper.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/FindBugsPluginLoader.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/FindBugsPluginLoader.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LICENSE-jsr305.txt" afterPath="$PROJECT_DIR$/LICENSE-jsr305.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-resolver.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-resolver.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-weblogic.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-weblogic.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/bin/antenv.cmd" afterPath="$PROJECT_DIR$/bin/ant/bin/antenv.cmd" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FindBugs-IDEA.iml" afterPath="$PROJECT_DIR$/FindBugs-IDEA.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/FilterConfiguration.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/FilterConfiguration.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzeProjectFiles.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzeProjectFiles.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-testutil-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-testutil-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-junit-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-junit-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/editor/EditorHandler.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/editor/EditorHandler.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/VisitableTreeNode.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/VisitableTreeNode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceGroupNode.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceGroupNode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-jsch.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-jsch.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/TreeOccurenceNavigator.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/TreeOccurenceNavigator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-log4j-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-log4j-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-regexp-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-regexp-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/fbAnalyzeActiveChangelist.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/fbAnalyzeActiveChangelist.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-starteam.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-starteam.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/BalloonTipFactory.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/BalloonTipFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-resolver-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-resolver-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/bug18x18.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/bug18x18.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/CloseToolWindow.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/CloseToolWindow.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/preferences/FindBugsPreferences.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/preferences/FindBugsPreferences.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-jdepend-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-jdepend-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/close.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/close.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/etc/log.xsl" afterPath="$PROJECT_DIR$/bin/ant/etc/log.xsl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-log4j-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-log4j-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/findbugs.jar" afterPath="$PROJECT_DIR$/lib/findbugs.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/button-empty_hover.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/button-empty_hover.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/types/EventManagerEvent.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/types/EventManagerEvent.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/field.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/field.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/annotation/Batch.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/annotation/Batch.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-trax-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-trax-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByFilter.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByFilter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/FileUtil.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/FileUtil.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-testutil-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-testutil-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/bin/ant.cmd" afterPath="$PROJECT_DIR$/bin/ant/bin/ant.cmd" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-nodeps-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-nodeps-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceNode.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceNode.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/recentSearches-1.png" afterPath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/recentSearches-1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzePackages.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzePackages.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-bsf.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-bsf.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/jaxen-1.1.1.jar" afterPath="$PROJECT_DIR$/lib/jaxen-1.1.1.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/bin/complete-ant-cmd.pl" afterPath="$PROJECT_DIR$/bin/ant/bin/complete-ant-cmd.pl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/types/EventManagerEventImpl.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/types/EventManagerEventImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByBugCategory.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByBugCategory.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeModule.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeModule.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/bin/antRun" afterPath="$PROJECT_DIR$/bin/ant/bin/antRun" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-javamail.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-javamail.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-antlr.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-antlr.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-parent-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-parent-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-netrexx-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-netrexx-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-swing-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-swing-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/BugTree.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/BugTree.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/types/BugReporterEventImpl.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/types/BugReporterEventImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/ActionToolbarContainer.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/ActionToolbarContainer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByClass.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByClass.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/nodes/TreeClosed.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/nodes/TreeClosed.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzeSelectedFiles.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzeSelectedFiles.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/AbstractListener.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/AbstractListener.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/DoneCallback.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-parent-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-parent-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/SplashBug1reverse.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/SplashBug1reverse.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/.directory" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/.directory" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/plugin/fb-contrib-3.6.1.jar" afterPath="$PROJECT_DIR$/lib/plugin/fb-contrib-3.6.1.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/xercesImpl.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/xercesImpl.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/moveDown.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/moveDown.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/BugInstanceComparator.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/BugInstanceComparator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/setenv.bat" afterPath="$PROJECT_DIR$/setenv.bat" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/KEYS" afterPath="$PROJECT_DIR$/bin/ant/KEYS" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/RecurseNodeVisitor.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/RecurseNodeVisitor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/editor/DocumentChangeTracker.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/editor/DocumentChangeTracker.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-starteam-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-starteam-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/editorView-1.png" afterPath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/editorView-1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/PreviewSelectBugInstance.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/PreviewSelectBugInstance.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-regexp.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-regexp.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/TreeNodeCellRenderer2.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/TreeNodeCellRenderer2.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByPackage.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByPackage.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/MaskIcon.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/MaskIcon.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/INSTALL" afterPath="$PROJECT_DIR$/bin/ant/INSTALL" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/inspection/FindBugsInspectionPanel.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/inspection/FindBugsInspectionPanel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/TreeXmlSerializer.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/TreeXmlSerializer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LICENSE.txt" afterPath="$PROJECT_DIR$/LICENSE.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/toolWindow-7.png" afterPath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/toolWindow-7.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LICENSE-commons-lang.txt" afterPath="$PROJECT_DIR$/LICENSE-commons-lang.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-jsch-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-jsch-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/filters/EventFilter.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/filters/EventFilter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/model/BugCategoryTableModel.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/model/BugCategoryTableModel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/moveUp.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/moveUp.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-nodeps.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-nodeps.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-log4j.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-log4j.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/dom4j-1.6.1.jar" afterPath="$PROJECT_DIR$/lib/dom4j-1.6.1.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/bin/runrc.cmd" afterPath="$PROJECT_DIR$/bin/ant/bin/runrc.cmd" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/filters/BugReporterEventFilter.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/filters/BugReporterEventFilter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/DetectorConfiguration.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/DetectorConfiguration.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-bsf-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-bsf-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-commons-net-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-commons-net-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/CollapseAll.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/CollapseAll.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/VersionManager.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/VersionManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-bcel.jar" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-bcel.jar" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ExportBugCollection.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ExportBugCollection.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/package.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/package.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/exception/FindBugsPluginException.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/exception/FindBugsPluginException.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/priority/priorityHigh.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/priority/priorityHigh.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/EventImpl.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/EventImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ImportBugCollection.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ImportBugCollection.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/types/TestEvent.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/types/TestEvent.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-antlr-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-antlr-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/etc/mmetrics-frames.xsl" afterPath="$PROJECT_DIR$/bin/ant/etc/mmetrics-frames.xsl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/toolbar-1.png" afterPath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/toolbar-1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/get-m2.xml" afterPath="$PROJECT_DIR$/bin/ant/get-m2.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/bin/runant.pl" afterPath="$PROJECT_DIR$/bin/ant/bin/runant.pl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-jmf-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-jmf-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/GuiResources.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/GuiResources.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ImportFileDialog.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/types/BugReporterInspectionEvent.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/types/BugReporterInspectionEvent.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/TreeNextOccurence.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/TreeNextOccurence.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LICENSE-dom4j.txt" afterPath="$PROJECT_DIR$/LICENSE-dom4j.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/inspection/SurroundWithTagFix.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/inspection/SurroundWithTagFix.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/Grouper.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/Grouper.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ConfigurationPage.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ConfigurationPage.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/BugInstanceUtil.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/BugInstanceUtil.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-jsch-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-jsch-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/TableSorter.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/TableSorter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-weblogic-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-weblogic-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/collectors/RecurseFileCollector.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/collectors/RecurseFileCollector.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzeModuleFiles.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzeModuleFiles.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByClass.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByClass.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-regexp-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-regexp-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/inspection/SuppressWarningFix.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/inspection/SuppressWarningFix.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/.directory" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/.directory" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/asm-3.1.jar" afterPath="$PROJECT_DIR$/lib/asm-3.1.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/button-empty.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/button-empty.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzeClassUnderCursor.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/AnalyzeClassUnderCursor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeModifiedFiles.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeModifiedFiles.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-antlr-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-antlr-1.7.0.pom.md5" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FindBugs-IDEA.iws" afterPath="$PROJECT_DIR$/FindBugs-IDEA.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/HelpAction.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/HelpAction.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-regexp-1.7.0.pom.sha1" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-regexp-1.7.0.pom.sha1" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/GroupBy.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/GroupBy.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeClassUnderCursor.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeClassUnderCursor.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeProject.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeProject.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/collectors/RecurseClassCollector.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/collectors/RecurseClassCollector.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-commons-net-1.7.0.pom" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-commons-net-1.7.0.pom" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/buggy.icns" afterPath="$PROJECT_DIR$/lib/buggy.icns" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/progress-2.png" afterPath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/progress-2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/sourcefile.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/sourcefile.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/bin/ant" afterPath="$PROJECT_DIR$/bin/ant/bin/ant" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-apache-oro-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-apache-oro-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/lib/ant-nodeps-1.7.0.pom.md5" afterPath="$PROJECT_DIR$/bin/ant/lib/ant-nodeps-1.7.0.pom.md5" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ShowPreferencesPage.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ShowPreferencesPage.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/projectView-1.png" afterPath="$PROJECT_DIR$/doc/screenshots/toolwindow/orig/projectView-1.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/Event.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/Event.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/bug2.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/bug2.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/priority/priorityMedium.png" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/priority/priorityMedium.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bin/ant/fetch.xml" afterPath="$PROJECT_DIR$/bin/ant/fetch.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LICENSE-jaxen.txt" afterPath="$PROJECT_DIR$/LICENSE-jaxen.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByRank.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByRank.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByPriority.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByPriority.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ImportFileDialog.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByClass.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByClass.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/GroupTreeModel.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/GroupTreeModel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByBugCategory.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByBugCategory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ImportBugCollection.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ImportBugCollection.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ExportFileDialog.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ExportFileDialog.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceGroupNode.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceGroupNode.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/EventDispatchThreadHelper.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/DoneCallback.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByPackage.java" afterPath="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByPackage.java" />
     </list>
     <list id="d519977a-3e43-45cf-93a1-95e9c089996b" name="doNotcheckin" comment="" />
     <list id="0e68ba08-e423-4899-b127-d44e5f1c02c1" name="ignore" comment="" />
@@ -473,7 +79,7 @@
   </component>
   <component name="DebuggerManager">
     <line_breakpoints>
-      <breakpoint url="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceNode.java" line="140" class="org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode" package="org.twodividedbyzero.idea.findbugs.gui.tree.model">
+      <breakpoint url="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByClass.java" line="72" class="org.twodividedbyzero.idea.findbugs.actions.GroupByClass" package="org.twodividedbyzero.idea.findbugs.actions">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -486,7 +92,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByClass.java" line="72" class="org.twodividedbyzero.idea.findbugs.actions.GroupByClass" package="org.twodividedbyzero.idea.findbugs.actions">
+      <breakpoint url="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ImportBugCollection.java" line="184" class="org.twodividedbyzero.idea.findbugs.actions.ImportBugCollection$1" package="org.twodividedbyzero.idea.findbugs.actions">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -562,37 +168,10 @@
   <component name="FileColors" enabled="false" enabledForTabs="false" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="BugTreePanel.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugTreePanel.java">
+      <file leaf-file-name="ImportBugCollection.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ImportBugCollection.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="389" column="11" selection-start="12600" selection-end="12600" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ToolWindowPanel.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="264" column="39" selection-start="10300" selection-end="10300" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GroupByClass.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByClass.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="67" column="0" selection-start="2692" selection-end="2692" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BugDetailsComponents.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugDetailsComponents.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="282" column="8" selection-start="10147" selection-end="10147" vertical-scroll-proportion="0.0">
+            <state line="184" column="0" selection-start="7481" selection-end="7481" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -610,57 +189,71 @@
       <file leaf-file-name="FindBugsTask.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/tasks/FindBugsTask.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="45" column="0" selection-start="1506" selection-end="1506" vertical-scroll-proportion="0.0">
+            <state line="38" column="13" selection-start="1251" selection-end="1251" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FindBugsPlugin.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPlugin.java">
+      <file leaf-file-name="ToolWindowPanel.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="39" column="3" selection-start="1289" selection-end="1406" vertical-scroll-proportion="0.0">
+            <state line="276" column="0" selection-start="11218" selection-end="11218" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FindBugsPluginImpl.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPluginImpl.java">
+      <file leaf-file-name="BugTreePanel.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugTreePanel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="141" column="47" selection-start="5818" selection-end="5818" vertical-scroll-proportion="0.0">
+            <state line="126" column="0" selection-start="4558" selection-end="4558" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="EventDispatchThreadHelper.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/EventDispatchThreadHelper.java">
+      <file leaf-file-name="GroupTreeModel.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/GroupTreeModel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="87" column="39" selection-start="2350" selection-end="2350" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CallerStack.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/CallerStack.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="18" column="0" selection-start="647" selection-end="765" vertical-scroll-proportion="0.099115044">
+            <state line="152" column="9" selection-start="5191" selection-end="5191" vertical-scroll-proportion="0.3139535">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CheckThreadViolationRepaintManager.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/CheckThreadViolationRepaintManager.java">
+      <file leaf-file-name="BugInstanceNode.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceNode.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="47" column="112" selection-start="1863" selection-end="1971" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state line="150" column="34" selection-start="4598" selection-end="4598" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BugInstanceUtil.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/BugInstanceUtil.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="169" column="53" selection-start="5162" selection-end="5162" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="IdeaUtilImpl.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/IdeaUtilImpl.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="757" column="59" selection-start="24962" selection-end="25006" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BugInstanceGroupNode.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceGroupNode.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="25" column="2" selection-start="910" selection-end="910" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -680,22 +273,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ExportFileDialog.java" />
-        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ImportFileDialog.java" />
-        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/DoneCallback.java" />
-        <option value="$PROJECT_DIR$/META-INF/plugin.xml" />
-        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/BugInstanceUtil.java" />
-        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceNode.java" />
+        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/model/BugCategoryTableModel.java" />
+        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/model/BugPatternTableModel.java" />
         <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugDetailsComponents.java" />
+        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugTreePanel.java" />
+        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/BugTreeHelper.java" />
+        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/AbstractTreeModel.java" />
+        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/report/BugReporter.java" />
+        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/view/TreeQuickSearch.java" />
+        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByBugCategory.java" />
+        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByPackage.java" />
+        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByPriority.java" />
+        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByRank.java" />
         <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ImportBugCollection.java" />
         <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/GroupTreeModel.java" />
-        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugTreePanel.java" />
-        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java" />
-        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByClass.java" />
-        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/CheckThreadViolationRepaintManager.java" />
-        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPluginImpl.java" />
-        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/CallerStack.java" />
-        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/EventDispatchThreadHelper.java" />
+        <option value="$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceGroupNode.java" />
+        <option value="$PROJECT_DIR$/META-INF/plugin.xml" />
       </list>
     </option>
   </component>
@@ -1124,7 +717,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="common" />
+              <option name="myItemId" value="actions" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1138,53 +731,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="impl" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="findbugs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="common" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="util" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="FindBugs-IDEA" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="FindBugs-IDEA" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="impl" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="findbugs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="common" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ui" />
+              <option name="myItemId" value="META-INF" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -1692,21 +1239,22 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1920" height="1200" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.29590866" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.29590866" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3390466" sideWeight="0.697431" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24959828" sideWeight="0.67490494" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.41294006" sideWeight="0.0" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.41294006" sideWeight="0.0" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32921588" sideWeight="0.6640549" order="15" side_tool="false" content_ui="tabs" />
-      <window_info id="FindBugs-IDEA" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3365019" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
+      <window_info id="FindBugs-IDEA" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3358706" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3282588" sideWeight="0.0" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.31844106" sideWeight="0.5" order="16" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.31363204" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3046749" sideWeight="0.3698761" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3992477" sideWeight="0.6663489" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27637923" sideWeight="0.58039963" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27637923" sideWeight="0.697431" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3297456" sideWeight="0.5" order="27" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32414448" sideWeight="0.0" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="DSM" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" x="130" y="100" width="1534" height="970" />
@@ -1717,7 +1265,6 @@
       <window_info id="PsiViewer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="SQL" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3297456" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3390466" sideWeight="0.58039963" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Profile" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
       <window_info id="IntelliJad Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3297456" sideWeight="0.5" order="17" side_tool="false" content_ui="tabs" />
       <window_info id="CafeBabe" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1764,7 +1311,7 @@
     <option name="PERFORM_ROLLBACK_IN_BACKGROUND" value="false" />
     <option name="CHECK_LOCALLY_CHANGED_CONFLICTS_IN_BACKGROUND" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="* removed unused declarations" />
+    <option name="LAST_COMMIT_MESSAGE" value="* set svn-keyword recursive" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -1798,6 +1345,7 @@
     <MESSAGE value="* do not make fields final or private - initialized per reflection from intellij persistence framework" />
     <MESSAGE value="* FindBugsWorker should always use FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND (AnalyzeProjectFiles)" />
     <MESSAGE value="* removed unused declarations" />
+    <MESSAGE value="* set svn-keyword recursive" />
   </component>
   <component name="VssConfiguration">
     <option name="CLIENT_PATH" value="" />
@@ -1872,106 +1420,114 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceNode.java">
+    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/event/EventManagerImpl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="151" column="29" selection-start="4700" selection-end="4700" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ImportBugCollection.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="144" column="51" selection-start="5512" selection-end="5512" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/tasks/BackgroundableTask.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="0" selection-start="1277" selection-end="1277" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/TestListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="13" selection-start="974" selection-end="974" vertical-scroll-proportion="0.2848837">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/nevent/EventManagerImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="35" column="6" selection-start="1355" selection-end="1355" vertical-scroll-proportion="-1.8037791">
+        <state line="92" column="0" selection-start="2877" selection-end="2877" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="264" column="39" selection-start="10300" selection-end="10300" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPluginImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="141" column="47" selection-start="5818" selection-end="5818" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPlugin.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="39" column="3" selection-start="1289" selection-end="1406" vertical-scroll-proportion="0.0">
+        <state line="276" column="0" selection-start="11218" selection-end="11218" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugTreePanel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="389" column="11" selection-start="12600" selection-end="12600" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/GroupByClass.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="67" column="0" selection-start="2692" selection-end="2692" vertical-scroll-proportion="0.0">
+        <state line="126" column="0" selection-start="4558" selection-end="4558" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../findbugs-1.3.9/src/java/edu/umd/cs/findbugs/BugInstance.java">
+    <entry file="jar:///opt/java/jdk1.6.0_13/src.zip!/java/util/concurrent/locks/ReentrantLock.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="232" column="12" selection-start="8116" selection-end="8116" vertical-scroll-proportion="3.970909">
+        <state line="257" column="66" selection-start="8905" selection-end="8905" vertical-scroll-proportion="0.3070326">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugDetailsComponents.java">
+    <entry file="jar:///opt/java/jdk1.6.0_13/jre/lib/rt.jar!/sun/misc/Unsafe.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="282" column="8" selection-start="10147" selection-end="10147" vertical-scroll-proportion="0.0" />
+        <state line="293" column="23" selection-start="9133" selection-end="9133" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///opt/java/jdk1.6.0_13/src.zip!/java/lang/Object.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="364" column="29" selection-start="17878" selection-end="17955" vertical-scroll-proportion="0.3327616">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/tasks/BackgroundableTask.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="40" column="0" selection-start="1277" selection-end="1277" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/tasks/FindBugsTask.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="45" column="0" selection-start="1506" selection-end="1506" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/CheckThreadViolationRepaintManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="47" column="112" selection-start="1863" selection-end="1971" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state line="38" column="13" selection-start="1251" selection-end="1251" vertical-scroll-proportion="0.0">
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/ui/EventDispatchThreadHelper.java">
+    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceGroupNode.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="87" column="39" selection-start="2350" selection-end="2350" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state line="25" column="2" selection-start="910" selection-end="910" vertical-scroll-proportion="0.0">
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/CallerStack.java">
+    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/actions/ImportBugCollection.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="0" selection-start="647" selection-end="765" vertical-scroll-proportion="0.099115044">
+        <state line="184" column="0" selection-start="7481" selection-end="7481" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="150" column="34" selection-start="4598" selection-end="4598" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/BugInstanceUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="169" column="53" selection-start="5162" selection-end="5162" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/common/util/IdeaUtilImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="757" column="59" selection-start="24962" selection-end="25006" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/META-INF/plugin.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="78" column="45" selection-start="5027" selection-end="5027" vertical-scroll-proportion="0.8112927">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///opt/java/jdk1.6.0_13/jre/lib/rt.jar!/sun/java2d/loops/Blit.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="4" selection-start="1583" selection-end="1583" vertical-scroll-proportion="0.41604754">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/GroupTreeModel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="152" column="9" selection-start="5191" selection-end="5191" vertical-scroll-proportion="0.3139535">
           <folding />
         </state>
       </provider>

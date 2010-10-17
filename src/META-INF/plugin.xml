@@ -76,6 +76,7 @@
             <li>add bug pattern abbr to bug pattern result explanation view matching preference bug pattern category </li>
             <li>configurable : open an exported bug collection html page in the intellij configured browser</li>
             <li>configurable : open an exported bug collection html page in the intellij configured browser</li>
+            <li>some performance improvements (non blocking Grouping and JavaPsiFacade.getInstance(...).findClass)</li>
 		</ul>
         <h3>0.9.95</h3>
 		<ul>

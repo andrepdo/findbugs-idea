@@ -16,7 +16,6 @@
 
 package org.twodividedbyzero.idea.findbugs.actions;
 
-import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -30,52 +29,34 @@ import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import edu.umd.cs.findbugs.BugCollection;
-import edu.umd.cs.findbugs.HTMLBugReporter;
-import org.dom4j.Document;
-import org.dom4j.io.DocumentSource;
+import edu.umd.cs.findbugs.BugInstance;
+import edu.umd.cs.findbugs.ProjectStats;
+import edu.umd.cs.findbugs.SortedBugCollection;
+import org.dom4j.DocumentException;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
+import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent.Operation;
+import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventImpl;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
+import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
-import org.twodividedbyzero.idea.findbugs.gui.common.ExportFileDialog;
+import org.twodividedbyzero.idea.findbugs.gui.common.ImportFileDialog;
 import org.twodividedbyzero.idea.findbugs.tasks.BackgroundableTask;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import java.awt.EventQueue;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
- * $Date: 2010-02-06 13:58:28 +0100 (Sat, 06 Feb 2010) $
+ * $Date: 2010-10-10 16:30:08 +0200 (Sun, 10 Oct 2010) $
  *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org> and ???
- * @version $Revision: 81 $
+ * @author Andre Pfeiler<andrep@twodividedbyzero.org>
+ * @version $Revision: 107 $
  * @since 0.9.96
  */
 @SuppressWarnings({"HardCodedStringLiteral"})
@@ -83,16 +64,10 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 
 	private static final Logger LOGGER = Logger.getInstance(ImportBugCollection.class.getName());
 
-	private static String _exportDir = System.getProperty("user.home") + File.separatorChar + FindBugsPluginConstants.TOOL_WINDOW_ID;
-
-	private static final String FINDBUGS_PLAIN_XSL = "plain.xsl";
-	private static final String FINDBUGS_RESULT_PREFIX = "FindBugsResult_";
-	private static final String FINDBUGS_RESULT_HTML_SUFFIX = ".html";
-	private static final String FINDBUGS_RESULT_RAW_SUFFIX = ".xml";
-
 	private boolean _enabled;
 	private BugCollection _bugCollection;
 	private boolean _running;
+	private BugCollection _importBugCollection;
 
 
 	@Override
@@ -128,77 +103,77 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 		final DialogBuilder dialogBuilder = new DialogBuilder(project);
 		dialogBuilder.addOkAction();
 		dialogBuilder.addCancelAction();
-		dialogBuilder.setTitle("Select directory to save the exported file");
-		final ExportFileDialog exportDialog = new ExportFileDialog(_exportDir, dialogBuilder);
+		dialogBuilder.setTitle("Import previous saved bug collection xml");
+		final ImportFileDialog importFileDialog = new ImportFileDialog(ExportBugCollection._exportDir, dialogBuilder);
 		dialogBuilder.showModal(true);
 		if (dialogBuilder.getDialogWrapper().getExitCode() == DialogWrapper.CANCEL_EXIT_CODE) {
 			return;
 		}
-		final String path = exportDialog.getText();
-		if (path == null || path.trim().length() == 0) {
+		final String fileToImport = importFileDialog.getText();
+		if (fileToImport == null || fileToImport.trim().length() == 0) {
 			return;
 		}
-		_exportDir = path.trim();
-		//Create a unique file name by using time stamp
-		final String timeStamp = new SimpleDateFormat().format(new Date()).replaceAll("[/ :]", "_");
-		final String fileNameHtml = _exportDir + File.separatorChar + FINDBUGS_RESULT_PREFIX + timeStamp + FINDBUGS_RESULT_HTML_SUFFIX;
-		final String fileNameXml = _exportDir + File.separatorChar + FINDBUGS_RESULT_PREFIX + timeStamp + FINDBUGS_RESULT_RAW_SUFFIX;
 
-		createExportDirIfAbsent();
+
+		final FindBugsPlugin findBugsPlugin = getPluginInterface(project);
+		final BugCollection bugCollection = findBugsPlugin.getToolWindowPanel().getBugCollection();
+		if (bugCollection != null && !bugCollection.getCollection().isEmpty()) {
+			final int result = Messages.showYesNoDialog(project, "Current result in the 'Found bugs view' will be deleted. Continue ?", "Delete found bugs?", Messages.getQuestionIcon());
+			if(result == 1) {
+				return;
+			}
+		}
 
 		//Create a task to export the bug collection to html
-		final AtomicReference<Task> exportTask = new AtomicReference<Task>(new BackgroundableTask(project, "Exporting Findbugs-IDEA Result", false) {
+		final AtomicReference<Task> importTask = new AtomicReference<Task>(new BackgroundableTask(project, "Importing Findbugs Result", true) {
 			private ProgressIndicator _indicator;
 
 
 			@SuppressWarnings({"IOResourceOpenedButNotSafelyClosed"})
 			@Override
 			public void run(@NotNull final ProgressIndicator indicator) {
-				indicator.setText2(fileNameXml);
+
+				EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_STARTED, null, 0, project.getName()));
 				setProgressIndicator(indicator);
-				FileWriter writer = null;
+				indicator.setFraction(0.0);
+				indicator.setIndeterminate(false);
+				indicator.setText(fileToImport);
 				try {
-					if (_bugCollection != null) {
-						_bugCollection.setWithMessages(true);
+					_bugCollection = new SortedBugCollection();
+					_importBugCollection = _bugCollection.createEmptyCollectionWithMetadata();
+					_importBugCollection.readXML(fileToImport);
 
-						final Document document = _bugCollection.toDocument();
-						writeXmlFile(document, new BufferedOutputStream(new FileOutputStream(fileNameXml)));
-
-						indicator.setText2(fileNameHtml);
-						final Source xsl = new StreamSource(getStylesheetStream(FINDBUGS_PLAIN_XSL));
-						xsl.setSystemId(FINDBUGS_PLAIN_XSL);
-
-						final Transformer transformer = TransformerFactory.newInstance().newTransformer(xsl);
-						final Source source = new DocumentSource(document);
-						writer = new FileWriter(fileNameHtml);
-						final Result result = new StreamResult(writer);
-						transformer.transform(source, result);
-						_bugCollection.setWithMessages(false);
-
-						showToolWindowNotifier("Exported bug collection to " + fileNameHtml + '.', MessageType.INFO);
-						if(BrowserUtil.canStartDefaultBrowser()) {
-							BrowserUtil.launchBrowser(new File(fileNameHtml).toURI().toURL().toExternalForm());
+					final ProjectStats projectStats = _importBugCollection.getProjectStats();
+					int bugCount = 0;
+					for (final BugInstance bugInstance : _importBugCollection) {
+						if(indicator.isCanceled()) {
+							EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_ABORTED, project.getName()));
+							Thread.currentThread().interrupt();
+							return;
 						}
+						final Integer bugCounter = bugCount++;
+						final double fraction = bugCounter.doubleValue() / projectStats.getTotalBugs();
+						indicator.setFraction(fraction);
+						indicator.setText2("Importing bug '" + bugCount + "' of '" + projectStats.getTotalBugs() + "' - " + bugInstance.getMessageWithoutPrefix());
+						EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.NEW_BUG_INSTANCE, bugInstance, bugCounter, projectStats, project.getName()));
 					}
-				} catch (IOException e) {
-					final String message = "Export failed.";
+
+					showToolWindowNotifier("Imported bug collection from '" + fileToImport + "'.", MessageType.INFO);
+				} catch (IOException e1) {
+					EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_ABORTED, project.getName()));
+					final String message = "Import failed";
 					showToolWindowNotifier(message, MessageType.ERROR);
-					LOGGER.error(message, e);
-				} catch (TransformerConfigurationException e) {
-					final String message = "Transform to html failed due to configuration problems.";
+					LOGGER.error(message, e1);
+
+				} catch (DocumentException e1) {
+					EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_ABORTED, project.getName()));
+					final String message = "Import failed";
 					showToolWindowNotifier(message, MessageType.ERROR);
-					LOGGER.error(message, e);
-				} catch (TransformerException e) {
-					final String message = "Transformation to xml failed.";
-					showToolWindowNotifier(message, MessageType.ERROR);
-					LOGGER.error(message, e);
+					LOGGER.error(message, e1);
+
 				} finally {
-					if (writer != null) {
-						try {
-							writer.close();
-						} catch (IOException ignored) {
-						}
-					}
+					EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_FINISHED, null, _importBugCollection, project.getName()));
+					_importBugCollection = null;
 				}
 			}
 
@@ -215,29 +190,14 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 			}
 		});
 
-		final File file = new File(fileNameHtml);
-		if (!file.exists()) {
-			showToolWindowNotifier("Exporting bug collection failed. '" + fileNameHtml + "'.", MessageType.ERROR);
-		} else {
-			exportTask.get().queue();
-		}
-	}
-
-
-	private static void createExportDirIfAbsent() {
-		final File exportDir = new File(_exportDir);
-		if(!exportDir.exists()) {
-			if(!exportDir.mkdir()) {
-				final String message = "Creating the export directory '" + _exportDir + "' failed.";
-				showToolWindowNotifier(message, MessageType.ERROR);
-				LOGGER.error(message);
-			}
-		}
+		importTask.get().setCancelText("Cancel");
+		importTask.get().asBackgroundable();
+		importTask.get().queue();
 	}
 
 
 	private static void showToolWindowNotifier(final String message, final MessageType type) {
-		EventQueue.invokeLater(new Runnable() {
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
 				FindBugsPluginImpl.showToolWindowNotifier(message, type);
 			}
@@ -245,70 +205,10 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 	}
 
 
-	private static InputStream getStylesheetStream(final String stylesheet) throws IOException {
-		try {
-			final URL url = new URL(stylesheet);
-			return url.openStream();
-		} catch (Exception e) {
-			LOGGER.info("xls read failed.", e);
-		}
-		try {
-			return new BufferedInputStream(new FileInputStream(stylesheet));
-		} catch (Exception ignored) {
-		}
-		final InputStream xslInputStream = HTMLBugReporter.class.getResourceAsStream("/" + stylesheet);
-		if (xslInputStream == null) {
-			throw new IOException("Could not load HTML generation stylesheet " + stylesheet);
-		}
-		return xslInputStream;
-	}
-
-
-	private static void writeXmlFile(final Document doc, final OutputStream outputStream) {
-		try {
-			final Source source = new DocumentSource(doc);
-			final Result result = new StreamResult(outputStream);
-			final Transformer transformer = TransformerFactory.newInstance().newTransformer();
-			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			transformer.setOutputProperty(OutputKeys.STANDALONE, "no");
-			transformer.transform(source, result);
-		} catch (IllegalArgumentException ignore) {
-			LOGGER.warn("Setting output property to document failed. no problem. may be an empty document.");
-		} catch (TransformerConfigurationException ignore) {
-		} catch (TransformerException ignore) {
-		}
-	}
-
-
-	public static String loadXmlFromDocument(final Document doc) {
-		String xmlString = "";
-
-		try {
-			final Source source = new DocumentSource(doc);
-			final StringWriter out = new StringWriter();
-			final Result result = new StreamResult(out);
-
-			final Transformer transformer = TransformerFactory.newInstance().newTransformer();
-			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			transformer.setOutputProperty(OutputKeys.STANDALONE, "no");
-			transformer.transform(source, result);
-			xmlString = out.toString();
-		} catch (IllegalArgumentException ignore) {
-			LOGGER.warn("Setting output property to document failed. no problem. may be an empty document.");
-		} catch (TransformerException e) {
-			LOGGER.error("Loading xml string from org.w3c.dom.Document failed.", e);
-		}
-
-		return xmlString;
-	}
-
-
 	@Override
 	public void update(final AnActionEvent event) {
 		try {
-			final Project project = DataKeys.PROJECT.getData(event.getDataContext());
+			final com.intellij.openapi.project.Project project = DataKeys.PROJECT.getData(event.getDataContext());
 			final Presentation presentation = event.getPresentation();
 
 			// check a project is loaded
@@ -330,7 +230,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 			registerEventListener(project);
 
 			if (!_running) {
-				_enabled = _bugCollection != null && _bugCollection.iterator().hasNext();
+				_enabled = _importBugCollection == null;
 			}
 
 			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());

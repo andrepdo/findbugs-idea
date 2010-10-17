@@ -16,10 +16,12 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import edu.umd.cs.findbugs.BugInstance;
+import org.twodividedbyzero.idea.findbugs.common.DoneCallback;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator;
@@ -27,6 +29,7 @@ import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.Grouper.GrouperCallback;
 
 import javax.annotation.Nullable;
+import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -34,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -101,22 +103,34 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	}
 
 
+	@SuppressWarnings({"ReturnOfCollectionOrArrayField"})
 	public Map<PsiFile, List<ExtendedProblemDescriptor>> getProblems() {
 		return _problems;
 	}
 
 
-	@SuppressWarnings({"MethodMayBeStatic"})
+	@SuppressWarnings({"MethodMayBeStatic", "AnonymousInnerClass"})
 	private void addProblem(final BugInstanceNode leaf) {
-		final PsiFile psiFile = leaf.getPsiFile();
-		if (psiFile != null) {
-			final ExtendedProblemDescriptor element = new ExtendedProblemDescriptor(psiFile, leaf.getBugInstance());
-			if(_problems.containsKey(psiFile)) {
-				_problems.get(psiFile).add(element);
+		final PsiFile psiFile = leaf.getPsiFile(new DoneCallback<PsiFile>() {
+			public void onDone(final PsiFile value) {
+				_addProblem(value, leaf);
+			}
+		});
+		if(psiFile != null) {
+			_addProblem(psiFile, leaf);
+		}
+	}
+
+
+	private void _addProblem(final PsiFile value, final BugInstanceNode leaf) {
+		if (value != null) {
+			final ExtendedProblemDescriptor element = new ExtendedProblemDescriptor(value, leaf.getBugInstance());
+			if (_problems.containsKey(value)) {
+				_problems.get(value).add(element);
 			} else {
 				final List<ExtendedProblemDescriptor> list = new ArrayList<ExtendedProblemDescriptor>();
 				list.add(element);
-				_problems.put(psiFile, list);
+				_problems.put(value, list);
 			}
 		}
 	}
@@ -127,16 +141,21 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	}
 
 
+	@SuppressWarnings({"LockAcquiredButNotSafelyReleased"})
 	public void addNode(final BugInstance bugInstance) {
 		/*if(isHiddenBugGroup(bugInstance)) {
 			return;
 		}*/
-		_lock.lock();
+		if (!ApplicationManager.getApplication().isDispatchThread() || !EventQueue.isDispatchThread()) {
+			_lock.lock();
+		}
 		try {
 			_bugCount.getAndIncrement();
 			group(bugInstance);
 		} finally {
-			_lock.unlock();
+			if(Thread.holdsLock(_lock)) {
+				_lock.unlock();
+			}
 		}
 	}
 
@@ -256,32 +275,30 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 
 
 	public void clear() {
+		if (!ApplicationManager.getApplication().isDispatchThread() || !EventQueue.isDispatchThread()) {
+			_lock.lock();
+		}
 		try {
-			if (_lock.tryLock(100, TimeUnit.MILLISECONDS)) {
-				try {
-					//_sortedCollection.clear();
-					_bugCount.set(0);
-					_groups.clear();
-					_problems.clear();
-					((RootNode) _root).removeAllChilds();
-					nodeStructureChanged(_root);
-					reload();
-				} finally {
-					_lock.unlock();
-				}
-			} else {
-				//clear();
+			//_sortedCollection.clear();
+			_bugCount.set(0);
+			_groups.clear();
+			_problems.clear();
+			((RootNode) _root).removeAllChilds();
+			nodeStructureChanged(_root);
+			reload();
+		} finally {
+			if(Thread.holdsLock(_lock)) {
+				_lock.unlock();
 			}
-		} catch (InterruptedException e) {
-			LOGGER.warn("could not acquire lock within 500ms. retry...", e);
-			//clear();
 		}
 	}
 
 
 	@Nullable
 	public BugInstanceNode findNodeByBugInstance(final BugInstance bugInstance) {
-		_lock.lock();
+		if (!ApplicationManager.getApplication().isDispatchThread() || !EventQueue.isDispatchThread()) {
+			_lock.lock();
+		}
 		try {
 			final String[] fullGroupPath = BugInstanceUtil.getFullGroupPath(bugInstance, _groupBy);
 			final String[] groupNameKey = BugInstanceUtil.getGroupPath(bugInstance, fullGroupPath.length - 1, _groupBy);
@@ -302,7 +319,9 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 				}
 			}
 		} finally {
-			_lock.unlock();
+			if(Thread.holdsLock(_lock)) {
+				_lock.unlock();
+			}
 		}
 
 		return null;
