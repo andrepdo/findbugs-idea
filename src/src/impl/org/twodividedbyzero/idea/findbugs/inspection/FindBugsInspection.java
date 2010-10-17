@@ -39,7 +39,6 @@ import edu.umd.cs.findbugs.MethodAnnotation;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
 import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
@@ -117,7 +116,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	@Override
 	@NotNull
 	public String getShortName() {
-		return FindBugsPluginConstants.TOOL_WINDOW_ID;
+		return ResourcesLoader.getString("findbugs.inspection.group");
 	}
 
 
