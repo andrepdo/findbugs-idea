@@ -116,7 +116,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	@Override
 	@NotNull
 	public String getShortName() {
-		return ResourcesLoader.getString("findbugs.inspection.group");
+		return "FindBugs.IDEA";
 	}
 
 
