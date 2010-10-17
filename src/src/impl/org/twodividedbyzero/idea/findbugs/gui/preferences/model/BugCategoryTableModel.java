@@ -15,8 +15,9 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.preferences.model;
 
+import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
+
 import javax.swing.table.AbstractTableModel;
-import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -74,29 +75,21 @@ public class BugCategoryTableModel extends AbstractTableModel {
 
 	@Override
 	public void fireTableRowsInserted(final int firstRow, final int lastRow) {
-		if (EventQueue.isDispatchThread()) {
-			super.fireTableRowsInserted(firstRow, lastRow);
-		} else {
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					fireTableRowsInserted(firstRow, lastRow);
-				}
-			});
-		}
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			public void run() {
+				BugCategoryTableModel.super.fireTableRowsInserted(firstRow, lastRow);
+			}
+		});
 	}
 
 
 	@Override
 	public void fireTableRowsDeleted(final int firstRow, final int lastRow) {
-		if (EventQueue.isDispatchThread()) {
-			super.fireTableRowsDeleted(firstRow, lastRow);
-		} else {
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					fireTableRowsDeleted(firstRow, lastRow);
-				}
-			});
-		}
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			public void run() {
+				BugCategoryTableModel.super.fireTableRowsDeleted(firstRow, lastRow);
+			}
+		});
 	}
 
 

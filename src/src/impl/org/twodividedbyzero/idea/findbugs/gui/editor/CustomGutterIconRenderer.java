@@ -47,10 +47,10 @@ import java.util.Map.Entry;
 
 
 /**
- * $Date$
+ * $Date: 2010-10-10 16:30:08 +0200 (Sun, 10 Oct 2010) $
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
+ * @version $Revision: 107 $
  * @since 0.9.92
  */
 class CustomGutterIconRenderer extends com.intellij.openapi.editor.markup.GutterIconRenderer {

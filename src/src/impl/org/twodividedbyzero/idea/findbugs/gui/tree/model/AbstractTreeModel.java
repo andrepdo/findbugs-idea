@@ -1,12 +1,13 @@
 package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 
+import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
+
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-import java.awt.EventQueue;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -333,15 +334,11 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 	 */
 	public final void nodeStructureChanged(final N node) {
 		if (node != null) {
-			if (EventQueue.isDispatchThread()) {
-				fireTreeStructureChanged(this, getPathToRoot(node), null, null);
-			} else {
-				EventQueue.invokeLater(new Runnable() {
-					public void run() {
-						nodeStructureChanged(node);
-					}
-				});
-			}
+			EventDispatchThreadHelper.invokeLater(new Runnable() {
+				public void run() {
+					fireTreeStructureChanged(this, getPathToRoot(node), null, null);
+				}
+			});
 		}
 	}
 

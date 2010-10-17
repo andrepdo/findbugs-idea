@@ -20,6 +20,7 @@ import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import info.clearthought.layout.TableLayout;
+import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.gui.common.TableSorter;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.model.BugPatternTableModel;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -35,7 +36,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -209,7 +209,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 						final DetectorFactory detectorFactory = _bugPatternModel.getEntries().get(e.getFirstIndex());
 						final String description = getDetailedText(detectorFactory);
 						getTextArea().setText(description);
-						SwingUtilities.invokeLater(new Runnable() {
+						EventDispatchThreadHelper.invokeLater(new Runnable() {
 							public void run() {
 								getTextArea().scrollRectToVisible(new Rectangle(0, 0));
 							}

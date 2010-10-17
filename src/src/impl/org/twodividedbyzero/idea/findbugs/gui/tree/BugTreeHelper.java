@@ -23,6 +23,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import edu.umd.cs.findbugs.BugInstance;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.AbstractTreeNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
@@ -33,7 +34,6 @@ import javax.swing.JTree;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -185,16 +185,12 @@ public class BugTreeHelper {
 
 
 	public void scrollPathToVisible(final TreePath path) {
-		if (EventQueue.isDispatchThread()) {
-			_tree.scrollPathToVisible(path);
-			_tree.setSelectionPath(path);
-		} else {
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					scrollPathToVisible(path);
-				}
-			});
-		}
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			public void run() {
+				_tree.scrollPathToVisible(path);
+				_tree.setSelectionPath(path);
+			}
+		});
 	}
 
 

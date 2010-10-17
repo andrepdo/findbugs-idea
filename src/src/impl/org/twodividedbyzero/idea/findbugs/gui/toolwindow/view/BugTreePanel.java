@@ -43,6 +43,7 @@ import edu.umd.cs.findbugs.ProjectStats;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
+import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
@@ -58,7 +59,6 @@ import javax.swing.tree.TreePath;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.util.Arrays;
 import java.util.Collection;
@@ -102,6 +102,7 @@ public class BugTreePanel extends JPanel {
 
 		_visibleRootNode = new RootNode(_project.getName());
 		_treeModel = new GroupTreeModel(_visibleRootNode, _groupBy, _project);
+
 		//noinspection ThisEscapedInObjectConstruction
 		_bugTree = new BugTree(_treeModel, this, _project);
 
@@ -138,32 +139,23 @@ public class BugTreePanel extends JPanel {
 		_visibleRootNode.setBugCount(_treeModel.getBugCount());
 		_visibleRootNode.setClassesCount(numClasses);
 
-		if (EventQueue.isDispatchThread()) {
-			_treeModel.nodeChanged(_visibleRootNode);
-		} else {
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					_treeModel.nodeChanged(_visibleRootNode);
-				}
-			});
-		}
-
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			public void run() {
+				_treeModel.nodeChanged(_visibleRootNode);
+			}
+		});
 	}
 
 
 	void clear(final boolean resetBugCount) {
-		if (EventQueue.isDispatchThread()) {
-			if (resetBugCount) {
-				_visibleRootNode.setBugCount(0);
-			}
-			_treeModel.clear();
-		} else {
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					clear(resetBugCount);
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			public void run() {
+				if (resetBugCount) {
+					_visibleRootNode.setBugCount(0);
 				}
-			});
-		}
+				_treeModel.clear();
+			}
+		});
 	}
 
 
@@ -386,7 +378,7 @@ public class BugTreePanel extends JPanel {
 	}
 
 
-	GroupBy[] getGroupBy() {
+	public GroupBy[] getGroupBy() {
 		return _groupBy.clone();
 	}
 

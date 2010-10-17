@@ -34,12 +34,12 @@ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent.Op
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEventImpl;
+import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.tasks.FindBugsTask;
 
-import java.awt.EventQueue;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -342,7 +342,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 			_goal = goal;
 		}
 
-		EventQueue.invokeLater(new Runnable() {
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
 				final int goal = getGoal();
 				//stageNameLabel.setText(stageName);
@@ -364,7 +364,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 			_count++;
 		}
 
-		EventQueue.invokeLater(new Runnable() {
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
 				final int count = getCount();
 				final int goal = getGoal();

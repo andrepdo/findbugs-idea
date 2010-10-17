@@ -19,8 +19,10 @@ package org.twodividedbyzero.idea.findbugs.gui.toolwindow.view;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import edu.umd.cs.findbugs.BugInstance;
+import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.FieldAnnotation;
 import edu.umd.cs.findbugs.MethodAnnotation;
+import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.DetectorConfiguration;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.BugTree;
@@ -38,7 +40,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -49,10 +50,10 @@ import java.net.URL;
 
 
 /**
- * $Date$
+ * $Date: 2010-10-10 16:30:08 +0200 (Sun, 10 Oct 2010) $
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
+ * @version $Revision: 107 $
  * @since 0.0.1
  */
 public class BugDetailsComponents /*extends JPanel*/ {
@@ -279,15 +280,17 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		html.append(BugInstanceUtil.getBugPatternShortDescription(bugInstance));
 		html.append(")</font>");
 		html.append("</li>");
-		html.append("<ul>");
-		html.append("<li>");
-		html.append(bugInstance.getDetectorFactory().getShortName());
-		html.append(" <font color='gray'>(");
-		html.append(DetectorConfiguration.createBugsAbbreviation(bugInstance.getDetectorFactory()));
-		html.append(")</font>");
-		html.append("</li>");
+		
+		final DetectorFactory detectorFactory = bugInstance.getDetectorFactory();
+		if (detectorFactory != null) {
+			html.append("<li>");
+			html.append(detectorFactory.getShortName());
+			html.append(" <font color='gray'>(");
+			html.append(DetectorConfiguration.createBugsAbbreviation(detectorFactory));
+			html.append(")</font>");
+			html.append("</li>");
+		}
 		html.append("</ul>");
-
 		html.append("</body></html>");
 
 		// todo: set Suppress actions hyperlink
@@ -316,7 +319,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 
 	private static void scrollRectToVisible(final JEditorPane pane) {
-		EventQueue.invokeLater(new Runnable() {
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
 				pane.scrollRectToVisible(new Rectangle(0, 0, 0, 0));
 				//_detailTextPane.setCaretPosition(0);

@@ -15,6 +15,8 @@
  */
 package org.twodividedbyzero.idea.findbugs.common.util;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
@@ -26,11 +28,12 @@ import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.MethodAnnotation;
 import edu.umd.cs.findbugs.SourceLineAnnotation;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.DoneCallback;
+import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 
 import java.awt.EventQueue;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +45,7 @@ import java.util.List;
  * @version $Revision$
  * @since 0.9.84-dev
  */
+@SuppressWarnings({"AnonymousInnerClass"})
 public class BugInstanceUtil {
 
 	private static final Logger LOGGER = Logger.getInstance(BugInstanceUtil.class.getName());
@@ -159,21 +163,36 @@ public class BugInstanceUtil {
 	}
 
 
+	public static void getPsiElement(final Project project, final BugInstanceNode node, final DoneCallback<PsiFile>... callback) {
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			public void run() {
+				final PsiClass[] psiClass = new PsiClass[1];
+				psiClass[0] = IdeaUtilImpl.findJavaPsiClass(project, node.getSourcePath());
+				for (final DoneCallback<PsiFile> doneCallback : callback) {
+					doneCallback.onDone(IdeaUtilImpl.getPsiFile(psiClass[0]));
+				}
+			}
+		});
+	}
+
+
+	/**
+	 * NOTE: use {@link #getPsiElement(com.intellij.openapi.project.Project, org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode, org.twodividedbyzero.idea.findbugs.common.DoneCallback[])}
+	 * instead of this method. this method is executed through ApplicationManager.getApplication().invokeAndWait so it's very deadlock prone.
+	 *
+	 * @param project
+	 * @param node
+	 * @return
+	 */
 	@Nullable
 	public static PsiFile getPsiElement(final Project project, final BugInstanceNode node) {
 		final PsiClass[] psiClass = new PsiClass[1];
 		if (!EventQueue.isDispatchThread()) {
-			try {
-				EventQueue.invokeAndWait(new Runnable() {
-					public void run() {
-						psiClass[0] = IdeaUtilImpl.findJavaPsiClass(project, node.getSourcePath());
-					}
-				});
-			} catch (final InterruptedException e) {
-				LOGGER.error(e);
-			} catch (final InvocationTargetException e) {
-				LOGGER.error(e);
-			}
+			ApplicationManager.getApplication().invokeAndWait(new Runnable() {
+				public void run() {
+					psiClass[0] = IdeaUtilImpl.findJavaPsiClass(project, node.getSourcePath());
+				}
+			}, ModalityState.defaultModalityState());
 		} else {
 			psiClass[0] = IdeaUtilImpl.findJavaPsiClass(project, node.getSourcePath());
 		}
