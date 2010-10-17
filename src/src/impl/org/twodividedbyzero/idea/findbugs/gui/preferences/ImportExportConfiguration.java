@@ -19,6 +19,7 @@ package org.twodividedbyzero.idea.findbugs.gui.preferences;
 import com.intellij.openapi.ui.MessageType;
 import info.clearthought.layout.TableLayout;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
+import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
@@ -36,7 +37,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -153,7 +153,7 @@ public class ImportExportConfiguration implements ConfigurationPage {
 
 
 	private static void showToolWindowNotifier(final String message, final MessageType type) {
-		EventQueue.invokeLater(new Runnable() {
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
 				FindBugsPluginImpl.showToolWindowNotifier(message, type);
 			}

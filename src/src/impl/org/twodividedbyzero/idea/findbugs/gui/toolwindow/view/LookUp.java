@@ -24,10 +24,10 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * $Date$
+ * $Date: 2010-10-11 23:47:29 +0200 (Mon, 11 Oct 2010) $
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
+ * @version $Revision: 112 $
  * @since 0.9.96
  */
 public final class LookUp {

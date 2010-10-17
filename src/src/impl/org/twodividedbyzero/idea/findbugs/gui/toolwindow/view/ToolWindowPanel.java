@@ -36,6 +36,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.ui.ActionToolbarContainer;
+import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ui.MultiSplitLayout;
 import org.twodividedbyzero.idea.findbugs.common.ui.MultiSplitPane;
 import org.twodividedbyzero.idea.findbugs.common.ui.NDockLayout;
@@ -48,7 +49,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import java.awt.Component;
-import java.awt.EventQueue;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -149,36 +149,33 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 
 	private void updateLayout(final boolean enablePreviewLayout) {
-		if(!_isPreviewLayoutEnabled && enablePreviewLayout) {
-			_updateMultiSplitLayout(PREVIEW_LAYOUT_DEF);
-			getMultiSplitPane().add(getBugTreePanel(), "left");
-			_multiSplitPane.add(getPreviewPanel().getComponent(), "middle");
-			getMultiSplitPane().add(getBugDetailsComponents().getBugDetailsPanel(), "right.top");
-			getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
-			_isPreviewLayoutEnabled = true;
-			
-		} else if (!enablePreviewLayout) {
-			getPreviewPanel().release();
-			/*getPreviewPanel().getComponent().setVisible(false);
-			getPreviewPanel().getComponent().removeAll();*/
-			/*getPreviewPanel().revalidate();
-			getPreviewPanel().repaint();*/
-			
-			_updateMultiSplitLayout(DEFAULT_LAYOUT_DEF);
-			getMultiSplitPane().add(getBugTreePanel(), "left");
-			getMultiSplitPane().add(getBugDetailsComponents().getBugDetailsPanel(), "right.top");
-			getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			public void run() {
 
-			if(getPreviewPanel().getEditor() != null) {
-				resizeSplitNodes(this);
+				if (!_isPreviewLayoutEnabled && enablePreviewLayout) {
+					_updateMultiSplitLayout(PREVIEW_LAYOUT_DEF);
+					getMultiSplitPane().add(getBugTreePanel(), "left");
+					_multiSplitPane.add(getPreviewPanel().getComponent(), "middle");
+					getMultiSplitPane().add(getBugDetailsComponents().getBugDetailsPanel(), "right.top");
+					getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
+					_isPreviewLayoutEnabled = true;
+
+				} else if (!enablePreviewLayout) {
+					getPreviewPanel().release();
+
+					_updateMultiSplitLayout(DEFAULT_LAYOUT_DEF);
+					getMultiSplitPane().add(getBugTreePanel(), "left");
+					getMultiSplitPane().add(getBugDetailsComponents().getBugDetailsPanel(), "right.top");
+					getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
+
+					if (getPreviewPanel().getEditor() != null) {
+						resizeSplitNodes(ToolWindowPanel.this);
+					}
+					_previewPanel = null;
+					_isPreviewLayoutEnabled = false;
+				}
 			}
-			_previewPanel = null;
-			/*getMultiSplitPane().revalidate();
-			getMultiSplitPane().repaint();*/
-			/*revalidate();
-			repaint();*/
-			_isPreviewLayoutEnabled = false;
-		}
+		});
 	}
 
 
@@ -247,18 +244,14 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 		switch (event.getOperation()) {
 			case ANALYSIS_STARTED:
-				EventQueue.invokeLater(new Runnable() {
-					public void run() {
-						updateLayout(false);
-					}
-				});
+				updateLayout(false);
 
 				_bugTreePanel.clear(true);
 				_bugTreePanel.updateRootNode(event.getProjectStats());
 				break;
 			case ANALYSIS_ABORTED:
 				_bugTreePanel.setBugCollection(event.getBugCollection());
-				EventQueue.invokeLater(new Runnable() {
+				EventDispatchThreadHelper.invokeLater(new Runnable() {
 					public void run() {
 						final String text = "Analysis aborted..."; 
 						BalloonTipFactory.showToolWindowInfoNotifier(text);
@@ -269,10 +262,9 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 				final BugCollection bugCollection = event.getBugCollection();
 				_bugTreePanel.setBugCollection(bugCollection);
 				final ProjectStats projectStats = bugCollection.getProjectStats();
-				//final int bugCount = bugCollection.getCollection().size();
 				_bugTreePanel.updateRootNode(projectStats);
 
-				EventQueue.invokeLater(new Runnable() {
+				EventDispatchThreadHelper.invokeLater(new Runnable() {
 					public void run() {
 						_bugTreePanel.getBugTree().validate();
 						final String text = VersionManager.getName() + ": <b>found " + _bugTreePanel.getGroupModel().getBugCount() + " bugs in " + projectStats.getNumClasses() + (projectStats.getNumClasses() > 1 ? " classes" : " class") + "</b><br/>" + "<font size='10px'>using " + VersionManager.getFullVersion() + " with Findbugs version " + FindBugsUtil.getFindBugsFullVersion() + "</font>"; 
@@ -283,7 +275,6 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 				break;
 			case NEW_BUG_INSTANCE:
 				_bugTreePanel.addNode(event.getBugInstance());
-				//_bugTreePanel.addTreeNode(event.getBugInstance());
 				_bugTreePanel.updateRootNode(event.getProjectStats());
 				break;
 			default:

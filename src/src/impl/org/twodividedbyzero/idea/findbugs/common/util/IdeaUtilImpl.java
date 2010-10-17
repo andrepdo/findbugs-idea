@@ -73,10 +73,10 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
+import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 
-import java.awt.EventQueue;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -824,16 +824,12 @@ public final class IdeaUtilImpl {
 
 
 	public static void activateToolWindow(final String toolWindowId, final DataContext dataContext) {
-		if (EventQueue.isDispatchThread()) {
-			final ToolWindow toolWindow = getToolWindowById(toolWindowId, dataContext);
-			activateToolWindow(toolWindow);
-		} else {
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					activateToolWindow(toolWindowId, dataContext);
-				}
-			});
-		}
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			public void run() {
+				final ToolWindow toolWindow = getToolWindowById(toolWindowId, dataContext);
+				activateToolWindow(toolWindow);
+			}
+		});
 	}
 
 

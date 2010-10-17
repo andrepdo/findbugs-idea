@@ -17,6 +17,7 @@
 package org.twodividedbyzero.idea.findbugs.gui.tree.view;
 
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.AbstractTreeNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.VisitableTreeNode;
 
@@ -26,7 +27,6 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -131,15 +131,11 @@ public class TreeQuickSearch extends QuickSearch<AbstractTreeNode<VisitableTreeN
 
 
 	private void scrollPathToVisible(final TreePath path) {
-		if (EventQueue.isDispatchThread()) {
-			_tree.scrollPathToVisible(path);
-		} else {
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					scrollPathToVisible(path);
-				}
-			});
-		}
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			public void run() {
+				_tree.scrollPathToVisible(path);
+			}
+		});
 	}
 
 

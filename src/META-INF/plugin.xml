@@ -67,12 +67,15 @@
         <h3>0.9.96</h3>
 		<ul>
 		    <li>add import bug collection from xml</li>
-			<li>fix export (xml html)</li>
+		    <li>export a bug collection to html and/or xml with limited configurable dir based archive support</li>
+			<li>fix export (xml, html)</li>
             <li>fix Issue 14 (Inspection ID must satisfy [a-zA-Z_0-9.]+ pattern)</li>
-            <li>fix exclude- include filter sttings and exclude base line bugs</li>
+            <li>fix exclude- include filter settings and exclude base line bugs</li>
             <li>fix issue 15 IDEA hangs when user closes FindBugs tab.</li>
             <li>add persistence action states (scrolltosource, GroupBy, preview)</li>
             <li>add bug pattern abbr to bug pattern result explanation view matching preference bug pattern category </li>
+            <li>configurable : open an exported bug collection html page in the intellij configured browser</li>
+            <li>configurable : open an exported bug collection html page in the intellij configured browser</li>
 		</ul>
         <h3>0.9.95</h3>
 		<ul>
@@ -422,7 +425,11 @@
                     class="org.twodividedbyzero.idea.findbugs.actions.PreviewSelectBugInstance"
                     text="Preview the current selected bug."
                     description="Preview the current selected bug."
-                    icon="/actions/preview.png"/>
+                    icon="/actions/preview.png">
+
+                <keyboard-shortcut keymap="$default" first-keystroke="alt Q"/>
+                <mouse-shortcut keymap="$default" keystroke="alt button1"/>
+            </action>
 
             <action id="FindBugs.ExpandAllAction"
                     class="org.twodividedbyzero.idea.findbugs.actions.ExpandAll"
