@@ -18,6 +18,7 @@ package org.twodividedbyzero.idea.findbugs.gui.common;
 
 import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.ui.DocumentAdapter;
+import info.clearthought.layout.TableLayout;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -31,10 +32,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
@@ -61,49 +61,46 @@ public class ExportFileDialog extends JPanel {
 	private final transient DialogBuilder _dialogBuilder;
 	private final JRadioButton _html;
 	private final JRadioButton _xml;
+	private final JRadioButton _both;
 
 
 	public ExportFileDialog(final String defaultValue, final DialogBuilder dialogBuilder) {
-		setLayout(new GridBagLayout());
-		final GridBagConstraints c = new GridBagConstraints();
-		c.gridy = 1;
-		c.insets = new Insets(5, 5, 5, 5);
-		c.anchor = GridBagConstraints.NORTHWEST;
+		final double border = 5;
+		final double rowsGap = 0;
+		final double colsGap = 10;
+		final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.FILL, colsGap, TableLayout.PREFERRED, border}, // Columns
+								 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
+		final LayoutManager tbl = new TableLayout(size);
+		setLayout(tbl);
 
 		_dialogBuilder = dialogBuilder;
 
 		_label = new JLabel("Directory: ");
-
-		c.weightx = 0;
-		c.gridwidth = 2;
-		add(_label, c);
+		add(_label, "1, 1, 1, 1");
+		
 		_path = new JTextField(defaultValue);
-		_path.setPreferredSize(new Dimension(200, 20));
-		c.weightx = 1;
-		c.gridwidth = 1;
-		add(_path, c);
+		add(_path, "3, 1, 3, 1");
 
 		_browseButton = new JButton("Browse");
 		_browseButton.addActionListener(new MyFileChooserActionListener());
-		c.weightx = 0;
-		add(_browseButton, c);
+		add(_browseButton, "5, 1, 5, 1");
 
-		c.gridx = GridBagConstraints.RELATIVE;
-		c.gridy = 2;
-		c.gridheight = 2;
-		add(new JLabel("Format:"), c);
-		c.insets = new Insets(0, 0, 0, 0);
+		add(new JLabel("Format"), "1, 3, 1, 3");
 
-		_html = new JRadioButton("HTML", true);
+		_html = new JRadioButton("HTML", false);
 		_xml = new JRadioButton("XML", false);
+		_both = new JRadioButton("Both (XML & HTML)", true);
 		final ButtonGroup group = new ButtonGroup();
 		group.add(_html);
 		group.add(_xml);
+		group.add(_both);
 
-		c.gridheight = 1;
-		add(_html, c);
-		c.gridy = 3;
-		add(_xml, c);
+		final Container buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		buttonsPanel.add(_html);
+		buttonsPanel.add(_xml);
+		buttonsPanel.add(_both);
+
+		add(buttonsPanel, "3 3, 3, 3");
 
 		dialogBuilder.setCenterPanel(this);
 
@@ -133,6 +130,11 @@ public class ExportFileDialog extends JPanel {
 
 
 	public boolean isXml() {
+		return _xml.isSelected();
+	}
+
+
+	public boolean isBoth() {
 		return _xml.isSelected();
 	}
 
