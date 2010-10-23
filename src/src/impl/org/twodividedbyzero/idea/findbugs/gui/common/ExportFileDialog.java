@@ -135,7 +135,7 @@ public class ExportFileDialog extends JPanel {
 
 
 	public boolean isBoth() {
-		return _xml.isSelected();
+		return _both.isSelected();
 	}
 
 

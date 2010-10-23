@@ -274,8 +274,12 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 				break;
 			case NEW_BUG_INSTANCE:
-				_bugTreePanel.addNode(event.getBugInstance());
-				_bugTreePanel.updateRootNode(event.getProjectStats());
+				EventDispatchThreadHelper.invokeLater(new Runnable() {
+					public void run() {
+						_bugTreePanel.addNode(event.getBugInstance());
+						_bugTreePanel.updateRootNode(event.getProjectStats());
+					}
+				});
 				break;
 			default:
 		}
