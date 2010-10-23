@@ -16,6 +16,7 @@
 
 package org.twodividedbyzero.idea.findbugs.common.ui;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.CallerStack;
@@ -35,6 +36,7 @@ public final class EventDispatchThreadHelper {
 
 	private static final Logger LOGGER = Logger.getInstance(EventDispatchThreadHelper.class.getName());
 
+
 	public static void invokeAndWait(@NotNull final Operation operation) {
 		assert operation != null : "Operation must not be null!";
 		if (EventQueue.isDispatchThread()) {
@@ -48,6 +50,58 @@ public final class EventDispatchThreadHelper {
 				operation.onFailure(e);
 			}
 		}
+	}
+
+
+	@SuppressWarnings({"ThrowableInstanceNeverThrown"})
+	public static void assertInEDT(final String message) {
+		if (!EventQueue.isDispatchThread()) {
+			final CallerStack caller = new CallerStack();
+			final Throwable e = new NotInEDTViolation(message);
+			CallerStack.initCallerStack(e, caller);
+			LOGGER.debug(e);
+		}
+	}
+
+
+	@SuppressWarnings({"ThrowableInstanceNeverThrown"})
+	public static void assertInADT(final String message) {
+		if (!ApplicationManager.getApplication().isDispatchThread()) {
+			final CallerStack caller = new CallerStack();
+			final Throwable e = new NotInADTViolation(message);
+			CallerStack.initCallerStack(e, caller);
+			LOGGER.debug(e);
+		}
+	}
+
+	public static void assertInEDTorADT() {
+		if (!EventQueue.isDispatchThread() && !ApplicationManager.getApplication().isDispatchThread()) {
+			final CallerStack caller = new CallerStack();
+			final Throwable e = new NotInEDTViolation("Should run in EventDispatchThread or ApplcationtDispatchThread.");
+			CallerStack.initCallerStack(e, caller);
+			LOGGER.debug(e);
+		}
+	}
+
+
+	public static void assertInEDT() {
+		assertInEDT("Should run in EventDispatchThread.");
+	}
+
+
+	public static void assertInADT() {
+		assertInEDT("Should run in ApplcationtDispatchThread.");
+	}
+
+
+	public static boolean checkEDTViolation() {
+		for (final String propertyName : new String[] { "checkedtviolation"}) {
+			final String value = System.getProperty(propertyName);
+			if ((value != null) && ("1".equals(value) || "yes".equalsIgnoreCase(value) || Boolean.valueOf(value))) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 
@@ -77,16 +131,16 @@ public final class EventDispatchThreadHelper {
 
 
 	public interface Operation extends Runnable {
-		
-		void onFailure(Throwable failure);
-		
-		void onSuccess();
-		
+
+		public void onFailure(Throwable failure);
+
+		public void onSuccess();
+
 	}
-	
-	
+
+
 	public abstract static class OperationAdapter implements Operation {
-		
+
 		public void onFailure(final Throwable failure) {
 			if (failure instanceof InterruptedException) {
 				Thread.currentThread().interrupt();
@@ -108,10 +162,43 @@ public final class EventDispatchThreadHelper {
 		}
 
 	}
-	
-	
+
+
 	private EventDispatchThreadHelper() {
 		// utility
+	}
+
+
+	private static class NotInEDTViolation extends Exception {
+
+		private static final long serialVersionUID = 1L;
+
+
+		NotInEDTViolation(final String message) {
+			super(message);
+		}
+	}
+
+
+	private static class NotInADTViolation extends Exception {
+
+		private static final long serialVersionUID = 1L;
+
+
+		NotInADTViolation(final String message) {
+			super(message);
+		}
+	}
+
+
+	private static class NotInEDTorADTViolation extends Exception {
+
+		private static final long serialVersionUID = 1L;
+
+
+		NotInEDTorADTViolation(final String message) {
+			super(message);
+		}
 	}
 
 }
