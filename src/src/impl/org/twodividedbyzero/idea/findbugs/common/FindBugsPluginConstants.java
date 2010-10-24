@@ -34,6 +34,7 @@ public class FindBugsPluginConstants {
 	public static final String ICON_RESOURCES_PKG = "/org/twodividedbyzero/idea/findbugs/resources/icons";
 
 	public static final String TOOL_WINDOW_ID = "FindBugs-IDEA";
+	public static final String DEFAULT_EXPORT_DIR = System.getProperty("user.home") + File.separatorChar + TOOL_WINDOW_ID;
 
 	public static final String PLUGIN_ID = "org.twodividedbyzero.idea.findbugs";
 	public static final String MODULE_ID = "org.twodividedbyzero.idea.findbugs.module";

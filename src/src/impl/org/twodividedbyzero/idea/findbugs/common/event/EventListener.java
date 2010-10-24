@@ -30,5 +30,4 @@ public interface EventListener<T extends Event> {
 
 	void onEvent(@NotNull T event);
 
-	//public Class<Event>[] initEventTypes();
 }

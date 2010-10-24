@@ -36,5 +36,9 @@ public interface EventFilter<T extends Event> /*extends Serializable*/ {
 
 	boolean acceptProject(@NotNull final String projectName);
 
+	boolean acceptToolWindowTabId(@NotNull String toolWindowId);
+
 	String getProjectName();
+
+	String getToolWindowTabId();
 }

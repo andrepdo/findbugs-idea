@@ -17,6 +17,7 @@
 package org.twodividedbyzero.idea.findbugs.common.event.filters;
 
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.event.Event.EventType;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 
@@ -30,8 +31,10 @@ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
  */
 public class BugReporterEventFilter implements EventFilter<BugReporterEvent> {
 
-	private String _projectName;
 	private static final String ALL_PROJECTS = "";
+	
+	private final String _projectName;
+	private final String _toolWindowTabId;
 
 
 	public BugReporterEventFilter() {
@@ -40,7 +43,13 @@ public class BugReporterEventFilter implements EventFilter<BugReporterEvent> {
 
 
 	public BugReporterEventFilter(final String projectName) {
+		this(projectName, FindBugsPluginConstants.TOOL_WINDOW_ID);
+	}
+
+
+	public BugReporterEventFilter(final String projectName, final String toolWindowTabId) {
 		_projectName = projectName;
+		_toolWindowTabId = toolWindowTabId;
 	}
 
 
@@ -54,6 +63,11 @@ public class BugReporterEventFilter implements EventFilter<BugReporterEvent> {
 	}
 
 
+	public boolean acceptToolWindowTabId(@NotNull final String toolWindowId) {
+		return _toolWindowTabId.equals(toolWindowId);
+	}
+
+
 	public EventType getEventType() {
 		return EventType.FINDBUGS;
 	}
@@ -64,8 +78,18 @@ public class BugReporterEventFilter implements EventFilter<BugReporterEvent> {
 	}
 
 
+	public String getToolWindowTabId() {
+		return _toolWindowTabId;
+	}
+
+
 	@Override
 	public String toString() {
-		return "BugReporterEventFilter{" + "_projectName='" + _projectName + '\'' + " EventType=" + getEventType() + '}';
+		final StringBuilder sb = new StringBuilder();
+		sb.append("BugReporterEventFilter");
+		sb.append("{_projectName='").append(_projectName).append('\'');
+		sb.append(", _toolWindowId='").append(_toolWindowTabId).append('\'');
+		sb.append('}');
+		return sb.toString();
 	}
 }

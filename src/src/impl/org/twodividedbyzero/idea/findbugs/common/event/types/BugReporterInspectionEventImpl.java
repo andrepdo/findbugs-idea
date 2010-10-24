@@ -21,6 +21,7 @@ import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.ProjectStats;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.event.EventImpl;
 
 
@@ -44,6 +45,7 @@ public class BugReporterInspectionEventImpl extends EventImpl implements BugRepo
 	private transient BugCollection _bugCollection;
 	private transient ProjectStats _projectStats;
 	private String _projectName;
+	private static final String _toolWindowId = FindBugsPluginConstants.TOOL_WINDOW_ID; // todo: set on instance creation
 
 
 	public BugReporterInspectionEventImpl(@NotNull final Operation operation, @NotNull final String projectName) {
@@ -128,8 +130,23 @@ public class BugReporterInspectionEventImpl extends EventImpl implements BugRepo
 	}
 
 
+	public String getToolWindowTabId() {
+		return _toolWindowId;
+	}
+
+
 	@Override
 	public String toString() {
-		return new StringBuilder().append("BugReporterInspectionEventImpl{").append("_operation=").append(_operation).append(", _bugInstance=").append(_bugInstance).append(", _bugCount=").append(_bugCount).append(", _bugCollection=").append(_bugCollection).append(", _projectStats=").append(_projectStats).append(", _projectName=").append(_projectName).append('}').toString();
+		final StringBuilder sb = new StringBuilder();
+		sb.append("BugReporterInspectionEventImpl");
+		sb.append("{_operation=").append(_operation);
+		sb.append(", _bugInstance=").append(_bugInstance);
+		sb.append(", _bugCount=").append(_bugCount);
+		sb.append(", _bugCollection=").append(_bugCollection);
+		sb.append(", _projectStats=").append(_projectStats);
+		sb.append(", _projectName='").append(_projectName).append('\'');
+		sb.append(", _toolWindowId='").append(_toolWindowId).append('\'');
+		sb.append('}');
+		return sb.toString();
 	}
 }

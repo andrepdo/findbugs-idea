@@ -58,13 +58,8 @@ public class EventManagerImpl implements EventManager {
 	}
 
 
-	public static EventManager getManager() {
-		return getInstance();
-	}
-
-
 	public static EventManager getInstance() {
-		return _instance;
+		return _instance; // todo: remove bad smelling singelTon - replace with LookUp
 	}
 
 
@@ -139,11 +134,11 @@ public class EventManagerImpl implements EventManager {
 
 	public void removeEventListener(@NotNull final EventListener<?> listener) {
 		for (final Collection<MulticastEventFilter> multicastEventFilters : _eventFilters.values()) {
-			for (final Iterator<MulticastEventFilter> iter = multicastEventFilters.iterator(); iter.hasNext();) {
-				final MulticastEventFilter multicastEventFilter = iter.next();
+			for (final Iterator<MulticastEventFilter> filterIterator = multicastEventFilters.iterator(); filterIterator.hasNext();) {
+				final MulticastEventFilter multicastEventFilter = filterIterator.next();
 
 				if (multicastEventFilter.getEventListener().equals(listener)) {
-					iter.remove();
+					filterIterator.remove();
 					fireEvent(new EventManagerEventImpl(EventManagerEvent.Operation.LISTENER_REMOVED));
 					LOGGER.debug("Unregistered listener [" + listener + "].");
 				}
@@ -155,11 +150,11 @@ public class EventManagerImpl implements EventManager {
 	public void removeEventListener(@NotNull final Project project) {
 
 		for (final Collection<MulticastEventFilter> multicastEventFilters : _eventFilters.values()) {
-			for (final Iterator<MulticastEventFilter> iter = multicastEventFilters.iterator(); iter.hasNext();) {
-				final MulticastEventFilter multicastEventFilter = iter.next();
+			for (final Iterator<MulticastEventFilter> filterIterator = multicastEventFilters.iterator(); filterIterator.hasNext();) {
+				final MulticastEventFilter multicastEventFilter = filterIterator.next();
 
 				if (multicastEventFilter.getEventFilter().acceptProject(project.getName())) {
-					iter.remove();
+					filterIterator.remove();
 					fireEvent(new EventManagerEventImpl(EventManagerEvent.Operation.LISTENER_REMOVED));
 					LOGGER.debug("Unregistered listener [" + multicastEventFilter + "]. project=" + project.getName());
 				}
@@ -237,4 +232,12 @@ public class EventManagerImpl implements EventManager {
 	}
 
 
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("EventManagerImpl");
+		sb.append("{_eventFilters=").append(_eventFilters);
+		sb.append('}');
+		return sb.toString();
+	}
 }

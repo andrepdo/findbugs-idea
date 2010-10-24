@@ -66,5 +66,8 @@ public interface BugReporterInspectionEvent extends Event {
 	 */
 	@NotNull
 	String getProjectName();
+
+
+	String getToolWindowTabId();
 }
 

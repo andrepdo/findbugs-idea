@@ -63,7 +63,7 @@ import java.util.Map;
  * @version $Revision$
  * @since 0.0.1
  */
-@SuppressWarnings({"HardCodedStringLiteral"})
+@SuppressWarnings({"HardCodedStringLiteral", "AnonymousInnerClass"})
 @edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_BAD_FIELD"})
 public class ToolWindowPanel extends JPanel implements EventListener<BugReporterEvent> {
 

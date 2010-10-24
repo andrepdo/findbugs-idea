@@ -44,6 +44,7 @@ import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.ExportFileDialog;
+import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.tasks.BackgroundableTask;
 
 import javax.xml.transform.Result;
@@ -63,7 +64,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Pattern;
 
 
 /**
@@ -79,8 +82,6 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 
 	private static final Logger LOGGER = Logger.getInstance(ExportBugCollection.class.getName());
 
-	static String _exportDir = System.getProperty("user.home") + File.separatorChar + FindBugsPluginConstants.TOOL_WINDOW_ID;
-
 	private static final String FINDBUGS_PLAIN_XSL = "plain.xsl";
 	private static final String FINDBUGS_RESULT_PREFIX = "FindBugsResult_";
 	private static final String FINDBUGS_RESULT_HTML_SUFFIX = ".html";
@@ -89,6 +90,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 	private boolean _enabled;
 	private BugCollection _bugCollection;
 	private boolean _running;
+	private static final Pattern PATTERN = Pattern.compile("[/ :]");
 
 
 	@Override
@@ -120,28 +122,43 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 			return;
 		}
 
-		//Ask the user for a export directory
-		final DialogBuilder dialogBuilder = new DialogBuilder(project);
-		dialogBuilder.addOkAction();
-		dialogBuilder.addCancelAction();
-		dialogBuilder.setTitle("Select directory to save the exported file");
-		final ExportFileDialog exportDialog = new ExportFileDialog(_exportDir, dialogBuilder);
-		dialogBuilder.showModal(true);
-		if (dialogBuilder.getDialogWrapper().getExitCode() == DialogWrapper.CANCEL_EXIT_CODE) {
-			return;
-		}
-		final String path = exportDialog.getText();
-		if (path == null || path.trim().length() == 0) {
-			return;
-		}
-		final boolean exportXml = exportDialog.isXml();
-		final boolean exportBoth = exportDialog.isBoth();
-		_exportDir = path.trim();
-		//Create a unique file name by using time stamp
-		final String timestamp = new SimpleDateFormat().format(new Date()).replaceAll("[/ :]", "_");
-		final String fileName = _exportDir + File.separatorChar + FINDBUGS_RESULT_PREFIX + timestamp;
+		final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
+		String exportDir = preferences.getProperty(FindBugsPreferences.EXPORT_BASE_DIR, FindBugsPluginConstants.DEFAULT_EXPORT_DIR);
+		boolean exportXml = preferences.getBooleanProperty(FindBugsPreferences.EXPORT_AS_XML, true);
+		boolean exportHtml = preferences.getBooleanProperty(FindBugsPreferences.EXPORT_AS_HTML, true);
+		boolean exportBoth = exportXml && preferences.getBooleanProperty(FindBugsPreferences.EXPORT_AS_HTML, true);
 
-		createExportDirIfAbsent();
+		if (exportDir.length() == 0 || !exportXml && !exportBoth && !exportHtml) {
+
+			//Ask the user for a export directory
+			final DialogBuilder dialogBuilder = new DialogBuilder(project);
+			dialogBuilder.addOkAction();
+			dialogBuilder.addCancelAction();
+			dialogBuilder.setTitle("Select directory to save the exported file");
+			final ExportFileDialog exportDialog = new ExportFileDialog(exportDir, dialogBuilder);
+			dialogBuilder.showModal(true);
+			if (dialogBuilder.getDialogWrapper().getExitCode() == DialogWrapper.CANCEL_EXIT_CODE) {
+				return;
+			}
+			final String path = exportDialog.getText();
+			if (path == null || path.trim().length() == 0) {
+				return;
+			}
+
+			exportXml = exportDialog.isXml() != exportXml ? exportDialog.isXml() : exportXml;
+			exportHtml = !exportDialog.isXml() != exportHtml ? !exportDialog.isXml() : exportHtml;
+			exportBoth = exportDialog.isBoth() != exportBoth ? exportDialog.isBoth() : exportBoth;
+			exportDir = path.trim();
+		}
+		//Create a unique file name by using time stamp
+		final Date currentDate = new Date();
+		final String timestamp = PATTERN.matcher(new SimpleDateFormat().format(currentDate)).replaceAll("_");
+		final String fileName = File.separatorChar + FINDBUGS_RESULT_PREFIX + timestamp;
+
+		final boolean finalExportXml = exportXml;
+		final boolean finalExportHtml = exportHtml;
+		final boolean finalExportBoth = exportBoth;
+		final String finalExportDir = exportDir + File.separatorChar + project.getName();
 
 		//Create a task to export the bug collection to html
 		final AtomicReference<Task> exportTask = new AtomicReference<Task>(new BackgroundableTask(project, "Exporting Findbugs Result", false) {
@@ -151,25 +168,34 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 			@SuppressWarnings({"IOResourceOpenedButNotSafelyClosed"})
 			@Override
 			public void run(@NotNull final ProgressIndicator indicator) {
-				indicator.setText2(fileName);
+				indicator.setText2(finalExportDir + File.separatorChar + fileName);
 				setProgressIndicator(indicator);
 				FileWriter writer = null;
 				try {
+					createDirIfAbsent(finalExportDir);
+					String exportDir = finalExportDir;
+					final boolean createSubDir = preferences.getBooleanProperty(FindBugsPreferences.EXPORT_CREATE_ARCHIVE_DIR, true);
+					if(createSubDir) {
+						exportDir = finalExportDir + File.separatorChar + new SimpleDateFormat("yyyy_MM_dd", Locale.ENGLISH).format(currentDate);
+						createDirIfAbsent(exportDir);
+					}
+
 					if (_bugCollection != null) {
 						_bugCollection.setWithMessages(true);
-						if (exportXml) {
-							_bugCollection.writeXML(fileName + FINDBUGS_RESULT_RAW_SUFFIX);
-						} if (exportBoth) {
-							_bugCollection.writeXML(fileName + FINDBUGS_RESULT_RAW_SUFFIX);
-							writer = exportHtml(fileName);
-						} else {
-							writer = exportHtml(fileName);
+						final String exportDirAndFilenameWithoutSuffix = exportDir + fileName;
+						if (finalExportXml && !finalExportBoth) {
+							_bugCollection.writeXML(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_RAW_SUFFIX);
+						} else if (finalExportBoth) {
+							_bugCollection.writeXML(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_RAW_SUFFIX);
+							writer = exportHtml(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_HTML_SUFFIX);
+						} else if (finalExportHtml) {
+							writer = exportHtml(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_HTML_SUFFIX);
 						}
 						_bugCollection.setWithMessages(false);
 
-						showToolWindowNotifier("Exported bug collection to " + fileName + '.', MessageType.INFO);
-						if(!exportXml) {
-							BrowserUtil.launchBrowser(new File(fileName).getAbsolutePath());
+						showToolWindowNotifier("Exported bug collection to " + exportDir + '.', MessageType.INFO);
+						if((!finalExportXml || finalExportBoth) && preferences.getBooleanProperty(FindBugsPreferences.EXPORT_OPEN_BROWSER, true)) {
+							BrowserUtil.launchBrowser(new File(exportDirAndFilenameWithoutSuffix).getAbsolutePath());
 						}
 					}
 				} catch (IOException e1) {
@@ -194,6 +220,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 						} catch (IOException ignored) {
 						}
 					}
+					Thread.currentThread().interrupt();
 				}
 			}
 
@@ -210,9 +237,9 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 			}
 		});
 
-		final File file = new File(fileName);
+		final File file = new File(exportDir + fileName);
 		if (file.getParentFile() == null) {
-			showToolWindowNotifier("Exporting bug collection failed. not a directory. " + fileName + '.', MessageType.ERROR);
+			showToolWindowNotifier("Exporting bug collection failed. not a directory. " + exportDir + fileName + '.', MessageType.ERROR);
 		} else {
 			exportTask.get().queue();
 		}
@@ -231,7 +258,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 		final Source source = new DocumentSource(document);
 
 		// Write result to output stream
-		final FileWriter writer = new FileWriter(fileName + FINDBUGS_RESULT_HTML_SUFFIX);
+		final FileWriter writer = new FileWriter(fileName);
 		final Result result = new StreamResult(writer);
 
 		// Do the transformation
@@ -240,11 +267,11 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 	}
 
 
-	private static void createExportDirIfAbsent() {
-		final File exportDir = new File(_exportDir);
+	private static void createDirIfAbsent(final String dir) {
+		final File exportDir = new File(dir);
 		if(!exportDir.exists()) {
-			if(!exportDir.mkdir()) {
-				final String message = "Creating the export directory '" + _exportDir + "' failed.";
+			if(!exportDir.mkdirs()) {
+				final String message = "Creating the export directory '" + exportDir + "' failed.";
 				showToolWindowNotifier(message, MessageType.ERROR);
 				LOGGER.error(message);
 			}
@@ -283,7 +310,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 	@Override
 	public void update(final AnActionEvent event) {
 		try {
-			final com.intellij.openapi.project.Project project = DataKeys.PROJECT.getData(event.getDataContext());
+			final Project project = DataKeys.PROJECT.getData(event.getDataContext());
 			final Presentation presentation = event.getPresentation();
 
 			// check a project is loaded

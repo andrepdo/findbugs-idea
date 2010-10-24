@@ -2694,6 +2694,7 @@
         <w>multicast</w>
         <w>navigatable</w>
         <w>resize</w>
+        <w>toolwindow</w>
       </words>
     </dictionary>
   </component>

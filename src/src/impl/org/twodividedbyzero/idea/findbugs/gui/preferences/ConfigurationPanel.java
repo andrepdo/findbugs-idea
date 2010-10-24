@@ -88,7 +88,7 @@ public class ConfigurationPanel extends JPanel {
 		initGui();
 
 		final FindBugsPreferences preferences = getPreferences();
-		if (!preferences.getBugCategories().containsValue("true") && !preferences.getDetectors().containsValue("true")) {
+		if ((!preferences.getBugCategories().containsValue("true") && !preferences.getDetectors().containsValue("true")) || (preferences.getBugCategories().isEmpty() && preferences.getDetectors().isEmpty())) {
 			restoreDefaultPreferences();
 		}
 	}

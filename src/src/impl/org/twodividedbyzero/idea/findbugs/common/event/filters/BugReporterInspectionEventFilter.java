@@ -17,6 +17,7 @@
 package org.twodividedbyzero.idea.findbugs.common.event.filters;
 
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.event.Event.EventType;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent;
 
@@ -30,8 +31,10 @@ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspecti
  */
 public class BugReporterInspectionEventFilter implements EventFilter<BugReporterInspectionEvent> {
 
-	private String _projectName;
 	private static final String ALL_PROJECTS = "";
+
+	private final String _projectName;
+	private final String _toolWindowTabId;
 
 
 	public BugReporterInspectionEventFilter() {
@@ -40,17 +43,28 @@ public class BugReporterInspectionEventFilter implements EventFilter<BugReporter
 
 
 	public BugReporterInspectionEventFilter(final String projectName) {
+		this(projectName, FindBugsPluginConstants.TOOL_WINDOW_ID);
+	}
+
+
+	public BugReporterInspectionEventFilter(final String projectName, final String toolWindowTabId) {
 		_projectName = projectName;
+		_toolWindowTabId = toolWindowTabId;
 	}
 
 
 	public boolean acceptEvent(@NotNull final BugReporterInspectionEvent event) {
-		return event.getProjectName().equals(_projectName) || ALL_PROJECTS.equals(_projectName);
+		return (event.getProjectName().equals(_projectName) || ALL_PROJECTS.equals(_projectName)) && event.getToolWindowTabId().equals(_toolWindowTabId);
 	}
 
 
 	public boolean acceptProject(@NotNull final String projectName) {
 		return projectName.equals(_projectName);
+	}
+
+
+	public boolean acceptToolWindowTabId(@NotNull final String toolWindowId) {
+		return _toolWindowTabId.equals(toolWindowId);
 	}
 
 
@@ -64,8 +78,18 @@ public class BugReporterInspectionEventFilter implements EventFilter<BugReporter
 	}
 
 
+	public String getToolWindowTabId() {
+		return _toolWindowTabId;
+	}
+
+
 	@Override
 	public String toString() {
-		return "BugReporterInspectionEventFilter{" + "_projectName='" + _projectName + '\'' + " EventType=" + getEventType() + '}';
+		final StringBuilder sb = new StringBuilder();
+		sb.append("BugReporterInspectionEventFilter");
+		sb.append("{_projectName='").append(_projectName).append('\'');
+		sb.append(", _toolWindowId='").append(_toolWindowTabId).append('\'');
+		sb.append('}');
+		return sb.toString();
 	}
 }

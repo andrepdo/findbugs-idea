@@ -34,6 +34,7 @@ import edu.umd.cs.findbugs.ProjectStats;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import org.dom4j.DocumentException;
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
@@ -46,8 +47,10 @@ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.ImportFileDialog;
+import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.tasks.BackgroundableTask;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -104,7 +107,11 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 		dialogBuilder.addOkAction();
 		dialogBuilder.addCancelAction();
 		dialogBuilder.setTitle("Import previous saved bug collection xml");
-		final ImportFileDialog importFileDialog = new ImportFileDialog(ExportBugCollection._exportDir, dialogBuilder);
+
+		final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
+		final String exportDir = preferences.getProperty(FindBugsPreferences.EXPORT_BASE_DIR, FindBugsPluginConstants.DEFAULT_EXPORT_DIR) + File.separatorChar + project.getName();
+
+		final ImportFileDialog importFileDialog = new ImportFileDialog(exportDir, dialogBuilder);
 		dialogBuilder.showModal(true);
 		if (dialogBuilder.getDialogWrapper().getExitCode() == DialogWrapper.CANCEL_EXIT_CODE) {
 			return;
@@ -174,6 +181,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 				} finally {
 					EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_FINISHED, null, _importBugCollection, project.getName()));
 					_importBugCollection = null;
+					Thread.currentThread().interrupt();
 				}
 			}
 

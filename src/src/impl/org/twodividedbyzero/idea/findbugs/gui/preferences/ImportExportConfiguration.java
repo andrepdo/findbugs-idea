@@ -18,7 +18,6 @@ package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
 import com.intellij.openapi.ui.MessageType;
 import info.clearthought.layout.TableLayout;
-import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -54,8 +53,6 @@ import java.io.File;
 @SuppressWarnings({"HardCodedStringLiteral"})
 public class ImportExportConfiguration implements ConfigurationPage {
 
-	private static final String _defaultExportDir = System.getProperty("user.home") + File.separatorChar + FindBugsPluginConstants.TOOL_WINDOW_ID;
-
 	private final FindBugsPreferences _preferences;
 	private final ConfigurationPanel _parent;
 	private Component _component;
@@ -71,6 +68,7 @@ public class ImportExportConfiguration implements ConfigurationPage {
 
 	private JPanel _browserPanel;
 	private JCheckBox _openBrowserCheckbox;
+	private String _currentExportDir;
 
 
 	public ImportExportConfiguration(final ConfigurationPanel parent, final FindBugsPreferences preferences) {
@@ -106,7 +104,8 @@ public class ImportExportConfiguration implements ConfigurationPage {
 		getWriteHtmlCheckbox().setSelected(Boolean.valueOf(_preferences.getProperty(FindBugsPreferences.EXPORT_AS_HTML)));
 		getWriteXmlCheckbox().setSelected(Boolean.valueOf(_preferences.getProperty(FindBugsPreferences.EXPORT_AS_XML)));
 		getOpenBrowserCheckbox().setSelected(Boolean.valueOf(_preferences.getProperty(FindBugsPreferences.EXPORT_OPEN_BROWSER)));
-		getExportDirTextField().setText(_preferences.getProperty(FindBugsPreferences.EXPORT_BASE_DIR));
+		_currentExportDir = _preferences.getProperty(FindBugsPreferences.EXPORT_BASE_DIR);
+		getExportDirTextField().setText(_currentExportDir);
 	}
 
 
@@ -164,7 +163,7 @@ public class ImportExportConfiguration implements ConfigurationPage {
 	private JTextComponent getExportDirTextField() {
 		if (_exportDirTextField == null) {
 			_exportDirTextField = new JTextField(30);
-			_exportDirTextField.setText(_defaultExportDir);
+			_exportDirTextField.setText(_currentExportDir);
 			_exportDirTextField.getDocument().addDocumentListener(new DocumentListener() {
 				public void insertUpdate(final DocumentEvent e) {
 					_preferences.setProperty(FindBugsPreferences.EXPORT_BASE_DIR, _exportDirTextField.getText());
@@ -176,6 +175,7 @@ public class ImportExportConfiguration implements ConfigurationPage {
 
 
 				public void changedUpdate(final DocumentEvent e) {
+					_preferences.setProperty(FindBugsPreferences.EXPORT_BASE_DIR, _exportDirTextField.getText());
 				}
 			});
 		}
@@ -230,7 +230,7 @@ public class ImportExportConfiguration implements ConfigurationPage {
 			_browserPanel.setBorder(BorderFactory.createTitledBorder("Result view settings"));
 
 			_browserPanel.add(getOpenBrowserCheckbox(), "1, 1, 1, 1");
-			_browserPanel.add(new JLabel("Open exported bug collection in the configured browser"), "3, 1, 3, 1");
+			_browserPanel.add(new JLabel("Open exported bug collection (only Html) in the configured browser"), "3, 1, 3, 1");
 		}
 		return _browserPanel;
 	}
@@ -281,6 +281,7 @@ public class ImportExportConfiguration implements ConfigurationPage {
 			final JFileChooser fc = new JFileChooser();
 			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			fc.showDialog(_parent, "Select");
+			fc.setCurrentDirectory(new File(getExportDirTextField().getText()));
 			final File selectedFile = fc.getSelectedFile();
 			if (selectedFile != null && selectedFile.isDirectory() && selectedFile.canWrite()) {
 				final String newLocation = selectedFile.getPath();
