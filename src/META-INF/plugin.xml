@@ -41,8 +41,9 @@
             <li>load additional detector plugins like fb-contrib.jar</li>
             <li>group results by: bug category, classname, package, priority, bug rank</li>
             <li>intellij local history support</li>
+            <li>quick search within the result tree</li>
             <li>run Findbugs analysis as IntelliJ inspection (experimental)</li>
-            <li>Analyze actions (all actions are also available in the intellij pro0ject tree, toolbar menu, context menu):
+            <li>Analyze actions (all actions are also available in the intellij project tree, toolbar menu, context menu):
                 <ul>
                     <li>&nbsp;analyze all modified files</li>
                     <li>&nbsp;analyze all files on the active changelist (available from FindBugs-IDEA main ToolWindow and the ChangelistToolWindow)</li>
