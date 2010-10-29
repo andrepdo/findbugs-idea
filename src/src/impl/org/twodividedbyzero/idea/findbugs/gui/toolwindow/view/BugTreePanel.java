@@ -27,6 +27,7 @@ import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
+import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -215,8 +216,13 @@ public class BugTreePanel extends JPanel {
 
 	private static void scrollToPreviewSource(final BugInstanceNode bugInstanceNode, final Editor editor) {
 		final int line = bugInstanceNode.getSourceLines()[0] - 1;
-		final LogicalPosition problemPos = new LogicalPosition(line, 0);
-		editor.getCaretModel().moveToLogicalPosition(problemPos);
+		if(line >= 0) {
+			final LogicalPosition problemPos = new LogicalPosition(line, 0);
+			editor.getCaretModel().moveToLogicalPosition(problemPos);
+		} else { // anonymous classes
+			final RangeHighlighter rangeHighlighter = editor.getMarkupModel().getAllHighlighters()[0];
+			editor.getCaretModel().moveToOffset(rangeHighlighter.getStartOffset());
+		}
 		editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
 	}
 
@@ -273,7 +279,17 @@ public class BugTreePanel extends JPanel {
 
 		final int lineStart = bugInstanceNode.getSourceLines()[0] - 1;
 		final int lineEnd = bugInstanceNode.getSourceLines()[1];
-		final PsiElement element = IdeaUtilImpl.getElementAtLine(bugInstanceNode.getPsiFile(), lineStart);
+		PsiElement element = null;
+		
+		final PsiFile psiFile = bugInstanceNode.getPsiFile();
+		if(lineStart < 0 && lineEnd < 0) {   // find anonymous classes
+			final PsiElement psiElement = IdeaUtilImpl.findAnonymousClassPsiElement(bugInstanceNode, _project);
+			if (psiElement != null) {
+				element = psiElement;
+			}
+		} else {
+			element = IdeaUtilImpl.getElementAtLine(psiFile, lineStart);
+		}
 
 		RangeMarker marker = null;
 		if (element != null) {
@@ -314,10 +330,9 @@ public class BugTreePanel extends JPanel {
 
 		if (treeNode instanceof BugInstanceNode) {
 			final BugInstanceNode bugNode = (BugInstanceNode) treeNode;
-			final BugInstance bugInstance = bugNode.getBugInstance();
 
 			if (_parent != null) {
-				_parent.getBugDetailsComponents().setBugsDetails(bugInstance, treePath);
+				_parent.getBugDetailsComponents().setBugsDetails(bugNode, treePath);
 			}
 		}
 	}

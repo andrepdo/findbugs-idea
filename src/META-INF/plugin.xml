@@ -28,7 +28,7 @@
 		FindBugs-IDEA plugin supports:
 		<ul>
 		    <li>configure findbugs on idea project and module level</li>
-		    <li>jump to source from results shown in toolwindow</li>
+		    <li>jump to source from results shown in toolwindow including anonymous classes</li>
 		    <li>bug descriptions, solutions</li>
 		    <li>run analysis always in background</li>
 		    <li>run findbugs analysis on all affected files after compile</li>
@@ -67,6 +67,8 @@
         <![CDATA[<html>
         <h3>0.9.96</h3>
 		<ul>
+		    <li>JumpToSource now works for anonymous classes (per default findbugs does not report any sourceline annotation for anonymous classes)</li>
+		    <li>add preview support: preview bug in source file (Preview panel inside toolwindow)</li>
 		    <li>add import bug collection from xml</li>
 		    <li>export a bug collection to html and/or xml with limited configurable dir based archive support</li>
 			<li>fix export (xml, html)</li>

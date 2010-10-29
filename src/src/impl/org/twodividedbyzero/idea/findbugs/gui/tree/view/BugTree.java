@@ -24,6 +24,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.PopupHandler;
 import com.intellij.util.EditSourceOnDoubleClickHandler;
@@ -31,6 +32,7 @@ import com.intellij.util.OpenSourceUtil;
 import com.intellij.util.ui.UIUtil;
 import edu.umd.cs.findbugs.BugInstance;
 import org.jetbrains.annotations.NonNls;
+import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.BugTreePanel;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugTreeHelper;
 import org.twodividedbyzero.idea.findbugs.gui.tree.ScrollToSourceHandler;
@@ -95,7 +97,7 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 		getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		setRootVisible(true);
 		setShowsRootHandles(true);
-		setCellRenderer(new TreeNodeCellRenderer2());
+		setCellRenderer(new TreeNodeCellRenderer());
 
 		installHandlers();
 	}
@@ -164,7 +166,13 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 			if (psiFile != null) {
 				final VirtualFile virtualFile = psiFile.getVirtualFile();
 				//LOGGER.debug("PsiFile: " + psiFile + " VirtualFile: " + virtualFile.getName() + " - Line: " + node.getSourceLines()[0]);
-				if (virtualFile != null) {
+				final int[] lines = node.getSourceLines();
+				if (lines[0] == -1 && lines[1] == -1) {  // find anonymous classes
+					final PsiElement psiElement = IdeaUtilImpl.findAnonymousClassPsiElement(psiFile, node, _project);
+					if (psiElement != null) {
+						return psiElement;
+					}
+				} else if (virtualFile != null) {
 					return new OpenFileDescriptor(_project, virtualFile, node.getSourceLines()[0] - 1, 0);
 				} else {
 					return null;
@@ -174,6 +182,14 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 			}
 		}
 		if ("psi.Element".equals(s)) {
+			final int[] lines = node.getSourceLines();
+			if (lines[0] == -1 && lines[1] == -1) {  // find anonymous classes
+				final PsiFile psiFile = _treeHelper.getSelectedFile();
+				final PsiElement psiElement = IdeaUtilImpl.findAnonymousClassPsiElement(psiFile, node, _project);
+				if (psiElement != null) {
+					return psiElement;
+				}
+			}
 			return _treeHelper.getSelectedElement();
 		}
 		if ("virtualFileArray".equals(s)) {

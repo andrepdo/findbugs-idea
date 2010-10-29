@@ -25,6 +25,7 @@ import edu.umd.cs.findbugs.MethodAnnotation;
 import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.DetectorConfiguration;
+import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.BugTree;
 
 import javax.swing.JEditorPane;
@@ -203,9 +204,10 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 
 	@SuppressWarnings({"HardCodedStringLiteral"})
-	public void setBugsDetails(final BugInstance bugInstance, final TreePath treePath) {
+	public void setBugsDetails(final BugInstanceNode bugInstanceNode, final TreePath treePath) {
 		_currentTreePath = treePath;
-		final int[] lines = BugInstanceUtil.getSourceLines(bugInstance);
+		final BugInstance bugInstance = bugInstanceNode.getBugInstance();
+		final int[] lines = BugInstanceUtil.getSourceLines(bugInstanceNode);
 		final MethodAnnotation methodAnnotation = BugInstanceUtil.getPrimaryMethod(bugInstance);
 		final FieldAnnotation fieldAnnotation = BugInstanceUtil.getPrimaryField(bugInstance);
 

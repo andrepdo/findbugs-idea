@@ -17,6 +17,7 @@ package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
 import info.clearthought.layout.TableLayout;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.ExtensionFileFilter;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.BrowseAction.BrowseActionCallback;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -147,8 +148,9 @@ public class FilterConfiguration implements ConfigurationPage {
 			final AbstractButton addButton = new JButton();
 			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTESIONS_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
-					((DefaultListModel) _includeList.getModel()).addElement(selectedFile.getAbsolutePath());
-					_preferences.getIncludeFilters().add(selectedFile.getAbsolutePath());
+					final String replacement = IdeaUtilImpl.replace$PROJECT_DIR$(selectedFile.getAbsolutePath());
+					((DefaultListModel) _includeList.getModel()).addElement(replacement);
+					_preferences.getIncludeFilters().add(replacement);
 					_preferences.setModified(true);
 				}
 			});
@@ -211,8 +213,9 @@ public class FilterConfiguration implements ConfigurationPage {
 			final AbstractButton addButton = new JButton();
 			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTESIONS_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
-					((DefaultListModel) _excludeList.getModel()).addElement(selectedFile.getAbsolutePath());
-					_preferences.getExcludeFilters().add(selectedFile.getAbsolutePath());
+					final String replacement = IdeaUtilImpl.replace$PROJECT_DIR$(selectedFile.getAbsolutePath());
+					((DefaultListModel) _excludeList.getModel()).addElement(replacement);
+					_preferences.getExcludeFilters().add(replacement);
 					_preferences.setModified(true);
 				}
 			});
@@ -275,8 +278,9 @@ public class FilterConfiguration implements ConfigurationPage {
 			final AbstractButton addButton = new JButton();
 			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTESIONS_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
-					((DefaultListModel) _baselineList.getModel()).addElement(selectedFile.getAbsolutePath());
-					_preferences.getExcludeBaselineBugs().add(selectedFile.getAbsolutePath());
+					final String replacement = IdeaUtilImpl.replace$PROJECT_DIR$(selectedFile.getAbsolutePath());
+					((DefaultListModel) _baselineList.getModel()).addElement(replacement);
+					_preferences.getExcludeBaselineBugs().add(replacement);
 					_preferences.setModified(true);
 				}
 			});

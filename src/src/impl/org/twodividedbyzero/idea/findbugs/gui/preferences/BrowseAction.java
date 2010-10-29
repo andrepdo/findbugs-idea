@@ -15,6 +15,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
+import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import javax.swing.AbstractAction;
@@ -37,6 +38,7 @@ import java.util.Collection;
 public final class BrowseAction extends AbstractAction {
 
 	private static final long serialVersionUID = 0L;
+	private static String _lastDir = IdeaUtilImpl.getProjectRootPath();
 
 	private final ConfigurationPanel _parent;
 	private final transient FileFilter _fileFilter;
@@ -60,12 +62,13 @@ public final class BrowseAction extends AbstractAction {
 
 
 	public void actionPerformed(final ActionEvent e) {
-		final JFileChooser fileChooser = new JFileChooser();
+		final JFileChooser fileChooser = new JFileChooser(_lastDir);
 		fileChooser.setFileFilter(_fileFilter);
 
 		final int result = fileChooser.showOpenDialog(_parent);
 		if (result == JFileChooser.APPROVE_OPTION) {
 			final File selectedFile = fileChooser.getSelectedFile();
+			_lastDir = selectedFile.getPath();
 			_callback.addSelection(selectedFile);
 		}
 	}

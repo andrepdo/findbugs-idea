@@ -142,6 +142,12 @@ public class BugInstanceUtil {
 	}
 
 
+	public static int[] getSourceLines(final BugInstanceNode bugInstanceNode) {
+		final BugInstance bugInstance = bugInstanceNode.getBugInstance();
+		return getSourceLines(bugInstance);
+	}
+
+
 	public static int[] getSourceLines(final BugInstance bugInstance) {
 		final int[] lines = new int[2];
 		final SourceLineAnnotation annotation = bugInstance.getPrimarySourceLineAnnotation();

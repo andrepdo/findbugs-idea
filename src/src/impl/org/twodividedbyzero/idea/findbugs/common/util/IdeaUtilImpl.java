@@ -61,6 +61,7 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
@@ -70,12 +71,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.collectors.RecurseClassCollector;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
+import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -83,6 +86,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 
@@ -96,6 +101,7 @@ import java.util.Set;
 public final class IdeaUtilImpl {
 
 	private static final VirtualFile[] EMPTY_VIRTUAL_FILE = new VirtualFile[0];
+	private static final String IDEA_PROJECT_DIR_VAR = "$PROJECT_DIR$";
 
 
 	private IdeaUtilImpl() {
@@ -862,5 +868,53 @@ public final class IdeaUtilImpl {
 	public static Document getDocument(@NotNull final Project project, @NotNull final ExtendedProblemDescriptor issue) {
 		final PsiFile psiFile = getPsiFile(project, issue);
 		return psiFile == null ? null : PsiDocumentManager.getInstance(project).getDocument(psiFile);
+	}
+	
+
+	@Nullable
+	public static PsiElement findAnonymousClassPsiElement(final BugInstanceNode bugInstanceNode, @NotNull final Project project) {
+		final PsiFile psiFile = bugInstanceNode.getPsiFile();
+		return findAnonymousClassPsiElement(psiFile, bugInstanceNode, project);
+	}
+
+
+	@Nullable
+	public static PsiElement findAnonymousClassPsiElement(final PsiFileSystemItem psiFile, final BugInstanceNode bugInstanceNode, @NotNull final Project project) {
+		if (psiFile != null) {
+			final String classNameToFind = BugInstanceUtil.getSimpleClassName(bugInstanceNode.getBugInstance());
+			final RecurseClassCollector recurseClassCollector = new RecurseClassCollector(null, project, false);
+			recurseClassCollector.addContainingClasses(psiFile.getVirtualFile());
+			final Map<String, PsiElement> result = recurseClassCollector.getResult();
+
+			for (final Entry<String, PsiElement> entry : result.entrySet()) {
+				final String fileName = new File(entry.getKey()).getName();
+				if (fileName.equals(classNameToFind + RecurseClassCollector.CLASS_FILE_SUFFIX)) {
+					return entry.getValue();
+				}
+			}
+		}
+		return null;
+	}
+
+
+	public static String getProjectRootPath() {
+		final Project project = getProject();
+		final ProjectRootManager projectManager = ProjectRootManager.getInstance(project);
+        final VirtualFile rootFiles[] = projectManager.getContentRoots();
+		return rootFiles[0].getPath();
+	}
+
+
+	public static String replace$PROJECT_DIR$(final String path) {
+		final StringBuilder result = new StringBuilder();
+		final String rootPath = getProjectRootPath();
+		if(path.contains(rootPath)) {
+			result.append(path.replace(rootPath, IDEA_PROJECT_DIR_VAR));
+			return result.toString();
+		} else if (path.contains(IDEA_PROJECT_DIR_VAR)) {
+			result.append(path.replace(IDEA_PROJECT_DIR_VAR, rootPath));
+			return result.toString();
+		}
+		return path;
 	}
 }
