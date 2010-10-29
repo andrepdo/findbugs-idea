@@ -18,6 +18,8 @@ export IDEA_HOME="/home/andrep/Apps/idea"
 export PATH="${JAVA_HOME}/bin:${PWD}/bin:${PATH}"
 
 echo IDEA_HOME: $IDEA_HOME
+echo JAVA_HOME: $JAVA_HOME
+echo AT_HOME: $ANT_HOME
 
 which java javac ant rmiregistry
 ant -version
