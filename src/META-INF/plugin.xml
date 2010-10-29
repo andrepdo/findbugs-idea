@@ -8,7 +8,7 @@
 		FindBugs is a defect detection tool for Java that uses static analysis to look for more than 200 bug patterns,
 		such as null pointer dereferences, infinite recursive loops, bad uses of the Java libraries and deadlocks.
 		FindBugs can identify hundreds of serious defects in large applications (typically about 1 defect per 1000-2000
-		lines of non-commenting source statements). The name FindBugs™ and the FindBugs logo are trademarked by The University of Maryland.
+		lines of non-commenting source statements). The name FindBugs&trade; and the FindBugs logo are trademarked by The University of Maryland.
 		As of July, 2008, FindBugs has been downloaded more than 700,000 times.
         FindBugs requires JRE (or JDK) 1.5.0 or later to run.  However, it can analyze programs compiled for any version of Java
 		and is used by many major companies and financial institutions.
@@ -67,7 +67,7 @@
         <![CDATA[<html>
         <h3>0.9.96</h3>
 		<ul>
-		    <li>JumpToSource now works for anonymous classes (per default findbugs does not report any sourceline annotation for anonymous classes)</li>
+		    <li>JumpToSource now works for anonymous classes (per default findbugs does not report any source line annotation for anonymous classes)</li>
 		    <li>add preview support: preview bug in source file (Preview panel inside toolwindow)</li>
 		    <li>add import bug collection from xml</li>
 		    <li>export a bug collection to html and/or xml with limited configurable dir based archive support</li>
@@ -75,10 +75,10 @@
             <li>fix Issue 14 (Inspection ID must satisfy [a-zA-Z_0-9.]+ pattern)</li>
             <li>fix exclude- include filter settings and exclude base line bugs</li>
             <li>fix issue 15 IDEA hangs when user closes FindBugs tab.</li>
-            <li>add persistence action states (scrolltosource, GroupBy, preview)</li>
+            <li>add persistence action states (scrollTosource, GroupBy, preview)</li>
             <li>add bug pattern abbr to bug pattern result explanation view matching preference bug pattern category </li>
             <li>configurable : open an exported bug collection html page in the intellij configured browser</li>
-            <li>configurable : open an exported bug collection html page in the intellij configured browser</li>
+            <li>configurable : default export dir</li>
             <li>some performance improvements (non blocking Grouping and JavaPsiFacade.getInstance(...).findClass)</li>
 		</ul>
         <h3>0.9.95</h3>
