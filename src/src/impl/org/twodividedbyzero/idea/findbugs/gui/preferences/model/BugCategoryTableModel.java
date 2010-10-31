@@ -15,7 +15,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.preferences.model;
 
-import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
+import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;

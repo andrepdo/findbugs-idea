@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.twodividedbyzero.idea.findbugs.common.util;
+package org.twodividedbyzero.idea.findbugs.common;
 
 import java.io.BufferedInputStream;
 import java.io.File;

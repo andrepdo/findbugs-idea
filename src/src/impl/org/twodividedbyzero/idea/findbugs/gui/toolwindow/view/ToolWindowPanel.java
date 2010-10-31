@@ -16,11 +16,13 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.toolwindow.view;
 
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiFile;
@@ -28,6 +30,7 @@ import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.ProjectStats;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
@@ -35,15 +38,14 @@ import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
-import org.twodividedbyzero.idea.findbugs.common.ui.ActionToolbarContainer;
-import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
-import org.twodividedbyzero.idea.findbugs.common.ui.MultiSplitLayout;
-import org.twodividedbyzero.idea.findbugs.common.ui.MultiSplitPane;
-import org.twodividedbyzero.idea.findbugs.common.ui.NDockLayout;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.gui.common.ActionToolbarContainer;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
+import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitLayout;
+import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitPane;
+import org.twodividedbyzero.idea.findbugs.gui.common.NDockLayout;
 
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -63,7 +65,7 @@ import java.util.Map;
  * @version $Revision$
  * @since 0.0.1
  */
-@SuppressWarnings({"HardCodedStringLiteral", "AnonymousInnerClass"})
+@SuppressWarnings({"HardCodedStringLiteral", "AnonymousInnerClass", "AnonymousInnerClassMayBeStatic"})
 @edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_BAD_FIELD"})
 public class ToolWindowPanel extends JPanel implements EventListener<BugReporterEvent> {
 
@@ -244,6 +246,12 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 		switch (event.getOperation()) {
 			case ANALYSIS_STARTED:
+				EventDispatchThreadHelper.invokeLater(new Runnable() {
+					public void run() {
+										EditorFactory.getInstance().refreshAllEditors();
+						DaemonCodeAnalyzer.getInstance(_project).restart();
+					}
+				});
 				updateLayout(false);
 
 				_bugTreePanel.clear(true);
@@ -267,8 +275,10 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 				EventDispatchThreadHelper.invokeLater(new Runnable() {
 					public void run() {
 						_bugTreePanel.getBugTree().validate();
-						final String text = VersionManager.getName() + ": <b>found " + _bugTreePanel.getGroupModel().getBugCount() + " bugs in " + projectStats.getNumClasses() + (projectStats.getNumClasses() > 1 ? " classes" : " class") + "</b><br/>" + "<font size='10px'>using " + VersionManager.getFullVersion() + " with Findbugs version " + FindBugsUtil.getFindBugsFullVersion() + "</font>"; 
+						final String text = VersionManager.getName() + ": <b>found " + _bugTreePanel.getGroupModel().getBugCount() + " bugs in " + projectStats.getNumClasses() + (projectStats.getNumClasses() > 1 ? " classes" : " class") + "</b><br/>" + "<font size='10px'>using " + VersionManager.getFullVersion() + " with Findbugs version " + FindBugsUtil.getFindBugsFullVersion() + "</font>";
 						BalloonTipFactory.showToolWindowInfoNotifier(text);
+						EditorFactory.getInstance().refreshAllEditors();
+						DaemonCodeAnalyzer.getInstance(_project).restart();
 					}
 				});
 

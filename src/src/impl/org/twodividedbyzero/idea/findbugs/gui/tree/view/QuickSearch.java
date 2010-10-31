@@ -19,9 +19,9 @@ package org.twodividedbyzero.idea.findbugs.gui.tree.view;
 import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.ui.AbstractBar;
-import org.twodividedbyzero.idea.findbugs.common.ui.ToolBarButton;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
+import org.twodividedbyzero.idea.findbugs.gui.common.AbstractBar;
+import org.twodividedbyzero.idea.findbugs.gui.common.ToolBarButton;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
 import javax.swing.BorderFactory;

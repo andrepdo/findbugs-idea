@@ -33,7 +33,7 @@ public class VersionManager {
 
 	private static final long _major = 0;
 	private static final long _minor = 9;
-	private static final long _build = 96;
+	private static final long _build = 97;
 
 	private static final String _branch = "";
 

@@ -99,7 +99,7 @@ public class EditorHandler implements ProjectComponent {
 
 	@Nullable
 	private RangeMarker findMarker(@NotNull final ExtendedProblemDescriptor problem) {
-		final DocumentChangeTracker documentChangeTracker = _changeTrackers.get(problem.getFile().getVirtualFile());
+		final DocumentChangeTracker documentChangeTracker = _changeTrackers.get(problem.getPsiFile().getVirtualFile());
 		if (documentChangeTracker == null) {
 			return null;
 		}
@@ -113,7 +113,7 @@ public class EditorHandler implements ProjectComponent {
 			return null;
 		}
 
-		final DocumentChangeTracker documentChangeTracker = _changeTrackers.get(problem.getFile().getVirtualFile());
+		final DocumentChangeTracker documentChangeTracker = _changeTrackers.get(problem.getPsiFile().getVirtualFile());
 		if (documentChangeTracker == null) {
 			return null;
 		}
@@ -163,7 +163,7 @@ public class EditorHandler implements ProjectComponent {
 
 
 	private void removeMarker(final ExtendedProblemDescriptor problem) {
-		final DocumentChangeTracker documentChangeTracker = _changeTrackers.get(problem.getFile().getVirtualFile());
+		final DocumentChangeTracker documentChangeTracker = _changeTrackers.get(problem.getPsiFile().getVirtualFile());
 		if (documentChangeTracker == null) {
 			return;
 		}

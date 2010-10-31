@@ -51,6 +51,11 @@ public class GuiResources {
 	public static final Color LOW_PRIORITY_COLOR = Color.GREEN;
 	public static final Color EXP_PRIORITY_COLOR = Color.BLACK;
 
+	public static final Icon PRIORITY_HIGH_ICON = ResourcesLoader.loadIcon("priority/bug_hiigh.png");
+	public static final Icon PRIORITY_NORMAL_ICON = ResourcesLoader.loadIcon("priority/bug_normal.png");
+	public static final Icon PRIORITY_LOW_ICON = ResourcesLoader.loadIcon("priority/bug_low.png");
+	public static final Icon PRIORITY_EXP_ICON = ResourcesLoader.loadIcon("priority/bug_exp.png");
+
 	/**
 	 * --------------------------------------------------------------------------------------------------
 	 * Grouping icons
@@ -91,7 +96,6 @@ public class GuiResources {
 	 */
 	public static final Icon NAVIGATION_MOVEUP_ICON = ResourcesLoader.loadIcon("actions/moveUp.png");
 	public static final Icon NAVIGATION_MOVEDOWN_ICON = ResourcesLoader.loadIcon("actions/moveDown.png");
-
 
 
 	private GuiResources() {

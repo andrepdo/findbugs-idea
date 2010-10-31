@@ -1,6 +1,6 @@
 package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 
-import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
+import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;

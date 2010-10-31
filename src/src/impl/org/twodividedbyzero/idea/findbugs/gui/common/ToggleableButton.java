@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.twodividedbyzero.idea.findbugs.common.ui;
+package org.twodividedbyzero.idea.findbugs.gui.common;
 
 import javax.swing.Action;
 import javax.swing.DefaultButtonModel;

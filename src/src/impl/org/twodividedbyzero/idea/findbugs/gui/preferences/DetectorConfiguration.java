@@ -20,7 +20,7 @@ import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import info.clearthought.layout.TableLayout;
-import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
+import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.gui.common.TableSorter;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.model.BugPatternTableModel;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;

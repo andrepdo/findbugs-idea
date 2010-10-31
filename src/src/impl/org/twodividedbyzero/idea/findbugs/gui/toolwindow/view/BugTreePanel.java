@@ -29,12 +29,8 @@ import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
-import com.intellij.openapi.fileEditor.FileEditor;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -43,8 +39,8 @@ import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.ProjectStats;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
-import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
@@ -169,48 +165,6 @@ public class BugTreePanel extends JPanel {
 		final Map<String, String> categories = _preferences.getBugCategories();
 		final String category = node.getBugPattern().getCategory();
 		return categories.containsKey(category) && "false".equals(categories.get(category));
-	}
-
-
-	/**
-	 * Scroll to the error specified by the given tree path, or do nothing
-	 * if no error is specified.
-	 *
-	 * @param treePath the tree path to scroll to.
-	 * @deprecated is now implemented with a {@link com.intellij.openapi.actionSystem.DataProvider} and {@link org.twodividedbyzero.idea.findbugs.gui.tree.ScrollToSourceHandler} in {@link org.twodividedbyzero.idea.findbugs.gui.tree.view.BugTree}
-	 */
-	@Deprecated
-	public void scrollToSource(final TreePath treePath) {
-
-		if (treePath.getLastPathComponent() instanceof BugInstanceNode) {
-			final BugInstanceNode instanceNodeInfo = (BugInstanceNode) getTreeNodeFromPath(treePath);
-			if (instanceNodeInfo == null) {
-				return;
-			}
-
-			if (instanceNodeInfo.getPsiFile() == null || instanceNodeInfo.getProblem() == null) {
-				return; // no problem here
-			}
-
-			final FileEditorManager fileEditorManager = FileEditorManager.getInstance(_project);
-			final PsiFile psiFile = instanceNodeInfo.getPsiFile();
-			@SuppressWarnings({"ConstantConditions"})
-			final VirtualFile virtualFile = psiFile.getVirtualFile();
-
-			if (virtualFile != null) {
-				final FileEditor[] editor = fileEditorManager.openFile(virtualFile, true);
-
-				if (editor.length > 0 && editor[0] instanceof TextEditor) {
-					final int column = instanceNodeInfo.getProblem() instanceof ExtendedProblemDescriptor ? ((ExtendedProblemDescriptor) instanceNodeInfo.getProblem()).getColumn() : 0;
-					final int line = instanceNodeInfo.getProblem() instanceof ExtendedProblemDescriptor ? ((ExtendedProblemDescriptor) instanceNodeInfo.getProblem()).getLine() : instanceNodeInfo.getProblem().getLineNumber();
-					final LogicalPosition problemPos = new LogicalPosition(line - 1, column);
-
-					((TextEditor) editor[0]).getEditor().getCaretModel().moveToLogicalPosition(problemPos);
-					((TextEditor) editor[0]).getEditor().getScrollingModel().scrollToCaret(ScrollType.CENTER);
-				}
-			}
-		}
-
 	}
 
 

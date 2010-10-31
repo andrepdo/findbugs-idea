@@ -22,7 +22,7 @@ import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.FieldAnnotation;
 import edu.umd.cs.findbugs.MethodAnnotation;
-import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
+import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.DetectorConfiguration;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
@@ -173,7 +173,6 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		if (evt.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
 			if (_parent instanceof ToolWindowPanel) {
 				final BugTreePanel bugTreePanel = ((ToolWindowPanel) _parent).getBugTreePanel();
-				//bugTreePanel.scrollToSource(_currentTreePath);
 				final BugTree tree = bugTreePanel.getBugTree();
 				if (bugTreePanel.isScrollToSource()) {
 					tree.getScrollToSourceHandler().scollToSelectionSource();

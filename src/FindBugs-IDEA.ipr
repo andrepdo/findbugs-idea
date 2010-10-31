@@ -2693,7 +2693,9 @@
         <w>multi</w>
         <w>multicast</w>
         <w>navigatable</w>
+        <w>recurse</w>
         <w>resize</w>
+        <w>tooltip</w>
         <w>toolwindow</w>
       </words>
     </dictionary>

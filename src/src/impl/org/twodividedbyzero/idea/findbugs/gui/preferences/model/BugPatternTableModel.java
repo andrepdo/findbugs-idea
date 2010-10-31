@@ -17,7 +17,7 @@ package org.twodividedbyzero.idea.findbugs.gui.preferences.model;
 
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.I18N;
-import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
+import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.DetectorConfiguration;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 

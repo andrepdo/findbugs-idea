@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.twodividedbyzero.idea.findbugs.common.ui;
+package org.twodividedbyzero.idea.findbugs.gui.common;
 
 /**
  * Layout Manager to control positions of docked toolbars

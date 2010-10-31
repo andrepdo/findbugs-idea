@@ -19,10 +19,10 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.twodividedbyzero.idea.findbugs.common.ui;
+package org.twodividedbyzero.idea.findbugs.gui.common;
 
-import org.twodividedbyzero.idea.findbugs.common.ui.MultiSplitLayout.Divider;
-import org.twodividedbyzero.idea.findbugs.common.ui.MultiSplitLayout.Node;
+import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitLayout.Divider;
+import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitLayout.Node;
 
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;

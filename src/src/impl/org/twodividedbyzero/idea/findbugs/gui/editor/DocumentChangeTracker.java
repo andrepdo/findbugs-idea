@@ -71,7 +71,7 @@ class DocumentChangeTracker implements DocumentListener {
 	@NotNull
 	RangeMarker addMarker(@NotNull final ExtendedProblemDescriptor problem, final boolean orphanMarker) {
 		final int lineStart = problem.getLineStart();
-		final PsiElement element = IdeaUtilImpl.getElementAtLine(problem.getFile(), lineStart);
+		final PsiElement element = IdeaUtilImpl.getElementAtLine(problem.getPsiFile(), lineStart);
 		final RangeMarker marker;
 		if (element != null) {
 			marker = _document.createRangeMarker(element.getTextRange());

@@ -18,7 +18,7 @@ package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
 import com.intellij.openapi.ui.MessageType;
 import info.clearthought.layout.TableLayout;
-import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
+import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 

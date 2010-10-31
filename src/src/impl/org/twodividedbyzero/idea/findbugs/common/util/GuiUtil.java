@@ -31,7 +31,12 @@ import java.awt.Component;
  * @version $Revision$
  * @since 0.0.1
  */
-public class GuiUtil {
+public final class GuiUtil {
+
+	private GuiUtil() {
+		throw new UnsupportedOperationException();
+	}
+
 
 	public static void navigateToElement(final PsiElement psiElement) {
 		final PsiElement navigationElement = psiElement.getNavigationElement();

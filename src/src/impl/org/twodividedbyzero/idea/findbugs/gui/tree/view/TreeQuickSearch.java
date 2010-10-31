@@ -17,7 +17,7 @@
 package org.twodividedbyzero.idea.findbugs.gui.tree.view;
 
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
+import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.AbstractTreeNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.VisitableTreeNode;
 

@@ -65,6 +65,10 @@
     </description>
     <change-notes>
         <![CDATA[<html>
+        <h3>0.9.97</h3>
+        <ul>
+		    <li></li>
+		</ul>
         <h3>0.9.96</h3>
 		<ul>
 		    <li>JumpToSource now works for anonymous classes (per default findbugs does not report any source line annotation for anonymous classes)</li>
@@ -192,10 +196,10 @@
     <!-- until-build="10762" min="8.0"-->
     <!--<helpset file="your-help.jar" path="path-to-helpset.hs"/>-->
     <resource-bundle>org.twodividedbyzero.idea.findbugs.resources.i18n.Messages</resource-bundle>
-    <!--<extensions defaultExtensionNs="com.intellij">
-         <annotator language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugAnnotator"/>
+    <extensions defaultExtensionNs="com.intellij">
+        <annotator language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugAnnotator"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugsLineMarkerProvider"/>
-    </extensions>-->
+    </extensions>
     <project-components>
         <component>
             <implementation-class>org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl</implementation-class>

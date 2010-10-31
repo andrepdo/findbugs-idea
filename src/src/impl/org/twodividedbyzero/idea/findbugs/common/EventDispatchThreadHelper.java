@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package org.twodividedbyzero.idea.findbugs.common.ui;
+package org.twodividedbyzero.idea.findbugs.common;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.common.CallerStack;
 
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;

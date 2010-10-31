@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package org.twodividedbyzero.idea.findbugs.common.ui;
+package org.twodividedbyzero.idea.findbugs.gui.common;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

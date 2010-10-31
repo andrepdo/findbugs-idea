@@ -21,8 +21,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import edu.umd.cs.findbugs.BugInstance;
 import org.twodividedbyzero.idea.findbugs.common.DoneCallback;
+import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
-import org.twodividedbyzero.idea.findbugs.common.ui.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
@@ -110,15 +110,15 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 				_addProblem(value, leaf);
 			}
 		});
-		if (psiFile != null) {
+		/*if (psiFile != null) {
 			_addProblem(psiFile, leaf);
-		}
+		}*/
 	}
 
 
 	private void _addProblem(final PsiFile value, final BugInstanceNode leaf) {
 		if (value != null) {
-			final ExtendedProblemDescriptor element = new ExtendedProblemDescriptor(value, leaf.getBugInstance());
+			final ExtendedProblemDescriptor element = new ExtendedProblemDescriptor(value, leaf);
 			if (_problems.containsKey(value)) {
 				_problems.get(value).add(element);
 			} else {

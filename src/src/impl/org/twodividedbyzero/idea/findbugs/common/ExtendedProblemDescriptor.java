@@ -26,6 +26,8 @@ import edu.umd.cs.findbugs.BugInstance;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 
 
 /**
@@ -38,27 +40,21 @@ import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 public class ExtendedProblemDescriptor implements ProblemDescriptor {
 
 
-	private ProblemDescriptor _delegate;
-	private int _column;
-	private int _line;
-	private PsiFile _file;
+	private final PsiFile _psiFile;
+	private PsiElement _psiElement;
 	private int _lineStart;
 	private int _lineEnd;
 	private int _hash;
 
-	private final BugInstance _bugInstance;
+	private final BugInstanceNode _bugInstanceNode;
 
 
-	public ExtendedProblemDescriptor(final PsiFile file, final BugInstance bugInstance) {
-		_file = file;
-		_bugInstance = bugInstance;
-		final int[] lines = BugInstanceUtil.getSourceLines(_bugInstance);
+	public ExtendedProblemDescriptor(final PsiFile psiFile, final BugInstanceNode bugInstanceNode) {
+		_psiFile = psiFile;
+		_bugInstanceNode = bugInstanceNode;
+		final int[] lines = BugInstanceUtil.getSourceLines(_bugInstanceNode);
 		_lineStart = lines[0] - 1;
 		_lineEnd = lines[1] - 1;
-		if(_lineStart < 0 || _lineEnd < 0) { // anonymous class? findbugs does not report line numbers for bug in anonymous/inner classes
-			_lineStart = 0;
-			_lineEnd = 0;
-		}
 	}
 
 
@@ -68,20 +64,8 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor {
 
 
 	public BugInstance getBugInstance() {
-		return _bugInstance;
+		return _bugInstanceNode.getBugInstance();
 	}
-
-
-	/*public ExtendedProblemDescriptor(final ProblemDescriptor delegate, final int line, final int column) {
-		if (delegate == null) {
-			throw new IllegalArgumentException("Delegate may not be null.");
-		}
-
-
-		_delegate = delegate;
-		_line = line;
-		_column = column;
-	}*/
 
 
 	/**
@@ -90,7 +74,7 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor {
 	 * @return the column position.
 	 */
 	public int getColumn() {
-		return _column;
+		return 0;
 	}
 
 
@@ -103,7 +87,7 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor {
 	 * @return the line position.
 	 */
 	public int getLine() {
-		return _line;
+		return _lineStart;
 	}
 
 
@@ -113,12 +97,12 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor {
 
 
 	public PsiElement getEndElement() {
-		return _delegate.getEndElement();
+		return getPsiElement();
 	}
 
 
 	public ProblemHighlightType getHighlightType() {
-		return _delegate.getHighlightType();
+		return ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
 	}
 
 
@@ -128,34 +112,37 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor {
 
 
 	public PsiElement getPsiElement() {
-		return _delegate.getPsiElement();
+		if (_psiElement != null) {
+			return _psiElement;
+		}
+		if(_lineStart < 0) {
+			_psiElement =  IdeaUtilImpl.findAnonymousClassPsiElement(_bugInstanceNode, _psiFile.getProject());
+		} else {
+			_psiElement = IdeaUtilImpl.getElementAtLine(_psiFile, _lineStart);
+		}
+		return _psiElement;
 	}
 
 
 	public PsiElement getStartElement() {
-		return _delegate.getStartElement();
+		return getPsiElement();
 	}
 
 
 	public boolean isAfterEndOfLine() {
-		return _delegate.isAfterEndOfLine();
+		return false;
 	}
 
 
 	@NotNull
 	public String getDescriptionTemplate() {
-		return _delegate.getDescriptionTemplate();
+		return "<description template>";
 	}
 
 
 	@Nullable
 	public QuickFix<?>[] getFixes() {
-		return _delegate.getFixes();
-	}
-
-
-	public void setFile(final PsiFile file) {
-		_file = file;
+		return null;
 	}
 
 
@@ -169,13 +156,8 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor {
 	}
 
 
-	public void setHash(final int hash) {
-		_hash = hash;
-	}
-
-
-	public PsiFile getFile() {
-		return _file;
+	public PsiFile getPsiFile() {
+		return _psiFile;
 	}
 
 

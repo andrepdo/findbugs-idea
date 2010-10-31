@@ -14,13 +14,14 @@ import java.util.Set;
  * @version $Revision$
  * @since 0.0.1
  */
-public class FindBugsUtil {
+public final class FindBugsUtil {
 
 	public static final Set<String> ARCHIVE_EXTENSION_SET = new HashSet<String>();
 	public static final Set<String> XML_EXTESIONS_SET = new HashSet<String>();
 
 
 	private FindBugsUtil() {
+		throw new UnsupportedOperationException();
 	}
 
 
