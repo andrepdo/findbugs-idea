@@ -18,10 +18,14 @@ package org.twodividedbyzero.idea.findbugs.gui.editor;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
+import com.intellij.openapi.editor.markup.EffectType;
+import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiAnonymousClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.util.PsiTreeUtil;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.Detector;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +37,8 @@ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +55,7 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 	private boolean _analysisRunning;
 	private boolean _isRegistered;
 
+
 	public BugAnnotator() {
 		_analysisRunning = false;
 		_isRegistered = false;
@@ -56,10 +63,10 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 
 
 	public void annotate(@NotNull final PsiElement psiElement, @NotNull final AnnotationHolder annotationHolder) {
-		if(_analysisRunning) {
+		if (_analysisRunning) {
 			return;
 		}
-		if(!_isRegistered) {
+		if (!_isRegistered) {
 			EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(psiElement.getProject().getName()), this);
 			_isRegistered = true;
 		}
@@ -68,44 +75,105 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 
 		final PsiFile psiFile = psiElement.getContainingFile();
 		if (problems.containsKey(psiFile)) {
-			addAnnotation(problems.get(psiFile), annotationHolder);
+			addAnnotation(psiElement, problems.get(psiFile), annotationHolder);
 		}
 	}
 
 
-	private static void addAnnotation(final Iterable<ExtendedProblemDescriptor> problemDescriptors, @NotNull final AnnotationHolder annotationHolder) {
+	private static void addAnnotation(@NotNull final PsiElement psiElement, final Iterable<ExtendedProblemDescriptor> problemDescriptors, @NotNull final AnnotationHolder annotationHolder) {
 		for (final ExtendedProblemDescriptor descriptor : problemDescriptors) {
-			addAnnotation(descriptor, annotationHolder);
+			final PsiElement problemPsiElement = descriptor.getPsiElement();
+
+			final PsiAnonymousClass psiAnonymousClass = PsiTreeUtil.getParentOfType(psiElement, PsiAnonymousClass.class);
+			if (psiElement.equals(problemPsiElement)) {
+				addAnnotation(descriptor, psiElement, annotationHolder);
+			} else if (psiAnonymousClass != null && psiAnonymousClass.equals(problemPsiElement)) {
+				addAnnotation(descriptor, psiAnonymousClass, annotationHolder);
+			}
 		}
 	}
 
 
-	private static void addAnnotation(final ExtendedProblemDescriptor problemDescriptor, @NotNull final AnnotationHolder annotationHolder) {
-		if (problemDescriptor.getLineStart() <= 0) {
-			return;
-		}
-		
+	private static void addAnnotation(final ExtendedProblemDescriptor problemDescriptor, final PsiElement psiElement, @NotNull final AnnotationHolder annotationHolder) {
 		final BugInstance bugInstance = problemDescriptor.getBugInstance();
 		final int priority = bugInstance.getPriority();
 		final Annotation annotation;
-		final TextRange textRange = problemDescriptor.getPsiElement().getTextRange();
+		final PsiElement problemElement = problemDescriptor.getPsiElement();
+		final TextRange textRange = problemElement.getTextRange();
+
+
 		switch (priority) {
-			case Detector.HIGH_PRIORITY :
-			case Detector.NORMAL_PRIORITY :
-			case Detector.EXP_PRIORITY :
-				annotation = annotationHolder.createErrorAnnotation(textRange, getAnnotationText(problemDescriptor));
-				annotation.registerFix(new AddSuppressWarningAnnotationFix(problemDescriptor), textRange);
+			case Detector.HIGH_PRIORITY:
+
+				if (psiElement instanceof PsiAnonymousClass) {
+					final PsiElement firstChild = psiElement.getFirstChild();
+					annotation = annotationHolder.createErrorAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(problemDescriptor));
+					annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, Color.RED.brighter(), Color.WHITE, EffectType.BOXED, Font.PLAIN));
+				} else {
+					annotation = annotationHolder.createErrorAnnotation(textRange, getAnnotationText(problemDescriptor));
+					annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, Color.WHITE, Color.RED, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
+				}
+
+				annotation.registerFix(new AddSuppressReportBugFix(problemDescriptor), textRange);
+				annotation.registerFix(new AddSuppressReportBugForClassFix(problemDescriptor), textRange);
+
 				break;
-			case Detector.LOW_PRIORITY :
-				annotation = annotationHolder.createWarningAnnotation(textRange, getAnnotationText(problemDescriptor));
-				annotation.registerFix(new AddSuppressWarningAnnotationFix(problemDescriptor), textRange);
+
+			case Detector.NORMAL_PRIORITY:
+
+				if (psiElement instanceof PsiAnonymousClass) {
+					final PsiElement firstChild = psiElement.getFirstChild();
+					annotation = annotationHolder.createErrorAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(problemDescriptor));
+				} else {
+					annotation = annotationHolder.createErrorAnnotation(textRange, getAnnotationText(problemDescriptor));
+				}
+				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, Color.WHITE, Color.YELLOW.darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
+				annotation.registerFix(new AddSuppressReportBugFix(problemDescriptor), textRange);
+				annotation.registerFix(new AddSuppressReportBugForClassFix(problemDescriptor), textRange);
+
 				break;
-			case Detector.IGNORE_PRIORITY :
-				annotation = annotationHolder.createInfoAnnotation(textRange, getAnnotationText(problemDescriptor));
+
+			case Detector.EXP_PRIORITY:
+
+				if (problemElement instanceof PsiAnonymousClass) {
+					final PsiElement firstChild = psiElement.getFirstChild();
+					annotation = annotationHolder.createErrorAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(problemDescriptor));
+				} else {
+					annotation = annotationHolder.createErrorAnnotation(textRange, getAnnotationText(problemDescriptor));
+				}
+				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, Color.WHITE, Color.GRAY, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
+				annotation.registerFix(new AddSuppressReportBugFix(problemDescriptor), textRange);
+				annotation.registerFix(new AddSuppressReportBugForClassFix(problemDescriptor), textRange);
+
+				break;
+			case Detector.LOW_PRIORITY:
+
+				if (psiElement instanceof PsiAnonymousClass) {
+					final PsiElement firstChild = psiElement.getFirstChild();
+					annotation = annotationHolder.createErrorAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(problemDescriptor));
+				} else {
+					annotation = annotationHolder.createErrorAnnotation(textRange, getAnnotationText(problemDescriptor));
+				}
+				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, Color.WHITE, Color.GREEN, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
+				annotation.registerFix(new AddSuppressReportBugFix(problemDescriptor), textRange);
+				annotation.registerFix(new AddSuppressReportBugForClassFix(problemDescriptor), textRange);
+
+				break;
+			case Detector.IGNORE_PRIORITY:
+				if (problemElement instanceof PsiAnonymousClass) {
+					final PsiElement firstChild = psiElement.getFirstChild();
+					annotation = annotationHolder.createErrorAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(problemDescriptor));
+					annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, Color.WHITE, Color.MAGENTA.brighter(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
+				} else {
+					annotation = annotationHolder.createErrorAnnotation(textRange, getAnnotationText(problemDescriptor));
+				}
+				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, Color.WHITE, Color.MAGENTA.darker().darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 				annotation.registerFix(new AddSuppressWarningAnnotationFix(problemDescriptor), textRange);
+				annotation.registerFix(new AddSuppressReportBugForClassFix(problemDescriptor), textRange);
+
 				break;
 			default:
-			break;
+				break;
 		}
 	}
 
@@ -133,4 +201,29 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 				break;
 		}
 	}
+
+
+	/*private static class AnonymousInnerClassMayBeStaticVisitor extends BaseInspectionVisitor {
+
+		@Override
+		public void visitClass(@NotNull PsiClass aClass) {
+			if (!(aClass instanceof PsiAnonymousClass)) {
+				return;
+			}
+			if (aClass instanceof PsiEnumConstantInitializer) {
+				return;
+			}
+			final PsiMember containingMember = PsiTreeUtil.getParentOfType(aClass, PsiMember.class);
+			if (containingMember == null || containingMember.hasModifierProperty(PsiModifier.STATIC)) {
+				return;
+			}
+			final PsiAnonymousClass anAnonymousClass = (PsiAnonymousClass) aClass;
+			final InnerClassReferenceVisitor visitor = new InnerClassReferenceVisitor(anAnonymousClass);
+			anAnonymousClass.accept(visitor);
+			if (!visitor.canInnerClassBeStatic()) {
+				return;
+			}
+			registerClassError(aClass);
+		}
+	}*/
 }

@@ -18,7 +18,9 @@ package org.twodividedbyzero.idea.findbugs.gui.editor;
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
+import com.intellij.psi.PsiAnonymousClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.Function;
@@ -81,6 +83,12 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 
 				final PsiElement problemPsiElement = problemDescriptor.getPsiElement();
 				if (psiElement.equals(problemPsiElement)) {
+					
+					if(psiElement instanceof PsiAnonymousClass) {
+						final Editor[] editors = com.intellij.openapi.editor.EditorFactory.getInstance().getEditors(IdeaUtilImpl.getDocument(psiFile.getProject(), problemDescriptor));
+						//editors[0].getMarkupModel().addRangeHighlighter()
+					}
+
 					final GutterIconNavigationHandler<PsiElement> navHandler = new BugGutterIconNavigationHandler();
 					return new LineMarkerInfo<PsiElement>(problemPsiElement, problemPsiElement.getTextRange().getStartOffset(), getIcon(problemDescriptor), 4, new TooltipProvider(problemDescriptor), navHandler, GutterIconRenderer.Alignment.LEFT);
 				}
@@ -143,6 +151,7 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 
 		public void navigate(final MouseEvent e, final PsiElement psiElement) {
 			//psiFileSystemItem.navigate(true);
+			
 		}
 	}
 

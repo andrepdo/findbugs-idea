@@ -2708,7 +2708,7 @@
       <module fileurl="file://$PROJECT_DIR$/FindBugs-IDEA.iml" filepath="$PROJECT_DIR$/FindBugs-IDEA.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="IDEA-9" project-jdk-type="IDEA JDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="IDEA IU-93.94" project-jdk-type="IDEA JDK">
     <output url="file://$PROJECT_DIR$/target/impl" />
   </component>
   <component name="ResourceManagerContainer">
