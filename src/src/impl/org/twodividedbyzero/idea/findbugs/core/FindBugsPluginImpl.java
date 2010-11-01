@@ -58,7 +58,6 @@ import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginExcepti
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
-import org.twodividedbyzero.idea.findbugs.gui.common.CheckThreadViolationRepaintManager;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.ConfigurationPanel;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -139,7 +138,6 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 
 	public void initComponent() {
-		CheckThreadViolationRepaintManager.install();
 		LOGGER.debug("initComponent");
 	}
 
