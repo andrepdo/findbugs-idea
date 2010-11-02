@@ -1,0 +1,916 @@
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java	(revision 133)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java	(revision )
+@@ -71,7 +71,7 @@
+ 
+ 	private static final Logger LOGGER = Logger.getInstance(ToolWindowPanel.class.getName());
+ 
+-	private static final String DEFAULT_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.4) (COLUMN weight=0.6 right.top right.bottom) wight=0.6)";
++	private static final String DEFAULT_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (COLUMN weight=0.3 right.top right.bottom) (LEAF name=right weight=0.4))";
+ 	private static final String PREVIEW_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (LEAF name=middle weight=0.4) (COLUMN weight=0.3 right.top right.bottom))";
+ 	//private static final String PREVIEW_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.4) (COLUMN weight=0.6 right.top right.bottom)  (LEAF name=right))";
+ 
+@@ -169,6 +169,7 @@
+ 					getMultiSplitPane().add(getBugTreePanel(), "left");
+ 					getMultiSplitPane().add(getBugDetailsComponents().getBugDetailsPanel(), "right.top");
+ 					getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
++			getMultiSplitPane().add(_bugDetailsComponents.getCloudCommentsPanel(), "right"); // NON-NLS
+ 
+ 					if (getPreviewPanel().getEditor() != null) {
+ 						resizeSplitNodes(ToolWindowPanel.this);
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/PluginGuiCallback.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/PluginGuiCallback.java	(revision )
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/PluginGuiCallback.java	(revision )
+@@ -0,0 +1,107 @@
++/*
++ * Copyright 2010 Andre Pfeiler
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *  http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package org.twodividedbyzero.idea.findbugs.gui;
++
++import com.intellij.openapi.progress.ProgressIndicator;
++import com.intellij.openapi.progress.Task.Backgroundable;
++import com.intellij.openapi.wm.WindowManager;
++import edu.umd.cs.findbugs.BugCollection;
++import edu.umd.cs.findbugs.BugInstance;
++import edu.umd.cs.findbugs.cloud.Cloud;
++import edu.umd.cs.findbugs.cloud.Cloud.CloudListener;
++import edu.umd.cs.findbugs.cloud.Cloud.CloudTask;
++import edu.umd.cs.findbugs.cloud.Cloud.CloudTaskListener;
++import edu.umd.cs.findbugs.gui2.AbstractSwingGuiCallback;
++import org.jetbrains.annotations.NotNull;
++import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
++
++import java.awt.EventQueue;
++import java.util.concurrent.CountDownLatch;
++
++public class PluginGuiCallback extends AbstractSwingGuiCallback {
++    private final FindBugsPlugin plugin;
++    private Cloud cloud;
++
++    private CloudListener cloudListener = new CloudListener() {
++        public void issueUpdated(BugInstance bug) {
++            plugin.getToolWindowPanel().getBugDetailsComponents().issueUpdated(bug);
++        }
++
++        public void statusUpdated() {
++            WindowManager.getInstance().getStatusBar(plugin.getProject()).setInfo(cloud.getStatusMsg());
++        }
++
++        public void taskStarted(final CloudTask task) {
++            task.setUseDefaultListener(false);
++            final Backgroundable backgroundable = new Backgroundable(plugin.getProject(), task.getName(), false) {
++
++                @Override
++                public void run(@NotNull final ProgressIndicator progressIndicator) {
++                    try {
++                        final CountDownLatch latch = new CountDownLatch(1);
++                        task.addListener(new CloudTaskListener() {
++                            public void taskStatusUpdated(String statusLine, double percentCompleted) {
++                                progressIndicator.setText(statusLine);
++                                progressIndicator.setFraction(percentCompleted / 100.0);
++                            }
++
++                            public void taskFinished() {
++                                latch.countDown();
++                            }
++
++                            public void taskFailed(String message) {
++                                progressIndicator.setText(message);
++                                latch.countDown();
++                            }
++                        });
++                        if (!task.isFinished())
++                            latch.await();
++                    } catch (InterruptedException e) {
++                        throw new IllegalStateException(e);
++                    }
++                }
++            };
++            EventQueue.invokeLater(new Runnable() {
++                public void run() {
++                    backgroundable.queue();
++                }
++            });
++        }
++    };
++
++    public PluginGuiCallback(FindBugsPlugin plugin) {
++        super(plugin.getToolWindowPanel());
++        this.plugin = plugin;
++    }
++
++    public void setErrorMessage(String errorMsg) {
++    }
++
++    public void registerCloud(final edu.umd.cs.findbugs.Project project, BugCollection collection, final Cloud cloud) {
++        this.cloud = cloud;
++        cloud.addListener(cloudListener);
++    }
++
++    public void unregisterCloud(edu.umd.cs.findbugs.Project project, BugCollection collection, Cloud cloud) {
++        //noinspection ObjectEquality
++        if (cloud == this.cloud) {
++            //noinspection AssignmentToNull
++            this.cloud = null;
++            cloud.removeListener(cloudListener);
++        }
++    }
++}
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugDetailsComponents.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugDetailsComponents.java	(revision 133)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugDetailsComponents.java	(revision )
+@@ -22,6 +22,7 @@
+ import edu.umd.cs.findbugs.DetectorFactory;
+ import edu.umd.cs.findbugs.FieldAnnotation;
+ import edu.umd.cs.findbugs.MethodAnnotation;
++import edu.umd.cs.findbugs.SortedBugCollection;
+ import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
+ import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
+ import org.twodividedbyzero.idea.findbugs.gui.preferences.DetectorConfiguration;
+@@ -64,11 +65,15 @@
+ 	private HTMLEditorKit _htmlEditorKit;
+ 	private JEditorPane _bugDetailsPane;
+ 	private JEditorPane _explanationPane;
++	private CloudCommentsPane _cloudCommentsPane;
+ 	private JPanel _bugDetailsPanel;
+ 	private JPanel _explanationPanel;
++	private JPanel _cloudCommentsPanel;
+ 	private final Component _parent;
+ 	private TreePath _currentTreePath;
+ 	private double _splitPaneHorizontalWeight = 0.6;
++	private SortedBugCollection _lastBugCollection;
++	private BugInstance _lastBugInstance;
+ 
+ 
+ 	public BugDetailsComponents(final Component parent) {
+@@ -130,6 +135,33 @@
+ 	}
+ 
+ 
++	public JPanel getCloudCommentsPanel() {
++		if (_cloudCommentsPanel == null) {
++			final JScrollPane detailHtmlScoller = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
++			detailHtmlScoller.setViewportView(getCloudCommentsPane());
++
++			_cloudCommentsPanel = new JPanel();
++			_cloudCommentsPanel.setLayout(new BorderLayout());
++			//_explanationPanel.setMinimumSize(new Dimension((int) (_parent.getPreferredSize().width * 0.6), 100));
++			//_explanationPanel.setPreferredSize(new Dimension((int) (_parent.getPreferredSize().width * 0.6), 150));
++			_cloudCommentsPanel.add(detailHtmlScoller, BorderLayout.CENTER);
++		}
++
++		return _cloudCommentsPanel;
++	}
++
++
++	private CloudCommentsPane getCloudCommentsPane() {
++		if (_cloudCommentsPane == null) {
++			_cloudCommentsPane = new CloudCommentsPane();
++			_cloudCommentsPane.setBorder(new EmptyBorder(10, 10, 10, 10));
++			//_explanationPane.setPreferredSize(new Dimension(_parent.getPreferredSize().width, 150));
++		}
++
++		return _cloudCommentsPane;
++	}
++
++
+ 	private JEditorPane getExplanationPane() {
+ 		if (_explanationPane == null) {
+ 			_explanationPane = new ExplanationEditorPane();
+@@ -281,7 +313,7 @@
+ 		html.append(BugInstanceUtil.getBugPatternShortDescription(bugInstance));
+ 		html.append(")</font>");
+ 		html.append("</li>");
+-		
++
+ 		final DetectorFactory detectorFactory = bugInstance.getDetectorFactory();
+ 		if (detectorFactory != null) {
+ 			html.append("<li>");
+@@ -302,8 +334,17 @@
+ 	}
+ 
+ 
+-	public void setBugExplanation(final BugInstance bugInstance) {
+-		final String html = BugInstanceUtil.getDetailHtml(bugInstance);
++	public void setBugExplanation(final SortedBugCollection bugCollection, final BugInstance bugInstance) {
++		_lastBugCollection = bugCollection;
++		_lastBugInstance = bugInstance;
++		refreshDetailsShown();
++
++		scrollRectToVisible(_bugDetailsPane);
++	}
++
++
++	private void refreshDetailsShown() {
++		final String html = BugInstanceUtil.getDetailHtml(_lastBugInstance);
+ 		final StringReader reader = new StringReader(html); // no need for BufferedReader
+ 		try {
+ 			_explanationPane.setToolTipText(edu.umd.cs.findbugs.L10N.getLocalString("tooltip.longer_description", "This gives a longer description of the detected bug pattern"));
+@@ -314,7 +355,7 @@
+ 		} finally {
+ 			reader.close(); // polite, but doesn't do much in StringReader
+ 		}
+-
++		_cloudCommentsPane.setBugInstance(_lastBugCollection, _lastBugInstance);
+ 		scrollRectToVisible(_bugDetailsPane);
+ 	}
+ 
+@@ -352,6 +393,14 @@
+ 	}
+ 
+ 
++	public void issueUpdated(BugInstance bug) {
++		//noinspection ObjectEquality
++		if (bug == _lastBugInstance) {
++			refreshDetailsShown();
++		}
++	}
++
++
+ 	public double getSplitPaneHorizontalWeight() {
+ 		return _splitPaneHorizontalWeight;
+ 	}
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.java	(revision )
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.java	(revision )
+@@ -0,0 +1,258 @@
++/*
++ * Copyright 2010 Andre Pfeiler
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *  http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package org.twodividedbyzero.idea.findbugs.gui.toolwindow.view;
++
++import com.intellij.ui.components.labels.LinkLabel;
++import com.intellij.ui.components.labels.LinkListener;
++import edu.umd.cs.findbugs.BugInstance;
++import edu.umd.cs.findbugs.I18N;
++import edu.umd.cs.findbugs.SortedBugCollection;
++import edu.umd.cs.findbugs.cloud.Cloud.UserDesignation;
++
++import javax.swing.BorderFactory;
++import javax.swing.DefaultComboBoxModel;
++import javax.swing.JButton;
++import javax.swing.JComboBox;
++import javax.swing.JComponent;
++import javax.swing.JEditorPane;
++import javax.swing.JLabel;
++import javax.swing.JPanel;
++import javax.swing.JScrollPane;
++import javax.swing.JTextArea;
++import javax.swing.border.TitledBorder;
++import javax.swing.text.BadLocationException;
++import javax.swing.text.html.HTMLDocument;
++import java.awt.BorderLayout;
++import java.awt.Color;
++import java.awt.GridBagConstraints;
++import java.awt.GridBagLayout;
++import java.awt.Insets;
++import java.awt.event.ActionEvent;
++import java.awt.event.ActionListener;
++
++public class CloudCommentsPane extends JPanel {
++
++    private JEditorPane _cloudReportPane;
++    private LinkLabel _addCommentLink;
++    private JTextArea _commentBox;
++    private JButton _submitCommentButton;
++    private JPanel _commentEntryPanel;
++    private JComboBox _classificationCombo;
++    private JPanel _mainPanel;
++    private LinkLabel _cancelLink;
++    private JScrollPane _cloudReportScrollPane;
++    private SortedBugCollection _bugCollection;
++    private BugInstance _bugInstance;
++
++    public CloudCommentsPane() {
++        setLayout(new BorderLayout());
++        this.add(_mainPanel, BorderLayout.CENTER);
++
++        _classificationCombo.removeAllItems();
++        for (UserDesignation designation : UserDesignation.values()) {
++            _classificationCombo.addItem(I18N.instance().getUserDesignation(designation.name()));
++        }
++
++        _commentEntryPanel.setVisible(false);
++        _addCommentLink.setListener(new LinkListener() {
++            public void linkSelected(LinkLabel linkLabel, Object o) {
++                _commentEntryPanel.setVisible(true);
++                _addCommentLink.setVisible(false);
++                _commentBox.requestFocus();
++                _commentBox.setSelectionStart(0);
++                _commentBox.setSelectionEnd(_commentBox.getText().length());
++                CloudCommentsPane.this.invalidate();
++            }
++        }, null);
++        _cancelLink.setListener(new LinkListener() {
++            public void linkSelected(LinkLabel linkLabel, Object o) {
++                _commentEntryPanel.setVisible(false);
++                _addCommentLink.setVisible(true);
++                CloudCommentsPane.this.invalidate();
++            }
++        }, null);
++        _submitCommentButton.addActionListener(new ActionListener() {
++            public void actionPerformed(ActionEvent e) {
++                String comment = _commentBox.getText();
++                int index = _classificationCombo.getSelectedIndex();
++                UserDesignation choice;
++                if (index == -1)
++                    choice = UserDesignation.UNCLASSIFIED;
++                else
++                    choice = UserDesignation.values()[index];
++                _bugInstance.setUserDesignationKey(choice.name(), _bugCollection);
++                _bugInstance.setAnnotationText(comment, _bugCollection);
++
++                _commentBox.setText("My comment");
++
++                updateBugCommentsView();
++
++                _commentEntryPanel.setVisible(false);
++                _addCommentLink.setVisible(true);
++                CloudCommentsPane.this.invalidate();
++            }
++        });
++    }
++
++    public void setBugInstance(SortedBugCollection bugCollection, BugInstance bugInstance) {
++        this._bugCollection = bugCollection;
++        this._bugInstance = bugInstance;
++        updateBugCommentsView();
++    }
++
++    private void updateBugCommentsView() {
++        HTMLDocument doc = (HTMLDocument) _cloudReportPane.getDocument();
++        try {
++            doc.remove(0, doc.getLength());
++            doc.insertString(0, _bugCollection.getCloud().getCloudReport(_bugInstance), null);
++        } catch (BadLocationException e) {
++            // probably won't happen
++        }
++        TitledBorder border1 = (TitledBorder) _cloudReportScrollPane.getBorder();
++        border1.setTitle(_bugCollection.getCloud().getPlugin().getDescription());
++        _cloudReportScrollPane.invalidate();
++        _cloudReportScrollPane.repaint();
++    }
++
++    {
++// GUI initializer generated by IntelliJ IDEA GUI Designer
++// >>> IMPORTANT!! <<<
++// DO NOT EDIT OR ADD ANY CODE HERE!
++        $$$setupUI$$$();
++    }
++
++    /**
++     * Method generated by IntelliJ IDEA GUI Designer
++     * >>> IMPORTANT!! <<<
++     * DO NOT edit this method OR call it in your code!
++     *
++     * @noinspection ALL
++     */
++    private void $$$setupUI$$$() {
++        _mainPanel = new JPanel();
++        _mainPanel.setLayout(new GridBagLayout());
++        final JPanel spacer1 = new JPanel();
++        GridBagConstraints gbc;
++        gbc = new GridBagConstraints();
++        gbc.gridx = 1;
++        gbc.gridy = 0;
++        gbc.fill = GridBagConstraints.HORIZONTAL;
++        _mainPanel.add(spacer1, gbc);
++        final JPanel spacer2 = new JPanel();
++        gbc = new GridBagConstraints();
++        gbc.gridx = 0;
++        gbc.gridy = 4;
++        gbc.fill = GridBagConstraints.BOTH;
++        _mainPanel.add(spacer2, gbc);
++        _addCommentLink = new LinkLabel();
++        _addCommentLink.setText("Add Comment");
++        gbc = new GridBagConstraints();
++        gbc.gridx = 0;
++        gbc.gridy = 3;
++        gbc.anchor = GridBagConstraints.WEST;
++        gbc.ipadx = 5;
++        gbc.ipady = 5;
++        _mainPanel.add(_addCommentLink, gbc);
++        _commentEntryPanel = new JPanel();
++        _commentEntryPanel.setLayout(new GridBagLayout());
++        gbc = new GridBagConstraints();
++        gbc.gridx = 0;
++        gbc.gridy = 1;
++        gbc.gridheight = 2;
++        gbc.weightx = 1.0;
++        gbc.fill = GridBagConstraints.BOTH;
++        gbc.insets = new Insets(5, 5, 5, 5);
++        _mainPanel.add(_commentEntryPanel, gbc);
++        _commentEntryPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), null));
++        _submitCommentButton = new JButton();
++        _submitCommentButton.setText("Submit");
++        gbc = new GridBagConstraints();
++        gbc.gridx = 3;
++        gbc.gridy = 1;
++        gbc.insets = new Insets(5, 5, 5, 5);
++        _commentEntryPanel.add(_submitCommentButton, gbc);
++        _classificationCombo = new JComboBox();
++        final DefaultComboBoxModel defaultComboBoxModel1 = new DefaultComboBoxModel();
++        defaultComboBoxModel1.addElement("Unclassified");
++        defaultComboBoxModel1.addElement("Not a bug");
++        defaultComboBoxModel1.addElement("Etc");
++        _classificationCombo.setModel(defaultComboBoxModel1);
++        gbc = new GridBagConstraints();
++        gbc.gridx = 1;
++        gbc.gridy = 1;
++        gbc.anchor = GridBagConstraints.WEST;
++        gbc.fill = GridBagConstraints.HORIZONTAL;
++        gbc.insets = new Insets(5, 5, 5, 5);
++        _commentEntryPanel.add(_classificationCombo, gbc);
++        final JLabel label1 = new JLabel();
++        label1.setText("Classification:");
++        gbc = new GridBagConstraints();
++        gbc.gridx = 0;
++        gbc.gridy = 1;
++        gbc.anchor = GridBagConstraints.WEST;
++        _commentEntryPanel.add(label1, gbc);
++        final JScrollPane scrollPane1 = new JScrollPane();
++        gbc = new GridBagConstraints();
++        gbc.gridx = 0;
++        gbc.gridy = 0;
++        gbc.gridwidth = 4;
++        gbc.weightx = 1.0;
++        gbc.fill = GridBagConstraints.BOTH;
++        _commentEntryPanel.add(scrollPane1, gbc);
++        scrollPane1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null));
++        _commentBox = new JTextArea();
++        _commentBox.setRows(5);
++        _commentBox.setText("My comment");
++        scrollPane1.setViewportView(_commentBox);
++        _cancelLink = new LinkLabel();
++        _cancelLink.setText("cancel");
++        gbc = new GridBagConstraints();
++        gbc.gridx = 3;
++        gbc.gridy = 2;
++        _commentEntryPanel.add(_cancelLink, gbc);
++        final JPanel spacer3 = new JPanel();
++        gbc = new GridBagConstraints();
++        gbc.gridx = 2;
++        gbc.gridy = 1;
++        gbc.weightx = 1.0;
++        gbc.fill = GridBagConstraints.HORIZONTAL;
++        _commentEntryPanel.add(spacer3, gbc);
++        _cloudReportScrollPane = new JScrollPane();
++        gbc = new GridBagConstraints();
++        gbc.gridx = 0;
++        gbc.gridy = 0;
++        gbc.weightx = 1.0;
++        gbc.weighty = 1.0;
++        gbc.fill = GridBagConstraints.BOTH;
++        gbc.insets = new Insets(5, 5, 5, 5);
++        _mainPanel.add(_cloudReportScrollPane, gbc);
++        _cloudReportScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "Comments - FindBugs Cloud"));
++        _cloudReportPane = new JEditorPane();
++        _cloudReportPane.setContentType("text/html");
++        _cloudReportPane.setEditable(false);
++        _cloudReportPane.setText("<html>\r\n  <head>\r\n\r\n  </head>\r\n  <body>\r\n    <p style=\"margin-top: 0\">\r\n      \r\n    </p>\r\n  </body>\r\n</html>\r\n");
++        _cloudReportScrollPane.setViewportView(_cloudReportPane);
++        label1.setLabelFor(_classificationCombo);
++    }
++
++    /**
++     * @noinspection ALL
++     */
++    public JComponent $$$getRootComponent$$$() {
++        return _mainPanel;
++    }
++}
+Index: src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsWorker.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsWorker.java	(revision 133)
++++ src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsWorker.java	(revision )
+@@ -30,7 +30,7 @@
+ import edu.umd.cs.findbugs.DetectorFactoryCollection;
+ import edu.umd.cs.findbugs.FindBugs2;
+ import edu.umd.cs.findbugs.IFindBugsEngine;
+-import edu.umd.cs.findbugs.IFindBugsEngine2;
++import edu.umd.cs.findbugs.SortedBugCollection;
+ import edu.umd.cs.findbugs.config.ProjectFilterSettings;
+ import edu.umd.cs.findbugs.config.UserPreferences;
+ import org.dom4j.DocumentException;
+@@ -43,6 +43,7 @@
+ import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
+ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
+ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
++import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
+ import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
+ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+ import org.twodividedbyzero.idea.findbugs.report.BugReporter;
+@@ -82,7 +83,8 @@
+ 	private CompilerManager _compilerManager;
+ 	private final boolean _startInBackground;
+ 	private Module _module;
++    protected SortedBugCollection _bugCollection;
+-	//private RecurseCollectorTask _collectorTask;
++    //private RecurseCollectorTask _collectorTask;
+ 
+ 
+ 	public FindBugsWorker(final com.intellij.openapi.project.Project project) {
+@@ -140,6 +142,11 @@
+ 		_findBugsProject = new FindBugsProject();
+ 		_findBugsProject.setProjectName(_project.getName());
+ 
++        _bugCollection = new SortedBugCollection();
++        FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(_project);
++        _bugCollection.getProject().setGuiCallback(new PluginGuiCallback(pluginComponent));
++        _bugCollection.setDoNotUseCloud(true);
++
+ 		//CompilerManager.getInstance(_project).addCompilationStatusListener(this);
+ 
+ 		//initCollectorTask(_findBugsProject);
+@@ -173,10 +180,11 @@
+ 	public boolean work() {
+ 		try {
+ 			registerEventListner();
+-			final IFindBugsEngine2 engine = createFindBugsEngine();
++			final IFindBugsEngine engine = createFindBugsEngine();
+ 
+ 			// Create FindBugsTask
+-			final FindBugsTask findBugsTask = new FindBugsTask(_project, "Running FindBugs analysis...", true, engine, _startInBackground);
++			final FindBugsTask findBugsTask = new FindBugsTask(_project, _bugCollection,
++                                                               "Running FindBugs analysis...", true, engine, _startInBackground);  // NON-NLS
+ 			_bugReporter.setFindBugsTask(findBugsTask);
+ 			queue(findBugsTask);
+ 
+@@ -230,16 +238,16 @@
+ 	}
+ 
+ 
+-	protected IFindBugsEngine2 createFindBugsEngine() {
++	protected IFindBugsEngine createFindBugsEngine() {
+ 		// Create BugReporter
+-		_bugReporter = new BugReporter(_project);
++		_bugReporter = new BugReporter(_project, _bugCollection);
+ 
+ 		//final ProjectFilterSettings projectFilterSettings = _userPrefs.getFilterSettings();
+ 		_bugReporter.setPriorityThreshold(_userPrefs.getUserDetectorThreshold());
+ 		//_bugReporter.setPriorityThreshold(projectFilterSettings.getMinPriorityAsInt());
+ 
+ 		// Create IFindBugsEngine
+-		final IFindBugsEngine2 engine = new FindBugs2();
++		final IFindBugsEngine engine = new FindBugs2();
+ 		engine.setNoClassOk(true);
+ 		engine.setMergeSimilarWarnings(false);
+ 		engine.setBugReporter(_bugReporter);
+Index: src/impl/org/twodividedbyzero/idea/findbugs/preferences/FindBugsPreferences.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/preferences/FindBugsPreferences.java	(revision 115)
++++ src/impl/org/twodividedbyzero/idea/findbugs/preferences/FindBugsPreferences.java	(revision )
+@@ -304,7 +304,7 @@
+ 
+ 			try {
+ 				getDetectorFactorCollection().setPluginList(result);
+-				getDetectorFactorCollection().ensureLoaded();
++				//getDetectorFactorCollection().ensureLoaded();
+ 			} catch (IllegalStateException e) {
+ 				throw new FindBugsPluginException("Plugin needs to be set first before DetectorFactoryCollection instance is created.", e);
+ 			}
+Index: src/impl/org/twodividedbyzero/idea/findbugs/report/BugReporter.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/report/BugReporter.java	(revision 133)
++++ src/impl/org/twodividedbyzero/idea/findbugs/report/BugReporter.java	(revision )
+@@ -36,6 +36,7 @@
+ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent;
+ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEventImpl;
+ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
++import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+ import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
+ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+ import org.twodividedbyzero.idea.findbugs.tasks.FindBugsTask;
+@@ -86,17 +87,18 @@
+ 	 *
+ 	 * @param project the project whose classes are being analyzed for bugs
+ 	 */
+-	public BugReporter(final Project project) {
+-		this(project, false);
++	public BugReporter(final Project project, SortedBugCollection bugCollection) {
++		this(project, false, bugCollection);
+ 	}
+ 
+ 
+-	public BugReporter(final Project project, final boolean isInspectionRun) {
++	public BugReporter(final Project project, final boolean isInspectionRun, SortedBugCollection bugCollection) {
+ 		//this.monitor = monitor;
+ 		_project = project;
+-		_preferences = IdeaUtilImpl.getPluginComponent(project).getPreferences();
++        FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(project);
++        _preferences = pluginComponent.getPreferences();
+ 		_isInspectionRun = isInspectionRun;
+-		_bugCollection = new SortedBugCollection();
++		_bugCollection = bugCollection;
+ 	}
+ 
+ 
+Index: src/impl/org/twodividedbyzero/idea/findbugs/inspection/FindBugsInspectionProvider.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/inspection/FindBugsInspectionProvider.java	(revision 115)
++++ src/impl/org/twodividedbyzero/idea/findbugs/inspection/FindBugsInspectionProvider.java	(revision )
+@@ -17,10 +17,15 @@
+ package org.twodividedbyzero.idea.findbugs.inspection;
+ 
+ import com.intellij.codeInspection.InspectionToolProvider;
++import com.intellij.ide.plugins.IdeaPluginDescriptor;
++import com.intellij.openapi.application.Application;
++import com.intellij.openapi.application.ApplicationManager;
+ import com.intellij.openapi.components.ApplicationComponent;
++import com.intellij.openapi.extensions.PluginId;
+ import org.jetbrains.annotations.NonNls;
+ import org.jetbrains.annotations.NotNull;
+ 
++import java.io.File;
+ 
+ /**
+  * $Date$
+@@ -46,6 +51,10 @@
+ 
+ 	public void initComponent() {
+ 		// no action required
++		Application app = ApplicationManager.getApplication();
++		IdeaPluginDescriptor plugin = app.getPlugin(PluginId.getId("FindBugs-IDEA"));
++		File jar = new File(plugin.getPath(), "lib/webCloudClient.jar");
++		System.setProperty("findbugs.plugin.appengine", jar.toURI().toString());
+ 	}
+ 
+ 
+Index: src/impl/org/twodividedbyzero/idea/findbugs/inspection/FindBugsInspector.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/inspection/FindBugsInspector.java	(revision 115)
++++ src/impl/org/twodividedbyzero/idea/findbugs/inspection/FindBugsInspector.java	(revision )
+@@ -20,7 +20,7 @@
+ import com.intellij.openapi.compiler.CompileTask;
+ import edu.umd.cs.findbugs.DetectorFactoryCollection;
+ import edu.umd.cs.findbugs.FindBugs2;
+-import edu.umd.cs.findbugs.IFindBugsEngine2;
++import edu.umd.cs.findbugs.IFindBugsEngine;
+ import org.twodividedbyzero.idea.findbugs.core.FindBugsWorker;
+ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+ import org.twodividedbyzero.idea.findbugs.report.BugReporter;
+@@ -60,9 +60,9 @@
+ 	public boolean work() {
+ 		try {
+ 			_inspection.registerEventListener();
+-			final IFindBugsEngine2 engine = createFindBugsEngine();
++			final IFindBugsEngine engine = createFindBugsEngine();
+ 			// Create FindBugsTask
+-			final FindBugsTask findBugsTask = new FindBugsTask(_project, "Runnig FindBugs inspection...", true, engine, true);
++			final FindBugsTask findBugsTask = new FindBugsTask(_project, _bugCollection, "Running FindBugs inspection...", true, engine, true);
+ 			_bugReporter.setFindBugsTask(findBugsTask);
+ 			findBugsTask.runFindBugs(engine);
+ 			return true;
+@@ -91,15 +91,15 @@
+ 
+ 
+ 	@Override
+-	protected IFindBugsEngine2 createFindBugsEngine() {
++	protected IFindBugsEngine createFindBugsEngine() {
+ 		//TODO: FindBugs.setHome(FindBugsPlugin.getFindBugsEnginePluginLocation());
+ 
+ 		// Create BugReporter
+-		_bugReporter = new BugReporter(_project, true);
++		_bugReporter = new BugReporter(_project, true, _bugCollection);
+ 		_bugReporter.setPriorityThreshold(_userPrefs.getUserDetectorThreshold());
+ 
+ 		// Create IFindBugsEngine
+-		final IFindBugsEngine2 engine = new FindBugs2();
++		final IFindBugsEngine engine = new FindBugs2();
+ 		engine.setNoClassOk(true);
+ 		engine.setBugReporter(_bugReporter);
+ 		engine.setProject(_findBugsProject);
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.form
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.form	(revision )
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.form	(revision )
+@@ -0,0 +1,132 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.CloudCommentsPane">
++  <grid id="27dc6" binding="_mainPanel" layout-manager="GridBagLayout">
++    <constraints>
++      <xy x="20" y="20" width="335" height="285"/>
++    </constraints>
++    <properties/>
++    <border type="none"/>
++    <children>
++      <hspacer id="2b63b">
++        <constraints>
++          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
++          <gridbag weightx="0.0" weighty="0.0"/>
++        </constraints>
++      </hspacer>
++      <vspacer id="4cae6">
++        <constraints>
++          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
++          <gridbag weightx="0.0" weighty="0.0"/>
++        </constraints>
++      </vspacer>
++      <component id="cc21b" class="com.intellij.ui.components.labels.LinkLabel" binding="_addCommentLink">
++        <constraints>
++          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="1" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
++          <gridbag weightx="0.0" weighty="0.0" ipadx="5" ipady="5"/>
++        </constraints>
++        <properties>
++          <text value="Add Comment"/>
++        </properties>
++      </component>
++      <grid id="1119e" binding="_commentEntryPanel" layout-manager="GridBagLayout">
++        <constraints>
++          <grid row="1" column="0" row-span="2" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
++          <gridbag top="5" left="5" bottom="5" right="5" weightx="1.0" weighty="0.0"/>
++        </constraints>
++        <properties/>
++        <border type="empty">
++          <size top="5" left="5" bottom="5" right="5"/>
++        </border>
++        <children>
++          <component id="96159" class="javax.swing.JButton" binding="_submitCommentButton">
++            <constraints>
++              <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
++              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
++            </constraints>
++            <properties>
++              <text value="Submit"/>
++            </properties>
++          </component>
++          <component id="27ff3" class="javax.swing.JComboBox" binding="_classificationCombo">
++            <constraints>
++              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
++              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
++            </constraints>
++            <properties>
++              <model>
++                <item value="Unclassified"/>
++                <item value="Not a bug"/>
++                <item value="Etc"/>
++              </model>
++            </properties>
++          </component>
++          <component id="be848" class="javax.swing.JLabel">
++            <constraints>
++              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
++              <gridbag weightx="0.0" weighty="0.0"/>
++            </constraints>
++            <properties>
++              <labelFor value="27ff3"/>
++              <text value="Classification:"/>
++            </properties>
++          </component>
++          <scrollpane id="c66c7">
++            <constraints>
++              <grid row="0" column="0" row-span="1" col-span="4" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
++              <gridbag weightx="1.0" weighty="0.0"/>
++            </constraints>
++            <properties/>
++            <border type="etched">
++              <color color="-16777216"/>
++            </border>
++            <children>
++              <component id="a0fd8" class="javax.swing.JTextArea" binding="_commentBox">
++                <constraints/>
++                <properties>
++                  <rows value="5"/>
++                  <text value="My comment"/>
++                </properties>
++              </component>
++            </children>
++          </scrollpane>
++          <component id="cfa15" class="com.intellij.ui.components.labels.LinkLabel" binding="_cancelLink">
++            <constraints>
++              <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="1" hsize-policy="1" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
++              <gridbag weightx="0.0" weighty="0.0"/>
++            </constraints>
++            <properties>
++              <text value="cancel"/>
++            </properties>
++          </component>
++          <hspacer id="c511a">
++            <constraints>
++              <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
++              <gridbag weightx="1.0" weighty="0.0"/>
++            </constraints>
++          </hspacer>
++        </children>
++      </grid>
++      <scrollpane id="f96d4" binding="_cloudReportScrollPane">
++        <constraints>
++          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
++          <gridbag top="5" left="5" bottom="5" right="5" weightx="1.0" weighty="1.0"/>
++        </constraints>
++        <properties/>
++        <border type="line" title="Comments - FindBugs Cloud">
++          <title-color color="-16777216"/>
++          <color color="-6710887"/>
++        </border>
++        <children>
++          <component id="92b79" class="javax.swing.JEditorPane" binding="_cloudReportPane">
++            <constraints/>
++            <properties>
++              <contentType value="text/html"/>
++              <editable value="false"/>
++              <text value="&lt;html&gt;&#13;&#10;  &lt;head&gt;&#13;&#10;    &#13;&#10;  &lt;/head&gt;&#13;&#10;  &lt;body&gt;&#13;&#10;  &lt;/body&gt;&#13;&#10;&lt;/html&gt;&#13;&#10;"/>
++            </properties>
++          </component>
++        </children>
++      </scrollpane>
++    </children>
++  </grid>
++</form>
+Index: src/impl/org/twodividedbyzero/idea/findbugs/tasks/FindBugsTask.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/tasks/FindBugsTask.java	(revision 115)
++++ src/impl/org/twodividedbyzero/idea/findbugs/tasks/FindBugsTask.java	(revision )
+@@ -21,7 +21,8 @@
+ import com.intellij.openapi.progress.ProgressIndicator;
+ import com.intellij.openapi.project.Project;
+ import edu.umd.cs.findbugs.FindBugs2;
+-import edu.umd.cs.findbugs.IFindBugsEngine2;
++import edu.umd.cs.findbugs.IFindBugsEngine;
++import edu.umd.cs.findbugs.SortedBugCollection;
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+ import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
+@@ -41,13 +42,15 @@
+ 	private static final Logger LOGGER = Logger.getInstance(FindBugsTask.class.getName());
+ 
+ 	private ProgressIndicator _indicator;
+-	private final IFindBugsEngine2 _engine;
+-	private final boolean _startInBackground;
++	private IFindBugsEngine _engine;
++	private boolean _startInBackground;
++    private final SortedBugCollection _bugCollection;
+ 
+ 
+-	public FindBugsTask(@Nullable final Project project, @NotNull final String title, final boolean canBeCancelled, final IFindBugsEngine2 engine, final boolean startInBackground) {
++    public FindBugsTask(@Nullable final Project project, SortedBugCollection bugCollection, @NotNull final String title, final boolean canBeCancelled, final IFindBugsEngine engine, final boolean startInBackground) {
+ 		super(project, title, canBeCancelled);
+-		setCancelText("Cancel");
++        _bugCollection = bugCollection;
++        setCancelText("Cancel");  // NON-NLS
+ 		asBackgroundable();
+ 		_startInBackground = startInBackground;
+ 		_engine = engine;
+@@ -93,7 +96,7 @@
+ 
+ 
+ 	@SuppressWarnings({"MethodMayBeStatic"})
+-	public void runFindBugs(final IFindBugsEngine2 findBugs) {
++	public void runFindBugs(final IFindBugsEngine findBugs) {
+ 		// bug 1828973 was fixed by findbugs engine, so that workaround to start the
+ 		// analysis in an extra thread is not more needed
+ 		try {
+@@ -114,6 +117,10 @@
+ 			//final Reporter bugReporter = (Reporter) findBugs.getBugReporter();
+ 			((FindBugs2) findBugs).dispose();
+ 		}
++
++        _bugCollection.setDoNotUseCloud(false);
++        _bugCollection.setTimestamp(System.currentTimeMillis());
++        _bugCollection.reinitializeCloud();
+ 	}
+ 
+ 
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugTreePanel.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugTreePanel.java	(revision 133)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugTreePanel.java	(revision )
+@@ -273,7 +273,7 @@
+ 			final BugInstance bugInstance = bugNode.getBugInstance();
+ 
+ 			if (_parent != null) {
+-				_parent.getBugDetailsComponents().setBugExplanation(bugInstance);
++				_parent.getBugDetailsComponents().setBugExplanation(_bugCollection, bugInstance);
+ 			}
+ 		}
+ 	}
