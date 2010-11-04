@@ -36,6 +36,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventImp
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEventImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.tasks.FindBugsTask;
@@ -86,17 +87,18 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 	 *
 	 * @param project the project whose classes are being analyzed for bugs
 	 */
-	public BugReporter(final Project project) {
-		this(project, false);
+	public BugReporter(final Project project, SortedBugCollection bugCollection) {
+		this(project, false, bugCollection);
 	}
 
 
-	public BugReporter(final Project project, final boolean isInspectionRun) {
+	public BugReporter(final Project project, final boolean isInspectionRun, SortedBugCollection bugCollection) {
 		//this.monitor = monitor;
 		_project = project;
-		_preferences = IdeaUtilImpl.getPluginComponent(project).getPreferences();
+        FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(project);
+        _preferences = pluginComponent.getPreferences();
 		_isInspectionRun = isInspectionRun;
-		_bugCollection = new SortedBugCollection();
+		_bugCollection = bugCollection;
 	}
 
 

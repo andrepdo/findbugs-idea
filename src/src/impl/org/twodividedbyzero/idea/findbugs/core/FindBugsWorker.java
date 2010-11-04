@@ -30,7 +30,7 @@ import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import edu.umd.cs.findbugs.FindBugs2;
 import edu.umd.cs.findbugs.IFindBugsEngine;
-import edu.umd.cs.findbugs.IFindBugsEngine2;
+import edu.umd.cs.findbugs.SortedBugCollection;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import edu.umd.cs.findbugs.config.UserPreferences;
 import org.dom4j.DocumentException;
@@ -43,6 +43,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.report.BugReporter;
@@ -82,7 +83,8 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	private CompilerManager _compilerManager;
 	private final boolean _startInBackground;
 	private Module _module;
-	//private RecurseCollectorTask _collectorTask;
+    protected SortedBugCollection _bugCollection;
+    //private RecurseCollectorTask _collectorTask;
 
 
 	public FindBugsWorker(final com.intellij.openapi.project.Project project) {
@@ -140,6 +142,11 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 		_findBugsProject = new FindBugsProject();
 		_findBugsProject.setProjectName(_project.getName());
 
+        _bugCollection = new SortedBugCollection();
+        FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(_project);
+        _bugCollection.getProject().setGuiCallback(new PluginGuiCallback(pluginComponent));
+        _bugCollection.setDoNotUseCloud(true);
+
 		//CompilerManager.getInstance(_project).addCompilationStatusListener(this);
 
 		//initCollectorTask(_findBugsProject);
@@ -173,10 +180,11 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	public boolean work() {
 		try {
 			registerEventListner();
-			final IFindBugsEngine2 engine = createFindBugsEngine();
+			final IFindBugsEngine engine = createFindBugsEngine();
 
 			// Create FindBugsTask
-			final FindBugsTask findBugsTask = new FindBugsTask(_project, "Running FindBugs analysis...", true, engine, _startInBackground);
+			final FindBugsTask findBugsTask = new FindBugsTask(_project, _bugCollection,
+                                                               "Running FindBugs analysis...", true, engine, _startInBackground);  // NON-NLS
 			_bugReporter.setFindBugsTask(findBugsTask);
 			queue(findBugsTask);
 
@@ -230,16 +238,16 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	}
 
 
-	protected IFindBugsEngine2 createFindBugsEngine() {
+	protected IFindBugsEngine createFindBugsEngine() {
 		// Create BugReporter
-		_bugReporter = new BugReporter(_project);
+		_bugReporter = new BugReporter(_project, _bugCollection);
 
 		//final ProjectFilterSettings projectFilterSettings = _userPrefs.getFilterSettings();
 		_bugReporter.setPriorityThreshold(_userPrefs.getUserDetectorThreshold());
 		//_bugReporter.setPriorityThreshold(projectFilterSettings.getMinPriorityAsInt());
 
 		// Create IFindBugsEngine
-		final IFindBugsEngine2 engine = new FindBugs2();
+		final IFindBugsEngine engine = new FindBugs2();
 		engine.setNoClassOk(true);
 		engine.setMergeSimilarWarnings(false);
 		engine.setBugReporter(_bugReporter);

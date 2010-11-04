@@ -20,7 +20,7 @@ import com.intellij.openapi.compiler.CompileContext;
 import com.intellij.openapi.compiler.CompileTask;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import edu.umd.cs.findbugs.FindBugs2;
-import edu.umd.cs.findbugs.IFindBugsEngine2;
+import edu.umd.cs.findbugs.IFindBugsEngine;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsWorker;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.report.BugReporter;
@@ -60,9 +60,9 @@ public class FindBugsInspector extends FindBugsWorker implements CompileTask {
 	public boolean work() {
 		try {
 			_inspection.registerEventListener();
-			final IFindBugsEngine2 engine = createFindBugsEngine();
+			final IFindBugsEngine engine = createFindBugsEngine();
 			// Create FindBugsTask
-			final FindBugsTask findBugsTask = new FindBugsTask(_project, "Runnig FindBugs inspection...", true, engine, true);
+			final FindBugsTask findBugsTask = new FindBugsTask(_project, _bugCollection, "Running FindBugs inspection...", true, engine, true);
 			_bugReporter.setFindBugsTask(findBugsTask);
 			findBugsTask.runFindBugs(engine);
 			return true;
@@ -91,15 +91,15 @@ public class FindBugsInspector extends FindBugsWorker implements CompileTask {
 
 
 	@Override
-	protected IFindBugsEngine2 createFindBugsEngine() {
+	protected IFindBugsEngine createFindBugsEngine() {
 		//TODO: FindBugs.setHome(FindBugsPlugin.getFindBugsEnginePluginLocation());
 
 		// Create BugReporter
-		_bugReporter = new BugReporter(_project, true);
+		_bugReporter = new BugReporter(_project, true, _bugCollection);
 		_bugReporter.setPriorityThreshold(_userPrefs.getUserDetectorThreshold());
 
 		// Create IFindBugsEngine
-		final IFindBugsEngine2 engine = new FindBugs2();
+		final IFindBugsEngine engine = new FindBugs2();
 		engine.setNoClassOk(true);
 		engine.setBugReporter(_bugReporter);
 		engine.setProject(_findBugsProject);

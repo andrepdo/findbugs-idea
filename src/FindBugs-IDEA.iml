@@ -15,19 +15,12 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
-      <library>
+      <library name="lib">
         <CLASSES>
           <root url="file://$MODULE_DIR$/lib" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../findbugs-1.3.9/src/junit" />
-          <root url="file://$MODULE_DIR$/../findbugs-1.3.9/src/java" />
-          <root url="file://$MODULE_DIR$/../findbugs-1.3.9/src/java5" />
-          <root url="file://$MODULE_DIR$/../findbugs-1.3.9/src/infonodeJava" />
-          <root url="file://$MODULE_DIR$/../findbugs-1.3.9/src/antTask" />
-          <root url="file://$MODULE_DIR$/../findbugs-1.3.9/src/tools" />
-        </SOURCES>
+        <SOURCES />
         <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
       </library>
     </orderEntry>

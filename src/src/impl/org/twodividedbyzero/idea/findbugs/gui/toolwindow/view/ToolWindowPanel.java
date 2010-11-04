@@ -71,7 +71,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 	private static final Logger LOGGER = Logger.getInstance(ToolWindowPanel.class.getName());
 
-	private static final String DEFAULT_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.4) (COLUMN weight=0.6 right.top right.bottom) wight=0.6)";
+	private static final String DEFAULT_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (COLUMN weight=0.3 right.top right.bottom) (LEAF name=right weight=0.4))";
 	private static final String PREVIEW_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (LEAF name=middle weight=0.4) (COLUMN weight=0.3 right.top right.bottom))";
 	//private static final String PREVIEW_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.4) (COLUMN weight=0.6 right.top right.bottom)  (LEAF name=right))";
 
@@ -169,6 +169,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 					getMultiSplitPane().add(getBugTreePanel(), "left");
 					getMultiSplitPane().add(getBugDetailsComponents().getBugDetailsPanel(), "right.top");
 					getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
+			getMultiSplitPane().add(_bugDetailsComponents.getCloudCommentsPanel(), "right"); // NON-NLS
 
 					if (getPreviewPanel().getEditor() != null) {
 						resizeSplitNodes(ToolWindowPanel.this);

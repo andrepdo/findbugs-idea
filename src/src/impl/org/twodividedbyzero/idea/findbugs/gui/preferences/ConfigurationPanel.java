@@ -74,6 +74,7 @@ public class ConfigurationPanel extends JPanel {
 	private transient FilterConfiguration _filterConfig;
 	private transient PluginConfiguration _pluginConfig;
 	private transient ImportExportConfiguration _importExportConfig;
+	private transient AnnotationConfiguration _annotationConfig;
 
 
 	public ConfigurationPanel(final FindBugsPlugin plugin) {
@@ -269,6 +270,7 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
+	@SuppressWarnings({"HardcodedFileSeparator"})
 	private Component getTabbedPane() {
 		if (_tabbedPane == null) {
 			_tabbedPane = new JTabbedPane();
@@ -281,6 +283,9 @@ public class ConfigurationPanel extends JPanel {
 			}
 			if (!_plugin.isModuleComponent()) {
 				_tabbedPane.addTab("Import/Export configuration", getImportExportConfig().getComponent());
+			}
+			if (!_plugin.isModuleComponent()) {
+				_tabbedPane.addTab("Annotation & QuickFix configuration", getAnnotationConfig().getComponent());
 			}
 		}
 		return _tabbedPane;
@@ -327,6 +332,14 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
+	AnnotationConfiguration getAnnotationConfig() {
+		if (_annotationConfig == null) {
+			_annotationConfig = new AnnotationConfiguration(this, getPreferences());
+		}
+		return _annotationConfig;
+	}
+
+
 	private Component getRestoreDefaultsButton() {
 		if (_restoreDefaultsButton == null) {
 			_restoreDefaultsButton = new JButton("Restore defaults");
@@ -365,6 +378,9 @@ public class ConfigurationPanel extends JPanel {
 		}
 		if (!_plugin.isModuleComponent()) {
 			getImportExportConfig().setEnabled(enabled);
+		}
+		if (!_plugin.isModuleComponent()) {
+			getAnnotationConfig().setEnabled(enabled);
 		}
 
 	}

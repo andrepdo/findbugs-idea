@@ -304,7 +304,7 @@ public class FindBugsPreferences extends Properties {
 
 			try {
 				getDetectorFactorCollection().setPluginList(result);
-				getDetectorFactorCollection().ensureLoaded();
+				//getDetectorFactorCollection().ensureLoaded();
 			} catch (IllegalStateException e) {
 				throw new FindBugsPluginException("Plugin needs to be set first before DetectorFactoryCollection instance is created.", e);
 			}

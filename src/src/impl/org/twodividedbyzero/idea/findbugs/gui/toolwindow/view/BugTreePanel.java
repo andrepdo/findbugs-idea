@@ -273,7 +273,7 @@ public class BugTreePanel extends JPanel {
 			final BugInstance bugInstance = bugNode.getBugInstance();
 
 			if (_parent != null) {
-				_parent.getBugDetailsComponents().setBugExplanation(bugInstance);
+				_parent.getBugDetailsComponents().setBugExplanation(_bugCollection, bugInstance);
 			}
 		}
 	}

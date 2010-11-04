@@ -17,10 +17,15 @@
 package org.twodividedbyzero.idea.findbugs.inspection;
 
 import com.intellij.codeInspection.InspectionToolProvider;
+import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ApplicationComponent;
+import com.intellij.openapi.extensions.PluginId;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 
 /**
  * $Date$
@@ -46,6 +51,10 @@ public class FindBugsInspectionProvider implements InspectionToolProvider, Appli
 
 	public void initComponent() {
 		// no action required
+		Application app = ApplicationManager.getApplication();
+		IdeaPluginDescriptor plugin = app.getPlugin(PluginId.getId("FindBugs-IDEA"));
+		File jar = new File(plugin.getPath(), "lib/webCloudClient.jar");
+		System.setProperty("findbugs.plugin.appengine", jar.toURI().toString());
 	}
 
 

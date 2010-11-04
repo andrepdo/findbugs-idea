@@ -22,6 +22,7 @@ import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.FieldAnnotation;
 import edu.umd.cs.findbugs.MethodAnnotation;
+import edu.umd.cs.findbugs.SortedBugCollection;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.DetectorConfiguration;
@@ -64,11 +65,15 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	private HTMLEditorKit _htmlEditorKit;
 	private JEditorPane _bugDetailsPane;
 	private JEditorPane _explanationPane;
+	private CloudCommentsPane _cloudCommentsPane;
 	private JPanel _bugDetailsPanel;
 	private JPanel _explanationPanel;
+	private JPanel _cloudCommentsPanel;
 	private final Component _parent;
 	private TreePath _currentTreePath;
 	private double _splitPaneHorizontalWeight = 0.6;
+	private SortedBugCollection _lastBugCollection;
+	private BugInstance _lastBugInstance;
 
 
 	public BugDetailsComponents(final Component parent) {
@@ -127,6 +132,33 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		}
 
 		return _explanationPanel;
+	}
+
+
+	public JPanel getCloudCommentsPanel() {
+		if (_cloudCommentsPanel == null) {
+			final JScrollPane detailHtmlScoller = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			detailHtmlScoller.setViewportView(getCloudCommentsPane());
+
+			_cloudCommentsPanel = new JPanel();
+			_cloudCommentsPanel.setLayout(new BorderLayout());
+			//_explanationPanel.setMinimumSize(new Dimension((int) (_parent.getPreferredSize().width * 0.6), 100));
+			//_explanationPanel.setPreferredSize(new Dimension((int) (_parent.getPreferredSize().width * 0.6), 150));
+			_cloudCommentsPanel.add(detailHtmlScoller, BorderLayout.CENTER);
+		}
+
+		return _cloudCommentsPanel;
+	}
+
+
+	private CloudCommentsPane getCloudCommentsPane() {
+		if (_cloudCommentsPane == null) {
+			_cloudCommentsPane = new CloudCommentsPane();
+			_cloudCommentsPane.setBorder(new EmptyBorder(10, 10, 10, 10));
+			//_explanationPane.setPreferredSize(new Dimension(_parent.getPreferredSize().width, 150));
+		}
+
+		return _cloudCommentsPane;
 	}
 
 
@@ -281,7 +313,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		html.append(BugInstanceUtil.getBugPatternShortDescription(bugInstance));
 		html.append(")</font>");
 		html.append("</li>");
-		
+
 		final DetectorFactory detectorFactory = bugInstance.getDetectorFactory();
 		if (detectorFactory != null) {
 			html.append("<li>");
@@ -302,8 +334,17 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	}
 
 
-	public void setBugExplanation(final BugInstance bugInstance) {
-		final String html = BugInstanceUtil.getDetailHtml(bugInstance);
+	public void setBugExplanation(final SortedBugCollection bugCollection, final BugInstance bugInstance) {
+		_lastBugCollection = bugCollection;
+		_lastBugInstance = bugInstance;
+		refreshDetailsShown();
+
+		scrollRectToVisible(_bugDetailsPane);
+	}
+
+
+	private void refreshDetailsShown() {
+		final String html = BugInstanceUtil.getDetailHtml(_lastBugInstance);
 		final StringReader reader = new StringReader(html); // no need for BufferedReader
 		try {
 			_explanationPane.setToolTipText(edu.umd.cs.findbugs.L10N.getLocalString("tooltip.longer_description", "This gives a longer description of the detected bug pattern"));
@@ -314,7 +355,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		} finally {
 			reader.close(); // polite, but doesn't do much in StringReader
 		}
-
+		_cloudCommentsPane.setBugInstance(_lastBugCollection, _lastBugInstance);
 		scrollRectToVisible(_bugDetailsPane);
 	}
 
@@ -349,6 +390,14 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		_explanationPanel.validate();
 		//_parent.validate();
 		//}
+	}
+
+
+	public void issueUpdated(BugInstance bug) {
+		//noinspection ObjectEquality
+		if (bug == _lastBugInstance) {
+			refreshDetailsShown();
+		}
 	}
 
 

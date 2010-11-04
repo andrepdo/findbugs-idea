@@ -21,7 +21,8 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import edu.umd.cs.findbugs.FindBugs2;
-import edu.umd.cs.findbugs.IFindBugsEngine2;
+import edu.umd.cs.findbugs.IFindBugsEngine;
+import edu.umd.cs.findbugs.SortedBugCollection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
@@ -41,13 +42,15 @@ public class FindBugsTask extends BackgroundableTask {
 	private static final Logger LOGGER = Logger.getInstance(FindBugsTask.class.getName());
 
 	private ProgressIndicator _indicator;
-	private final IFindBugsEngine2 _engine;
-	private final boolean _startInBackground;
+	private IFindBugsEngine _engine;
+	private boolean _startInBackground;
+    private final SortedBugCollection _bugCollection;
 
 
-	public FindBugsTask(@Nullable final Project project, @NotNull final String title, final boolean canBeCancelled, final IFindBugsEngine2 engine, final boolean startInBackground) {
+    public FindBugsTask(@Nullable final Project project, SortedBugCollection bugCollection, @NotNull final String title, final boolean canBeCancelled, final IFindBugsEngine engine, final boolean startInBackground) {
 		super(project, title, canBeCancelled);
-		setCancelText("Cancel");
+        _bugCollection = bugCollection;
+        setCancelText("Cancel");  // NON-NLS
 		asBackgroundable();
 		_startInBackground = startInBackground;
 		_engine = engine;
@@ -93,7 +96,7 @@ public class FindBugsTask extends BackgroundableTask {
 
 
 	@SuppressWarnings({"MethodMayBeStatic"})
-	public void runFindBugs(final IFindBugsEngine2 findBugs) {
+	public void runFindBugs(final IFindBugsEngine findBugs) {
 		// bug 1828973 was fixed by findbugs engine, so that workaround to start the
 		// analysis in an extra thread is not more needed
 		try {
@@ -114,6 +117,10 @@ public class FindBugsTask extends BackgroundableTask {
 			//final Reporter bugReporter = (Reporter) findBugs.getBugReporter();
 			((FindBugs2) findBugs).dispose();
 		}
+
+        _bugCollection.setDoNotUseCloud(false);
+        _bugCollection.setTimestamp(System.currentTimeMillis());
+        _bugCollection.reinitializeCloud();
 	}
 
 
