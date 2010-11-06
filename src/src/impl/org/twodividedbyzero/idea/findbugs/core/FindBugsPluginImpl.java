@@ -186,7 +186,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 		final ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
 
 		final JComponent toolWindowPanel = new ToolWindowPanel(_project, _toolWindow);
-		final Content content = contentFactory.createContent(toolWindowPanel, "Found Bugs View", false);
+		final Content content = contentFactory.createContent(toolWindowPanel, "FindBugs Analysis Results", false);
 		//final Content content1 = contentFactory.createContent(toolWindowPanel, "Found Bugs View", false);
 		//final Content content1 = contentFactory.createContent(_contentPanel1, "Bug Details", false);
 		//final JComponent toolWindowPanel1 = new ToolWindowPanel(_project, _toolWindow);

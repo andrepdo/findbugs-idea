@@ -87,6 +87,7 @@ public class BugTreePanel extends JPanel {
 	private double _splitPaneVerticalWeight = 1.0;
 	private final double _splitPaneHorizontalWeight = 0.4;
 	private boolean _bugPreviewEnabled;
+	private final Object addNodeLock = new Object();
 
 
 	public BugTreePanel(final ToolWindowPanel parent, final Project project) {
@@ -109,19 +110,21 @@ public class BugTreePanel extends JPanel {
 	}
 
 
-	synchronized void addNode(final BugInstance bugInstance) {
-		if (bugInstance == null) {
-			return;
-		}
-		/*if(isHiddenBugGroup(bugInstance)) {
-			return;
-		}*/
+	void addNode(final BugInstance bugInstance) {
+		synchronized(addNodeLock) {
+			if (bugInstance == null) {
+				return;
+			}
+			/*if(isHiddenBugGroup(bugInstance)) {
+				return;
+			}*/
 
-		if (_treeModel.getGroupBy() != _groupBy) {
-			_treeModel.setGroupBy(_groupBy);
-		}
+			if (_treeModel.getGroupBy() != _groupBy) {
+				_treeModel.setGroupBy(_groupBy);
+			}
 
-		_treeModel.addNode(bugInstance);
+			_treeModel.addNode(bugInstance);
+		}
 
 	}
 

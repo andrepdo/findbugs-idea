@@ -1,6 +1,7 @@
 package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 
 import edu.umd.cs.findbugs.BugInstance;
+import edu.umd.cs.findbugs.BugRankCategory;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
@@ -305,7 +306,12 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 					return GuiResources.GROUP_BY_PRIORITY_EXP_ICON;
 				}
 			case BugRank:
-				return GuiResources.GROUP_BY_RANK_ICON;
+				final String rankString = BugRankCategory.getRank(getBugInstance().getBugRank()).toString();
+				if (GuiResources.GROUP_BY_RANK_ICONS.containsKey(rankString)) {
+					return GuiResources.GROUP_BY_RANK_ICONS.get(rankString);
+				} else {
+					return GuiResources.GROUP_BY_PRIORITY_ICON;
+				}
 			default:
 				return _collapsedIcon;
 		}
@@ -333,7 +339,12 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 					return GuiResources.GROUP_BY_PRIORITY_EXP_ICON;
 				}
 			case BugRank:
-				return GuiResources.GROUP_BY_RANK_ICON;
+				final String rankString = BugRankCategory.getRank(getBugInstance().getBugRank()).toString();
+				if (GuiResources.GROUP_BY_RANK_ICONS.containsKey(rankString)) {
+					return GuiResources.GROUP_BY_RANK_ICONS.get(rankString);
+				} else {
+					return GuiResources.GROUP_BY_PRIORITY_ICON;
+				}
 			default:
 				return _expandedIcon;
 		}

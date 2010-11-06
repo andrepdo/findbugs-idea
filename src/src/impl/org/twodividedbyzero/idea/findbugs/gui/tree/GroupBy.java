@@ -1,6 +1,7 @@
 package org.twodividedbyzero.idea.findbugs.gui.tree;
 
 import edu.umd.cs.findbugs.BugInstance;
+import edu.umd.cs.findbugs.BugRankCategory;
 import edu.umd.cs.findbugs.I18N;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstanceBugRankComparator;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstanceCategoryComparator;
@@ -98,7 +99,7 @@ public enum GroupBy {
 				break;
 			case BugRank:
 				final BugInstanceBugRankComparator bugRankComparator = (BugInstanceBugRankComparator) BugInstanceComparator.getBugInstanceBugRankComparator();
-				groupName = String.valueOf(bugRankComparator.getBugRank(bugInstance));
+				groupName = BugRankCategory.getRank(bugInstance.getBugRank()).name();
 				break;
 			default:
 				throw new IllegalStateException("Unknown group order: " + groupBy);

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,7 +40,6 @@ import javax.swing.text.html.StyleSheet;
 import javax.swing.tree.TreePath;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -69,15 +68,15 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	private JPanel _bugDetailsPanel;
 	private JPanel _explanationPanel;
 	private JPanel _cloudCommentsPanel;
-	private final Component _parent;
+	private final ToolWindowPanel _parent;
 	private TreePath _currentTreePath;
 	private double _splitPaneHorizontalWeight = 0.6;
 	private SortedBugCollection _lastBugCollection;
 	private BugInstance _lastBugInstance;
 
 
-	public BugDetailsComponents(final Component parent) {
-		_parent = parent;
+	public BugDetailsComponents(final ToolWindowPanel toolWindowPanel) {
+		_parent = toolWindowPanel;
 		init();
 	}
 
@@ -153,7 +152,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 	private CloudCommentsPane getCloudCommentsPane() {
 		if (_cloudCommentsPane == null) {
-			_cloudCommentsPane = new CloudCommentsPane();
+			_cloudCommentsPane = new CloudCommentsPane(_parent);
 			_cloudCommentsPane.setBorder(new EmptyBorder(10, 10, 10, 10));
 			//_explanationPane.setPreferredSize(new Dimension(_parent.getPreferredSize().width, 150));
 		}

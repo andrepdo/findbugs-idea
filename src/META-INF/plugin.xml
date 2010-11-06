@@ -236,7 +236,7 @@
         </group>
 
         <group id="FindBugs.AnalyzeMenu" text="FindBugs" popup="true">
-            <add-to-group anchor="last" group-id="ToolsMenu"/>
+            <add-to-group anchor="last" group-id="AnalyzeMenu"/>
         </group>
 
         <action id="FindBugs.SelectedFilesAction"
@@ -401,18 +401,20 @@
                     text="Group by package"
                     description="Group by package."
                     icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByPackage.png"/>
+<!--
 
             <action id="FindBugs.GroupByPriority"
                     class="org.twodividedbyzero.idea.findbugs.actions.GroupByPriority"
                     text="Group by priority"
                     description="Group by priority."
                     icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByPriority.png"/>
+-->
 
             <action id="FindBugs.GroupByRank"
                     class="org.twodividedbyzero.idea.findbugs.actions.GroupByRank"
                     text="Group by bug rank"
                     description="Group by bug rank."
-                    icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByRank.png"/>
+                    icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByPriority.png"/>
 
             <!-- <action id="FindBugs.GroupByFilter"
                class="org.twodividedbyzero.idea.findbugs.actions.GroupByFilter"

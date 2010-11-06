@@ -17,7 +17,9 @@
 package org.twodividedbyzero.idea.findbugs.gui;
 
 import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.progress.Task.Backgroundable;
+import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.BugInstance;
@@ -33,21 +35,23 @@ import java.awt.EventQueue;
 import java.util.concurrent.CountDownLatch;
 
 public class PluginGuiCallback extends AbstractSwingGuiCallback {
-    private final FindBugsPlugin plugin;
-    private Cloud cloud;
+    private final FindBugsPlugin _plugin;
+    private Cloud _cloud;
 
-    private CloudListener cloudListener = new CloudListener() {
+    private final CloudListener _cloudListener = new CloudListener() {
         public void issueUpdated(BugInstance bug) {
-            plugin.getToolWindowPanel().getBugDetailsComponents().issueUpdated(bug);
+            _plugin.getToolWindowPanel().getBugDetailsComponents().issueUpdated(bug);
         }
 
         public void statusUpdated() {
-            WindowManager.getInstance().getStatusBar(plugin.getProject()).setInfo(cloud.getStatusMsg());
+			StatusBar sb = WindowManager.getInstance().getStatusBar(_plugin.getProject());
+			if (sb != null && _cloud != null)
+				sb.setInfo(_cloud.getStatusMsg());
         }
 
         public void taskStarted(final CloudTask task) {
             task.setUseDefaultListener(false);
-            final Backgroundable backgroundable = new Backgroundable(plugin.getProject(), task.getName(), false) {
+            final Task backgroundable = new Backgroundable(_plugin.getProject(), task.getName(), false) {
 
                 @Override
                 public void run(@NotNull final ProgressIndicator progressIndicator) {
@@ -85,23 +89,23 @@ public class PluginGuiCallback extends AbstractSwingGuiCallback {
 
     public PluginGuiCallback(FindBugsPlugin plugin) {
         super(plugin.getToolWindowPanel());
-        this.plugin = plugin;
+		_plugin = plugin;
     }
 
     public void setErrorMessage(String errorMsg) {
     }
 
     public void registerCloud(final edu.umd.cs.findbugs.Project project, BugCollection collection, final Cloud cloud) {
-        this.cloud = cloud;
-        cloud.addListener(cloudListener);
+		_cloud = cloud;
+        cloud.addListener(_cloudListener);
     }
 
     public void unregisterCloud(edu.umd.cs.findbugs.Project project, BugCollection collection, Cloud cloud) {
         //noinspection ObjectEquality
-        if (cloud == this.cloud) {
+        if (cloud == _cloud) {
             //noinspection AssignmentToNull
-            this.cloud = null;
-            cloud.removeListener(cloudListener);
+			_cloud = null;
+            cloud.removeListener(_cloudListener);
         }
     }
 }

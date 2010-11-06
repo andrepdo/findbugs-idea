@@ -1,0 +1,1103 @@
+Index: src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPluginImpl.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPluginImpl.java	(revision 134)
++++ src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPluginImpl.java	(revision )
+@@ -177,7 +177,7 @@
+ 		final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(_project);
+ 
+ 		_toolWindow = toolWindowManager.registerToolWindow(getInternalToolWindowId(), false, ToolWindowAnchor.BOTTOM);
+-		_toolWindow.setTitle(FindBugsPluginConstants.TOOL_WINDOW_ID);
++		_toolWindow.setTitle("FindBugs");
+ 		_toolWindow.setType(ToolWindowType.DOCKED, null);
+ 
+ 
+@@ -186,7 +186,7 @@
+ 		final ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+ 
+ 		final JComponent toolWindowPanel = new ToolWindowPanel(_project, _toolWindow);
+-		final Content content = contentFactory.createContent(toolWindowPanel, "Found Bugs View", false);
++		final Content content = contentFactory.createContent(toolWindowPanel, "Analysis Results", false);
+ 		//final Content content1 = contentFactory.createContent(toolWindowPanel, "Found Bugs View", false);
+ 		//final Content content1 = contentFactory.createContent(_contentPanel1, "Bug Details", false);
+ 		//final JComponent toolWindowPanel1 = new ToolWindowPanel(_project, _toolWindow);
+Index: src/impl/org/twodividedbyzero/idea/findbugs/resources/i18n/Messages.properties
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/resources/i18n/Messages.properties	(revision 117)
++++ src/impl/org/twodividedbyzero/idea/findbugs/resources/i18n/Messages.properties	(revision )
+@@ -4,5 +4,5 @@
+   dialog to configure the inspection.
+ findbugs.inspection.description=This inspection integrates <b>FindBugs</b> bug pattern detectors and reports in real-time on found problems<br> \
+   Note: FindBugs-IDEA inspection is a bytecode analysis based inspection.
+-findbugs.plugin.configuration.name=FindBugs-IDEA
++findbugs.plugin.configuration.name=FindBugs
+ findbugs.inspection.quickfix.supress.warning=Suppress findbugs bug type
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/PluginGuiCallback.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/PluginGuiCallback.java	(revision 137)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/PluginGuiCallback.java	(revision )
+@@ -18,6 +18,7 @@
+ 
+ import com.intellij.openapi.progress.ProgressIndicator;
+ import com.intellij.openapi.progress.Task.Backgroundable;
++import com.intellij.openapi.wm.StatusBar;
+ import com.intellij.openapi.wm.WindowManager;
+ import edu.umd.cs.findbugs.BugCollection;
+ import edu.umd.cs.findbugs.BugInstance;
+@@ -42,7 +43,9 @@
+         }
+ 
+         public void statusUpdated() {
+-            WindowManager.getInstance().getStatusBar(plugin.getProject()).setInfo(cloud.getStatusMsg());
++			StatusBar sb = WindowManager.getInstance().getStatusBar(plugin.getProject());
++			if (sb != null && cloud != null)
++				sb.setInfo(cloud.getStatusMsg());
+         }
+ 
+         public void taskStarted(final CloudTask task) {
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.java	(revision 137)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.java	(revision )
+@@ -16,12 +16,22 @@
+ 
+ package org.twodividedbyzero.idea.findbugs.gui.toolwindow.view;
+ 
++import com.intellij.openapi.diagnostic.Logger;
++import com.intellij.openapi.ui.Messages;
++import com.intellij.openapi.ui.popup.JBPopupFactory;
++import com.intellij.openapi.ui.popup.ListPopup;
++import com.intellij.openapi.ui.popup.PopupStep;
++import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
+ import com.intellij.ui.components.labels.LinkLabel;
+ import com.intellij.ui.components.labels.LinkListener;
+ import edu.umd.cs.findbugs.BugInstance;
++import edu.umd.cs.findbugs.DetectorFactoryCollection;
+ import edu.umd.cs.findbugs.I18N;
+ import edu.umd.cs.findbugs.SortedBugCollection;
++import edu.umd.cs.findbugs.cloud.Cloud;
+ import edu.umd.cs.findbugs.cloud.Cloud.UserDesignation;
++import edu.umd.cs.findbugs.cloud.CloudPlugin;
++import sun.swing.SwingUtilities2;
+ 
+ import javax.swing.BorderFactory;
+ import javax.swing.DefaultComboBoxModel;
+@@ -33,226 +43,422 @@
+ import javax.swing.JPanel;
+ import javax.swing.JScrollPane;
+ import javax.swing.JTextArea;
+-import javax.swing.border.TitledBorder;
+ import javax.swing.text.BadLocationException;
+ import javax.swing.text.html.HTMLDocument;
+ import java.awt.BorderLayout;
+ import java.awt.Color;
++import java.awt.Dimension;
++import java.awt.Font;
+ import java.awt.GridBagConstraints;
+ import java.awt.GridBagLayout;
+ import java.awt.Insets;
++import java.awt.RenderingHints;
+ import java.awt.event.ActionEvent;
+ import java.awt.event.ActionListener;
++import java.util.ArrayList;
++import java.util.List;
+ 
+ public class CloudCommentsPane extends JPanel {
++	private static final Logger LOGGER = Logger.getInstance(CloudCommentsPane.class.getName());
+ 
+-    private JEditorPane _cloudReportPane;
+-    private LinkLabel _addCommentLink;
+-    private JTextArea _commentBox;
+-    private JButton _submitCommentButton;
+-    private JPanel _commentEntryPanel;
+-    private JComboBox _classificationCombo;
+-    private JPanel _mainPanel;
+-    private LinkLabel _cancelLink;
+-    private JScrollPane _cloudReportScrollPane;
++	private JEditorPane _cloudReportPane;
++	private LinkLabel _addCommentLink;
++	private JTextArea _commentBox;
++	private JButton _submitCommentButton;
++	private JPanel _commentEntryPanel;
++	private JComboBox _classificationCombo;
++	private JPanel _mainPanel;
++	private LinkLabel _cancelLink;
++	private JScrollPane _cloudReportScrollPane;
++	private JLabel _titleLabel;
++	private LinkLabel _signInOutLink;
++	private LinkLabel _changeLink;
++	private JTextArea _cloudDetailsLabel;
+-    private SortedBugCollection _bugCollection;
+-    private BugInstance _bugInstance;
++	private SortedBugCollection _bugCollection;
++	private BugInstance _bugInstance;
+ 
+-    public CloudCommentsPane() {
++	private Cloud.CloudStatusListener cloudStatusListener = new Cloud.CloudStatusListener() {
++		public void handleIssueDataDownloadedEvent() {
++		}
++
++		public void handleStateChange(Cloud.SigninState oldState, Cloud.SigninState state) {
++			updateBugCommentsView();
++		}
++	};
++	private final ToolWindowPanel _toolWindowPanel;
++
++	public CloudCommentsPane(ToolWindowPanel toolWindowPanel) {
++		_toolWindowPanel = toolWindowPanel;
+-        setLayout(new BorderLayout());
+-        this.add(_mainPanel, BorderLayout.CENTER);
++		setLayout(new BorderLayout());
++		this.add(_mainPanel, BorderLayout.CENTER);
+ 
+-        _classificationCombo.removeAllItems();
+-        for (UserDesignation designation : UserDesignation.values()) {
+-            _classificationCombo.addItem(I18N.instance().getUserDesignation(designation.name()));
+-        }
++		_classificationCombo.removeAllItems();
++		for (UserDesignation designation : UserDesignation.values()) {
++			_classificationCombo.addItem(I18N.instance().getUserDesignation(designation.name()));
++		}
+ 
+-        _commentEntryPanel.setVisible(false);
+-        _addCommentLink.setListener(new LinkListener() {
+-            public void linkSelected(LinkLabel linkLabel, Object o) {
+-                _commentEntryPanel.setVisible(true);
+-                _addCommentLink.setVisible(false);
+-                _commentBox.requestFocus();
+-                _commentBox.setSelectionStart(0);
+-                _commentBox.setSelectionEnd(_commentBox.getText().length());
+-                CloudCommentsPane.this.invalidate();
+-            }
+-        }, null);
+-        _cancelLink.setListener(new LinkListener() {
+-            public void linkSelected(LinkLabel linkLabel, Object o) {
+-                _commentEntryPanel.setVisible(false);
+-                _addCommentLink.setVisible(true);
+-                CloudCommentsPane.this.invalidate();
+-            }
+-        }, null);
+-        _submitCommentButton.addActionListener(new ActionListener() {
+-            public void actionPerformed(ActionEvent e) {
+-                String comment = _commentBox.getText();
+-                int index = _classificationCombo.getSelectedIndex();
+-                UserDesignation choice;
+-                if (index == -1)
+-                    choice = UserDesignation.UNCLASSIFIED;
+-                else
+-                    choice = UserDesignation.values()[index];
+-                _bugInstance.setUserDesignationKey(choice.name(), _bugCollection);
++		_commentEntryPanel.setVisible(false);
++		_addCommentLink.setListener(new LinkListener() {
++			public void linkSelected(LinkLabel linkLabel, Object o) {
++				_commentEntryPanel.setVisible(true);
++				_addCommentLink.setVisible(false);
++				_commentBox.requestFocus();
++				_commentBox.setSelectionStart(0);
++				_commentBox.setSelectionEnd(_commentBox.getText().length());
++				CloudCommentsPane.this.invalidate();
++			}
++		}, null);
++		_cancelLink.setListener(new LinkListener() {
++			public void linkSelected(LinkLabel linkLabel, Object o) {
++				_commentEntryPanel.setVisible(false);
++				_addCommentLink.setVisible(true);
++				CloudCommentsPane.this.invalidate();
++			}
++		}, null);
++		_submitCommentButton.addActionListener(new ActionListener() {
++			public void actionPerformed(ActionEvent e) {
++				String comment = _commentBox.getText();
++				int index = _classificationCombo.getSelectedIndex();
++				UserDesignation choice;
++				if (index == -1)
++					choice = UserDesignation.UNCLASSIFIED;
++				else
++					choice = UserDesignation.values()[index];
++				_bugInstance.setUserDesignationKey(choice.name(), _bugCollection);
++                //TODO: do in background
+-                _bugInstance.setAnnotationText(comment, _bugCollection);
++				_bugInstance.setAnnotationText(comment, _bugCollection);
+ 
+-                _commentBox.setText("My comment");
++				_commentBox.setText("My comment");
+ 
+-                updateBugCommentsView();
++				updateBugCommentsView();
+ 
+-                _commentEntryPanel.setVisible(false);
+-                _addCommentLink.setVisible(true);
+-                CloudCommentsPane.this.invalidate();
+-            }
+-        });
++				_commentEntryPanel.setVisible(false);
++				_addCommentLink.setVisible(true);
++				CloudCommentsPane.this.invalidate();
++			}
++		});
++		_signInOutLink.setListener(new LinkListener() {
++			public void linkSelected(LinkLabel linkLabel, Object o) {
++				if (_bugCollection != null) {
++					Cloud cloud = _bugCollection.getCloud();
++					switch (cloud.getSigninState()) {
++						case SIGNED_OUT:
++						case SIGNIN_FAILED:
++						case UNAUTHENTICATED:
++							try {
++								cloud.signIn();
++							} catch (Exception e) {
++								Messages.showErrorDialog("The FindBugs Cloud could not be contacted at this time.\n\n"
++										+ e.getMessage(), "Could not connect to FindBugs Cloud");
++								LOGGER.warn(e);
+-    }
++							}
++							break;
++						case SIGNED_IN:
++							cloud.signOut();
++							break;
++					}
++				}
++			}
++		}, null);
++		_changeLink.setListener(new LinkListener() {
++			public void linkSelected(LinkLabel linkLabel, Object o) {
++				final List<CloudPlugin> plugins = new ArrayList<CloudPlugin>();
++				final List<String> descriptions = new ArrayList<String>();
++				for (CloudPlugin plugin : DetectorFactoryCollection.instance().getRegisteredClouds().values()) {
++					if (!plugin.isHidden()) {
++						descriptions.add(plugin.getDescription());
++						plugins.add(plugin);
++					}
++				}
++				JBPopupFactory factory = JBPopupFactory.getInstance();
++				ListPopup popup = factory.createListPopup(new BaseListPopupStep<String>("Store comments in:", descriptions) {
++					@Override
++					public PopupStep<?> onChosen(String selectedValue, boolean finalChoice) {
++						if (selectedValue != null) {
++							int index = descriptions.indexOf(selectedValue);
++							if (index == -1) {
++								LOGGER.error("Error - not found - '" + selectedValue + "' among " + descriptions);
++							} else {
++								CloudPlugin newPlugin = plugins.get(index);
++								String newCloudId = newPlugin.getId();
++								String oldCloudId = _bugCollection.getCloud().getPlugin().getId();
++								if (!oldCloudId.equals(newCloudId)) {
++									_bugCollection.getProject().setCloudId(newCloudId);
++									//TODO: execute in background so signin doesn't stall UI
++									_bugCollection.reinitializeCloud();
++									_toolWindowPanel.getBugDetailsComponents().issueUpdated(_bugInstance);
++								}
++							}
++						}
++						return super.onChosen(selectedValue, finalChoice);
++					}
+ 
++					@Override
++					public void canceled() {
++						super.canceled();
++					}
++				});
++				popup.showInCenterOf(_changeLink);
++			}
++		}, null);
++		_cloudDetailsLabel.setBackground(null);
++		_cloudDetailsLabel.setBorder(null);
++		_titleLabel.putClientProperty(SwingUtilities2.AA_TEXT_PROPERTY_KEY, new SwingUtilities2.AATextInfo(RenderingHints.VALUE_TEXT_ANTIALIAS_ON, null));
++		_cloudDetailsLabel.putClientProperty(SwingUtilities2.AA_TEXT_PROPERTY_KEY, new SwingUtilities2.AATextInfo(RenderingHints.VALUE_TEXT_ANTIALIAS_ON, null));
++		updateBugCommentsView();
++	}
++
+-    public void setBugInstance(SortedBugCollection bugCollection, BugInstance bugInstance) {
++	public void setBugInstance(SortedBugCollection bugCollection, BugInstance bugInstance) {
++		updateCloudListeners(bugCollection);
+-        this._bugCollection = bugCollection;
+-        this._bugInstance = bugInstance;
+-        updateBugCommentsView();
+-    }
++		this._bugCollection = bugCollection;
++		this._bugInstance = bugInstance;
++		updateBugCommentsView();
++	}
+ 
++	private void updateCloudListeners(SortedBugCollection newBugCollection) {
++		boolean isNewCloud = false;
++		Cloud newCloud = newBugCollection.getCloud();
++		if (_bugCollection != null) {
++			Cloud oldCloud = _bugCollection.getCloud();
++			//noinspection ObjectEquality
++			if (oldCloud != newCloud) {
++				isNewCloud = true;
++				if (oldCloud != null) {
++					oldCloud.removeStatusListener(cloudStatusListener);
++				}
++			}
++		} else {
++			isNewCloud = true;
++		}
++		if (isNewCloud && newCloud != null) {
++			newCloud.addStatusListener(cloudStatusListener);
++		}
++	}
++
+-    private void updateBugCommentsView() {
++	private void updateBugCommentsView() {
++		if (_bugCollection == null) {
++			_signInOutLink.setVisible(false);
++			_changeLink.setVisible(false);
++			_cloudDetailsLabel.setText("");
++			_titleLabel.setText("<html>FindBugs Cloud");
++			return;
++		}
++		_changeLink.setVisible(true);
+-        HTMLDocument doc = (HTMLDocument) _cloudReportPane.getDocument();
++		HTMLDocument doc = (HTMLDocument) _cloudReportPane.getDocument();
++		Cloud cloud = _bugCollection.getCloud();
+-        try {
+-            doc.remove(0, doc.getLength());
++		try {
++			doc.remove(0, doc.getLength());
+-            doc.insertString(0, _bugCollection.getCloud().getCloudReport(_bugInstance), null);
++			doc.insertString(0, cloud.getCloudReport(_bugInstance), null);
+-        } catch (BadLocationException e) {
+-            // probably won't happen
+-        }
++		} catch (BadLocationException e) {
++			// probably won't happen
++		}
+-        TitledBorder border1 = (TitledBorder) _cloudReportScrollPane.getBorder();
+-        border1.setTitle(_bugCollection.getCloud().getPlugin().getDescription());
+-        _cloudReportScrollPane.invalidate();
+-        _cloudReportScrollPane.repaint();
++		CloudPlugin plugin = cloud.getPlugin();
++		_cloudDetailsLabel.setText(plugin.getDetails());
++		Cloud.SigninState state = cloud.getSigninState();
++		String stateStr = state == Cloud.SigninState.NO_SIGNIN_REQUIRED ? "" : state + " - ";
++		String userStr = cloud.getUser() == null ? "" : cloud.getUser();
++		_titleLabel.setText("<html><b>Comments - " + plugin.getDescription() + "</b>"
++				+ "<br><font style='font-size: x-small;color:darkgray'>" + stateStr + userStr);
++		switch (state) {
++			case NO_SIGNIN_REQUIRED:
++			case SIGNING_IN:
++				_signInOutLink.setVisible(false);
++				break;
++			case SIGNED_OUT:
++			case SIGNIN_FAILED:
++			case UNAUTHENTICATED:
++				_signInOutLink.setText("sign in");
++				_signInOutLink.setVisible(true);
++				break;
++			case SIGNED_IN:
++				_signInOutLink.setText("sign out");
++				_signInOutLink.setVisible(true);
++				break;
+-    }
++		}
++	}
+ 
+-    {
++	{
+ // GUI initializer generated by IntelliJ IDEA GUI Designer
+ // >>> IMPORTANT!! <<<
+ // DO NOT EDIT OR ADD ANY CODE HERE!
+-        $$$setupUI$$$();
+-    }
++		$$$setupUI$$$();
++	}
+ 
+-    /**
+-     * Method generated by IntelliJ IDEA GUI Designer
+-     * >>> IMPORTANT!! <<<
+-     * DO NOT edit this method OR call it in your code!
+-     *
+-     * @noinspection ALL
+-     */
+-    private void $$$setupUI$$$() {
+-        _mainPanel = new JPanel();
+-        _mainPanel.setLayout(new GridBagLayout());
+-        final JPanel spacer1 = new JPanel();
+-        GridBagConstraints gbc;
+-        gbc = new GridBagConstraints();
++	/**
++	 * Method generated by IntelliJ IDEA GUI Designer
++	 * >>> IMPORTANT!! <<<
++	 * DO NOT edit this method OR call it in your code!
++	 *
++	 * @noinspection ALL
++	 */
++	private void $$$setupUI$$$() {
++		_mainPanel = new JPanel();
++		_mainPanel.setLayout(new GridBagLayout());
++		final JPanel spacer1 = new JPanel();
++		GridBagConstraints gbc;
++		gbc = new GridBagConstraints();
+-        gbc.gridx = 1;
+-        gbc.gridy = 0;
+-        gbc.fill = GridBagConstraints.HORIZONTAL;
+-        _mainPanel.add(spacer1, gbc);
+-        final JPanel spacer2 = new JPanel();
+-        gbc = new GridBagConstraints();
+-        gbc.gridx = 0;
++		gbc.gridx = 0;
+-        gbc.gridy = 4;
++		gbc.gridy = 6;
+-        gbc.fill = GridBagConstraints.BOTH;
++		gbc.fill = GridBagConstraints.BOTH;
+-        _mainPanel.add(spacer2, gbc);
++		_mainPanel.add(spacer1, gbc);
+-        _addCommentLink = new LinkLabel();
+-        _addCommentLink.setText("Add Comment");
+-        gbc = new GridBagConstraints();
+-        gbc.gridx = 0;
++		_addCommentLink = new LinkLabel();
++		_addCommentLink.setText("Add Comment");
++		gbc = new GridBagConstraints();
++		gbc.gridx = 0;
+-        gbc.gridy = 3;
++		gbc.gridy = 5;
+-        gbc.anchor = GridBagConstraints.WEST;
+-        gbc.ipadx = 5;
+-        gbc.ipady = 5;
+-        _mainPanel.add(_addCommentLink, gbc);
+-        _commentEntryPanel = new JPanel();
+-        _commentEntryPanel.setLayout(new GridBagLayout());
+-        gbc = new GridBagConstraints();
+-        gbc.gridx = 0;
++		gbc.anchor = GridBagConstraints.WEST;
++		gbc.ipadx = 5;
++		gbc.ipady = 5;
++		_mainPanel.add(_addCommentLink, gbc);
++		_commentEntryPanel = new JPanel();
++		_commentEntryPanel.setLayout(new GridBagLayout());
++		gbc = new GridBagConstraints();
++		gbc.gridx = 0;
+-        gbc.gridy = 1;
++		gbc.gridy = 3;
+-        gbc.gridheight = 2;
+-        gbc.weightx = 1.0;
+-        gbc.fill = GridBagConstraints.BOTH;
+-        gbc.insets = new Insets(5, 5, 5, 5);
+-        _mainPanel.add(_commentEntryPanel, gbc);
+-        _commentEntryPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), null));
+-        _submitCommentButton = new JButton();
+-        _submitCommentButton.setText("Submit");
+-        gbc = new GridBagConstraints();
+-        gbc.gridx = 3;
+-        gbc.gridy = 1;
+-        gbc.insets = new Insets(5, 5, 5, 5);
+-        _commentEntryPanel.add(_submitCommentButton, gbc);
+-        _classificationCombo = new JComboBox();
+-        final DefaultComboBoxModel defaultComboBoxModel1 = new DefaultComboBoxModel();
+-        defaultComboBoxModel1.addElement("Unclassified");
+-        defaultComboBoxModel1.addElement("Not a bug");
+-        defaultComboBoxModel1.addElement("Etc");
+-        _classificationCombo.setModel(defaultComboBoxModel1);
+-        gbc = new GridBagConstraints();
+-        gbc.gridx = 1;
+-        gbc.gridy = 1;
+-        gbc.anchor = GridBagConstraints.WEST;
+-        gbc.fill = GridBagConstraints.HORIZONTAL;
+-        gbc.insets = new Insets(5, 5, 5, 5);
+-        _commentEntryPanel.add(_classificationCombo, gbc);
+-        final JLabel label1 = new JLabel();
+-        label1.setText("Classification:");
+-        gbc = new GridBagConstraints();
+-        gbc.gridx = 0;
+-        gbc.gridy = 1;
+-        gbc.anchor = GridBagConstraints.WEST;
+-        _commentEntryPanel.add(label1, gbc);
+-        final JScrollPane scrollPane1 = new JScrollPane();
+-        gbc = new GridBagConstraints();
+-        gbc.gridx = 0;
+-        gbc.gridy = 0;
+-        gbc.gridwidth = 4;
+-        gbc.weightx = 1.0;
+-        gbc.fill = GridBagConstraints.BOTH;
+-        _commentEntryPanel.add(scrollPane1, gbc);
+-        scrollPane1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null));
+-        _commentBox = new JTextArea();
+-        _commentBox.setRows(5);
+-        _commentBox.setText("My comment");
+-        scrollPane1.setViewportView(_commentBox);
+-        _cancelLink = new LinkLabel();
+-        _cancelLink.setText("cancel");
+-        gbc = new GridBagConstraints();
+-        gbc.gridx = 3;
+-        gbc.gridy = 2;
+-        _commentEntryPanel.add(_cancelLink, gbc);
++		gbc.gridheight = 2;
++		gbc.weightx = 1.0;
++		gbc.fill = GridBagConstraints.BOTH;
++		gbc.insets = new Insets(5, 5, 5, 5);
++		_mainPanel.add(_commentEntryPanel, gbc);
++		_commentEntryPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), null));
++		_submitCommentButton = new JButton();
++		_submitCommentButton.setText("Submit");
++		gbc = new GridBagConstraints();
++		gbc.gridx = 3;
++		gbc.gridy = 1;
++		gbc.insets = new Insets(5, 5, 5, 5);
++		_commentEntryPanel.add(_submitCommentButton, gbc);
++		_classificationCombo = new JComboBox();
++		final DefaultComboBoxModel defaultComboBoxModel1 = new DefaultComboBoxModel();
++		defaultComboBoxModel1.addElement("Unclassified");
++		defaultComboBoxModel1.addElement("Not a bug");
++		defaultComboBoxModel1.addElement("Etc");
++		_classificationCombo.setModel(defaultComboBoxModel1);
++		gbc = new GridBagConstraints();
++		gbc.gridx = 1;
++		gbc.gridy = 1;
++		gbc.anchor = GridBagConstraints.WEST;
++		gbc.fill = GridBagConstraints.HORIZONTAL;
++		gbc.insets = new Insets(5, 5, 5, 5);
++		_commentEntryPanel.add(_classificationCombo, gbc);
++		final JLabel label1 = new JLabel();
++		label1.setText("Classification:");
++		gbc = new GridBagConstraints();
++		gbc.gridx = 0;
++		gbc.gridy = 1;
++		gbc.anchor = GridBagConstraints.WEST;
++		_commentEntryPanel.add(label1, gbc);
++		final JScrollPane scrollPane1 = new JScrollPane();
++		gbc = new GridBagConstraints();
++		gbc.gridx = 0;
++		gbc.gridy = 0;
++		gbc.gridwidth = 4;
++		gbc.weightx = 1.0;
++		gbc.fill = GridBagConstraints.BOTH;
++		_commentEntryPanel.add(scrollPane1, gbc);
++		scrollPane1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null));
++		_commentBox = new JTextArea();
++		_commentBox.setRows(5);
++		_commentBox.setText("My comment");
++		scrollPane1.setViewportView(_commentBox);
++		_cancelLink = new LinkLabel();
++		_cancelLink.setText("cancel");
++		gbc = new GridBagConstraints();
++		gbc.gridx = 3;
++		gbc.gridy = 2;
++		_commentEntryPanel.add(_cancelLink, gbc);
+-        final JPanel spacer3 = new JPanel();
++		final JPanel spacer2 = new JPanel();
+-        gbc = new GridBagConstraints();
+-        gbc.gridx = 2;
+-        gbc.gridy = 1;
+-        gbc.weightx = 1.0;
+-        gbc.fill = GridBagConstraints.HORIZONTAL;
++		gbc = new GridBagConstraints();
++		gbc.gridx = 2;
++		gbc.gridy = 1;
++		gbc.weightx = 1.0;
++		gbc.fill = GridBagConstraints.HORIZONTAL;
+-        _commentEntryPanel.add(spacer3, gbc);
++		_commentEntryPanel.add(spacer2, gbc);
+-        _cloudReportScrollPane = new JScrollPane();
+-        gbc = new GridBagConstraints();
+-        gbc.gridx = 0;
++		_cloudReportScrollPane = new JScrollPane();
++		gbc = new GridBagConstraints();
++		gbc.gridx = 0;
+-        gbc.gridy = 0;
++		gbc.gridy = 2;
+-        gbc.weightx = 1.0;
+-        gbc.weighty = 1.0;
+-        gbc.fill = GridBagConstraints.BOTH;
+-        gbc.insets = new Insets(5, 5, 5, 5);
+-        _mainPanel.add(_cloudReportScrollPane, gbc);
++		gbc.weightx = 1.0;
++		gbc.weighty = 1.0;
++		gbc.fill = GridBagConstraints.BOTH;
++		gbc.insets = new Insets(5, 5, 5, 5);
++		_mainPanel.add(_cloudReportScrollPane, gbc);
+-        _cloudReportScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "Comments - FindBugs Cloud"));
++		_cloudReportScrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), null));
+-        _cloudReportPane = new JEditorPane();
+-        _cloudReportPane.setContentType("text/html");
+-        _cloudReportPane.setEditable(false);
++		_cloudReportPane = new JEditorPane();
++		_cloudReportPane.setContentType("text/html");
++		_cloudReportPane.setEditable(false);
+-        _cloudReportPane.setText("<html>\r\n  <head>\r\n\r\n  </head>\r\n  <body>\r\n    <p style=\"margin-top: 0\">\r\n      \r\n    </p>\r\n  </body>\r\n</html>\r\n");
++		_cloudReportPane.setText("<html>\r\n  <head>\r\n    \r\n  </head>\r\n  <body>\r\n  </body>\r\n</html>\r\n");
+-        _cloudReportScrollPane.setViewportView(_cloudReportPane);
++		_cloudReportScrollPane.setViewportView(_cloudReportPane);
++		final JPanel panel1 = new JPanel();
++		panel1.setLayout(new GridBagLayout());
++		panel1.setBackground(new Color(-3355444));
++		gbc = new GridBagConstraints();
++		gbc.gridx = 0;
++		gbc.gridy = 0;
++		gbc.weightx = 1.0;
++		gbc.fill = GridBagConstraints.BOTH;
++		_mainPanel.add(panel1, gbc);
++		panel1.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-16751002)), null));
++		_titleLabel = new JLabel();
++		_titleLabel.setFont(new Font(_titleLabel.getFont().getName(), Font.BOLD, 14));
++		_titleLabel.setForeground(new Color(-16777216));
++		_titleLabel.setText("FindBugs Cloud - signed in");
++		gbc = new GridBagConstraints();
++		gbc.gridx = 0;
++		gbc.gridy = 0;
++		gbc.gridheight = 2;
++		gbc.weightx = 1.0;
++		gbc.anchor = GridBagConstraints.NORTHWEST;
++		panel1.add(_titleLabel, gbc);
++		_signInOutLink = new LinkLabel();
++		_signInOutLink.setText("sign out");
++		gbc = new GridBagConstraints();
++		gbc.gridx = 1;
++		gbc.gridy = 0;
++		gbc.anchor = GridBagConstraints.NORTHWEST;
++		panel1.add(_signInOutLink, gbc);
++		final JPanel panel2 = new JPanel();
++		panel2.setLayout(new GridBagLayout());
++		gbc = new GridBagConstraints();
++		gbc.gridx = 0;
++		gbc.gridy = 1;
++		gbc.weightx = 1.0;
++		gbc.fill = GridBagConstraints.BOTH;
++		gbc.insets = new Insets(5, 5, 5, 5);
++		_mainPanel.add(panel2, gbc);
++		_changeLink = new LinkLabel();
++		_changeLink.setText("change");
++		_changeLink.setToolTipText("Choose where comments are stored");
++		gbc = new GridBagConstraints();
++		gbc.gridx = 1;
++		gbc.gridy = 0;
++		gbc.anchor = GridBagConstraints.EAST;
++		panel2.add(_changeLink, gbc);
++		_cloudDetailsLabel = new JTextArea();
++		_cloudDetailsLabel.setEditable(false);
++		_cloudDetailsLabel.setFont(new Font(_cloudDetailsLabel.getFont().getName(), Font.ITALIC, 10));
++		_cloudDetailsLabel.setForeground(new Color(-10066330));
++		_cloudDetailsLabel.setLineWrap(true);
++		_cloudDetailsLabel.setMaximumSize(new Dimension(100, 50));
++		_cloudDetailsLabel.setMinimumSize(new Dimension(50, 16));
++		_cloudDetailsLabel.setOpaque(false);
++		_cloudDetailsLabel.setPreferredSize(new Dimension(100, 31));
++		_cloudDetailsLabel.setText("Comments are stored on the FindBugs Cloud at http://findbugs-cloud.appspot.com");
++		_cloudDetailsLabel.setWrapStyleWord(true);
++		gbc = new GridBagConstraints();
++		gbc.gridx = 0;
++		gbc.gridy = 0;
++		gbc.weightx = 1.0;
++		gbc.weighty = 1.0;
++		gbc.fill = GridBagConstraints.BOTH;
++		panel2.add(_cloudDetailsLabel, gbc);
+-        label1.setLabelFor(_classificationCombo);
+-    }
++		label1.setLabelFor(_classificationCombo);
++	}
+ 
+-    /**
+-     * @noinspection ALL
+-     */
+-    public JComponent $$$getRootComponent$$$() {
+-        return _mainPanel;
+-    }
++	/**
++	 * @noinspection ALL
++	 */
++	public JComponent $$$getRootComponent$$$() {
++		return _mainPanel;
++	}
+ }
+Index: src/impl/org/twodividedbyzero/idea/findbugs/resources/GuiResources.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/resources/GuiResources.java	(revision 133)
++++ src/impl/org/twodividedbyzero/idea/findbugs/resources/GuiResources.java	(revision )
+@@ -63,14 +63,28 @@
+ 	public static final Icon GROUP_BY_CATEGORY_ICON = ResourcesLoader.loadIcon("actions/groupByBugCategory.png");
+ 	public static final Icon GROUP_BY_CLASS_ICON = ResourcesLoader.loadIcon("actions/groupByClass.png");
+ 	public static final Icon GROUP_BY_RANK_ICON = ResourcesLoader.loadIcon("actions/groupByRank.png");
++	public static final Icon GROUP_BY_PRIORITY_ICON = ResourcesLoader.loadIcon("actions/groupByPriority.png");
+ 	public static final Icon GROUP_BY_PACKAGE_ICON = ResourcesLoader.loadIcon("actions/groupByPackage.png");
+ 
+-	private static final Icon GROUP_BY_PRIORITY_HIGH_ICON = ResourcesLoader.loadIcon("priority/priorityHigh.png");
+-	private static final Icon GROUP_BY_PRIORITY_MEDIUM_ICON = ResourcesLoader.loadIcon("priority/priorityMedium.png");
+-	private static final Icon GROUP_BY_PRIORITY_LOW_ICON = ResourcesLoader.loadIcon("priority/priorityLow.png");
++	public static final Icon GROUP_BY_RANK_SCARIEST_ICON = ResourcesLoader.loadIcon("priority/rankScariest.png");
++	public static final Icon GROUP_BY_RANK_SCARY_ICON = ResourcesLoader.loadIcon("priority/rankScary.png");
++	public static final Icon GROUP_BY_RANK_TROUBLING_ICON = ResourcesLoader.loadIcon("priority/rankTroubling.png");
++	public static final Icon GROUP_BY_RANK_OF_CONCERN_ICON = ResourcesLoader.loadIcon("priority/rankOfConcern.png");
++	public static final Map<String, Icon> GROUP_BY_RANK_ICONS = new HashMap<String, Icon>(4);
++
++	static {
++		GROUP_BY_RANK_ICONS.put("SCARIEST", GROUP_BY_RANK_SCARIEST_ICON);
++		GROUP_BY_RANK_ICONS.put("SCARY", GROUP_BY_RANK_SCARY_ICON);
++		GROUP_BY_RANK_ICONS.put("TROUBLING", GROUP_BY_RANK_TROUBLING_ICON);
++		GROUP_BY_RANK_ICONS.put("OF_CONCERN", GROUP_BY_RANK_OF_CONCERN_ICON);
++	}
++
++	public static final Icon GROUP_BY_PRIORITY_HIGH_ICON = ResourcesLoader.loadIcon("priority/priorityHigh.png");
++	public static final Icon GROUP_BY_PRIORITY_MEDIUM_ICON = ResourcesLoader.loadIcon("priority/priorityMedium.png");
++	public static final Icon GROUP_BY_PRIORITY_LOW_ICON = ResourcesLoader.loadIcon("priority/priorityLow.png");
+ 	public static final Icon GROUP_BY_PRIORITY_EXP_ICON = ResourcesLoader.loadIcon("priority/priorityExp.png");
+-	private static final Icon GROUP_BY_PRIORITY_IGNORE_ICON = ResourcesLoader.loadIcon("priority/priorityIgnore.png");
+-	public static final Map<String, Icon> GROUP_BY_PRIORITY_ICONS = new HashMap<String, Icon>(3);
++	public static final Icon GROUP_BY_PRIORITY_IGNORE_ICON = ResourcesLoader.loadIcon("priority/priorityIgnore.png");
++	public static final Map<String, Icon> GROUP_BY_PRIORITY_ICONS = new HashMap<String, Icon>(5);
+ 
+ 
+ 	static {
+Index: META-INF/plugin.xml
+===================================================================
+--- META-INF/plugin.xml	(revision 133)
++++ META-INF/plugin.xml	(revision )
+@@ -236,7 +236,7 @@
+         </group>
+ 
+         <group id="FindBugs.AnalyzeMenu" text="FindBugs" popup="true">
+-            <add-to-group anchor="last" group-id="ToolsMenu"/>
++            <add-to-group anchor="last" group-id="AnalyzeMenu"/>
+         </group>
+ 
+         <action id="FindBugs.SelectedFilesAction"
+@@ -401,18 +401,20 @@
+                     text="Group by package"
+                     description="Group by package."
+                     icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByPackage.png"/>
++<!--
+ 
+             <action id="FindBugs.GroupByPriority"
+                     class="org.twodividedbyzero.idea.findbugs.actions.GroupByPriority"
+                     text="Group by priority"
+                     description="Group by priority."
+                     icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByPriority.png"/>
++-->
+ 
+             <action id="FindBugs.GroupByRank"
+                     class="org.twodividedbyzero.idea.findbugs.actions.GroupByRank"
+                     text="Group by bug rank"
+                     description="Group by bug rank."
+-                    icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByRank.png"/>
++                    icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/groupByPriority.png"/>
+ 
+             <!-- <action id="FindBugs.GroupByFilter"
+                class="org.twodividedbyzero.idea.findbugs.actions.GroupByFilter"
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceGroupNode.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceGroupNode.java	(revision 119)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceGroupNode.java	(revision )
+@@ -1,6 +1,7 @@
+ package org.twodividedbyzero.idea.findbugs.gui.tree.model;
+ 
+ import edu.umd.cs.findbugs.BugInstance;
++import edu.umd.cs.findbugs.BugRankCategory;
+ import org.jetbrains.annotations.Nullable;
+ import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator;
+ import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
+@@ -305,7 +306,12 @@
+ 					return GuiResources.GROUP_BY_PRIORITY_EXP_ICON;
+ 				}
+ 			case BugRank:
+-				return GuiResources.GROUP_BY_RANK_ICON;
++				final String rankString = BugRankCategory.getRank(getBugInstance().getBugRank()).toString();
++				if (GuiResources.GROUP_BY_RANK_ICONS.containsKey(rankString)) {
++					return GuiResources.GROUP_BY_RANK_ICONS.get(rankString);
++				} else {
++					return GuiResources.GROUP_BY_PRIORITY_ICON;
++				}
+ 			default:
+ 				return _collapsedIcon;
+ 		}
+@@ -333,7 +339,12 @@
+ 					return GuiResources.GROUP_BY_PRIORITY_EXP_ICON;
+ 				}
+ 			case BugRank:
+-				return GuiResources.GROUP_BY_RANK_ICON;
++				final String rankString = BugRankCategory.getRank(getBugInstance().getBugRank()).toString();
++				if (GuiResources.GROUP_BY_RANK_ICONS.containsKey(rankString)) {
++					return GuiResources.GROUP_BY_RANK_ICONS.get(rankString);
++				} else {
++					return GuiResources.GROUP_BY_PRIORITY_ICON;
++				}
+ 			default:
+ 				return _expandedIcon;
+ 		}
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/BugInstanceComparator.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/BugInstanceComparator.java	(revision 113)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/BugInstanceComparator.java	(revision )
+@@ -18,6 +18,7 @@
+ 
+ import edu.umd.cs.findbugs.BugInstance;
+ import edu.umd.cs.findbugs.BugPattern;
++import edu.umd.cs.findbugs.BugRankCategory;
+ 
+ import java.io.Serializable;
+ import java.util.ArrayList;
+@@ -198,17 +199,10 @@
+ 
+ 		private static final long serialVersionUID = 0L;
+ 
+-
+ 		public int compare(final BugInstance lhs, final BugInstance rhs) {
+-			return getBugRank(lhs).compareTo(getBugRank(rhs));
++			return BugRankCategory.getRank(lhs.getBugRank()).compareTo(BugRankCategory.getRank(rhs.getBugRank()));
+ 		}
+-
+-
+-		@SuppressWarnings({"MethodMayBeStatic"})
+-		public Integer getBugRank(final BugInstance bugInstance) {
+-			return bugInstance.getBugRank();
+-		}
++	}
+-	}
+ 
+ 	/** The instance of BugInstancePriorityComparator. */
+ 	public static final Comparator<BugInstance> _bugInstanceBugRankComparator = new BugInstanceBugRankComparator();
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugTreePanel.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugTreePanel.java	(revision 137)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugTreePanel.java	(revision )
+@@ -87,6 +87,7 @@
+ 	private double _splitPaneVerticalWeight = 1.0;
+ 	private final double _splitPaneHorizontalWeight = 0.4;
+ 	private boolean _bugPreviewEnabled;
++	private final Object addNodeLock = new Object();
+ 
+ 
+ 	public BugTreePanel(final ToolWindowPanel parent, final Project project) {
+@@ -109,19 +110,21 @@
+ 	}
+ 
+ 
+-	synchronized void addNode(final BugInstance bugInstance) {
++	void addNode(final BugInstance bugInstance) {
++		synchronized(addNodeLock) {
+-		if (bugInstance == null) {
+-			return;
+-		}
+-		/*if(isHiddenBugGroup(bugInstance)) {
+-			return;
+-		}*/
++			if (bugInstance == null) {
++				return;
++			}
++			/*if(isHiddenBugGroup(bugInstance)) {
++				return;
++			}*/
+ 
+-		if (_treeModel.getGroupBy() != _groupBy) {
+-			_treeModel.setGroupBy(_groupBy);
+-		}
++			if (_treeModel.getGroupBy() != _groupBy) {
++				_treeModel.setGroupBy(_groupBy);
++			}
+ 
+-		_treeModel.addNode(bugInstance);
++			_treeModel.addNode(bugInstance);
++		}
+ 
+ 	}
+ 
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/GroupBy.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/GroupBy.java	(revision 115)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/GroupBy.java	(revision )
+@@ -1,6 +1,7 @@
+ package org.twodividedbyzero.idea.findbugs.gui.tree;
+ 
+ import edu.umd.cs.findbugs.BugInstance;
++import edu.umd.cs.findbugs.BugRankCategory;
+ import edu.umd.cs.findbugs.I18N;
+ import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstanceBugRankComparator;
+ import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstanceCategoryComparator;
+@@ -98,7 +99,7 @@
+ 				break;
+ 			case BugRank:
+ 				final BugInstanceBugRankComparator bugRankComparator = (BugInstanceBugRankComparator) BugInstanceComparator.getBugInstanceBugRankComparator();
+-				groupName = String.valueOf(bugRankComparator.getBugRank(bugInstance));
++				groupName = BugRankCategory.getRank(bugInstance.getBugRank()).name();
+ 				break;
+ 			default:
+ 				throw new IllegalStateException("Unknown group order: " + groupBy);
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugDetailsComponents.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugDetailsComponents.java	(revision 137)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugDetailsComponents.java	(revision )
+@@ -5,7 +5,7 @@
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+- *   http://www.apache.org/licenses/LICENSE-2.0
++ *  http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+@@ -40,7 +40,6 @@
+ import javax.swing.tree.TreePath;
+ import java.awt.BorderLayout;
+ import java.awt.Color;
+-import java.awt.Component;
+ import java.awt.Dimension;
+ import java.awt.Graphics;
+ import java.awt.Graphics2D;
+@@ -69,15 +68,15 @@
+ 	private JPanel _bugDetailsPanel;
+ 	private JPanel _explanationPanel;
+ 	private JPanel _cloudCommentsPanel;
+-	private final Component _parent;
++	private final ToolWindowPanel _parent;
+ 	private TreePath _currentTreePath;
+ 	private double _splitPaneHorizontalWeight = 0.6;
+ 	private SortedBugCollection _lastBugCollection;
+ 	private BugInstance _lastBugInstance;
+ 
+ 
+-	public BugDetailsComponents(final Component parent) {
+-		_parent = parent;
++	public BugDetailsComponents(final ToolWindowPanel toolWindowPanel) {
++		_parent = toolWindowPanel;
+ 		init();
+ 	}
+ 
+@@ -153,7 +152,7 @@
+ 
+ 	private CloudCommentsPane getCloudCommentsPane() {
+ 		if (_cloudCommentsPane == null) {
+-			_cloudCommentsPane = new CloudCommentsPane();
++			_cloudCommentsPane = new CloudCommentsPane(_parent);
+ 			_cloudCommentsPane.setBorder(new EmptyBorder(10, 10, 10, 10));
+ 			//_explanationPane.setPreferredSize(new Dimension(_parent.getPreferredSize().width, 150));
+ 		}
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.form
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.form	(revision 137)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.form	(revision )
+@@ -2,26 +2,20 @@
+ <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.CloudCommentsPane">
+   <grid id="27dc6" binding="_mainPanel" layout-manager="GridBagLayout">
+     <constraints>
+-      <xy x="20" y="20" width="335" height="285"/>
++      <xy x="20" y="20" width="377" height="285"/>
+     </constraints>
+     <properties/>
+     <border type="none"/>
+     <children>
+-      <hspacer id="2b63b">
+-        <constraints>
+-          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+-          <gridbag weightx="0.0" weighty="0.0"/>
+-        </constraints>
+-      </hspacer>
+       <vspacer id="4cae6">
+         <constraints>
+-          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
++          <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+           <gridbag weightx="0.0" weighty="0.0"/>
+         </constraints>
+       </vspacer>
+       <component id="cc21b" class="com.intellij.ui.components.labels.LinkLabel" binding="_addCommentLink">
+         <constraints>
+-          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="1" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
++          <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="1" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+           <gridbag weightx="0.0" weighty="0.0" ipadx="5" ipady="5"/>
+         </constraints>
+         <properties>
+@@ -30,7 +24,7 @@
+       </component>
+       <grid id="1119e" binding="_commentEntryPanel" layout-manager="GridBagLayout">
+         <constraints>
+-          <grid row="1" column="0" row-span="2" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
++          <grid row="3" column="0" row-span="2" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+           <gridbag top="5" left="5" bottom="5" right="5" weightx="1.0" weighty="0.0"/>
+         </constraints>
+         <properties/>
+@@ -108,14 +102,11 @@
+       </grid>
+       <scrollpane id="f96d4" binding="_cloudReportScrollPane">
+         <constraints>
+-          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
++          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+           <gridbag top="5" left="5" bottom="5" right="5" weightx="1.0" weighty="1.0"/>
+         </constraints>
+         <properties/>
+-        <border type="line" title="Comments - FindBugs Cloud">
+-          <title-color color="-16777216"/>
+-          <color color="-6710887"/>
+-        </border>
++        <border type="line"/>
+         <children>
+           <component id="92b79" class="javax.swing.JEditorPane" binding="_cloudReportPane">
+             <constraints/>
+@@ -127,6 +118,78 @@
+           </component>
+         </children>
+       </scrollpane>
++      <grid id="a5cbd" layout-manager="GridBagLayout">
++        <constraints>
++          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
++          <gridbag weightx="1.0" weighty="0.0"/>
++        </constraints>
++        <properties>
++          <background color="-3355444"/>
++        </properties>
++        <border type="line">
++          <color color="-16751002"/>
++        </border>
++        <children>
++          <component id="5b239" class="javax.swing.JLabel" binding="_titleLabel">
++            <constraints>
++              <grid row="0" column="0" row-span="2" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
++              <gridbag weightx="1.0" weighty="0.0"/>
++            </constraints>
++            <properties>
++              <font size="14" style="1"/>
++              <foreground color="-16777216"/>
++              <text value="FindBugs Cloud - signed in"/>
++            </properties>
++          </component>
++          <component id="ebd63" class="com.intellij.ui.components.labels.LinkLabel" binding="_signInOutLink">
++            <constraints>
++              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="1" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
++              <gridbag weightx="0.0" weighty="0.0"/>
++            </constraints>
++            <properties>
++              <text value="sign out"/>
++            </properties>
++          </component>
+-    </children>
+-  </grid>
++        </children>
++      </grid>
++      <grid id="a3aad" layout-manager="GridBagLayout">
++        <constraints>
++          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
++          <gridbag top="5" left="5" bottom="5" right="5" weightx="1.0" weighty="0.0"/>
++        </constraints>
++        <properties/>
++        <border type="none"/>
++        <children>
++          <component id="9b3a5" class="com.intellij.ui.components.labels.LinkLabel" binding="_changeLink">
++            <constraints>
++              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="1" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
++              <gridbag weightx="0.0" weighty="0.0"/>
++            </constraints>
++            <properties>
++              <text value="change"/>
++              <toolTipText value="Choose where comments are stored"/>
++            </properties>
++          </component>
++          <component id="494a4" class="javax.swing.JTextArea" binding="_cloudDetailsLabel">
++            <constraints>
++              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
++              <gridbag weightx="1.0" weighty="1.0"/>
++            </constraints>
++            <properties>
++              <editable value="false"/>
++              <font size="10" style="2"/>
++              <foreground color="-10066330"/>
++              <lineWrap value="true"/>
++              <maximumSize width="100" height="50"/>
++              <minimumSize width="50" height="16"/>
++              <opaque value="false"/>
++              <preferredSize width="100" height="31"/>
++              <text value="Comments are stored on the FindBugs Cloud at http://findbugs-cloud.appspot.com"/>
++              <wrapStyleWord value="true"/>
++            </properties>
++          </component>
++        </children>
++      </grid>
++    </children>
++  </grid>
+ </form>

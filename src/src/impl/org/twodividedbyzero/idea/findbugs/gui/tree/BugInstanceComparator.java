@@ -18,6 +18,7 @@ package org.twodividedbyzero.idea.findbugs.gui.tree;
 
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.BugPattern;
+import edu.umd.cs.findbugs.BugRankCategory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -198,15 +199,8 @@ public class BugInstanceComparator {
 
 		private static final long serialVersionUID = 0L;
 
-
 		public int compare(final BugInstance lhs, final BugInstance rhs) {
-			return getBugRank(lhs).compareTo(getBugRank(rhs));
-		}
-
-
-		@SuppressWarnings({"MethodMayBeStatic"})
-		public Integer getBugRank(final BugInstance bugInstance) {
-			return bugInstance.getBugRank();
+			return BugRankCategory.getRank(lhs.getBugRank()).compareTo(BugRankCategory.getRank(rhs.getBugRank()));
 		}
 	}
 
