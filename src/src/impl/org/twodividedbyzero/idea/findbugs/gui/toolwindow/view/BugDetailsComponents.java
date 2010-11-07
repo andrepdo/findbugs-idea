@@ -23,7 +23,6 @@ import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.FieldAnnotation;
 import edu.umd.cs.findbugs.MethodAnnotation;
 import edu.umd.cs.findbugs.SortedBugCollection;
-import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.gui.common.CustomLineBorder;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitLayout;
@@ -104,6 +103,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	JTabbedPane getTabbedPane() {
 		if (_jTabbedPane == null) {
 			_jTabbedPane = new JTabbedPane(JTabbedPane.RIGHT);
+			_jTabbedPane.setFocusable(false);
 			_jTabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
 			final String detailsTabTitle = "Bug Details";
@@ -186,7 +186,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 			final String layoutDef = "(ROW weight=1.0 (COLUMN weight=1.0 top bottom))";
 			final MultiSplitLayout.Node modelRoot = MultiSplitLayout.parseModel(layoutDef);
 			final MultiSplitLayout multiSplitLayout = _bugDetailsSplitPane.getMultiSplitLayout();
-			multiSplitLayout.setDividerSize(5);
+			multiSplitLayout.setDividerSize(6);
 			multiSplitLayout.setModel(modelRoot);
 			multiSplitLayout.setFloatingDividers(true);
 			_bugDetailsSplitPane.add(getBugDetailsPanel(), "top");
@@ -467,7 +467,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 	@SuppressWarnings({"AnonymousInnerClass"})
 	private static void scrollRectToVisible(final JEditorPane pane) {
-		EventDispatchThreadHelper.invokeLater(new Runnable() {
+		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				pane.scrollRectToVisible(new Rectangle(0, 0, 0, 0));
 			}
