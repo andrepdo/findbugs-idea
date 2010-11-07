@@ -25,13 +25,21 @@ import edu.umd.cs.findbugs.MethodAnnotation;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
+import org.twodividedbyzero.idea.findbugs.gui.common.CustomLineBorder;
+import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitLayout;
+import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitPane;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.DetectorConfiguration;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.BugTree;
+import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -40,11 +48,15 @@ import javax.swing.text.html.StyleSheet;
 import javax.swing.tree.TreePath;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.KeyEvent;
+import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
@@ -73,6 +85,8 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	private double _splitPaneHorizontalWeight = 0.6;
 	private SortedBugCollection _lastBugCollection;
 	private BugInstance _lastBugInstance;
+	private JTabbedPane _jTabbedPane;
+	private MultiSplitPane _bugDetailsSplitPane;
 
 
 	public BugDetailsComponents(final ToolWindowPanel toolWindowPanel) {
@@ -87,16 +101,115 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	}
 
 
-	public JPanel getBugDetailsPanel() {
+	JTabbedPane getTabbedPane() {
+		if (_jTabbedPane == null) {
+			_jTabbedPane = new JTabbedPane(JTabbedPane.RIGHT);
+			_jTabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+
+			final String detailsTabTitle = "Bug Details";
+			final Icon detailsIcon = new Icon() {
+				public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
+					final Graphics2D g2d = (Graphics2D) g.create();
+					g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+					g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+					g2d.transform(AffineTransform.getRotateInstance(1 * Math.PI / 2.0));
+					g2d.translate(0, -getIconWidth());
+
+					GuiResources.FINDBUGS_ICON.paintIcon(c, g, getIconWidth(), y + 8);
+					g2d.setColor(Color.BLACK);
+					final Font font = _jTabbedPane.getFont().deriveFont(Font.PLAIN);
+					g2d.setFont(font);
+					final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), detailsTabTitle);
+					g2d.drawString(detailsTabTitle, getIconHeight() / 2 - width / 2 + GuiResources.FINDBUGS_ICON.getIconHeight() + y - 5, -getIconWidth());
+
+					
+				}
+
+
+				public int getIconWidth() {
+					return 5;
+				}
+
+
+				public int getIconHeight() {
+					final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), detailsTabTitle);
+					return width + GuiResources.FINDBUGS_ICON.getIconHeight() + 20;
+				}
+			};
+
+			_jTabbedPane.addTab(null, detailsIcon, getBugDetailsSplitPane());
+			_jTabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
+			//_jTabbedPane.setDisplayedMnemonicIndexAt(0, 0);
+
+
+			final String cloudTabTitle = "FindBugs Cloud";
+			final Icon cloudIcon = new Icon() {
+				public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
+					final Graphics2D g2d = (Graphics2D) g.create();
+					g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+					g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+					g2d.transform(AffineTransform.getRotateInstance(1 * Math.PI / 2.0));
+					g2d.translate(0, -getIconWidth());
+
+					GuiResources.FINDBUGS_CLOUD_ICON.paintIcon(c, g, getIconWidth(), y + 8);
+					g2d.setColor(Color.BLACK);
+					final Font font = _jTabbedPane.getFont().deriveFont(Font.PLAIN);
+					g2d.setFont(font);
+					final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), cloudTabTitle);
+					g2d.drawString(cloudTabTitle, getIconHeight() / 2 - width / 2 + GuiResources.FINDBUGS_ICON.getIconHeight() + y - 5, -getIconWidth());
+				}
+
+
+				public int getIconWidth() {
+					return 5;
+				}
+
+
+				public int getIconHeight() {
+					final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), cloudTabTitle);
+					return width + GuiResources.FINDBUGS_CLOUD_ICON.getIconHeight() + 20;
+				}
+			};
+			_jTabbedPane.addTab(null, cloudIcon, getCloudCommentsPanel());
+			_jTabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
+			//_jTabbedPane.setDisplayedMnemonicIndexAt(1, 0);
+
+		}
+		return _jTabbedPane;
+	}
+
+
+	private Component getBugDetailsSplitPane() {
+		if (_bugDetailsSplitPane == null) {
+			_bugDetailsSplitPane = new MultiSplitPane();
+			_bugDetailsSplitPane.setContinuousLayout(true);
+			final String layoutDef = "(ROW weight=1.0 (COLUMN weight=1.0 top bottom))";
+			final MultiSplitLayout.Node modelRoot = MultiSplitLayout.parseModel(layoutDef);
+			final MultiSplitLayout multiSplitLayout = _bugDetailsSplitPane.getMultiSplitLayout();
+			multiSplitLayout.setDividerSize(5);
+			multiSplitLayout.setModel(modelRoot);
+			multiSplitLayout.setFloatingDividers(true);
+			_bugDetailsSplitPane.add(getBugDetailsPanel(), "top");
+			_bugDetailsSplitPane.add(getBugExplanationPanel(), "bottom");
+
+
+		}
+		return _bugDetailsSplitPane;
+	}
+
+
+	JPanel getBugDetailsPanel() {
 		if (_bugDetailsPanel == null) {
-			final JScrollPane detailTextScoller = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			detailTextScoller.setViewportView(getBugDetailsPane());
+			final JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			scrollPane.setViewportView(getBugDetailsPane());
+			//scrollPane.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(0, 0, 0, 3), new CustomLineBorder(new Color(98, 95, 89), 0, 0, 1, 1)));
+			scrollPane.setBorder(new CustomLineBorder(new Color(98, 95, 89), 0, 0, 1, 0));
+			//scrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 
 			_bugDetailsPanel = new JPanel();
-			//_bugDetailsPanel.setPreferredSize(new Dimension((int) (_parent.getPreferredSize().width * 0.6), (int) (_parent.getPreferredSize().height * 0.6)));
+			_bugDetailsPanel.setBorder(new EmptyBorder(3, 2, 0, 3));
 			_bugDetailsPanel.setLayout(new BorderLayout());
-			_bugDetailsPanel.add(detailTextScoller, BorderLayout.CENTER);
-			_bugDetailsPane.setEditorKit(_htmlEditorKit);
+			_bugDetailsPanel.add(scrollPane, BorderLayout.CENTER);
 		}
 
 		return _bugDetailsPanel;
@@ -110,6 +223,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 			_bugDetailsPane.setEditable(false);
 			_bugDetailsPane.setBackground(Color.white);
 			_bugDetailsPane.setContentType("text/html");
+			_bugDetailsPane.setEditorKit(_htmlEditorKit);
 			_bugDetailsPane.addHyperlinkListener(new BugDetailsPaneHyperlinkListener());
 		}
 
@@ -117,33 +231,50 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	}
 
 
-	public JPanel getBugExplanationPanel() {
+	JPanel getBugExplanationPanel() {
 		if (_explanationPanel == null) {
-			final JScrollPane detailHtmlScoller = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			detailHtmlScoller.setViewportView(getExplanationPane());
+			final JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			scrollPane.setViewportView(getExplanationPane());
+			scrollPane.setBorder(BorderFactory.createCompoundBorder(new CustomLineBorder(new Color(208, 206, 203), 1, 0, 0, 0), new CustomLineBorder(new Color(98, 95, 89), 1, 0, 0, 0)));
 
 			_explanationPanel = new JPanel();
+			_explanationPanel.setBorder(new EmptyBorder(0, 2, 0, 3));
 			_explanationPanel.setLayout(new BorderLayout());
-			//_explanationPanel.setMinimumSize(new Dimension((int) (_parent.getPreferredSize().width * 0.6), 100));
-			//_explanationPanel.setPreferredSize(new Dimension((int) (_parent.getPreferredSize().width * 0.6), 150));
-			_explanationPanel.add(detailHtmlScoller, BorderLayout.CENTER);
-			_explanationPane.setEditorKit(_htmlEditorKit);
+			_explanationPanel.add(scrollPane, BorderLayout.CENTER);
 		}
 
 		return _explanationPanel;
 	}
 
 
-	public JPanel getCloudCommentsPanel() {
-		if (_cloudCommentsPanel == null) {
-			final JScrollPane detailHtmlScoller = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			detailHtmlScoller.setViewportView(getCloudCommentsPane());
+	@SuppressWarnings({"AnonymousInnerClass"})
+	private JEditorPane getExplanationPane() {
+		if (_explanationPane == null) {
+			_explanationPane = new ExplanationEditorPane();
+			_explanationPane.setBorder(new EmptyBorder(10, 10, 10, 10));
+			_explanationPane.setEditable(false);
+			_explanationPane.setBackground(Color.white);
+			_explanationPane.setContentType("text/html");
+			_explanationPane.setEditorKit(_htmlEditorKit);
+			_explanationPane.addHyperlinkListener(new HyperlinkListener() {
+				public void hyperlinkUpdate(final HyperlinkEvent evt) {
+					editorPaneHyperlinkUpdate(evt);
+				}
+			});
+		}
 
+		return _explanationPane;
+	}
+
+
+	JPanel getCloudCommentsPanel() {
+		if (_cloudCommentsPanel == null) {
+			final JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			scrollPane.setBorder(null);
+			scrollPane.setViewportView(getCloudCommentsPane());
 			_cloudCommentsPanel = new JPanel();
 			_cloudCommentsPanel.setLayout(new BorderLayout());
-			//_explanationPanel.setMinimumSize(new Dimension((int) (_parent.getPreferredSize().width * 0.6), 100));
-			//_explanationPanel.setPreferredSize(new Dimension((int) (_parent.getPreferredSize().width * 0.6), 150));
-			_cloudCommentsPanel.add(detailHtmlScoller, BorderLayout.CENTER);
+			_cloudCommentsPanel.add(scrollPane, BorderLayout.CENTER);
 		}
 
 		return _cloudCommentsPanel;
@@ -154,30 +285,9 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		if (_cloudCommentsPane == null) {
 			_cloudCommentsPane = new CloudCommentsPane(_parent);
 			_cloudCommentsPane.setBorder(new EmptyBorder(10, 10, 10, 10));
-			//_explanationPane.setPreferredSize(new Dimension(_parent.getPreferredSize().width, 150));
 		}
 
 		return _cloudCommentsPane;
-	}
-
-
-	private JEditorPane getExplanationPane() {
-		if (_explanationPane == null) {
-			_explanationPane = new ExplanationEditorPane();
-			_explanationPane.setBorder(new EmptyBorder(10, 10, 10, 10));
-			//_explanationPane.setPreferredSize(new Dimension(_parent.getPreferredSize().width, 150));
-			_explanationPane.setEditable(false);
-			_explanationPane.setBackground(Color.white);
-			_explanationPane.setContentType("text/html");
-
-			_explanationPane.addHyperlinkListener(new HyperlinkListener() {
-				public void hyperlinkUpdate(final HyperlinkEvent evt) {
-					editorPaneHyperlinkUpdate(evt);
-				}
-			});
-		}
-
-		return _explanationPane;
 	}
 
 
@@ -202,8 +312,8 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 	private void scrollToError(final HyperlinkEvent evt) {
 		if (evt.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
-			if (_parent instanceof ToolWindowPanel) {
-				final BugTreePanel bugTreePanel = ((ToolWindowPanel) _parent).getBugTreePanel();
+			if (_parent != null) {
+				final BugTreePanel bugTreePanel = _parent.getBugTreePanel();
 				final BugTree tree = bugTreePanel.getBugTree();
 				if (bugTreePanel.isScrollToSource()) {
 					tree.getScrollToSourceHandler().scollToSelectionSource();
@@ -222,8 +332,6 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		try {
 			if (evt.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
 				final URL url = evt.getURL();
-				//showInBrowser(url.toString());
-				//LaunchBrowser.showDocument(url);
 				BrowserUtil.launchBrowser(url.toExternalForm());
 				_explanationPane.setPage(url);
 			}
@@ -337,8 +445,6 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		_lastBugCollection = bugCollection;
 		_lastBugInstance = bugInstance;
 		refreshDetailsShown();
-
-		scrollRectToVisible(_bugDetailsPane);
 	}
 
 
@@ -359,11 +465,11 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	}
 
 
+	@SuppressWarnings({"AnonymousInnerClass"})
 	private static void scrollRectToVisible(final JEditorPane pane) {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
 				pane.scrollRectToVisible(new Rectangle(0, 0, 0, 0));
-				//_detailTextPane.setCaretPosition(0);
 			}
 		});
 	}
@@ -387,6 +493,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		_explanationPanel.setSize(new Dimension(width, expHeight));
 		//_explanationPanel.doLayout();
 		_explanationPanel.validate();
+		getBugDetailsSplitPane().validate();
 		//_parent.validate();
 		//}
 	}
@@ -435,7 +542,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	private class BugDetailsPaneHyperlinkListener implements HyperlinkListener {
 
 		public void hyperlinkUpdate(final HyperlinkEvent evt) {
-			if (_parent instanceof ToolWindowPanel) {
+			if (_parent != null) {
 				scrollToError(evt);
 			}
 		}

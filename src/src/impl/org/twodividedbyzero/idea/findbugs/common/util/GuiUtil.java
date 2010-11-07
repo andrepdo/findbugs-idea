@@ -22,6 +22,10 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JScrollPane;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Toolkit;
+import java.util.Map;
 
 
 /**
@@ -32,6 +36,9 @@ import java.awt.Component;
  * @since 0.0.1
  */
 public final class GuiUtil {
+
+	public static final String DESKTOP_PROPERTY_AWT_FONT_DESKTOP_HINTS = "awt.font.desktophints";
+	
 
 	private GuiUtil() {
 		throw new UnsupportedOperationException();
@@ -58,6 +65,22 @@ public final class GuiUtil {
 		} else {
 			return null;
 		}
+	}
+
+
+	@SuppressWarnings({"RawUseOfParameterizedType"})
+	public static void configureGraphics(final Graphics graphics) {
+		if (graphics instanceof Graphics2D) {
+			final Graphics2D graphics2D = (Graphics2D) graphics;
+			// http://download.oracle.com/docs/cd/E17409_01/javase/6/docs/technotes/guides/2d/flags.html#aaFonts
+			// http://download.oracle.com/docs/cd/E17409_01/javase/6/docs/api/java/awt/doc-files/DesktopProperties.html
+			final Toolkit tk = Toolkit.getDefaultToolkit();
+			final Map map = (Map) (tk.getDesktopProperty(DESKTOP_PROPERTY_AWT_FONT_DESKTOP_HINTS));
+			if (map != null) {
+				graphics2D.addRenderingHints(map);
+			}
+		}
+
 	}
 
 }

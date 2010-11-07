@@ -18,7 +18,6 @@ package org.twodividedbyzero.idea.findbugs.resources;
 
 import javax.swing.Icon;
 import java.awt.Color;
-import java.awt.Font;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,22 +35,17 @@ public class GuiResources {
 	public static final Icon FINDBUGS_ICON = ResourcesLoader.loadIcon("bug.png");
 	public static final Icon FINDBUGS_CONFIGURATION_ICON = ResourcesLoader.loadIcon("smallBuggy.png");
 	public static final Icon FINDBUGS_EXECUTE_ICON = ResourcesLoader.loadIcon("actions/bug18x18.png");
+	public static final Icon FINDBUGS_CLOUD_ICON = ResourcesLoader.loadIcon("bug_cloud.png");
 
 	public static final Icon CLOSE_EDITOR_ICON = ResourcesLoader.loadIcon("close.png");
 	public static final Icon CLOSE_EDITOR_HOVER_ICON = ResourcesLoader.loadIcon("closeHovered.png");
-
-	private static final int fontSize = 12;
-	public static final Font SOURCE_FONT = new java.awt.Font("Monospaced", 0, fontSize);
-	public static final Font JTREE_FONT = new java.awt.Font("SansSerif", 0, fontSize);
-	public static final Font LABEL_FONT = new java.awt.Font("Dialog", 1, 2 * fontSize);
-	public static final Font BUTTON_FONT = new java.awt.Font("Dialog", 0, fontSize);
 
 	public static final Color HIGH_PRIORITY_COLOR = Color.RED;
 	public static final Color MIDDLE_PRIORITY_COLOR = Color.YELLOW;
 	public static final Color LOW_PRIORITY_COLOR = Color.GREEN;
 	public static final Color EXP_PRIORITY_COLOR = Color.BLACK;
 
-	public static final Icon PRIORITY_HIGH_ICON = ResourcesLoader.loadIcon("priority/bug_hiigh.png");
+	public static final Icon PRIORITY_HIGH_ICON = ResourcesLoader.loadIcon("priority/bug_high.png");
 	public static final Icon PRIORITY_NORMAL_ICON = ResourcesLoader.loadIcon("priority/bug_normal.png");
 	public static final Icon PRIORITY_LOW_ICON = ResourcesLoader.loadIcon("priority/bug_low.png");
 	public static final Icon PRIORITY_EXP_ICON = ResourcesLoader.loadIcon("priority/bug_exp.png");

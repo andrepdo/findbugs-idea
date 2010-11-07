@@ -737,9 +737,9 @@ public class MultiSplitLayout implements LayoutManager {
 	private static void checkLayout(final Node root) {
 		if (root instanceof Split) {
 			final Split split = (Split) root;
-			if (split.getChildren().size() <= 2) {
-				throwInvalidLayout("Split must have > 2 children", root);
-			}
+			//if (split.getChildren().size() <= 2) {
+				//throwInvalidLayout("Split must have > 2 children", root);
+			//}
 			final Iterator<Node> splitChildren = split.getChildren().iterator();
 			double weight = 0.0;
 			while (splitChildren.hasNext()) {

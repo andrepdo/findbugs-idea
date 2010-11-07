@@ -71,8 +71,10 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 	private static final Logger LOGGER = Logger.getInstance(ToolWindowPanel.class.getName());
 
-	private static final String DEFAULT_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (COLUMN weight=0.3 right.top right.bottom) (LEAF name=right weight=0.4))";
-	private static final String PREVIEW_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (LEAF name=middle weight=0.4) (COLUMN weight=0.3 right.top right.bottom))";
+	///private static final String DEFAULT_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (COLUMN weight=0.3 right.top right.bottom) (LEAF name=right weight=0.4))";
+	private static final String DEFAULT_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.4) (LEAF name=right weight=0.6))";
+	private static final String PREVIEW_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (LEAF name=middle weight=0.4) (LEAF weight=0.3 name=right))";
+	///private static final String PREVIEW_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (LEAF name=middle weight=0.4) (COLUMN weight=0.3 right.top right.bottom))";
 	//private static final String PREVIEW_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.4) (COLUMN weight=0.6 right.top right.bottom)  (LEAF name=right))";
 
 	private final Project _project;
@@ -158,8 +160,8 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 					_updateMultiSplitLayout(PREVIEW_LAYOUT_DEF);
 					getMultiSplitPane().add(getBugTreePanel(), "left");
 					_multiSplitPane.add(getPreviewPanel().getComponent(), "middle");
-					getMultiSplitPane().add(getBugDetailsComponents().getBugDetailsPanel(), "right.top");
-					getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
+					getMultiSplitPane().add(getBugDetailsComponents().getTabbedPane(), "right");
+					//getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
 					_isPreviewLayoutEnabled = true;
 
 				} else if (!enablePreviewLayout) {
@@ -167,9 +169,9 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 					_updateMultiSplitLayout(DEFAULT_LAYOUT_DEF);
 					getMultiSplitPane().add(getBugTreePanel(), "left");
-					getMultiSplitPane().add(getBugDetailsComponents().getBugDetailsPanel(), "right.top");
-					getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
-			getMultiSplitPane().add(_bugDetailsComponents.getCloudCommentsPanel(), "right"); // NON-NLS
+					getMultiSplitPane().add(getBugDetailsComponents().getTabbedPane(), "right");
+					//getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
+					////getMultiSplitPane().add(_bugDetailsComponents.getCloudCommentsPanel(), "right");
 
 					if (getPreviewPanel().getEditor() != null) {
 						resizeSplitNodes(ToolWindowPanel.this);
@@ -249,7 +251,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 			case ANALYSIS_STARTED:
 				EventDispatchThreadHelper.invokeLater(new Runnable() {
 					public void run() {
-										EditorFactory.getInstance().refreshAllEditors();
+						EditorFactory.getInstance().refreshAllEditors();
 						DaemonCodeAnalyzer.getInstance(_project).restart();
 					}
 				});
