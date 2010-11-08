@@ -441,6 +441,15 @@
                 <mouse-shortcut keymap="$default" keystroke="alt button1"/>
             </action>
 
+            <action id="FindBugs.ShowQuickSearch"
+                    class="org.twodividedbyzero.idea.findbugs.actions.ShowQuickSearch"
+                    text="Find a matching string in the current analysis results."
+                    description="Find a matching string in the current analysis results."
+                    icon="/actions/find.png">
+
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl F"/>
+             </action>
+
             <action id="FindBugs.ExpandAllAction"
                     class="org.twodividedbyzero.idea.findbugs.actions.ExpandAll"
                     text="Expand All"
