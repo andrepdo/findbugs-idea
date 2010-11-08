@@ -200,7 +200,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 	JPanel getBugDetailsPanel() {
 		if (_bugDetailsPanel == null) {
-			final JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			scrollPane.setViewportView(getBugDetailsPane());
 			//scrollPane.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(0, 0, 0, 3), new CustomLineBorder(new Color(98, 95, 89), 0, 0, 1, 1)));
 			scrollPane.setBorder(new CustomLineBorder(new Color(98, 95, 89), 0, 0, 1, 0));
@@ -233,7 +233,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 	JPanel getBugExplanationPanel() {
 		if (_explanationPanel == null) {
-			final JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			scrollPane.setViewportView(getExplanationPane());
 			scrollPane.setBorder(BorderFactory.createCompoundBorder(new CustomLineBorder(new Color(208, 206, 203), 1, 0, 0, 0), new CustomLineBorder(new Color(98, 95, 89), 1, 0, 0, 0)));
 
