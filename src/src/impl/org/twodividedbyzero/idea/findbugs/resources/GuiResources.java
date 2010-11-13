@@ -17,6 +17,7 @@
 package org.twodividedbyzero.idea.findbugs.resources;
 
 import javax.swing.Icon;
+import javax.swing.text.html.StyleSheet;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +30,7 @@ import java.util.Map;
  * @version $Revision$
  * @since 0.0.1
  */
-@SuppressWarnings({"HardCodedStringLiteral"})
+@SuppressWarnings({"HardCodedStringLiteral", "HardcodedFileSeparator"})
 public class GuiResources {
 
 	public static final Icon FINDBUGS_ICON = ResourcesLoader.loadIcon("bug.png");
@@ -104,6 +105,23 @@ public class GuiResources {
 	 */
 	public static final Icon NAVIGATION_MOVEUP_ICON = ResourcesLoader.loadIcon("actions/moveUp.png");
 	public static final Icon NAVIGATION_MOVEDOWN_ICON = ResourcesLoader.loadIcon("actions/moveDown.png");
+
+	public static final StyleSheet EDITORPANE_STYLESHEET;
+	static {
+		EDITORPANE_STYLESHEET = new StyleSheet();
+		EDITORPANE_STYLESHEET.addRule("body {font-size: 12pt}");
+		EDITORPANE_STYLESHEET.addRule("H1 {color: #005555;  font-size: 120%; font-weight: bold;}");
+		EDITORPANE_STYLESHEET.addRule("H2, .fakeH2 {color: #005555;  font-size: 12pt; font-weight: bold;}");
+		EDITORPANE_STYLESHEET.addRule("H3 {color: #005555;  font-size: 12pt; font-weight: bold;}");
+		EDITORPANE_STYLESHEET.addRule("code {font-family: courier; font-size: 12pt}");
+		EDITORPANE_STYLESHEET.addRule("pre {color: gray; font-family: courier; font-size: 12pt}");
+		EDITORPANE_STYLESHEET.addRule("a {color: blue; font-decoration: underline}");
+		EDITORPANE_STYLESHEET.addRule("li {margin-left: 10px; list-style-type: none}");
+		EDITORPANE_STYLESHEET.addRule("#Low {background-color: green; width: 15px; height: 15px;}");
+		EDITORPANE_STYLESHEET.addRule("#Medium {background-color: yellow; width: 15px; height: 15px;}");
+		EDITORPANE_STYLESHEET.addRule("#High {background-color: red; width: 15px; height: 15px;}");
+		EDITORPANE_STYLESHEET.addRule("#Exp {background-color: black; width: 15px; height: 15px;}");
+	}
 
 
 	private GuiResources() {

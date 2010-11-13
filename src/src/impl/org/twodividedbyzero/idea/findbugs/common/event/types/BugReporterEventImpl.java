@@ -22,6 +22,7 @@ import edu.umd.cs.findbugs.ProjectStats;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.event.EventImpl;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 
 
 /**
@@ -49,6 +50,7 @@ public class BugReporterEventImpl extends EventImpl implements BugReporterEvent 
 			justification = "because I know better")
 	private transient ProjectStats _projectStats;
 	private String _projectName;
+	private FindBugsProject _findBugsProject;
 
 
 	public BugReporterEventImpl(@NotNull final Operation operation, @NotNull final String projectName) {
@@ -66,22 +68,27 @@ public class BugReporterEventImpl extends EventImpl implements BugReporterEvent 
 	}
 
 
+	public BugReporterEventImpl(@NotNull final Operation operation, @Nullable final Integer bugCount, @NotNull final BugCollection bugCollection, @NotNull final String projectName, @Nullable final FindBugsProject findBugsProject) {
+		this(operation, null, bugCount, bugCollection, null, projectName, findBugsProject);
+	}
+
+
 	public BugReporterEventImpl(@NotNull final Operation operation, @Nullable final BugInstance bugInstance, @Nullable final Integer bugCount, @NotNull final String projectName) {
-		this(operation, bugInstance, bugCount, null, null, projectName);
+		this(operation, bugInstance, bugCount, null, null, projectName, null);
 	}
 
 
 	public BugReporterEventImpl(@NotNull final Operation operation, @Nullable final BugInstance bugInstance, @Nullable final Integer bugCount, @Nullable final ProjectStats projectStats, @NotNull final String projectName) {
-		this(operation, bugInstance, bugCount, null, projectStats, projectName);
+		this(operation, bugInstance, bugCount, null, projectStats, projectName, null);
 	}
 
 
 	public BugReporterEventImpl(@NotNull final Operation operation, @Nullable final BugInstance bugInstance, @Nullable final Integer bugCount, @Nullable final BugCollection bugCollection, @NotNull final String projectName) {
-		this(operation, bugInstance, bugCount, bugCollection, null, projectName);
+		this(operation, bugInstance, bugCount, bugCollection, null, projectName, null);
 	}
 
 
-	public BugReporterEventImpl(@NotNull final Operation operation, @Nullable final BugInstance bugInstance, @Nullable final Integer bugCount, @Nullable final BugCollection bugCollection, @Nullable final ProjectStats projectStats, @NotNull final String projectName) {
+	public BugReporterEventImpl(@NotNull final Operation operation, @Nullable final BugInstance bugInstance, @Nullable final Integer bugCount, @Nullable final BugCollection bugCollection, @Nullable final ProjectStats projectStats, @NotNull final String projectName, @Nullable final FindBugsProject findBugsProject) {
 		super(EventType.FINDBUGS);
 		_operation = operation;
 		_bugInstance = bugInstance;
@@ -89,7 +96,11 @@ public class BugReporterEventImpl extends EventImpl implements BugReporterEvent 
 		_bugCollection = bugCollection;
 		_projectStats = projectStats;
 		_projectName = projectName;
+		_findBugsProject = findBugsProject;
 	}
+
+
+
 
 
 	@NotNull
@@ -130,6 +141,12 @@ public class BugReporterEventImpl extends EventImpl implements BugReporterEvent 
 	@NotNull
 	public String getProjectName() {
 		return _projectName;
+	}
+
+
+	@Nullable
+	public FindBugsProject getFindBugsProject() {
+		return _findBugsProject;
 	}
 
 

@@ -18,11 +18,15 @@ package org.twodividedbyzero.idea.findbugs.gui.toolwindow.view;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;
+import edu.umd.cs.findbugs.BugAnnotation;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.FieldAnnotation;
+import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.MethodAnnotation;
 import edu.umd.cs.findbugs.SortedBugCollection;
+import edu.umd.cs.findbugs.cloud.Cloud;
+import edu.umd.cs.findbugs.cloud.Cloud.UserDesignation;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.gui.common.CustomLineBorder;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitLayout;
@@ -43,7 +47,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.StyleSheet;
 import javax.swing.tree.TreePath;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -59,6 +62,7 @@ import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.util.List;
 
 
 /**
@@ -96,7 +100,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 	public final void init() {
 		_htmlEditorKit = new HTMLEditorKit();
-		setStyleSheets();
+		_htmlEditorKit.setStyleSheet(GuiResources.EDITORPANE_STYLESHEET);
 	}
 
 
@@ -122,7 +126,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 					final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), detailsTabTitle);
 					g2d.drawString(detailsTabTitle, getIconHeight() / 2 - width / 2 + GuiResources.FINDBUGS_ICON.getIconHeight() + y - 5, -getIconWidth());
 
-					
+
 				}
 
 
@@ -137,12 +141,12 @@ public class BugDetailsComponents /*extends JPanel*/ {
 				}
 			};
 
-			_jTabbedPane.addTab(null, detailsIcon, getBugDetailsSplitPane());
+			_jTabbedPane.addTab(null, detailsIcon, getBugDetailsSplitPane(), "Bug details concerning the current selected bug in the left tree");
 			_jTabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 			//_jTabbedPane.setDisplayedMnemonicIndexAt(0, 0);
 
 
-			final String cloudTabTitle = "FindBugs Cloud";
+			final String cloudTabTitle = "Comments";
 			final Icon cloudIcon = new Icon() {
 				public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
 					final Graphics2D g2d = (Graphics2D) g.create();
@@ -170,7 +174,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 					return width + GuiResources.FINDBUGS_CLOUD_ICON.getIconHeight() + 20;
 				}
 			};
-			_jTabbedPane.addTab(null, cloudIcon, getCloudCommentsPanel());
+			_jTabbedPane.addTab(null, cloudIcon, getCloudCommentsPanel(), "Comments from the FindBugs Cloud");
 			_jTabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 			//_jTabbedPane.setDisplayedMnemonicIndexAt(1, 0);
 
@@ -224,7 +228,13 @@ public class BugDetailsComponents /*extends JPanel*/ {
 			_bugDetailsPane.setBackground(Color.white);
 			_bugDetailsPane.setContentType("text/html");
 			_bugDetailsPane.setEditorKit(_htmlEditorKit);
-			_bugDetailsPane.addHyperlinkListener(new BugDetailsPaneHyperlinkListener());
+			_bugDetailsPane.addHyperlinkListener(new HyperlinkListener() {
+				public void hyperlinkUpdate(final HyperlinkEvent evt) {
+					if (_parent != null) {
+						handleDetailsClick(evt);
+					}
+				}
+			});
 		}
 
 		return _bugDetailsPane;
@@ -291,38 +301,23 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	}
 
 
-	private void setStyleSheets() {
-		final StyleSheet styleSheet = new StyleSheet();
-		styleSheet.addRule("body {font-size: 12pt}");
-		styleSheet.addRule("H1 {color: #005555;  font-size: 120%; font-weight: bold;}");
-		styleSheet.addRule("H2 {color: #005555;  font-size: 12pt; font-weight: bold;}");
-		styleSheet.addRule("H3 {color: #005555;  font-size: 12pt; font-weight: bold;}");
-		styleSheet.addRule("code {font-family: courier; font-size: 12pt}");
-		styleSheet.addRule("pre {color: gray; font-family: courier; font-size: 12pt}");
-		styleSheet.addRule("a {color: blue; font-decoration: underline}");
-		styleSheet.addRule("li {margin-left: 10px; list-style-type: none}");
-		styleSheet.addRule("#Low {background-color: green; width: 15px; height: 15px;}");
-		styleSheet.addRule("#Medium {background-color: yellow; width: 15px; height: 15px;}");
-		styleSheet.addRule("#High {background-color: red; width: 15px; height: 15px;}");
-		styleSheet.addRule("#Exp {background-color: black; width: 15px; height: 15px;}");
-
-		_htmlEditorKit.setStyleSheet(styleSheet);
-	}
-
-
-	private void scrollToError(final HyperlinkEvent evt) {
+	private void handleDetailsClick(final HyperlinkEvent evt) {
 		if (evt.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
 			if (_parent != null) {
-				final BugTreePanel bugTreePanel = _parent.getBugTreePanel();
-				final BugTree tree = bugTreePanel.getBugTree();
-				if (bugTreePanel.isScrollToSource()) {
-					tree.getScrollToSourceHandler().scollToSelectionSource();
-				} else {
-					bugTreePanel.setScrollToSource(true);
-					tree.getScrollToSourceHandler().scollToSelectionSource();
-					bugTreePanel.setScrollToSource(false);
+				String desc = evt.getDescription();
+				if (desc.equals("#class")) {
+					final BugTreePanel bugTreePanel = _parent.getBugTreePanel();
+					final BugTree tree = bugTreePanel.getBugTree();
+					if (bugTreePanel.isScrollToSource()) {
+						tree.getScrollToSourceHandler().scollToSelectionSource();
+					} else {
+						bugTreePanel.setScrollToSource(true);
+						tree.getScrollToSourceHandler().scollToSelectionSource();
+						bugTreePanel.setScrollToSource(false);
+					}
+				} else if (desc.equals("#comments")) {
+					getTabbedPane().setSelectedComponent(getCloudCommentsPanel());
 				}
-
 			}
 		}
 	}
@@ -351,29 +346,64 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 		final StringBuilder html = new StringBuilder();
 		html.append("<html><body>");
-		html.append("<h2>");
+		html.append("<span class='fakeH2'>");
 		html.append(bugInstance.getAbridgedMessage());
-		html.append("</h2>");
+		html.append("</span>");
+		SortedBugCollection bc = getCloudCommentsPane().getBugCollection();
+		if (bc != null) {
+			Cloud cloud = bc.getCloud();
+			if (cloud != null) {
+				int reviewers = cloud.getReviewers(bugInstance).size();
+				if (reviewers > 0) {
+					html.append(" - <a href='#comments'><u>");
+					html.append(reviewers);
+					html.append(" comment");
+					html.append(reviewers != 1 ? "s" : "");
+					html.append("</u></a>");
+				}
+				UserDesignation designation = cloud.getConsensusDesignation(bugInstance);
+				if (designation != UserDesignation.UNCLASSIFIED) {
+					List<String> userDesignationKeys = I18N.instance().getUserDesignationKeys(true);
+					html.append(" - \"");
+					html.append(I18N.instance().getUserDesignation(designation.name()));
+					html.append("\"");
+				}
+				int ageInDays = (int) ((System.currentTimeMillis() - cloud.getFirstSeen(bugInstance)) / (1000 * 60 * 60 * 24));
+				if (cloud.isInCloud(bugInstance) && ageInDays > 0) {
+					html.append(" - first seen ");
+					html.append(ageInDays);
+					html.append(" day");
+					html.append(ageInDays != 1 ? "s" : "");
+					html.append(" ago");
+				}
+			}
+		}
 
-		html.append("<p><h3>Class:</p>");
+		html.append("<table border=1 cellpadding=10><tr valign=top><td valign=top>");
+		html.append("<h3>Class:</h3>");
 		html.append("<ul>");
 		html.append("<li>");
-		html.append("<a href=''><u>");
+		html.append("<a href='#class'><u>");
 		html.append(BugInstanceUtil.getSimpleClassName(bugInstance));
 		html.append("</u></a>");
 		html.append(" <font color='gray'>(");
-		html.append(BugInstanceUtil.getPackageName(bugInstance));
-		html.append(")</font></li>");
-		html.append("</ul>");
+		String packageName = BugInstanceUtil.getPackageName(bugInstance);
+		html.append(packageName);
+		html.append(")</font>");
 
 		if (lines[0] > -1) {
-			html.append("<p><h3>Line:</p>");
-			html.append("<ul>");
-			html.append("<li>");
-			html.append(lines[0]).append(" - ").append(lines[1]);
-			html.append("</li>");
-			html.append("</ul>");
+			boolean singleLine = lines[1] == lines[0];
+			if (singleLine) {
+				html.append(" line ");
+			} else {
+				html.append(" lines ");
+			}
+			html.append(lines[0]);
+			if (!singleLine) {
+				html.append("-").append(lines[1]);
+			}
 		}
+		html.append("</ul>");
 
 		if (methodAnnotation != null) {
 			html.append("<p><h3>Method:</p>");
@@ -405,8 +435,9 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		html.append(BugInstanceUtil.getPriorityTypeString(bugInstance));
 		html.append("</li>");
 		html.append("</ul>");
+		html.append("</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td valign=top>");
 
-		html.append("<p><h3>Problem classification:</p>");
+		html.append("<h3>Problem classification:</h3>");
 		html.append("<ul>");
 		html.append("<li>");
 		html.append(BugInstanceUtil.getBugCategoryDescription(bugInstance));
@@ -421,6 +452,16 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		html.append(")</font>");
 		html.append("</li>");
 
+		Iterable<BugAnnotation> annotations = bugInstance.getAnnotationsForMessage(false);
+		if (annotations.iterator().hasNext()) {
+			html.append("<p><h3>Notes:</p>");
+			html.append("<ul>");
+			for (BugAnnotation annotation : annotations) {
+				html.append("<li>" + annotation.toString(bugInstance.getPrimaryClass()) + "</li>");
+			}
+			html.append("</ul>");
+		}
+
 		final DetectorFactory detectorFactory = bugInstance.getDetectorFactory();
 		if (detectorFactory != null) {
 			html.append("<li>");
@@ -431,6 +472,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 			html.append("</li>");
 		}
 		html.append("</ul>");
+		html.append("</tr></table>");
 		html.append("</body></html>");
 
 		// todo: set Suppress actions hyperlink
@@ -539,12 +581,4 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		}
 	}
 
-	private class BugDetailsPaneHyperlinkListener implements HyperlinkListener {
-
-		public void hyperlinkUpdate(final HyperlinkEvent evt) {
-			if (_parent != null) {
-				scrollToError(evt);
-			}
-		}
-	}
 }

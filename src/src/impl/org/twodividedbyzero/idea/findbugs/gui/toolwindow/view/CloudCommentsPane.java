@@ -31,6 +31,8 @@ import edu.umd.cs.findbugs.SortedBugCollection;
 import edu.umd.cs.findbugs.cloud.Cloud;
 import edu.umd.cs.findbugs.cloud.Cloud.UserDesignation;
 import edu.umd.cs.findbugs.cloud.CloudPlugin;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import sun.swing.SwingUtilities2;
 
 import javax.swing.BorderFactory;
@@ -58,7 +60,9 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class CloudCommentsPane extends JPanel {
+
 	private static final Logger LOGGER = Logger.getInstance(CloudCommentsPane.class.getName());
 
 	private JEditorPane _cloudReportPane;
@@ -77,56 +81,59 @@ public class CloudCommentsPane extends JPanel {
 	private SortedBugCollection _bugCollection;
 	private BugInstance _bugInstance;
 
-	private Cloud.CloudStatusListener cloudStatusListener = new Cloud.CloudStatusListener() {
+	private final Cloud.CloudStatusListener _cloudStatusListener = new Cloud.CloudStatusListener() {
 		public void handleIssueDataDownloadedEvent() {
 		}
 
-		public void handleStateChange(Cloud.SigninState oldState, Cloud.SigninState state) {
+
+		public void handleStateChange(final Cloud.SigninState oldState, final Cloud.SigninState state) {
 			updateBugCommentsView();
 		}
 	};
 	private final ToolWindowPanel _toolWindowPanel;
 
-	public CloudCommentsPane(ToolWindowPanel toolWindowPanel) {
+
+	public CloudCommentsPane(final ToolWindowPanel toolWindowPanel) {
 		_toolWindowPanel = toolWindowPanel;
 		setLayout(new BorderLayout());
-		this.add(_mainPanel, BorderLayout.CENTER);
+		add(_mainPanel, BorderLayout.CENTER);
 
 		_classificationCombo.removeAllItems();
-		for (UserDesignation designation : UserDesignation.values()) {
+		for (final UserDesignation designation : UserDesignation.values()) {
 			_classificationCombo.addItem(I18N.instance().getUserDesignation(designation.name()));
 		}
 
 		_commentEntryPanel.setVisible(false);
 		_addCommentLink.setListener(new LinkListener() {
-			public void linkSelected(LinkLabel linkLabel, Object o) {
+			public void linkSelected(final LinkLabel linkLabel, final Object o) {
 				_commentEntryPanel.setVisible(true);
 				_addCommentLink.setVisible(false);
 				_commentBox.requestFocus();
 				_commentBox.setSelectionStart(0);
 				_commentBox.setSelectionEnd(_commentBox.getText().length());
-				CloudCommentsPane.this.invalidate();
+				invalidate();
 			}
 		}, null);
 		_cancelLink.setListener(new LinkListener() {
-			public void linkSelected(LinkLabel linkLabel, Object o) {
+			public void linkSelected(final LinkLabel linkLabel, final Object o) {
 				_commentEntryPanel.setVisible(false);
 				_addCommentLink.setVisible(true);
-				CloudCommentsPane.this.invalidate();
+				invalidate();
 			}
 		}, null);
 		_submitCommentButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String comment = _commentBox.getText();
-				int index = _classificationCombo.getSelectedIndex();
-				UserDesignation choice;
-				if (index == -1)
+			public void actionPerformed(final ActionEvent e) {
+				final String comment = _commentBox.getText();
+				final int index = _classificationCombo.getSelectedIndex();
+				final UserDesignation choice;
+				if (index == -1) {
 					choice = UserDesignation.UNCLASSIFIED;
-				else
+				} else {
 					choice = UserDesignation.values()[index];
+				}
 				_bugInstance.setUserDesignationKey(choice.name(), _bugCollection);
-                //TODO: do in background
-				_bugInstance.setAnnotationText(comment, _bugCollection);
+				//TODO: do in background
+				_bugInstance.setAnnotationText("\n" + comment, _bugCollection);
 
 				_commentBox.setText("My comment");
 
@@ -134,13 +141,13 @@ public class CloudCommentsPane extends JPanel {
 
 				_commentEntryPanel.setVisible(false);
 				_addCommentLink.setVisible(true);
-				CloudCommentsPane.this.invalidate();
+				invalidate();
 			}
 		});
 		_signInOutLink.setListener(new LinkListener() {
-			public void linkSelected(LinkLabel linkLabel, Object o) {
+			public void linkSelected(final LinkLabel linkLabel, final Object o) {
 				if (_bugCollection != null) {
-					Cloud cloud = _bugCollection.getCloud();
+					final Cloud cloud = _bugCollection.getCloud();
 					switch (cloud.getSigninState()) {
 						case SIGNED_OUT:
 						case SIGNIN_FAILED:
@@ -148,8 +155,7 @@ public class CloudCommentsPane extends JPanel {
 							try {
 								cloud.signIn();
 							} catch (Exception e) {
-								Messages.showErrorDialog("The FindBugs Cloud could not be contacted at this time.\n\n"
-										+ e.getMessage(), "Could not connect to FindBugs Cloud");
+								Messages.showErrorDialog("The FindBugs Cloud could not be contacted at this time.\n\n" + e.getMessage(), "Could not connect to FindBugs Cloud");
 								LOGGER.warn(e);
 							}
 							break;
@@ -161,27 +167,30 @@ public class CloudCommentsPane extends JPanel {
 			}
 		}, null);
 		_changeLink.setListener(new LinkListener() {
-			public void linkSelected(LinkLabel linkLabel, Object o) {
+			public void linkSelected(final LinkLabel linkLabel, final Object o) {
 				final List<CloudPlugin> plugins = new ArrayList<CloudPlugin>();
 				final List<String> descriptions = new ArrayList<String>();
-				for (CloudPlugin plugin : DetectorFactoryCollection.instance().getRegisteredClouds().values()) {
-					if (!plugin.isHidden()) {
+				for (final CloudPlugin plugin : DetectorFactoryCollection.instance().getRegisteredClouds().values()) {
+					final FindBugsPlugin findBugsPlugin = _toolWindowPanel.getProject().getComponent(FindBugsPlugin.class);
+					final FindBugsPreferences prefs = findBugsPlugin.getPreferences();
+					final boolean disabled = prefs.isPluginDisabled(plugin.getFindbugsPluginId());
+					if (!disabled && !plugin.isHidden()) {
 						descriptions.add(plugin.getDescription());
 						plugins.add(plugin);
 					}
 				}
-				JBPopupFactory factory = JBPopupFactory.getInstance();
-				ListPopup popup = factory.createListPopup(new BaseListPopupStep<String>("Store comments in:", descriptions) {
+				final JBPopupFactory factory = JBPopupFactory.getInstance();
+				final ListPopup popup = factory.createListPopup(new BaseListPopupStep<String>("Store comments in:", descriptions) {
 					@Override
-					public PopupStep<?> onChosen(String selectedValue, boolean finalChoice) {
+					public PopupStep<?> onChosen(final String selectedValue, final boolean finalChoice) {
 						if (selectedValue != null) {
-							int index = descriptions.indexOf(selectedValue);
+							final int index = descriptions.indexOf(selectedValue);
 							if (index == -1) {
 								LOGGER.error("Error - not found - '" + selectedValue + "' among " + descriptions);
 							} else {
-								CloudPlugin newPlugin = plugins.get(index);
-								String newCloudId = newPlugin.getId();
-								String oldCloudId = _bugCollection.getCloud().getPlugin().getId();
+								final CloudPlugin newPlugin = plugins.get(index);
+								final String newCloudId = newPlugin.getId();
+								final String oldCloudId = _bugCollection.getCloud().getPlugin().getId();
 								if (!oldCloudId.equals(newCloudId)) {
 									_bugCollection.getProject().setCloudId(newCloudId);
 									//TODO: execute in background so signin doesn't stall UI
@@ -192,6 +201,7 @@ public class CloudCommentsPane extends JPanel {
 						}
 						return super.onChosen(selectedValue, finalChoice);
 					}
+
 
 					@Override
 					public void canceled() {
@@ -208,32 +218,40 @@ public class CloudCommentsPane extends JPanel {
 		updateBugCommentsView();
 	}
 
-	public void setBugInstance(SortedBugCollection bugCollection, BugInstance bugInstance) {
+
+	public SortedBugCollection getBugCollection() {
+		return _bugCollection;
+	}
+
+
+	public void setBugInstance(final SortedBugCollection bugCollection, final BugInstance bugInstance) {
 		updateCloudListeners(bugCollection);
-		this._bugCollection = bugCollection;
-		this._bugInstance = bugInstance;
+		_bugCollection = bugCollection;
+		_bugInstance = bugInstance;
 		updateBugCommentsView();
 	}
 
-	private void updateCloudListeners(SortedBugCollection newBugCollection) {
+
+	private void updateCloudListeners(final SortedBugCollection newBugCollection) {
 		boolean isNewCloud = false;
-		Cloud newCloud = newBugCollection.getCloud();
+		final Cloud newCloud = newBugCollection.getCloud();
 		if (_bugCollection != null) {
-			Cloud oldCloud = _bugCollection.getCloud();
+			final Cloud oldCloud = _bugCollection.getCloud();
 			//noinspection ObjectEquality
 			if (oldCloud != newCloud) {
 				isNewCloud = true;
 				if (oldCloud != null) {
-					oldCloud.removeStatusListener(cloudStatusListener);
+					oldCloud.removeStatusListener(_cloudStatusListener);
 				}
 			}
 		} else {
 			isNewCloud = true;
 		}
 		if (isNewCloud && newCloud != null) {
-			newCloud.addStatusListener(cloudStatusListener);
+			newCloud.addStatusListener(_cloudStatusListener);
 		}
 	}
+
 
 	private void updateBugCommentsView() {
 		if (_bugCollection == null) {
@@ -244,21 +262,20 @@ public class CloudCommentsPane extends JPanel {
 			return;
 		}
 		_changeLink.setVisible(true);
-		HTMLDocument doc = (HTMLDocument) _cloudReportPane.getDocument();
-		Cloud cloud = _bugCollection.getCloud();
+		final HTMLDocument doc = (HTMLDocument) _cloudReportPane.getDocument();
+		final Cloud cloud = _bugCollection.getCloud();
 		try {
 			doc.remove(0, doc.getLength());
 			doc.insertString(0, cloud.getCloudReport(_bugInstance), null);
 		} catch (BadLocationException e) {
 			// probably won't happen
 		}
-		CloudPlugin plugin = cloud.getPlugin();
+		final CloudPlugin plugin = cloud.getPlugin();
 		_cloudDetailsLabel.setText(plugin.getDetails());
-		Cloud.SigninState state = cloud.getSigninState();
-		String stateStr = state == Cloud.SigninState.NO_SIGNIN_REQUIRED ? "" : state + " - ";
-		String userStr = cloud.getUser() == null ? "" : cloud.getUser();
-		_titleLabel.setText("<html><b>Comments - " + plugin.getDescription() + "</b>"
-				+ "<br><font style='font-size: x-small;color:darkgray'>" + stateStr + userStr);
+		final Cloud.SigninState state = cloud.getSigninState();
+		final String stateStr = state == Cloud.SigninState.NO_SIGNIN_REQUIRED ? "" : state + " - ";
+		final String userStr = cloud.getUser() == null ? "" : cloud.getUser();
+		_titleLabel.setText("<html><b>Comments - " + plugin.getDescription() + "</b>" + "<br><font style='font-size: x-small;color:darkgray'>" + stateStr + userStr);
 		switch (state) {
 			case NO_SIGNIN_REQUIRED:
 			case SIGNING_IN:
@@ -277,12 +294,14 @@ public class CloudCommentsPane extends JPanel {
 		}
 	}
 
+
 	{
 // GUI initializer generated by IntelliJ IDEA GUI Designer
 // >>> IMPORTANT!! <<<
 // DO NOT EDIT OR ADD ANY CODE HERE!
 		$$$setupUI$$$();
 	}
+
 
 	/**
 	 * Method generated by IntelliJ IDEA GUI Designer
@@ -455,9 +474,8 @@ public class CloudCommentsPane extends JPanel {
 		label1.setLabelFor(_classificationCombo);
 	}
 
-	/**
-	 * @noinspection ALL
-	 */
+
+	/** @noinspection ALL */
 	public JComponent $$$getRootComponent$$$() {
 		return _mainPanel;
 	}

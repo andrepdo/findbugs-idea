@@ -1,0 +1,303 @@
+Index: src/impl/org/twodividedbyzero/idea/findbugs/resources/i18n/Messages.properties
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/resources/i18n/Messages.properties	(revision 117)
++++ src/impl/org/twodividedbyzero/idea/findbugs/resources/i18n/Messages.properties	(revision )
+@@ -4,5 +4,5 @@
+   dialog to configure the inspection.
+ findbugs.inspection.description=This inspection integrates <b>FindBugs</b> bug pattern detectors and reports in real-time on found problems<br> \
+   Note: FindBugs-IDEA inspection is a bytecode analysis based inspection.
+-findbugs.plugin.configuration.name=FindBugs-IDEA
++findbugs.plugin.configuration.name=FindBugs
+ findbugs.inspection.quickfix.supress.warning=Suppress findbugs bug type
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.java	(revision 138)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.java	(revision )
+@@ -208,7 +208,11 @@
+ 		updateBugCommentsView();
+ 	}
+ 
++    public SortedBugCollection getBugCollection() {
++        return _bugCollection;
++    }
++
+-	public void setBugInstance(SortedBugCollection bugCollection, BugInstance bugInstance) {
++    public void setBugInstance(SortedBugCollection bugCollection, BugInstance bugInstance) {
+ 		updateCloudListeners(bugCollection);
+ 		this._bugCollection = bugCollection;
+ 		this._bugInstance = bugInstance;
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceGroupNode.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceGroupNode.java	(revision 138)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/model/BugInstanceGroupNode.java	(revision )
+@@ -339,7 +339,7 @@
+ 					return GuiResources.GROUP_BY_PRIORITY_EXP_ICON;
+ 				}
+ 			case BugRank:
+-				final String rankString = BugRankCategory.getRank(getBugInstance().getBugRank()).toString();
++				final String rankString = BugRankCategory.getRank(getBugInstance().getBugRank()).name();
+ 				if (GuiResources.GROUP_BY_RANK_ICONS.containsKey(rankString)) {
+ 					return GuiResources.GROUP_BY_RANK_ICONS.get(rankString);
+ 				} else {
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/GroupBy.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/GroupBy.java	(revision 138)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/tree/GroupBy.java	(revision )
+@@ -3,7 +3,6 @@
+ import edu.umd.cs.findbugs.BugInstance;
+ import edu.umd.cs.findbugs.BugRankCategory;
+ import edu.umd.cs.findbugs.I18N;
+-import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstanceBugRankComparator;
+ import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstanceCategoryComparator;
+ import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstanceClassComparator;
+ import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstancePackageComparator;
+@@ -98,8 +97,7 @@
+ 				groupName = priorityComparator.getPriorityString(bugInstance);
+ 				break;
+ 			case BugRank:
+-				final BugInstanceBugRankComparator bugRankComparator = (BugInstanceBugRankComparator) BugInstanceComparator.getBugInstanceBugRankComparator();
+-				groupName = BugRankCategory.getRank(bugInstance.getBugRank()).name();
++                groupName = BugRankCategory.getRank(bugInstance.getBugRank()).toString();
+ 				break;
+ 			default:
+ 				throw new IllegalStateException("Unknown group order: " + groupBy);
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugDetailsComponents.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugDetailsComponents.java	(revision 143)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugDetailsComponents.java	(revision )
+@@ -18,11 +18,15 @@
+ 
+ import com.intellij.ide.BrowserUtil;
+ import com.intellij.openapi.diagnostic.Logger;
++import edu.umd.cs.findbugs.BugAnnotation;
+ import edu.umd.cs.findbugs.BugInstance;
+ import edu.umd.cs.findbugs.DetectorFactory;
+ import edu.umd.cs.findbugs.FieldAnnotation;
++import edu.umd.cs.findbugs.I18N;
+ import edu.umd.cs.findbugs.MethodAnnotation;
+ import edu.umd.cs.findbugs.SortedBugCollection;
++import edu.umd.cs.findbugs.cloud.Cloud;
++import edu.umd.cs.findbugs.cloud.Cloud.UserDesignation;
+ import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
+ import org.twodividedbyzero.idea.findbugs.gui.common.CustomLineBorder;
+ import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitLayout;
+@@ -59,6 +63,7 @@
+ import java.io.IOException;
+ import java.io.StringReader;
+ import java.net.URL;
++import java.util.List;
+ 
+ 
+ /**
+@@ -142,7 +147,7 @@
+ 			//_jTabbedPane.setDisplayedMnemonicIndexAt(0, 0);
+ 
+ 
+-			final String cloudTabTitle = "FindBugs Cloud";
++			final String cloudTabTitle = "Comments";
+ 			final Icon cloudIcon = new Icon() {
+ 				public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
+ 					final Graphics2D g2d = (Graphics2D) g.create();
+@@ -170,7 +175,7 @@
+ 					return width + GuiResources.FINDBUGS_CLOUD_ICON.getIconHeight() + 20;
+ 				}
+ 			};
+-			_jTabbedPane.addTab(null, cloudIcon, getCloudCommentsPanel());
++			_jTabbedPane.addTab(null, cloudIcon, getCloudCommentsPanel(), "Comments from the FindBugs Cloud");
+ 			_jTabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
+ 			//_jTabbedPane.setDisplayedMnemonicIndexAt(1, 0);
+ 
+@@ -224,8 +229,14 @@
+ 			_bugDetailsPane.setBackground(Color.white);
+ 			_bugDetailsPane.setContentType("text/html");
+ 			_bugDetailsPane.setEditorKit(_htmlEditorKit);
+-			_bugDetailsPane.addHyperlinkListener(new BugDetailsPaneHyperlinkListener());
++			_bugDetailsPane.addHyperlinkListener(new HyperlinkListener() {
++                public void hyperlinkUpdate(final HyperlinkEvent evt) {
++                    if (_parent != null) {
++                        handleDetailsClick(evt);
+-		}
++                    }
++                }
++            });
++		}
+ 
+ 		return _bugDetailsPane;
+ 	}
+@@ -295,7 +306,7 @@
+ 		final StyleSheet styleSheet = new StyleSheet();
+ 		styleSheet.addRule("body {font-size: 12pt}");
+ 		styleSheet.addRule("H1 {color: #005555;  font-size: 120%; font-weight: bold;}");
+-		styleSheet.addRule("H2 {color: #005555;  font-size: 12pt; font-weight: bold;}");
++		styleSheet.addRule("H2, .fakeH2 {color: #005555;  font-size: 12pt; font-weight: bold;}");
+ 		styleSheet.addRule("H3 {color: #005555;  font-size: 12pt; font-weight: bold;}");
+ 		styleSheet.addRule("code {font-family: courier; font-size: 12pt}");
+ 		styleSheet.addRule("pre {color: gray; font-family: courier; font-size: 12pt}");
+@@ -310,22 +321,26 @@
+ 	}
+ 
+ 
+-	private void scrollToError(final HyperlinkEvent evt) {
++	private void handleDetailsClick(final HyperlinkEvent evt) {
+ 		if (evt.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+ 			if (_parent != null) {
++                String desc = evt.getDescription();
++                if (desc.equals("#class")) {
+-				final BugTreePanel bugTreePanel = _parent.getBugTreePanel();
+-				final BugTree tree = bugTreePanel.getBugTree();
+-				if (bugTreePanel.isScrollToSource()) {
+-					tree.getScrollToSourceHandler().scollToSelectionSource();
+-				} else {
+-					bugTreePanel.setScrollToSource(true);
+-					tree.getScrollToSourceHandler().scollToSelectionSource();
+-					bugTreePanel.setScrollToSource(false);
+-				}
++                    final BugTreePanel bugTreePanel = _parent.getBugTreePanel();
++                    final BugTree tree = bugTreePanel.getBugTree();
++                    if (bugTreePanel.isScrollToSource()) {
++                        tree.getScrollToSourceHandler().scollToSelectionSource();
++                    } else {
++                        bugTreePanel.setScrollToSource(true);
++                        tree.getScrollToSourceHandler().scollToSelectionSource();
++                        bugTreePanel.setScrollToSource(false);
++                    }
+-
++                } else if (desc.equals("#comments")) {
++                    getTabbedPane().setSelectedComponent(getCloudCommentsPanel());
+-			}
+-		}
+-	}
++                }
++			}
++		}
++	}
+ 
+ 
+ 	private void editorPaneHyperlinkUpdate(final HyperlinkEvent evt) {
+@@ -351,29 +366,62 @@
+ 
+ 		final StringBuilder html = new StringBuilder();
+ 		html.append("<html><body>");
+-		html.append("<h2>");
++		html.append("<span class='fakeH2'>");
+ 		html.append(bugInstance.getAbridgedMessage());
+-		html.append("</h2>");
++        html.append("</span>");
++        SortedBugCollection bc = getCloudCommentsPane().getBugCollection();
++        if (bc != null) {
++            Cloud cloud = bc.getCloud();
++            if (cloud != null) {
++                int reviewers = cloud.getReviewers(bugInstance).size();
++                if (reviewers > 0) {
++                    html.append(" - <a href='#comments'><u>");
++                    html.append(reviewers);
++                    html.append(" comment");
++                    html.append(reviewers != 1 ? "s" : "");
++                    html.append("</u></a>");
++                }
++                UserDesignation designation = cloud.getConsensusDesignation(bugInstance);
++                if (designation != UserDesignation.UNCLASSIFIED) {
++                    List<String> userDesignationKeys = I18N.instance().getUserDesignationKeys(true);
++                    html.append(" - \"");
++                    html.append(I18N.instance().getUserDesignation(designation.name()));
++                    html.append("\"");
++                }
++                int ageInDays = (int) ((System.currentTimeMillis() - cloud.getFirstSeen(bugInstance)) / (1000 * 60 * 60 * 24));
++                if (cloud.isInCloud(bugInstance) && ageInDays > 0) {
++                    html.append(" - first seen ");
++                    html.append(ageInDays);
++                    html.append(" day");
++                    html.append(ageInDays != 1 ? "s" : "");
++                    html.append(" ago");
++                }
++            }
++        }
+ 
+-		html.append("<p><h3>Class:</p>");
++        html.append("<table border=0 cellpadding=10><tr valign=top><td valign=top>");
++		html.append("<h3>Class:</h3>");
+ 		html.append("<ul>");
+ 		html.append("<li>");
+-		html.append("<a href=''><u>");
++		html.append("<a href='#class'><u>");
+ 		html.append(BugInstanceUtil.getSimpleClassName(bugInstance));
+ 		html.append("</u></a>");
+-		html.append(" <font color='gray'>(");
++        html.append(" <font color='gray'>(");
+-		html.append(BugInstanceUtil.getPackageName(bugInstance));
+-		html.append(")</font></li>");
+-		html.append("</ul>");
++        String packageName = BugInstanceUtil.getPackageName(bugInstance);
++        html.append(packageName);
++        html.append(")</font>");
+ 
+ 		if (lines[0] > -1) {
+-			html.append("<p><h3>Line:</p>");
+-			html.append("<ul>");
+-			html.append("<li>");
+-			html.append(lines[0]).append(" - ").append(lines[1]);
+-			html.append("</li>");
+-			html.append("</ul>");
++            boolean singleLine = lines[1] == lines[0];
++			if (singleLine)
++                html.append(" line ");
++            else
++                html.append(" lines ");
++            html.append(lines[0]);
++            if (!singleLine)
++                html.append("-").append(lines[1]);
+ 		}
++		html.append("</ul>");
+ 
+ 		if (methodAnnotation != null) {
+ 			html.append("<p><h3>Method:</p>");
+@@ -405,8 +453,9 @@
+ 		html.append(BugInstanceUtil.getPriorityTypeString(bugInstance));
+ 		html.append("</li>");
+ 		html.append("</ul>");
++        html.append("</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td valign=top>");
+ 
+-		html.append("<p><h3>Problem classification:</p>");
++		html.append("<h3>Problem classification:</h3>");
+ 		html.append("<ul>");
+ 		html.append("<li>");
+ 		html.append(BugInstanceUtil.getBugCategoryDescription(bugInstance));
+@@ -421,6 +470,16 @@
+ 		html.append(")</font>");
+ 		html.append("</li>");
+ 
++        Iterable<BugAnnotation> annotations = bugInstance.getAnnotationsForMessage(false);
++        if (annotations.iterator().hasNext()) {
++            html.append("<p><h3>Notes:</p>");
++            html.append("<ul>");
++            for (BugAnnotation annotation : annotations) {
++                html.append("<li>" + annotation.toString(bugInstance.getPrimaryClass()) + "</li>");
++            }
++            html.append("</ul>");
++        }
++
+ 		final DetectorFactory detectorFactory = bugInstance.getDetectorFactory();
+ 		if (detectorFactory != null) {
+ 			html.append("<li>");
+@@ -431,6 +490,7 @@
+ 			html.append("</li>");
+ 		}
+ 		html.append("</ul>");
++        html.append("</tr></table>");
+ 		html.append("</body></html>");
+ 
+ 		// todo: set Suppress actions hyperlink
+@@ -539,12 +599,4 @@
+ 		}
+ 	}
+ 
+-	private class BugDetailsPaneHyperlinkListener implements HyperlinkListener {
+-
+-		public void hyperlinkUpdate(final HyperlinkEvent evt) {
+-			if (_parent != null) {
+-				scrollToError(evt);
+-			}
++}
+-		}
+-	}
+-}

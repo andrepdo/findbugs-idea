@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.event.EventImpl;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 
 
 /**
@@ -39,13 +40,15 @@ public class BugReporterInspectionEventImpl extends EventImpl implements BugRepo
 
 	private static final long serialVersionUID = 0L;
 
+	private static final String _toolWindowId = FindBugsPluginConstants.TOOL_WINDOW_ID; // todo: set on instance creation
+
 	private Operation _operation;
 	private BugInstance _bugInstance;
 	private Integer _bugCount;
 	private transient BugCollection _bugCollection;
 	private transient ProjectStats _projectStats;
 	private String _projectName;
-	private static final String _toolWindowId = FindBugsPluginConstants.TOOL_WINDOW_ID; // todo: set on instance creation
+	private final FindBugsProject _findBugsProject;
 
 
 	public BugReporterInspectionEventImpl(@NotNull final Operation operation, @NotNull final String projectName) {
@@ -64,21 +67,26 @@ public class BugReporterInspectionEventImpl extends EventImpl implements BugRepo
 
 
 	public BugReporterInspectionEventImpl(@NotNull final Operation operation, @Nullable final BugInstance bugInstance, @Nullable final Integer bugCount, @NotNull final String projectName) {
-		this(operation, bugInstance, bugCount, null, null, projectName);
+		this(operation, bugInstance, bugCount, null, null, projectName, null);
 	}
 
 
 	public BugReporterInspectionEventImpl(@NotNull final Operation operation, @Nullable final BugInstance bugInstance, @Nullable final Integer bugCount, @Nullable final ProjectStats projectStats, @NotNull final String projectName) {
-		this(operation, bugInstance, bugCount, null, projectStats, projectName);
+		this(operation, bugInstance, bugCount, null, projectStats, projectName, null);
 	}
 
 
 	public BugReporterInspectionEventImpl(@NotNull final Operation operation, @Nullable final BugInstance bugInstance, @Nullable final Integer bugCount, @Nullable final BugCollection bugCollection, @NotNull final String projectName) {
-		this(operation, bugInstance, bugCount, bugCollection, null, projectName);
+		this(operation, bugInstance, bugCount, bugCollection, null, projectName, null);
 	}
 
 
-	public BugReporterInspectionEventImpl(@NotNull final Operation operation, @Nullable final BugInstance bugInstance, @Nullable final Integer bugCount, @Nullable final BugCollection bugCollection, @Nullable final ProjectStats projectStats, @NotNull final String projectName) {
+	public BugReporterInspectionEventImpl(@NotNull final Operation operation, @Nullable final Integer bugCount, @NotNull final BugCollection bugCollection, @NotNull final String projectName, @Nullable final FindBugsProject findBugsProject) {
+		this(operation, null, bugCount, bugCollection, null, projectName, findBugsProject);
+	}
+
+
+	public BugReporterInspectionEventImpl(@NotNull final Operation operation, @Nullable final BugInstance bugInstance, @Nullable final Integer bugCount, @Nullable final BugCollection bugCollection, @Nullable final ProjectStats projectStats, @NotNull final String projectName, @Nullable final FindBugsProject findBugsProject) {
 		super(EventType.FINDBUGS_INSPECTION);
 		_operation = operation;
 		_bugInstance = bugInstance;
@@ -86,6 +94,7 @@ public class BugReporterInspectionEventImpl extends EventImpl implements BugRepo
 		_bugCollection = bugCollection;
 		_projectStats = projectStats;
 		_projectName = projectName;
+		_findBugsProject = findBugsProject;
 	}
 
 
@@ -127,6 +136,12 @@ public class BugReporterInspectionEventImpl extends EventImpl implements BugRepo
 	@NotNull
 	public String getProjectName() {
 		return _projectName;
+	}
+
+
+	@Nullable
+	public FindBugsProject getFindBugsProject() {
+		return _findBugsProject;
 	}
 
 

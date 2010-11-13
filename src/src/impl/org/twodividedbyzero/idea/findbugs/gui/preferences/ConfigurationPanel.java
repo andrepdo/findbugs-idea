@@ -95,6 +95,11 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
+	public FindBugsPlugin getFindBugsPlugin() {
+		return _plugin;
+	}
+
+
 	private void initGui() {
 		add(getMainPanel());
 	}
@@ -274,18 +279,18 @@ public class ConfigurationPanel extends JPanel {
 	private Component getTabbedPane() {
 		if (_tabbedPane == null) {
 			_tabbedPane = new JTabbedPane();
-			_tabbedPane.addTab("Detector configuration", getDetectorConfig().getComponent());
-			_tabbedPane.addTab("Reporter configuration", getReporterConfig().getComponent());
-			_tabbedPane.addTab("Filter configuration", getFilterConfig().getComponent());
+			_tabbedPane.addTab("Detectors", getDetectorConfig().getComponent());
+			_tabbedPane.addTab("Reporting", getReporterConfig().getComponent());
+			_tabbedPane.addTab("Filters", getFilterConfig().getComponent());
 
 			if (!_plugin.isModuleComponent()) {
-				_tabbedPane.addTab("Plugin configuration", getPluginConfig().getComponent());
+				_tabbedPane.addTab("Plugins", getPluginConfig().getComponent());
 			}
 			if (!_plugin.isModuleComponent()) {
-				_tabbedPane.addTab("Import/Export configuration", getImportExportConfig().getComponent());
+				_tabbedPane.addTab("Import/Export", getImportExportConfig().getComponent());
 			}
 			if (!_plugin.isModuleComponent()) {
-				_tabbedPane.addTab("Annotation & QuickFix configuration", getAnnotationConfig().getComponent());
+				_tabbedPane.addTab("Annotations", getAnnotationConfig().getComponent());
 			}
 		}
 		return _tabbedPane;

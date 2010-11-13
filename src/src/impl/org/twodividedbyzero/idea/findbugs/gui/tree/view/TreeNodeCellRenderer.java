@@ -16,6 +16,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.tree.view;
 
+import info.clearthought.layout.TableLayout;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceGroupNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.RootNode;
@@ -26,8 +27,8 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreePath;
 import java.awt.BasicStroke;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -35,8 +36,8 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.LayoutManager;
 import java.awt.RenderingHints;
-import java.util.Map;
 
 
 /**
@@ -47,50 +48,29 @@ import java.util.Map;
  * @since 0.9.7-dev
  */
 @SuppressWarnings({"HardCodedStringLiteral"})
-public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer {
+public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer/*, TreeCellEditor*/ {
 
 	private static final BasicStroke _stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1, new float[] {1, 1}, 0);
 
-	/** Is the value currently selected. */
 	private boolean _selected;
-
-	/** True if has focus. */
 	private boolean _hasFocus;
-	/** True if draws focus border around icon as well. */
 	private final boolean _drawsFocusBorderAroundIcon;
-
-	// Colors
-	/** Color to use for the foreground for selected nodes. */
 	private Color _textSelectionColor;
-
-	/** Color to use for the foreground for non-selected nodes. */
 	private Color _textNonSelectionColor;
-
-	/** Color to use for the background when a node is selected. */
 	private Color _backgroundSelectionColor;
-
-	/** Color to use for the background when the node is not selected. */
 	private Color _backgroundNonSelectionColor;
-
-	/** Color to use for the background when the node is not selected. */
 	private Color _borderSelectionColor;
-
 	private Color _hitsForegroundColor;
-
-	/** Map to use for rendering included images. */
-	protected Map<?, ?> _map;
-
 	private final int _hGap = 4;
 
 	private final JLabel _icon;
 	private final ValueLabel _title;
 	private final ValueLabel _hits;
+	private final ValueLabel _link;
 
 
-	/** Create a new cell renderer. */
 	public TreeNodeCellRenderer() {
 		setOpaque(false);
-		//_map = map;
 
 		setTextSelectionColor(UIManager.getColor("Tree.selectionForeground"));
 		setTextNonSelectionColor(UIManager.getColor("Tree.textForeground"));
@@ -101,37 +81,39 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer {
 		setHitsForegroundColor(Color.GRAY);
 		_drawsFocusBorderAroundIcon = value != null && (Boolean) value;
 
-		//noinspection ThisEscapedInObjectConstruction
-		//setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		setLayout(new BorderLayout(_hGap, 0));
+		final double border = 0;
+		final double rowsGap = 0;
+		final double colsGap = _hGap;
+		final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, border}, // Columns
+								 {border, TableLayout.PREFERRED, border}};// Rows
+		final LayoutManager tbl = new TableLayout(size);
+		setLayout(tbl);
+
+		//setLayout(new BorderLayout(_hGap, 0));
 		_icon = new JLabel();
-		//_icon.setHorizontalAlignment(JLabel.LEFT);
 
 		_title = new ValueLabel();
 		_title.setFont(getFont());
-		//_title.setHorizontalAlignment(JLabel.LEFT);
 
 		_hits = new ValueLabel();
 		_hits.setForeground(Color.GRAY);
 		_hits.setFont(getFont());
-		//_hits.setHorizontalAlignment(JLabel.RIGHT);
 
-		//add(Box.createRigidArea(new Dimension(4, 0)));
-		add(_icon, BorderLayout.LINE_START);
-		//add(_icon);
-		//add(Box.createRigidArea(new Dimension(4, 0)));
+		_link = new ValueLabel();
+		_link.setForeground(Color.GRAY);
+		_link.setFont(getFont());
+
+		add(_icon, "1, 1, 1, 1");
+		add(_title, "3, 1, 3, 1");
+		add(_hits, "5, 1, 5, 1");
+		add(_link, "7, 1, 7, 1");
+
+		/*add(_icon, BorderLayout.LINE_START);
 		add(_title, BorderLayout.CENTER);
-		//add(_title);
-		//add(Box.createRigidArea(new Dimension(4, 0)));
-		add(_hits, BorderLayout.LINE_END);
-		//add(_hits);
+		add(_hits, BorderLayout.LINE_END);*/
+		//add(_link, BorderLayout.LINE_END);
+
 	}
-
-
-	/*@Override
-	public String toString() {
-		return "TreeNodeCellRenderer2{" + "_icon=" + _icon + ", _title=" + _title + ", _hits=" + _hits + '}';
-	}*/
 
 
 	final void setHitsForegroundColor(final Color color) {
@@ -144,105 +126,54 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer {
 	}
 
 
-	/** Sets the color the text is drawn with when the node is selected.
-	 * @param newColor*/
 	final void setTextSelectionColor(final Color newColor) {
 		_textSelectionColor = newColor;
 	}
 
 
-	/** Returns the color the text is drawn with when the node is selected.
-	 * @return*/
 	Color getTextSelectionColor() {
 		return _textSelectionColor;
 	}
 
 
-	/** Sets the color the text is drawn with when the node is not selected.
-	 * @param newColor*/
 	final void setTextNonSelectionColor(final Color newColor) {
 		_textNonSelectionColor = newColor;
 	}
 
 
-	/** Returns the color the text is drawn with when the node is not selected.
-	 * @return*/
 	Color getTextNonSelectionColor() {
 		return _textNonSelectionColor;
 	}
 
 
-	/** Sets the color to use for the background if the node is selected.
-	 * @param newColor*/
 	final void setBackgroundSelectionColor(final Color newColor) {
 		_backgroundSelectionColor = newColor;
 	}
 
 
-	/** Returns the color to use for the background if the node is selected.
-	 * @return*/
 	Color getBackgroundSelectionColor() {
 		return _backgroundSelectionColor;
 	}
 
 
-	/** Sets the background color to be used for unselected nodes.
-	 * @param newColor*/
 	final void setBackgroundNonSelectionColor(final Color newColor) {
 		_backgroundNonSelectionColor = newColor;
 	}
 
 
-	/** Returns the background color to be used for unselected nodes.
-	 * @return*/
 	Color getBackgroundNonSelectionColor() {
 		return _backgroundNonSelectionColor;
 	}
 
 
-	/** Sets the color to use for the border.
-	 * @param newColor*/
 	final void setBorderSelectionColor(final Color newColor) {
 		_borderSelectionColor = newColor;
 	}
 
 
-	/** Returns the the border color.
-	 * @return*/
 	public Color getBorderSelectionColor() {
 		return _borderSelectionColor;
 	}
-
-
-	/** Subclassed to only accept the font if it is not a FontUIResource. */
-	/*@Override
-	public void setFont(Font font) {
-		if (font instanceof FontUIResource) {
-			//noinspection AssignmentToMethodParameter,AssignmentToNull
-			font = null;
-		}
-		if (font != null) {
-			if (_title != null) {
-				_title.setFont(font);
-			}
-
-			if (_hits != null) {
-				_hits.setFont(font);
-			}
-		}
-		super.setFont(font);
-	}*/
-
-
-	/** Subclassed to only accept the color if it is not a ColorUIResource. */
-	/*@Override
-	public void setBackground(Color color) {
-		if (color instanceof ColorUIResource) {
-			//noinspection AssignmentToMethodParameter,AssignmentToNull
-			color = null;
-		}
-		super.setBackground(color);
-	}*/
 
 
 	public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
@@ -260,6 +191,15 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer {
 			if (bColor == null) {
 				bColor = getBackground();
 			}
+
+			final TreePath path = tree.getPathForRow(row);
+			final TreePath selectionPath = tree.getSelectionPath();
+			if (selectionPath != null && tree.getRowForPath(selectionPath) > 0 && selectionPath.isDescendant(path)) {
+				setBackgroundNonSelectionColor(Tree.HIGHLIGHT_COLOR);
+			} else {
+				setBackgroundNonSelectionColor(UIManager.getColor("Tree.textBackground"));
+			}
+
 			_hits.setForeground(getHitsForegroundColor());
 			_hits.setBackground(bColor);
 			_title.setForeground(getTextNonSelectionColor());
@@ -267,7 +207,7 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer {
 		}
 
 		if (value != null) {
-
+			setLinkHtml("");
 			if (value instanceof BugInstanceNode) {
 				final BugInstanceNode bugInstanceNode = (BugInstanceNode) value;
 
@@ -301,7 +241,9 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer {
 				setToolTipText(rootNode.getTooltip());
 				setTitle(rootNode.getSimpleName());
 				final int bugCount = rootNode.getBugCount();
-				setHits(bugCount == -1 ? "" : " (found " + bugCount + " bug items in " + rootNode.getClassesCount() + " classes)");
+				final int classesCount = rootNode.getClassesCount();
+				setHits(bugCount == -1 ? "" : "(found " + bugCount + " bug items in " + classesCount + (classesCount == 1 ? " class)" : " classes)"));
+				setLinkHtml(rootNode.getLinkHtml());
 
 			} else if (value instanceof BugInstanceGroupNode) {
 				final BugInstanceGroupNode groupNode = (BugInstanceGroupNode) value;
@@ -319,7 +261,8 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer {
 
 				setToolTipText(groupNode.getTooltip());
 				setTitle(groupNode.getSimpleName());
-				setHits(" (" + groupNode.getMemberCount() + " items)");
+				final int memberCount = groupNode.getMemberCount();
+				setHits("(" + memberCount + (memberCount == 1 ? " item" : " items") + ')');
 
 			} else {
 				setIcon(null);
@@ -333,26 +276,6 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer {
 
 		return this;
 	}
-
-
-	/*@Override
-	public void paintComponent(final Graphics g) {
-		g.setColor(getBackground());
-
-		int offset = 0;
-		if (_title.getIcon() != null) {
-			offset = _title.getIcon().getIconWidth() + _title.getIconTextGap();
-		}
-
-		g.fillRect(offset, 0, (getWidth() - 1 - offset), (getHeight() - 1));
-
-		if (_selected) {
-			g.setColor(UIManager.getColor("Tree.selectionBorderColor"));
-			g.drawRect(offset, 0, (getWidth() - 1 - offset), (getHeight() - 1));
-		}
-
-		super.paintComponent(g);
-	}*/
 
 
 	/** Paints the value.  The background is filled based on selected color. */
@@ -398,27 +321,18 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer {
 		// call paintChildren and not paint so we don't
 		// erase everyting we've already done.
 		//super.paintComponent(g);
-		super.paintChildren(g);
+		paintChildren(g);
 
 	}
 
 
-	/*@Override
-	public Dimension getPreferredSize() {
-		return updateBounds();
-	}*/
-
-
 	private void updateBounds() {
-		/*invalidate();
-		_icon.invalidate();
-		_title.invalidate();
-		_hits.invalidate();*/
-
 		final Dimension size = _icon.getPreferredSize();
 		size.width += _title.getPreferredSize().width;
-		//size.width += _title.getFontMetrics(new Font(getFont().getName(), Font.BOLD, getFont().getSize())).stringWidth(_title.getText()) + 10;
 		size.width += _hits.getPreferredSize().width;
+		if (_link.getText().length() > 0) {
+			size.width += 50; //_link
+		}
 		size.width += _hGap; // BorderLayout hGap
 		size.height += 2;
 
@@ -427,8 +341,6 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer {
 		synchronized (getTreeLock()) {
 			validateTree();
 		}
-
-		//eturn size;
 	}
 
 
@@ -452,6 +364,11 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer {
 	}
 
 
+	private void setLinkHtml(final String html) {
+		_link.setText(html);
+	}
+
+
 	private static class ValueLabel extends JLabel {
 
 		private Graphics2D _g2D;
@@ -464,100 +381,13 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer {
 		}
 
 
-		/*@Override
-		public void paintComponent(final Graphics g) {
-			super.paintComponent(g);
-			final Insets insets = getInsets();
-			g.translate(insets.left, insets.top);
-			final int baseline = 150;
-
-			g.setFont(getFont());
-			final FontMetrics fm = g.getFontMetrics();
-
-			// Center line
-			final int width = getWidth() - insets.right;
-			final int stringWidth = fm.stringWidth(getText());
-			final int x = (width - stringWidth) / 2;
-
-			g.drawString(getText(), x, baseline);
-
-			final Graphics2D g2d = (Graphics2D) g;
-			final FontRenderContext frc = g2d.getFontRenderContext();
-			final Shape shape = getFont().getStringBounds(getText(), frc);
-			g.translate(x, baseline);
-			g2d.draw(shape);
-			g.translate(-x, -baseline);
-			g.translate(-insets.left, -insets.top);
-		}*/
-
-
-		/*@Override
-		public void setPreferredSize(final Dimension preferredSize) {
-			super.setPreferredSize(preferredSize);
-		}*/
-
-
 		@Override
 		public Dimension getPreferredSize() {
 			final Dimension size = super.getPreferredSize();
-			//size.width = SwingUtilities.computeStringWidth(getFontMetrics(getFont()), getText());
 			final FontMetrics fm = getFontMetrics(getFont());
-			//size.width = _g2D != null ? (int) fm.getStringBounds(getText() + 5, _g2D).getBounds2D().getWidth() : fm.stringWidth(getText()) + 5;
 			size.width = fm.stringWidth(getText()) + getInsets().left + getInsets().right + 5;
-
-			/*if (_g2D != null) {
-
-				final Rectangle2D r = _g2D.getFontMetrics(getFont()).getStringBounds(getText(), _g2D);
-				//size.width = getStringWidth(_g2D, getText());
-				return new Dimension((int) r.getWidth(), (int) r.getHeight());
-			}*/
-			/*if (_g2D != null) {
-				final TextLayout textLayout = new TextLayout(getText(), getFont(), _g2D.getFontRenderContext());
-				final Rectangle2D bounds = textLayout.getBounds();
-				final int width = (int) Math.ceil(bounds.getWidth()) + 5;
-				//final int height = (int) Math.ceil(bounds.getHeight());
-				size.width = width;
-			}*/
-
-			/*int w = 0;
-			int c = 0;
-			final StringTokenizer st = new StringTokenizer(getText(), " ");
-            while (st.hasMoreTokens()) {
-                final String s = st.nextToken();
-                w += fm.stringWidth(s);
-				c++;
-            }
-
-			size = new Dimension(w + (c * fm.stringWidth(" ")) + getInsets().left + getInsets().right + 5, size.height);*/
-
-
-			//final Graphics2D g2d = (Graphics2D) g;
-			//final FontMetrics fm = getFontMetrics(getFont());
-			//final Rectangle2D rect = fm.getStringBounds(getText(), getGraphics());
-			//final Rectangle2D rect = getFont().getStringBounds(getText(), g2d.getFontRenderContext());
-			//final Dimension size = new Dimension((int) rect.getHeight(), (int) rect.getWidth());
-			//setSize(size);
-			//setPreferredSize(size);
-			//setPreferredSize(size);
 			return size;
 		}
-	}
-
-
-	public static int getStringWidth(final Graphics g, final String s) {
-		int maxWidth = 0;
-
-		for (int i = 0, b = 0; i < s.length(); i++) {
-			if (s.charAt(i) == ' ' || i == s.length() - 1) {
-				final int w = g.getFontMetrics().stringWidth(s.substring(b, i + (i == s.length() - 1 ? 1 : 0)));
-
-				maxWidth = maxWidth > w ? maxWidth : w;
-
-				b = i + 1;
-			}
-		}
-
-		return maxWidth;
 	}
 
 	/** Overridden for performance reasons. See the <a href="#override">Implementation Note</a> for more information. */

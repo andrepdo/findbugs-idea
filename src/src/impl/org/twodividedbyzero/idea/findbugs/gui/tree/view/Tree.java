@@ -34,7 +34,7 @@ import java.awt.Rectangle;
 public abstract class Tree extends JTree {
 
 	private TreePath _highlightPath;
-	private final Color _highlightColor = new Color(255, 255, 204);
+	public static final Color HIGHLIGHT_COLOR = new Color(255, 255, 204);
 
 
 	public Tree(final TreeModel treeModel) {
@@ -80,7 +80,7 @@ public abstract class Tree extends JTree {
 		g.fillRect(0, 0, getWidth(), getHeight());
 
 		// paint the highlight if any
-		g.setColor(_highlightColor);
+		g.setColor(HIGHLIGHT_COLOR);
 		final int fromRow = getRowForPath(_highlightPath);
 		if (fromRow != -1) {
 			int toRow = fromRow;

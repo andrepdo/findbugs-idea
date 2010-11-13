@@ -96,7 +96,7 @@ public class BugTreePanel extends JPanel {
 		_parent = parent;
 		_project = project;
 		_preferences = IdeaUtilImpl.getPluginComponent(project).getPreferences();
-		_groupBy = GroupBy.getSortOrderGroup(GroupBy.BugCategory); // default sorder oder group
+		_groupBy = GroupBy.getSortOrderGroup(GroupBy.BugCategory); // default sort oder group
 
 		_visibleRootNode = new RootNode(_project.getName());
 		_treeModel = new GroupTreeModel(_visibleRootNode, _groupBy, _project);

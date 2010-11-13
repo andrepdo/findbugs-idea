@@ -42,18 +42,20 @@ public class FindBugsTask extends BackgroundableTask {
 	private static final Logger LOGGER = Logger.getInstance(FindBugsTask.class.getName());
 
 	private ProgressIndicator _indicator;
-	private IFindBugsEngine _engine;
-	private boolean _startInBackground;
+	private final IFindBugsEngine _engine;
+	private final boolean _startInBackground;
     private final SortedBugCollection _bugCollection;
+	private final edu.umd.cs.findbugs.Project _findBugsProject;
 
 
-    public FindBugsTask(@Nullable final Project project, SortedBugCollection bugCollection, @NotNull final String title, final boolean canBeCancelled, final IFindBugsEngine engine, final boolean startInBackground) {
+	public FindBugsTask(@Nullable final Project project, SortedBugCollection bugCollection, @NotNull final String title, final boolean canBeCancelled, final IFindBugsEngine engine, final boolean startInBackground) {
 		super(project, title, canBeCancelled);
         _bugCollection = bugCollection;
         setCancelText("Cancel");  // NON-NLS
 		asBackgroundable();
 		_startInBackground = startInBackground;
 		_engine = engine;
+		_findBugsProject = _engine.getProject();
 	}
 
 
@@ -82,12 +84,7 @@ public class FindBugsTask extends BackgroundableTask {
 		ApplicationManager.getApplication().invokeLater(new Runnable() {
 			public void run() {
 				_indicator.setText("FindBugs analysis...");
-				//performing some operations
-				//indicator.setFraction(0.2); // Activity percentage
 				_indicator.setIndeterminate(true);
-				//indicator.setFraction(0);
-				//_indicator.setText2("Bug count: 0");
-
 			}
 		});
 
@@ -134,5 +131,10 @@ public class FindBugsTask extends BackgroundableTask {
 	@Override
 	public ProgressIndicator getProgressIndicator() {
 		return _indicator;
+	}
+
+
+	public edu.umd.cs.findbugs.Project getFindBugsProject() {
+		return _findBugsProject;
 	}
 }

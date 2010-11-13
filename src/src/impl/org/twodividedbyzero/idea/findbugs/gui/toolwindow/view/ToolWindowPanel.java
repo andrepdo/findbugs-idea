@@ -24,6 +24,8 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogBuilder;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiFile;
 import edu.umd.cs.findbugs.BugCollection;
@@ -41,16 +43,26 @@ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.gui.common.ActionToolbarContainer;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitLayout;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitPane;
 import org.twodividedbyzero.idea.findbugs.gui.common.NDockLayout;
+import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
+import javax.swing.BorderFactory;
+import javax.swing.JEditorPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.html.HTMLEditorKit;
+import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -71,6 +83,8 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 	private static final Logger LOGGER = Logger.getInstance(ToolWindowPanel.class.getName());
 
+	private static final String A_HREF_MORE_ANCHOR = "#more";
+
 	///private static final String DEFAULT_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (COLUMN weight=0.3 right.top right.bottom) (LEAF name=right weight=0.4))";
 	private static final String DEFAULT_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.4) (LEAF name=right weight=0.6))";
 	private static final String PREVIEW_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (LEAF name=middle weight=0.4) (LEAF weight=0.3 name=right))";
@@ -87,6 +101,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 	private boolean _isPreviewLayoutEnabled;
 	private transient PreviewPanel _previewPanel;
 	private final transient ToolWindow _parent;
+	private FindBugsProject _bugsProject;
 
 
 	public ToolWindowPanel(final Project project, final ToolWindow parent) {
@@ -135,7 +150,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 
 	private MultiSplitPane getMultiSplitPane() {
-		if(_multiSplitPane == null) {
+		if (_multiSplitPane == null) {
 			_multiSplitPane = new MultiSplitPane();
 			_multiSplitPane.setContinuousLayout(true);
 		}
@@ -185,16 +200,15 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 
 	private PreviewPanel getPreviewPanel() {
-		if(_previewPanel == null) {
+		if (_previewPanel == null) {
 			_previewPanel = new PreviewPanel();
 		}
 		return _previewPanel;
 	}
 
-	
+
 	public void setPreviewEditor(@Nullable final Editor editor, final PsiFile psiFile) {
-		if(editor != null) {
-			//getPreviewPanel().releaseEditor();
+		if (editor != null) {
 			updateLayout(true);
 			getPreviewPanel().add(editor, psiFile);
 			resizeSplitNodes(this);
@@ -223,8 +237,18 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 	}
 
 
+	public Project getProject() {
+		return _project;
+	}
+
+
 	public BugCollection getBugCollection() {
 		return _bugTreePanel.getBugCollection();
+	}
+
+
+	public FindBugsProject getBugsProject() {
+		return _bugsProject;
 	}
 
 
@@ -245,7 +269,6 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON"})
 	public void onEvent(@NotNull final BugReporterEvent event) {
-		///LOGGER.debug(event.toString());
 
 		switch (event.getOperation()) {
 			case ANALYSIS_STARTED:
@@ -264,7 +287,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 				_bugTreePanel.setBugCollection(event.getBugCollection());
 				EventDispatchThreadHelper.invokeLater(new Runnable() {
 					public void run() {
-						final String text = "Analysis aborted..."; 
+						final String text = "Analysis aborted...";
 						BalloonTipFactory.showToolWindowInfoNotifier(text);
 					}
 				});
@@ -278,8 +301,29 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 				EventDispatchThreadHelper.invokeLater(new Runnable() {
 					public void run() {
 						_bugTreePanel.getBugTree().validate();
-						final String text = VersionManager.getName() + ": <b>found " + _bugTreePanel.getGroupModel().getBugCount() + " bugs in " + projectStats.getNumClasses() + (projectStats.getNumClasses() > 1 ? " classes" : " class") + "</b><br/>" + "<font size='10px'>using " + VersionManager.getFullVersion() + " with Findbugs version " + FindBugsUtil.getFindBugsFullVersion() + "</font>";
-						BalloonTipFactory.showToolWindowInfoNotifier(text);
+						final int numAnalysedClasses = projectStats.getNumClasses();
+
+						final StringBuilder message = new StringBuilder()
+								.append(VersionManager.getName())
+								.append(": <b>found ")
+								.append(_bugTreePanel.getGroupModel().getBugCount())
+								.append(" bugs in ")
+								.append(numAnalysedClasses)
+								.append(numAnalysedClasses > 1 ? " classes" : " class")
+								.append("</b>");
+
+						_bugsProject = event.getFindBugsProject();
+
+						if (numAnalysedClasses == 0) {
+							message.append("&nbsp; (no class files found <a href='").append(A_HREF_MORE_ANCHOR).append("'>more...</a>)<br/>");
+							message.append("<font size='10px'>using ").append(VersionManager.getFullVersion()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font>");
+							BalloonTipFactory.showToolWindowWarnNotifier(_project, message.toString(), new NotifierHyperlinkListener(ToolWindowPanel.this, _bugsProject));
+						} else {
+							message.append("&nbsp;<a href='").append(A_HREF_MORE_ANCHOR).append("'>more...</a><br/>");
+							message.append("<font size='10px'>using ").append(VersionManager.getFullVersion()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font>");
+							BalloonTipFactory.showToolWindowInfoNotifier(_project, message.toString(), new NotifierHyperlinkListener(ToolWindowPanel.this, _bugsProject));
+						}
+
 						EditorFactory.getInstance().refreshAllEditors();
 						DaemonCodeAnalyzer.getInstance(_project).restart();
 					}
@@ -299,6 +343,94 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 	}
 
 
+	public DialogBuilder createDetailsDialog(final int bugCount, final ProjectStats projectStats, final FindBugsProject bugsProject) {
+		final int numAnalysedClasses = projectStats.getNumClasses();
+
+		final List<String> fileList = bugsProject.getFileList();
+		final List<String> auxClasspathEntries = bugsProject.getAuxClasspathEntryList();
+		final VirtualFile[] configuredOutputFiles = bugsProject.getConfiguredOutputFiles();
+		//bugsProject.get
+
+		final StringBuilder html = new StringBuilder();
+		html.append("<html><body>");
+		html.append("<p><h2>").append(VersionManager.getName()).append(": <b>found ").append(bugCount).append(" bugs in ").append(numAnalysedClasses).append(numAnalysedClasses > 1 ? " classes" : " class").append("</b>").append("</h2></p>");
+		html.append("<p>").append("<font size='10px'>using ").append(VersionManager.getFullVersion()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font>").append("</p>");
+
+		html.append("<p><h3>ConfiguredOutputFiles").append(" <font color='gray'>(").append(configuredOutputFiles.length).append(")</h3></p>");
+		html.append("<ul>");
+		for (final VirtualFile file : configuredOutputFiles) {
+			html.append("<li>");
+			html.append(file.getPresentableName());
+			html.append("</li>");
+		}
+		html.append("</ul>");
+
+		html.append("<p><h3>CompileOutputPath").append(" <font size='9px' color='gray'>(").append("IDEA)</h3></p>");
+		html.append("<ul>");
+		for (final String auxClasspathEntry : auxClasspathEntries) {
+			//html.append("<li>");
+			//html.append(auxClasspathEntry);
+			//html.append("</li>");
+		}
+		html.append("</ul>");
+
+
+		html.append("<p><h3>SourceDirList ").append(" <font size='9px' color='gray'>(").append(bugsProject.getNumSourceDirs()).append(")</h3></p>");
+		html.append("<ul>");
+		final List<String> sourceDirList = bugsProject.getSourceDirList();
+		for (final String sourceDir : sourceDirList) {
+			html.append("<li>");
+			html.append(sourceDir);
+			html.append("</li>");
+		}
+		html.append("</ul>");
+
+
+		html.append("<p><h3>FileList ").append(" <font size='9px' color='gray'>(").append(bugsProject.getFileCount()).append(")</h3></p>");
+		html.append("<ul>");
+		for (final String file : fileList) {
+			html.append("<li>");
+			html.append(file);
+			html.append("</li>");
+		}
+		html.append("</ul>");
+
+		html.append("<p><h3>AuxClasspathEntries ").append(" <font size='9px' color='gray'>(").append(bugsProject.getNumAuxClasspathEntries()).append(")</h3></p>");
+		html.append("<ul>");
+		for (final String auxClasspathEntry : auxClasspathEntries) {
+			html.append("<li>");
+			html.append(auxClasspathEntry);
+			html.append("</li>");
+		}
+		html.append("</ul>");
+
+		html.append("</html></body>");
+
+
+		final DialogBuilder dialogBuilder = new DialogBuilder(_project);
+		dialogBuilder.addCloseButton();
+		dialogBuilder.setTitle("FindBugs analysis settings");
+		final JPanel panel = new JPanel(new BorderLayout());
+		panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+		final HTMLEditorKit htmlEditorKit = new HTMLEditorKit();
+		htmlEditorKit.setStyleSheet(GuiResources.EDITORPANE_STYLESHEET);
+		final JEditorPane jEditorPane = new JEditorPane();
+		jEditorPane.setPreferredSize(new Dimension(450, 600));
+		jEditorPane.setEditable(false);
+		jEditorPane.setContentType("text/html");
+		jEditorPane.setEditorKit(htmlEditorKit);
+
+
+		jEditorPane.setText(html.toString());
+
+		panel.add(new JScrollPane(jEditorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+		panel.setBorder(BorderFactory.createTitledBorder("FindBugs analysis run configuration"));
+		dialogBuilder.setCenterPanel(panel);
+		return dialogBuilder;
+	}
+
+
 	private ComponentListener createComponentListener() {
 		return new ToolWindowComponentAdapter(this);
 	}
@@ -307,7 +439,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 	private void resizeSplitNodes(final Component component) {
 		final int width = component.getWidth();
 		final int height = component.getHeight();
-		if(isPreviewEnabled() && getPreviewPanel().getEditor() != null) {
+		if (isPreviewEnabled() && getPreviewPanel().getEditor() != null) {
 			_bugDetailsComponents.adaptSize((int) (width * 0.3), height);
 			_bugTreePanel.adaptSize((int) (width * 0.3), height);
 		} else {
@@ -320,7 +452,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 
 	public BugTreePanel getBugTreePanel() {
-		if(_bugTreePanel == null) {
+		if (_bugTreePanel == null) {
 			_bugTreePanel = new BugTreePanel(this, _project);
 		}
 		return _bugTreePanel;
@@ -328,7 +460,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 
 	public BugDetailsComponents getBugDetailsComponents() {
-		if(_bugDetailsComponents == null) {
+		if (_bugDetailsComponents == null) {
 			_bugDetailsComponents = new BugDetailsComponents(this);
 		}
 		return _bugDetailsComponents;
@@ -366,6 +498,39 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 			super.componentMoved(e);
 			final Component component = e.getComponent();
 			_toolWindowPanel.resizeSplitNodes(component);
+		}
+	}
+
+	private static class NotifierHyperlinkListener implements HyperlinkListener {
+
+		private final FindBugsProject _bugsProject;
+		private final ToolWindowPanel _toolWindowPanel;
+
+
+		private NotifierHyperlinkListener(final ToolWindowPanel toolWindowPanel, final FindBugsProject bugsProject) {
+			_bugsProject = bugsProject;
+			_toolWindowPanel = toolWindowPanel;
+		}
+
+
+		public void hyperlinkUpdate(final HyperlinkEvent e) {
+			if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+				final String desc = e.getDescription();
+				if (desc.equals(A_HREF_MORE_ANCHOR)) {
+					_toolWindowPanel.createDetailsDialog(_toolWindowPanel.getBugTreePanel().getGroupModel().getBugCount(), _toolWindowPanel.getBugCollection().getProjectStats(), _bugsProject).showModal(false);;
+				}
+			}
+		}
+
+
+		@Override
+		public String toString() {
+			final StringBuilder sb = new StringBuilder();
+			sb.append("NotifierHyperlinkListener");
+			sb.append("{_bugsProject=").append(_bugsProject);
+			sb.append(", _toolWindowPanel=").append(_toolWindowPanel);
+			sb.append('}');
+			return sb.toString();
 		}
 	}
 }

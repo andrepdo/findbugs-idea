@@ -38,6 +38,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspecti
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.tasks.FindBugsTask;
 
@@ -77,9 +78,10 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 	@NonNls
 	private String _currentStageName;
 	private static final String ANALYZING_CLASSES_i18N = "Analyzing classes: ";
-	private boolean _isInspectionRun;
+	private final boolean _isInspectionRun;
 	private boolean _isRunning;
-	private FindBugsPreferences _preferences;
+	private final FindBugsPreferences _preferences;
+	private final FindBugsProject _findBugsProject;
 
 
 	/**
@@ -87,18 +89,19 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 	 *
 	 * @param project the project whose classes are being analyzed for bugs
 	 */
-	public BugReporter(final Project project, SortedBugCollection bugCollection) {
-		this(project, false, bugCollection);
+	public BugReporter(final Project project, SortedBugCollection bugCollection, final FindBugsProject findBugsProject) {
+		this(project, false, bugCollection, findBugsProject);
 	}
 
 
-	public BugReporter(final Project project, final boolean isInspectionRun, SortedBugCollection bugCollection) {
+	public BugReporter(final Project project, final boolean isInspectionRun, SortedBugCollection bugCollection, final FindBugsProject findBugsProject) {
 		//this.monitor = monitor;
 		_project = project;
         FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(project);
         _preferences = pluginComponent.getPreferences();
 		_isInspectionRun = isInspectionRun;
 		_bugCollection = bugCollection;
+		_findBugsProject = findBugsProject;
 	}
 
 
@@ -200,16 +203,11 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 		}
 
 		if (_isInspectionRun) {
-			EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent.Operation.ANALYSIS_FINISHED, null, getBugCollection(), _project.getName()));
+			EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent.Operation.ANALYSIS_FINISHED, null, getBugCollection(), _project.getName(), _findBugsProject));
 		} else {
-			EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_FINISHED, null, getBugCollection(), _project.getName()));
+			EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_FINISHED, null, getBugCollection(), _project.getName(), _findBugsProject));
 		}
 
-		/*InfoPopup.popup(_warningButton, "Changelist Collision Detected!", ResourcesLoader.loadIcon(GuiResources.FINDBUGS_ICON), "Click here to clear this alert and open the Changes toolwindow.", new AbstractAction() {
-			public void actionPerformed(final ActionEvent e) {
-				//showChangesToolwindow(_projectComponent.getProject());
-			}
-		}, 0);*/
 		setRunning(false);
 	}
 

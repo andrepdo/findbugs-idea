@@ -70,6 +70,14 @@ public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements Vis
 	}
 
 
+	public String getLinkHtml() {
+		if (_bugCount > -1) {
+			return new StringBuilder().append("<html><body>").append(" <a href='#more'>more...</a>").append("</body></html>").toString();
+		}
+		return "";
+	}
+
+
 	/**
 	 * Perfomrs a deep search. Get child BugInstanceGroupNode by BugInstance group name.
 	 *

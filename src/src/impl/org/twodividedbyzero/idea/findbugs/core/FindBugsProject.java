@@ -38,6 +38,7 @@ public class FindBugsProject extends Project {
 
 	private static final Logger LOGGER = Logger.getInstance(FindBugsProject.class.getName());
 	private VirtualFile[] _outputFiles;
+	private static final VirtualFile[] EMPTY_VIRTUAL_FILES_ARRAY = new VirtualFile[]{};
 	//private RecurseCollectorTask _collectorTask;
 
 
@@ -137,7 +138,7 @@ public class FindBugsProject extends Project {
 
 
 	public VirtualFile[] getConfiguredOutputFiles() {
-		return _outputFiles.clone();
+		return _outputFiles != null ? _outputFiles.clone() : EMPTY_VIRTUAL_FILES_ARRAY;
 	}
 
 

@@ -1,0 +1,676 @@
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/PluginConfiguration.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/PluginConfiguration.java	(revision 117)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/PluginConfiguration.java	(revision )
+@@ -16,28 +16,33 @@
+ 
+ package org.twodividedbyzero.idea.findbugs.gui.preferences;
+ 
++import com.intellij.openapi.ui.Messages;
++import edu.umd.cs.findbugs.BugCollection;
++import edu.umd.cs.findbugs.Plugin;
++import edu.umd.cs.findbugs.PluginException;
++import edu.umd.cs.findbugs.Project;
+ import info.clearthought.layout.TableLayout;
+-import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
+-import org.twodividedbyzero.idea.findbugs.gui.common.ExtensionFileFilter;
+ import org.twodividedbyzero.idea.findbugs.gui.preferences.BrowseAction.BrowseActionCallback;
++import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
+ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+ 
+ import javax.swing.AbstractButton;
+ import javax.swing.Action;
+ import javax.swing.BorderFactory;
+-import javax.swing.DefaultListModel;
++import javax.swing.BoxLayout;
+ import javax.swing.JButton;
+-import javax.swing.JList;
++import javax.swing.JCheckBox;
+ import javax.swing.JPanel;
+ import javax.swing.JScrollPane;
+-import javax.swing.ListSelectionModel;
+-import javax.swing.event.ListSelectionEvent;
+-import javax.swing.event.ListSelectionListener;
++import javax.swing.SwingConstants;
++import javax.swing.border.EmptyBorder;
++import javax.swing.filechooser.FileNameExtensionFilter;
+ import java.awt.Component;
+ import java.awt.Container;
+ import java.awt.event.ActionEvent;
+ import java.awt.event.ActionListener;
+ import java.io.File;
++import java.net.MalformedURLException;
+ 
+ 
+ /**
+@@ -53,10 +58,10 @@
+ 	private final ConfigurationPanel _parent;
+ 	private Component _component;
+ 	private JPanel _pluginsPanel;
+-	private JList _pluginList;
++    private JPanel _checkboxPanel;
+ 
+ 
+-	public PluginConfiguration(final ConfigurationPanel parent, final FindBugsPreferences preferences) {
++    public PluginConfiguration(final ConfigurationPanel parent, final FindBugsPreferences preferences) {
+ 		//noinspection AssignmentToCollectionOrArrayFieldFromParameter
+ 		_preferences = preferences;
+ 		_parent = parent;
+@@ -66,8 +71,6 @@
+ 	public Component getComponent() {
+ 		if (_component == null) {
+ 			final double border = 5;
+-			final double rowsGap = 5;
+-			final double colsGap = 10;
+ 			final double[][] size = {{border, TableLayout.FILL, border}, // Columns
+ 									 {border, TableLayout.PREFERRED, border}};// Rows
+ 			final TableLayout tbl = new TableLayout(size);
+@@ -83,23 +86,48 @@
+ 
+ 
+ 	public void updatePreferences() {
+-		clearModels();
+-		syncModels();
++        rebuildCheckboxes();
+ 	}
+ 
++    private void rebuildCheckboxes() {
++        if (_checkboxPanel == null)
++            return;
++        _checkboxPanel.removeAll();
++        final Project currentProject = getCurrentProject();
++        for (final Plugin plugin : Plugin.getAllPlugins()) {
++            if (plugin.isCorePlugin())
++                continue;
++            String text = plugin.getShortDescription();
++            String id = plugin.getPluginId();
++            if (text == null)
++                text = id;
++            String pluginUrl = plugin.getPluginLoader().getURL().toExternalForm();
++            text = String.format("<html>%s<br><font style='font-weight:normal;font-style:italic'>%s",
++                    text, pluginUrl);
+ 
+-	private void syncModels() {
+-		for (final String s : _preferences.getPlugins()) {
+-			getModel(getPluginList()).addElement(s);
++            boolean enabled = isEnabled(currentProject, plugin);
++            final JCheckBox checkbox = new JCheckBox(text, enabled);
++            checkbox.setVerticalTextPosition(SwingConstants.TOP);
++            String longText = plugin.getDetailedDescription();
++            if (longText != null)
++                checkbox.setToolTipText("<html>" + longText +"</html>");
++            checkbox.setSelected(!_preferences.isPluginDisabled(plugin.getPluginId()));
++            checkbox.addActionListener(new ActionListener() {
++                public void actionPerformed(ActionEvent e) {
++                    _preferences.enablePlugin(plugin.getPluginId(), checkbox.isSelected());
++                    _preferences.setModified(true);
+-		}
++                }
++            });
++            _checkboxPanel.add(checkbox);
+-	}
++		}
++    }
+ 
+-
+-	private void clearModels() {
+-		getModel(getPluginList()).clear();
++    private boolean isEnabled(Project project, Plugin plugin) {
++        if (project == null)
++            return plugin.isGloballyEnabled();
++        return project.getPluginStatus(plugin);
+-	}
++    }
+ 
+-
+ 	JPanel getPluginPanel() {
+ 		if (_pluginsPanel == null) {
+ 
+@@ -111,13 +139,12 @@
+ 			_pluginsPanel = new JPanel(tbl);
+ 			_pluginsPanel.setBorder(BorderFactory.createTitledBorder("Plugins"));
+ 
+-			final DefaultListModel model = new DefaultListModel();
++            _checkboxPanel = new JPanel();
++            _checkboxPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
++            _checkboxPanel.setLayout(new BoxLayout(_checkboxPanel, BoxLayout.Y_AXIS));
++            rebuildCheckboxes();
+ 
+-			_pluginList = new JList(model);
+-			_pluginList.setVisibleRowCount(30);
+-			_pluginList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+-
+-			final Component scrollPane = new JScrollPane(_pluginList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
++			final Component scrollPane = new JScrollPane(_checkboxPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+ 			_pluginsPanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
+ 
+ 
+@@ -130,80 +157,51 @@
+ 			_pluginsPanel.add(buttonPanel, "3, 1, 3, 1");
+ 
+ 			final AbstractButton addButton = new JButton();
+-			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.ARCHIVE_EXTENSION_SET), new BrowseActionCallback() {
++			final Action action = new BrowseAction(_parent, "Install New Plugin...", 
++                                                   new FileNameExtensionFilter("FindBugs Plugins (*.jar)", "jar"),
++                                                   new BrowseActionCallback() {
+ 				public void addSelection(final File selectedFile) {
+-					((DefaultListModel) _pluginList.getModel()).addElement(selectedFile.getAbsolutePath());
+-					_preferences.getPlugins().add(selectedFile.getAbsolutePath());
++                    try {
++                        Plugin.loadPlugin(selectedFile, getCurrentProject());
++                        try {
++                            _preferences.addPlugin(selectedFile.toURI().toURL().toExternalForm());
++                        } catch (MalformedURLException e) {
++                            Messages.showErrorDialog(e.getMessage(), e.getClass().getSimpleName());
++                        }
++                        updatePreferences();
++                    } catch (PluginException e) {
++                        Messages.showErrorDialog(_parent,
++                                                 "Error loading " + selectedFile.getPath() + ":\n\n"
++                                                 + e.getClass().getSimpleName() + ": " + e.getMessage(),
++                                                 "Error loading plugin");
++                    }
+-					_preferences.setModified(true);
++                    _preferences.setModified(true);
+ 				}
+ 			});
+ 			addButton.setAction(action);
+ 			buttonPanel.add(addButton, "1, 1, 1, 1");
+ 
+-			final AbstractButton removeButton = new JButton("Remove") {
+-				@Override
+-				public boolean isEnabled() {
+-					return super.isEnabled() && _pluginList.getSelectedIndex() > -1;
+-				}
++		}
+-			};
+-			removeButton.addActionListener(new RemoveActionListener());
+-			buttonPanel.add(removeButton, "1, 3, 1, 3");
+ 
+-			_pluginList.addListSelectionListener(new PluginListSelectionListener(removeButton));
+-		}
+-
+ 		return _pluginsPanel;
+ 	}
+ 
+-
+-
+-
+-
+-	JList getPluginList() {
+-		if(_pluginList == null) {
+-			getPluginPanel();
++    private Project getCurrentProject() {
++        ToolWindowPanel panel = _parent.getFindBugsPlugin().getToolWindowPanel();
++        if (panel == null)
++            return null;
++        BugCollection bugCollection = panel.getBugCollection();
++        if (bugCollection == null)
++            return null;
++        return bugCollection.getProject();
+-		}
++    }
+-		return _pluginList;
+-	}
+ 
+-
+-	private static DefaultListModel getModel(final JList list) {
+-		return (DefaultListModel) list.getModel();
++    public void setEnabled(boolean enabled) {
++        _pluginsPanel.setEnabled(enabled);
+-	}
++    }
+ 
+-
+-	public void setEnabled(final boolean enabled) {
+-		getPluginList().setEnabled(enabled);
+-	}
+-
+-
+-	public boolean showInModulePreferences() {
++    public boolean showInModulePreferences() {
+ 		return false;
+ 	}
+ 
+-
+-	private class RemoveActionListener implements ActionListener {
+-
+-		public void actionPerformed(final ActionEvent e) {
+-			final int index = _pluginList.getSelectedIndex();
+-			getModel(_pluginList).remove(index);
+-			_preferences.removePlugin(index);
+-		}
++}
+\ No newline at end of file
+-	}
+-
+-	private static class PluginListSelectionListener implements ListSelectionListener {
+-
+-		private final AbstractButton _removeButton;
+-
+-
+-		private PluginListSelectionListener(final AbstractButton removeButton) {
+-			_removeButton = removeButton;
+-		}
+-
+-
+-		public void valueChanged(final ListSelectionEvent e) {
+-			_removeButton.setEnabled(!e.getValueIsAdjusting() && e.getFirstIndex() >= 0);
+-
+-		}
+-	}
+-}
+\ No newline at end of file
+Index: src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPluginImpl.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPluginImpl.java	(revision 138)
++++ src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsPluginImpl.java	(revision )
+@@ -400,6 +400,7 @@
+ 
+ 
+ 	public void reset() {
++        //TODO: what??
+ 	}
+ 
+ 
+@@ -435,6 +436,9 @@
+ 			_preferences = getEmptyPreferences(state.getPlugins());
+ 			//_preferences.clear();
+ 			_preferences.setPlugins(state.getPlugins()); // needs to be set first before DetectorFactoryCollection instance is created first
++            _preferences.setEnabledPlugins(state.getEnabledPlugins());
++            _preferences.setDisabledPlugins(state.getDisabledPlugins());
++
+ 			for (final String key : state.getBasePreferences().keySet()) {
+ 				_preferences.setProperty(key, state.getBasePreferences().get(key));
+ 			}
+@@ -486,6 +490,8 @@
+ 		preferencesBean.getExcludeFilters().addAll(_preferences.getExcludeFilters());
+ 		preferencesBean.getExcludeBaselineBugs().addAll(_preferences.getExcludeBaselineBugs());
+ 		preferencesBean.getPlugins().addAll(_preferences.getPlugins());
++        preferencesBean.getEnabledPlugins().addAll(_preferences.getEnabledPlugins());
++        preferencesBean.getDisabledPlugins().addAll(_preferences.getDisabledPlugins());
+ 
+ 		preferencesBean.getEnabledModuleConfigs().addAll(_preferences.getEnabledModuleConfigs());
+ 
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java	(revision 140)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java	(revision )
+@@ -222,8 +222,11 @@
+ 		}
+ 	}
+ 
++    public Project getProject() {
++        return _project;
++    }
+ 
+-	public BugCollection getBugCollection() {
++    public BugCollection getBugCollection() {
+ 		return _bugTreePanel.getBugCollection();
+ 	}
+ 
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.java	(revision 138)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.java	(revision )
+@@ -31,28 +31,14 @@
+ import edu.umd.cs.findbugs.cloud.Cloud;
+ import edu.umd.cs.findbugs.cloud.Cloud.UserDesignation;
+ import edu.umd.cs.findbugs.cloud.CloudPlugin;
++import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
++import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+ import sun.swing.SwingUtilities2;
+ 
+-import javax.swing.BorderFactory;
+-import javax.swing.DefaultComboBoxModel;
+-import javax.swing.JButton;
+-import javax.swing.JComboBox;
+-import javax.swing.JComponent;
+-import javax.swing.JEditorPane;
+-import javax.swing.JLabel;
+-import javax.swing.JPanel;
+-import javax.swing.JScrollPane;
+-import javax.swing.JTextArea;
++import javax.swing.*;
+ import javax.swing.text.BadLocationException;
+ import javax.swing.text.html.HTMLDocument;
+-import java.awt.BorderLayout;
+-import java.awt.Color;
+-import java.awt.Dimension;
+-import java.awt.Font;
+-import java.awt.GridBagConstraints;
+-import java.awt.GridBagLayout;
+-import java.awt.Insets;
+-import java.awt.RenderingHints;
++import java.awt.*;
+ import java.awt.event.ActionEvent;
+ import java.awt.event.ActionListener;
+ import java.util.ArrayList;
+@@ -165,7 +151,10 @@
+ 				final List<CloudPlugin> plugins = new ArrayList<CloudPlugin>();
+ 				final List<String> descriptions = new ArrayList<String>();
+ 				for (CloudPlugin plugin : DetectorFactoryCollection.instance().getRegisteredClouds().values()) {
+-					if (!plugin.isHidden()) {
++                    FindBugsPlugin findBugsPlugin = _toolWindowPanel.getProject().getComponent(FindBugsPlugin.class);
++                    FindBugsPreferences prefs = findBugsPlugin.getPreferences();
++                    boolean disabled = prefs.isPluginDisabled(plugin.getFindbugsPluginId());
++                    if (!disabled && !plugin.isHidden()) {
+ 						descriptions.add(plugin.getDescription());
+ 						plugins.add(plugin);
+ 					}
+Index: src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsWorker.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsWorker.java	(revision 137)
++++ src/impl/org/twodividedbyzero/idea/findbugs/core/FindBugsWorker.java	(revision )
+@@ -26,11 +26,7 @@
+ import com.intellij.openapi.project.Project;
+ import com.intellij.openapi.vfs.VirtualFile;
+ import com.intellij.psi.PsiClass;
+-import edu.umd.cs.findbugs.BugInstance;
+-import edu.umd.cs.findbugs.DetectorFactoryCollection;
+-import edu.umd.cs.findbugs.FindBugs2;
+-import edu.umd.cs.findbugs.IFindBugsEngine;
+-import edu.umd.cs.findbugs.SortedBugCollection;
++import edu.umd.cs.findbugs.*;
+ import edu.umd.cs.findbugs.config.ProjectFilterSettings;
+ import edu.umd.cs.findbugs.config.UserPreferences;
+ import org.dom4j.DocumentException;
+@@ -141,6 +137,9 @@
+ 
+ 		_findBugsProject = new FindBugsProject();
+ 		_findBugsProject.setProjectName(_project.getName());
++        for (Plugin plugin : Plugin.getAllPlugins()) {
++            _findBugsProject.setPluginStatus(plugin, !preferences.isPluginDisabled(plugin.getPluginId()));
++        }
+ 
+         _bugCollection = new SortedBugCollection();
+         FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(_project);
+Index: src/impl/org/twodividedbyzero/idea/findbugs/preferences/FindBugsPreferences.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/preferences/FindBugsPreferences.java	(revision 137)
++++ src/impl/org/twodividedbyzero/idea/findbugs/preferences/FindBugsPreferences.java	(revision )
+@@ -19,24 +19,13 @@
+ import edu.umd.cs.findbugs.DetectorFactory;
+ import edu.umd.cs.findbugs.DetectorFactoryCollection;
+ import edu.umd.cs.findbugs.I18N;
++import edu.umd.cs.findbugs.Plugin;
+ import edu.umd.cs.findbugs.config.ProjectFilterSettings;
+ import edu.umd.cs.findbugs.config.UserPreferences;
+ import org.jetbrains.annotations.NotNull;
+-import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
+ 
+-import java.io.File;
+-import java.net.MalformedURLException;
+ import java.net.URL;
+-import java.util.ArrayList;
+-import java.util.Arrays;
+-import java.util.Collection;
+-import java.util.Collections;
+-import java.util.Enumeration;
+-import java.util.HashMap;
+-import java.util.Iterator;
+-import java.util.List;
+-import java.util.Map;
+-import java.util.Properties;
++import java.util.*;
+ 
+ 
+ /**
+@@ -87,7 +76,12 @@
+ 	public transient List<String> _includeFilters;
+ 	public transient List<String> _excludeFilters;
+ 	public transient List<String> _excludeBaselineBugs;
++    /** URL's of extra plugins to load */
+ 	public transient List<String> _plugins;
++    /** A list of plugin ID's */
++    public transient List<String> _disabledPlugins;
++    /** A list of plugin ID's */
++    public transient List<String> _enabledPlugins;
+ 
+ 	public transient List<String> _enabledModuleConfigs;
+ 
+@@ -108,6 +102,8 @@
+ 		_excludeFilters = new ArrayList<String>();
+ 		_excludeBaselineBugs = new ArrayList<String>();
+ 		_plugins = new ArrayList<String>();
++		_enabledPlugins = new ArrayList<String>();
++		_disabledPlugins = new ArrayList<String>();
+ 		_enabledModuleConfigs = new ArrayList<String>();
+ 		_userPreferences = UserPreferences.createDefaultUserPreferences();
+ 	}
+@@ -290,26 +286,16 @@
+ 	}
+ 
+ 
+-	public static void loadPlugins(final List<String> pluginList) {
+-		if (pluginList != null && !pluginList.isEmpty()) {
+-			final URL[] result = new URL[pluginList.size()];
+-			for (int i = 0; i < pluginList.size(); i++) {
+-				final String s = pluginList.get(i);
++	public static void loadPlugins(final List<String> pluginUrls) {
++        for (String pluginUrl : pluginUrls) {
+-				try {
++            try {
+-					result[i] = new File(s).toURI().toURL();
+-				} catch (MalformedURLException e) {
+-					throw new FindBugsPluginException("plugin '" + s + "' can not be injected.", e);
++                Plugin plugin = Plugin.loadPlugin(new URL(pluginUrl), null);
++                plugin.setGloballyEnabled(false);
++            } catch (Exception e) {
++                e.printStackTrace();
+-				}
+-			}
++            }
++        }
+-
+-			try {
+-				getDetectorFactorCollection().setPluginList(result);
+-				//getDetectorFactorCollection().ensureLoaded();
+-			} catch (IllegalStateException e) {
+-				throw new FindBugsPluginException("Plugin needs to be set first before DetectorFactoryCollection instance is created.", e);
+-			}
++	}
+-		}
+-	}
+ 
+ 
+ 	public void setIncludeFilters(final List<String> includeFilters) {
+@@ -504,6 +490,8 @@
+ 		getExcludeBaselineBugs().clear();
+ 		getEnabledModuleConfigs().clear();
+ 		getPlugins().clear();
++        _enabledPlugins.clear();
++        _disabledPlugins.clear();
+ 		setModified(true);
+ 	}
+ 
+@@ -612,4 +600,33 @@
+ 	}
+ 
+ 
++    public void enablePlugin(String pluginId, boolean selected) {
++        if (selected) {
++            _enabledPlugins.add(pluginId);
++            _disabledPlugins.remove(pluginId);
++        } else {
++            _enabledPlugins.remove(pluginId);
++            _disabledPlugins.add(pluginId);
+-}
++        }
++    }
++
++    public List<String> getDisabledPlugins() {
++        return _disabledPlugins;
++    }
++
++    public List<String> getEnabledPlugins() {
++        return _enabledPlugins;
++    }
++
++    public void setDisabledPlugins(List<String> disabledPlugins) {
++        _disabledPlugins = disabledPlugins;
++    }
++
++    public void setEnabledPlugins(List<String> enabledPlugins) {
++        _enabledPlugins = enabledPlugins;
++    }
++
++    public boolean isPluginDisabled(String pluginId) {
++        return _disabledPlugins.contains(pluginId);
++    }
++}
+Index: src/impl/org/twodividedbyzero/idea/findbugs/preferences/PersistencePreferencesBean.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/preferences/PersistencePreferencesBean.java	(revision 117)
++++ src/impl/org/twodividedbyzero/idea/findbugs/preferences/PersistencePreferencesBean.java	(revision )
+@@ -41,6 +41,8 @@
+ 	public List<String> _excludeFilters;
+ 	public List<String> _excludeBaselineBugs;
+ 	public List<String> _plugins;
++	public List<String> _enabledPlugins;
++	public List<String> _disabledPlugins;
+ 
+ 	public List<String> _enabledModuleConfigs;
+ 
+@@ -55,6 +57,8 @@
+ 		_excludeFilters = new ArrayList<String>();
+ 		_excludeBaselineBugs = new ArrayList<String>();
+ 		_plugins = new ArrayList<String>();
++		_enabledPlugins = new ArrayList<String>();
++		_disabledPlugins = new ArrayList<String>();
+ 
+ 		_enabledModuleConfigs = new ArrayList<String>();
+ 	}
+@@ -101,8 +105,15 @@
+ 		return _plugins;
+ 	}
+ 
++    public List<String> getEnabledPlugins() {
++        return _enabledPlugins;
++    }
+ 
++    public List<String> getDisabledPlugins() {
++        return _disabledPlugins;
++    }
++
+-	public List<String> getEnabledModuleConfigs() {
++    public List<String> getEnabledModuleConfigs() {
+ 		//noinspection ReturnOfCollectionOrArrayField
+ 		return _enabledModuleConfigs;
+ 	}
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ConfigurationPanel.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ConfigurationPanel.java	(revision 137)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ConfigurationPanel.java	(revision )
+@@ -94,8 +94,11 @@
+ 		}
+ 	}
+ 
++    public FindBugsPlugin getFindBugsPlugin() {
++        return _plugin;
++    }
+ 
+-	private void initGui() {
++    private void initGui() {
+ 		add(getMainPanel());
+ 	}
+ 
+@@ -274,18 +277,18 @@
+ 	private Component getTabbedPane() {
+ 		if (_tabbedPane == null) {
+ 			_tabbedPane = new JTabbedPane();
+-			_tabbedPane.addTab("Detector configuration", getDetectorConfig().getComponent());
+-			_tabbedPane.addTab("Reporter configuration", getReporterConfig().getComponent());
+-			_tabbedPane.addTab("Filter configuration", getFilterConfig().getComponent());
++			_tabbedPane.addTab("Detectors", getDetectorConfig().getComponent());
++			_tabbedPane.addTab("Reporting", getReporterConfig().getComponent());
++			_tabbedPane.addTab("Filters", getFilterConfig().getComponent());
+ 
+ 			if (!_plugin.isModuleComponent()) {
+-				_tabbedPane.addTab("Plugin configuration", getPluginConfig().getComponent());
++				_tabbedPane.addTab("Plugins", getPluginConfig().getComponent());
+ 			}
+ 			if (!_plugin.isModuleComponent()) {
+-				_tabbedPane.addTab("Import/Export configuration", getImportExportConfig().getComponent());
++				_tabbedPane.addTab("Import/Export", getImportExportConfig().getComponent());
+ 			}
+ 			if (!_plugin.isModuleComponent()) {
+-				_tabbedPane.addTab("Annotation & QuickFix configuration", getAnnotationConfig().getComponent());
++				_tabbedPane.addTab("Annotations", getAnnotationConfig().getComponent());
+ 			}
+ 		}
+ 		return _tabbedPane;
+Index: src/impl/org/twodividedbyzero/idea/findbugs/actions/ImportBugCollection.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/actions/ImportBugCollection.java	(revision 133)
++++ src/impl/org/twodividedbyzero/idea/findbugs/actions/ImportBugCollection.java	(revision )
+@@ -28,10 +28,7 @@
+ import com.intellij.openapi.ui.MessageType;
+ import com.intellij.openapi.ui.Messages;
+ import com.intellij.openapi.wm.ToolWindow;
+-import edu.umd.cs.findbugs.BugCollection;
+-import edu.umd.cs.findbugs.BugInstance;
+-import edu.umd.cs.findbugs.ProjectStats;
+-import edu.umd.cs.findbugs.SortedBugCollection;
++import edu.umd.cs.findbugs.*;
+ import org.dom4j.DocumentException;
+ import org.jetbrains.annotations.NotNull;
+ import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
+@@ -46,6 +43,7 @@
+ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+ import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+ import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
++import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
+ import org.twodividedbyzero.idea.findbugs.gui.common.ImportFileDialog;
+ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+ import org.twodividedbyzero.idea.findbugs.tasks.BackgroundableTask;
+@@ -68,9 +66,9 @@
+ 	private static final Logger LOGGER = Logger.getInstance(ImportBugCollection.class.getName());
+ 
+ 	private boolean _enabled;
+-	private BugCollection _bugCollection;
++	private SortedBugCollection _bugCollection;
+ 	private boolean _running;
+-	private BugCollection _importBugCollection;
++	private SortedBugCollection _importBugCollection;
+ 
+ 
+ 	@Override
+@@ -146,8 +144,15 @@
+ 				indicator.setIndeterminate(false);
+ 				indicator.setText(fileToImport);
+ 				try {
+-					_bugCollection = new SortedBugCollection();
++                    _bugCollection = new SortedBugCollection();
++                    FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(project);
+-					_importBugCollection = _bugCollection.createEmptyCollectionWithMetadata();
++                    _importBugCollection = _bugCollection.createEmptyCollectionWithMetadata();
++                    edu.umd.cs.findbugs.Project importProject = _importBugCollection.getProject();
++                    importProject.setGuiCallback(new PluginGuiCallback(pluginComponent));
++                    _importBugCollection.setDoNotUseCloud(true);
++                    for (Plugin plugin : Plugin.getAllPlugins()) {
++                        importProject.setPluginStatus(plugin, !preferences.isPluginDisabled(plugin.getPluginId()));
++                    }
+ 					_importBugCollection.readXML(fileToImport);
+ 
+ 					final ProjectStats projectStats = _importBugCollection.getProjectStats();
+@@ -166,6 +171,10 @@
+ 					}
+ 
+ 					showToolWindowNotifier("Imported bug collection from '" + fileToImport + "'.", MessageType.INFO);
++
++                    _importBugCollection.setDoNotUseCloud(false);
++                    _importBugCollection.setTimestamp(System.currentTimeMillis());
++                    _importBugCollection.reinitializeCloud();
+ 				} catch (IOException e1) {
+ 					EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_ABORTED, project.getName()));
+ 					final String message = "Import failed";
+@@ -267,7 +276,7 @@
+ 				setRunning(false);
+ 				break;
+ 			case ANALYSIS_FINISHED:
+-				_bugCollection = event.getBugCollection();
++				_bugCollection = (SortedBugCollection) event.getBugCollection();
+ 				setEnabled(true);
+ 				setRunning(false);
+ 				break;

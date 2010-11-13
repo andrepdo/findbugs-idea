@@ -22,6 +22,7 @@ import edu.umd.cs.findbugs.ProjectStats;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.event.Event;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 
 
 /**
@@ -66,5 +67,9 @@ public interface BugReporterEvent extends Event {
 	 */
 	@NotNull
 	String getProjectName();
+
+
+	@Nullable
+	FindBugsProject getFindBugsProject();
 
 }

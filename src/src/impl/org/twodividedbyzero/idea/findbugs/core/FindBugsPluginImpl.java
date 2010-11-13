@@ -400,6 +400,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 
 	public void reset() {
+		//TODO: what??
 	}
 
 
@@ -435,6 +436,9 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 			_preferences = getEmptyPreferences(state.getPlugins());
 			//_preferences.clear();
 			_preferences.setPlugins(state.getPlugins()); // needs to be set first before DetectorFactoryCollection instance is created first
+			_preferences.setEnabledPlugins(state.getEnabledPlugins());
+			_preferences.setDisabledPlugins(state.getDisabledPlugins());
+
 			for (final String key : state.getBasePreferences().keySet()) {
 				_preferences.setProperty(key, state.getBasePreferences().get(key));
 			}
@@ -486,6 +490,8 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 		preferencesBean.getExcludeFilters().addAll(_preferences.getExcludeFilters());
 		preferencesBean.getExcludeBaselineBugs().addAll(_preferences.getExcludeBaselineBugs());
 		preferencesBean.getPlugins().addAll(_preferences.getPlugins());
+		preferencesBean.getEnabledPlugins().addAll(_preferences.getEnabledPlugins());
+		preferencesBean.getDisabledPlugins().addAll(_preferences.getDisabledPlugins());
 
 		preferencesBean.getEnabledModuleConfigs().addAll(_preferences.getEnabledModuleConfigs());
 

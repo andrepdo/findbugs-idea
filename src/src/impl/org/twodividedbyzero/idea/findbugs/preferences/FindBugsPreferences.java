@@ -19,13 +19,11 @@ import com.intellij.openapi.module.Module;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import edu.umd.cs.findbugs.I18N;
+import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import edu.umd.cs.findbugs.config.UserPreferences;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,7 +85,12 @@ public class FindBugsPreferences extends Properties {
 	public transient List<String> _includeFilters;
 	public transient List<String> _excludeFilters;
 	public transient List<String> _excludeBaselineBugs;
+	/** URL's of extra plugins to load */
 	public transient List<String> _plugins;
+	/** A list of plugin ID's */
+	public transient List<String> _disabledPlugins;
+	/** A list of plugin ID's */
+	public transient List<String> _enabledPlugins;
 
 	public transient List<String> _enabledModuleConfigs;
 
@@ -108,6 +111,8 @@ public class FindBugsPreferences extends Properties {
 		_excludeFilters = new ArrayList<String>();
 		_excludeBaselineBugs = new ArrayList<String>();
 		_plugins = new ArrayList<String>();
+		_enabledPlugins = new ArrayList<String>();
+		_disabledPlugins = new ArrayList<String>();
 		_enabledModuleConfigs = new ArrayList<String>();
 		_userPreferences = UserPreferences.createDefaultUserPreferences();
 	}
@@ -290,23 +295,13 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public static void loadPlugins(final List<String> pluginList) {
-		if (pluginList != null && !pluginList.isEmpty()) {
-			final URL[] result = new URL[pluginList.size()];
-			for (int i = 0; i < pluginList.size(); i++) {
-				final String s = pluginList.get(i);
-				try {
-					result[i] = new File(s).toURI().toURL();
-				} catch (MalformedURLException e) {
-					throw new FindBugsPluginException("plugin '" + s + "' can not be injected.", e);
-				}
-			}
-
+	public static void loadPlugins(final List<String> pluginUrls) {
+		for (String pluginUrl : pluginUrls) {
 			try {
-				getDetectorFactorCollection().setPluginList(result);
-				//getDetectorFactorCollection().ensureLoaded();
-			} catch (IllegalStateException e) {
-				throw new FindBugsPluginException("Plugin needs to be set first before DetectorFactoryCollection instance is created.", e);
+				Plugin plugin = Plugin.loadPlugin(new URL(pluginUrl), null);
+				plugin.setGloballyEnabled(false);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -504,6 +499,8 @@ public class FindBugsPreferences extends Properties {
 		getExcludeBaselineBugs().clear();
 		getEnabledModuleConfigs().clear();
 		getPlugins().clear();
+		_enabledPlugins.clear();
+		_disabledPlugins.clear();
 		setModified(true);
 	}
 
@@ -612,4 +609,38 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
+	public void enablePlugin(String pluginId, boolean selected) {
+		if (selected) {
+			_enabledPlugins.add(pluginId);
+			_disabledPlugins.remove(pluginId);
+		} else {
+			_enabledPlugins.remove(pluginId);
+			_disabledPlugins.add(pluginId);
+		}
+	}
+
+
+	public List<String> getDisabledPlugins() {
+		return _disabledPlugins;
+	}
+
+
+	public List<String> getEnabledPlugins() {
+		return _enabledPlugins;
+	}
+
+
+	public void setDisabledPlugins(List<String> disabledPlugins) {
+		_disabledPlugins = disabledPlugins;
+	}
+
+
+	public void setEnabledPlugins(List<String> enabledPlugins) {
+		_enabledPlugins = enabledPlugins;
+	}
+
+
+	public boolean isPluginDisabled(String pluginId) {
+		return _disabledPlugins.contains(pluginId);
+	}
 }

@@ -30,6 +30,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.BugInstance;
+import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.ProjectStats;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import org.dom4j.DocumentException;
@@ -46,6 +47,7 @@ import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginExcepti
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
+import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
 import org.twodividedbyzero.idea.findbugs.gui.common.ImportFileDialog;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.tasks.BackgroundableTask;
@@ -68,9 +70,9 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 	private static final Logger LOGGER = Logger.getInstance(ImportBugCollection.class.getName());
 
 	private boolean _enabled;
-	private BugCollection _bugCollection;
+	private SortedBugCollection _bugCollection;
 	private boolean _running;
-	private BugCollection _importBugCollection;
+	private SortedBugCollection _importBugCollection;
 
 
 	@Override
@@ -126,7 +128,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 		final BugCollection bugCollection = findBugsPlugin.getToolWindowPanel().getBugCollection();
 		if (bugCollection != null && !bugCollection.getCollection().isEmpty()) {
 			final int result = Messages.showYesNoDialog(project, "Current result in the 'Found bugs view' will be deleted. Continue ?", "Delete found bugs?", Messages.getQuestionIcon());
-			if(result == 1) {
+			if (result == 1) {
 				return;
 			}
 		}
@@ -147,13 +149,20 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 				indicator.setText(fileToImport);
 				try {
 					_bugCollection = new SortedBugCollection();
+					FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(project);
 					_importBugCollection = _bugCollection.createEmptyCollectionWithMetadata();
+					edu.umd.cs.findbugs.Project importProject = _importBugCollection.getProject();
+					importProject.setGuiCallback(new PluginGuiCallback(pluginComponent));
+					_importBugCollection.setDoNotUseCloud(true);
+					for (Plugin plugin : Plugin.getAllPlugins()) {
+						importProject.setPluginStatus(plugin, !preferences.isPluginDisabled(plugin.getPluginId()));
+					}
 					_importBugCollection.readXML(fileToImport);
 
 					final ProjectStats projectStats = _importBugCollection.getProjectStats();
 					int bugCount = 0;
 					for (final BugInstance bugInstance : _importBugCollection) {
-						if(indicator.isCanceled()) {
+						if (indicator.isCanceled()) {
 							EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_ABORTED, project.getName()));
 							Thread.currentThread().interrupt();
 							return;
@@ -166,6 +175,10 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 					}
 
 					showToolWindowNotifier("Imported bug collection from '" + fileToImport + "'.", MessageType.INFO);
+
+					_importBugCollection.setDoNotUseCloud(false);
+					_importBugCollection.setTimestamp(System.currentTimeMillis());
+					_importBugCollection.reinitializeCloud();
 				} catch (IOException e1) {
 					EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_ABORTED, project.getName()));
 					final String message = "Import failed";
@@ -267,7 +280,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 				setRunning(false);
 				break;
 			case ANALYSIS_FINISHED:
-				_bugCollection = event.getBugCollection();
+				_bugCollection = (SortedBugCollection) event.getBugCollection();
 				setEnabled(true);
 				setRunning(false);
 				break;

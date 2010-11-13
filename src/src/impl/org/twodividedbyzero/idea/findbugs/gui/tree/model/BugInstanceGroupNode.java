@@ -339,7 +339,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 					return GuiResources.GROUP_BY_PRIORITY_EXP_ICON;
 				}
 			case BugRank:
-				final String rankString = BugRankCategory.getRank(getBugInstance().getBugRank()).toString();
+				final String rankString = BugRankCategory.getRank(getBugInstance().getBugRank()).name();
 				if (GuiResources.GROUP_BY_RANK_ICONS.containsKey(rankString)) {
 					return GuiResources.GROUP_BY_RANK_ICONS.get(rankString);
 				} else {

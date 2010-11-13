@@ -95,7 +95,7 @@ public class FindBugsInspector extends FindBugsWorker implements CompileTask {
 		//TODO: FindBugs.setHome(FindBugsPlugin.getFindBugsEnginePluginLocation());
 
 		// Create BugReporter
-		_bugReporter = new BugReporter(_project, true, _bugCollection);
+		_bugReporter = new BugReporter(_project, true, _bugCollection, _findBugsProject);
 		_bugReporter.setPriorityThreshold(_userPrefs.getUserDetectorThreshold());
 
 		// Create IFindBugsEngine

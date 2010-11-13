@@ -30,6 +30,7 @@ import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import edu.umd.cs.findbugs.FindBugs2;
 import edu.umd.cs.findbugs.IFindBugsEngine;
+import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import edu.umd.cs.findbugs.config.UserPreferences;
@@ -83,8 +84,8 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	private CompilerManager _compilerManager;
 	private final boolean _startInBackground;
 	private Module _module;
-    protected SortedBugCollection _bugCollection;
-    //private RecurseCollectorTask _collectorTask;
+	protected SortedBugCollection _bugCollection;
+	//private RecurseCollectorTask _collectorTask;
 
 
 	public FindBugsWorker(final com.intellij.openapi.project.Project project) {
@@ -141,11 +142,14 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 
 		_findBugsProject = new FindBugsProject();
 		_findBugsProject.setProjectName(_project.getName());
+		for (Plugin plugin : Plugin.getAllPlugins()) {
+			_findBugsProject.setPluginStatus(plugin, !preferences.isPluginDisabled(plugin.getPluginId()));
+		}
 
-        _bugCollection = new SortedBugCollection();
-        FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(_project);
-        _bugCollection.getProject().setGuiCallback(new PluginGuiCallback(pluginComponent));
-        _bugCollection.setDoNotUseCloud(true);
+		_bugCollection = new SortedBugCollection();
+		FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(_project);
+		_bugCollection.getProject().setGuiCallback(new PluginGuiCallback(pluginComponent));
+		_bugCollection.setDoNotUseCloud(true);
 
 		//CompilerManager.getInstance(_project).addCompilationStatusListener(this);
 
@@ -183,8 +187,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 			final IFindBugsEngine engine = createFindBugsEngine();
 
 			// Create FindBugsTask
-			final FindBugsTask findBugsTask = new FindBugsTask(_project, _bugCollection,
-                                                               "Running FindBugs analysis...", true, engine, _startInBackground);  // NON-NLS
+			final FindBugsTask findBugsTask = new FindBugsTask(_project, _bugCollection, "Running FindBugs analysis...", true, engine, _startInBackground);
 			_bugReporter.setFindBugsTask(findBugsTask);
 			queue(findBugsTask);
 
@@ -240,7 +243,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 
 	protected IFindBugsEngine createFindBugsEngine() {
 		// Create BugReporter
-		_bugReporter = new BugReporter(_project, _bugCollection);
+		_bugReporter = new BugReporter(_project, _bugCollection, _findBugsProject);
 
 		//final ProjectFilterSettings projectFilterSettings = _userPrefs.getFilterSettings();
 		_bugReporter.setPriorityThreshold(_userPrefs.getUserDetectorThreshold());

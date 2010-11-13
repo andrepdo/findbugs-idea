@@ -41,6 +41,8 @@ public class PersistencePreferencesBean {
 	public List<String> _excludeFilters;
 	public List<String> _excludeBaselineBugs;
 	public List<String> _plugins;
+	public List<String> _enabledPlugins;
+	public List<String> _disabledPlugins;
 
 	public List<String> _enabledModuleConfigs;
 
@@ -55,6 +57,8 @@ public class PersistencePreferencesBean {
 		_excludeFilters = new ArrayList<String>();
 		_excludeBaselineBugs = new ArrayList<String>();
 		_plugins = new ArrayList<String>();
+		_enabledPlugins = new ArrayList<String>();
+		_disabledPlugins = new ArrayList<String>();
 
 		_enabledModuleConfigs = new ArrayList<String>();
 	}
@@ -99,6 +103,16 @@ public class PersistencePreferencesBean {
 	public List<String> getPlugins() {
 		//noinspection ReturnOfCollectionOrArrayField
 		return _plugins;
+	}
+
+
+	public List<String> getEnabledPlugins() {
+		return _enabledPlugins;
+	}
+
+
+	public List<String> getDisabledPlugins() {
+		return _disabledPlugins;
 	}
 
 

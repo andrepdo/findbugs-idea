@@ -24,9 +24,12 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.PopupHandler;
+import com.intellij.ui.content.Content;
 import com.intellij.util.EditSourceOnDoubleClickHandler;
 import com.intellij.util.OpenSourceUtil;
 import com.intellij.util.ui.UIUtil;
@@ -34,6 +37,7 @@ import edu.umd.cs.findbugs.BugInstance;
 import org.jetbrains.annotations.NonNls;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.BugTreePanel;
+import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugTreeHelper;
 import org.twodividedbyzero.idea.findbugs.gui.tree.ScrollToSourceHandler;
 import org.twodividedbyzero.idea.findbugs.gui.tree.TreeOccurenceNavigator;
@@ -42,14 +46,18 @@ import org.twodividedbyzero.idea.findbugs.gui.tree.model.AbstractTreeNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.VisitableTreeNode;
 
+import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 
 
 /**
@@ -271,26 +279,67 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 
 
 	/** Listen for clicks and scroll to the error's source as necessary. */
-	protected class TreeMouseListener extends MouseAdapter {
+	protected class TreeMouseListener extends MouseAdapter implements MouseMotionListener {
 
 		@Override
 		public void mouseClicked(final MouseEvent e) {
-			if (!_bugTreePanel.isScrollToSource() && e.getClickCount() < 2) {
-				final TreePath treePath = getPathForLocation(e.getX(), e.getY());
-				if (_bugTreePanel.isPreviewEnabled() && treePath != null) {
-					_bugTreePanel.setPreview(treePath);
+			if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() < 2) {
+				if (!_bugTreePanel.isScrollToSource()) {
+					final TreePath treePath = getPathForLocation(e.getX(), e.getY());
+					if (_bugTreePanel.isPreviewEnabled() && treePath != null) {
+						_bugTreePanel.setPreview(treePath);
+					}
+				}
+
+				if (_bugTreePanel.getBugCollection() != null && getRowForLocation(e.getX(), e.getY()) == 0) {
+					final Object root = getModel().getRoot();
+					final Component rendererComponent = getCellRenderer().getTreeCellRendererComponent(BugTree.this, root, true, true, false, 0, true);
+					final int width = rendererComponent.getPreferredSize().width;
+					final int mouseX = e.getX();
+					if (mouseX <= width + 10 && mouseX >= width - 40) {
+						final ToolWindow toolWindow = ToolWindowManager.getInstance(_project).getToolWindow(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId());
+						final Content content = toolWindow.getContentManager().getContent(0);
+						if (content != null) {
+							final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
+							panel.createDetailsDialog(panel.getBugTreePanel().getGroupModel().getBugCount(), panel.getBugCollection().getProjectStats(), panel.getBugsProject()).showModal(false);
+
+						}
+					}
 				}
 				return;
 			}
 
 			final TreePath treePath = getPathForLocation(e.getX(), e.getY());
-			//_bugTree.setHighlightPath(treePath);
+			//setHighlightPath(treePath);
 
 			if (treePath != null) {
 				_scrollToSourceHandler.scollToSelectionSource();
 			}
 		}
 
+
+		@SuppressWarnings({"override"})
+		public void mouseMoved(final MouseEvent e) {
+			if (_bugTreePanel.getBugCollection() != null && getRowForLocation(e.getX(), e.getY()) != 0) {
+				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			} else if (_bugTreePanel.getBugCollection() != null) {
+				final Object root = getModel().getRoot();
+				final Component rendererComponent = getCellRenderer().getTreeCellRendererComponent(BugTree.this, root, true, true, false, 0, true);
+				final int width = rendererComponent.getPreferredSize().width;
+				final int mouseX = e.getX();
+				if (mouseX <= width && mouseX >= width - 100) {
+					setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+				}
+			}
+		}
+
+
+		@Override
+		public void mouseExited(final MouseEvent e) {
+			if (_bugTreePanel.getBugCollection() != null) {
+				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			}
+		}
 	}
 
 
@@ -299,6 +348,9 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 
 		public void valueChanged(final TreeSelectionEvent e) {
 			final TreePath path = e.getPath();
+			if (getRowForPath(path) > 0) {
+				setHighlightPath(path);
+			}
 
 			_bugTreePanel.setDetailText(path);
 			_bugTreePanel.setDetailHtml(path);

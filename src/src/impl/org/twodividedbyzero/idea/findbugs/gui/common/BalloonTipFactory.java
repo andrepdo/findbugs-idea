@@ -28,6 +28,7 @@ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 
 import javax.annotation.Nullable;
 import javax.swing.Icon;
+import javax.swing.event.HyperlinkListener;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
@@ -70,44 +71,59 @@ public class BalloonTipFactory {
 
 
 	public static void showToolWindowInfoNotifier(final String html) {
-		showToolWindowInfoNotifier(IdeaUtilImpl.getProject(), html);
+		showToolWindowInfoNotifier(IdeaUtilImpl.getProject(), html, null);
 	}
 
 
-	public static void showToolWindowInfoNotifier(final Project project, final String html) {
+	public static void showToolWindowInfoNotifier(final String html, final HyperlinkListener hyperlinkListener) {
+		showToolWindowInfoNotifier(IdeaUtilImpl.getProject(), html, hyperlinkListener);
+	}
+
+
+	public static void showToolWindowInfoNotifier(final Project project, final String html, @Nullable final HyperlinkListener hyperlinkListener) {
 		final ToolWindowManager manager = ToolWindowManager.getInstance(project);
 		if (manager == null) { // this should never happen.
 			return;
 		}
-		manager.notifyByBalloon(IdeaUtilImpl.getPluginComponent(project).getInternalToolWindowId(), MessageType.INFO, html);
+		manager.notifyByBalloon(IdeaUtilImpl.getPluginComponent(project).getInternalToolWindowId(), MessageType.INFO, html, null, hyperlinkListener);
 	}
 
 
 	public static void showToolWindowWarnNotifier(final String html) {
-		showToolWindowWarnNotifier(IdeaUtilImpl.getProject(), html);
+		showToolWindowWarnNotifier(IdeaUtilImpl.getProject(), html, null);
 	}
 
 
-	public static void showToolWindowWarnNotifier(final Project project, final String html) {
+	public static void showToolWindowWarnNotifier(final String html, @Nullable final HyperlinkListener hyperlinkListener) {
+		showToolWindowWarnNotifier(IdeaUtilImpl.getProject(), html, hyperlinkListener);
+	}
+
+
+	public static void showToolWindowWarnNotifier(final Project project, final String html, @Nullable final HyperlinkListener hyperlinkListener) {
 		final ToolWindowManager manager = ToolWindowManager.getInstance(project);
 		if (manager == null) { // this should never happen.
 			return;
 		}
-		manager.notifyByBalloon(IdeaUtilImpl.getPluginComponent(project).getInternalToolWindowId(), MessageType.WARNING, html);
+		manager.notifyByBalloon(IdeaUtilImpl.getPluginComponent(project).getInternalToolWindowId(), MessageType.WARNING, html, null, hyperlinkListener);
 	}
 
 
 	public static void showToolWindowErrorNotifier(final String html) {
-		showToolWindowErrorNotifier(IdeaUtilImpl.getProject(), html);
+		showToolWindowErrorNotifier(IdeaUtilImpl.getProject(), html, null);
 	}
 
 
-	public static void showToolWindowErrorNotifier(final Project project, final String html) {
+	public static void showToolWindowErrorNotifier(final String html, @Nullable final HyperlinkListener hyperlinkListener) {
+		showToolWindowErrorNotifier(IdeaUtilImpl.getProject(), html, hyperlinkListener);
+	}
+
+
+	public static void showToolWindowErrorNotifier(final Project project, final String html, @Nullable final HyperlinkListener hyperlinkListener) {
 		final ToolWindowManager manager = ToolWindowManager.getInstance(project);
 		if (manager == null) { // this should never happen.
 			return;
 		}
-		manager.notifyByBalloon(IdeaUtilImpl.getPluginComponent(project).getInternalToolWindowId(), MessageType.ERROR, html);
+		manager.notifyByBalloon(IdeaUtilImpl.getPluginComponent(project).getInternalToolWindowId(), MessageType.ERROR, html, null, hyperlinkListener);
 	}
 
 
