@@ -99,11 +99,11 @@ public class PluginConfiguration implements ConfigurationPage {
 
 
 	public void updatePreferences() {
-		rebuildCheckboxes();
+		rebuildPluginComponents();
 	}
 
 
-	private void rebuildCheckboxes() {
+	private void rebuildPluginComponents() {
 		if (_pluginComponentPanel == null) {
 			return;
 		}
@@ -139,7 +139,7 @@ public class PluginConfiguration implements ConfigurationPage {
 
 			_pluginComponentPanel = new JPanel();
 			_pluginComponentPanel.setLayout(new BoxLayout(_pluginComponentPanel, BoxLayout.Y_AXIS));
-			rebuildCheckboxes();
+			rebuildPluginComponents();
 
 			final Component scrollPane = new JScrollPane(_pluginComponentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			_pluginsPanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row

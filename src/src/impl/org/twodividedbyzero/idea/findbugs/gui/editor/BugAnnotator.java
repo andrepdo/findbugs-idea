@@ -36,6 +36,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventF
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -54,11 +55,13 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 
 	private boolean _analysisRunning;
 	private boolean _isRegistered;
+	private final FindBugsPreferences _preferences;
 
 
 	public BugAnnotator() {
 		_analysisRunning = false;
 		_isRegistered = false;
+		_preferences = IdeaUtilImpl.getPluginComponent(IdeaUtilImpl.getProject()).getPreferences();
 	}
 
 
