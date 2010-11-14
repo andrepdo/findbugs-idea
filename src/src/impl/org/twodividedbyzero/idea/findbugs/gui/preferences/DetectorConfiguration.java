@@ -441,6 +441,16 @@ public class DetectorConfiguration implements ConfigurationPage {
 	}
 
 
+	public boolean isAdvancedConfig() {
+		return true;
+	}
+
+
+	public String getTitle() {
+		return "Detectors";
+	}
+
+
 	private static class ColorRenderer extends JLabel implements TableCellRenderer {
 
 		private static final Color BG_COLOR = new Color(226, 225, 225);

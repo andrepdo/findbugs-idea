@@ -218,4 +218,14 @@ public class AnnotationConfiguration implements ConfigurationPage {
 		return false;
 	}
 
+
+	public boolean isAdvancedConfig() {
+		return true;
+	}
+
+
+	public String getTitle() {
+		return "Annotations";
+	}
+
 }

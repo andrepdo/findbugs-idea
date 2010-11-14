@@ -123,6 +123,16 @@ public class ImportExportConfiguration implements ConfigurationPage {
 	}
 
 
+	public boolean isAdvancedConfig() {
+		return false;
+	}
+
+
+	public String getTitle() {
+		return "Import/Export";
+	}
+
+
 	private Component getExportDirPanel() {
 		if (_exportDirPanel == null) {
 			final double border = 5;

@@ -352,6 +352,16 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
+	public boolean isAdvancedConfig() {
+		return false;
+	}
+
+
+	public String getTitle() {
+		return "Filters";
+	}
+
+
 	private static class IncludeListSelectionListener implements ListSelectionListener {
 
 		private final JButton _removeButton;

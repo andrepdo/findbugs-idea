@@ -202,6 +202,16 @@ public class PluginConfiguration implements ConfigurationPage {
 	}
 
 
+	public boolean isAdvancedConfig() {
+		return false;
+	}
+
+
+	public String getTitle() {
+		return "Plugins";
+	}
+
+
 	private static class PluginComponent {
 
 		private final Plugin _plugin;

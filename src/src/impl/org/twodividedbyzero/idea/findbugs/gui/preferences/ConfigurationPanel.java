@@ -30,6 +30,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.BorderLayout;
@@ -41,8 +42,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
 
 
 /**
@@ -75,6 +78,8 @@ public class ConfigurationPanel extends JPanel {
 	private transient PluginConfiguration _pluginConfig;
 	private transient ImportExportConfiguration _importExportConfig;
 	private transient AnnotationConfiguration _annotationConfig;
+	private List<ConfigurationPage> _configPagesRegistry;
+	private JToggleButton _showAdvancedConfigsButton;
 
 
 	public ConfigurationPanel(final FindBugsPlugin plugin) {
@@ -89,7 +94,7 @@ public class ConfigurationPanel extends JPanel {
 		initGui();
 
 		final FindBugsPreferences preferences = getPreferences();
-		if ((!preferences.getBugCategories().containsValue("true") && !preferences.getDetectors().containsValue("true")) || (preferences.getBugCategories().isEmpty() && preferences.getDetectors().isEmpty())) {
+		if (!preferences.getBugCategories().containsValue("true") && !preferences.getDetectors().containsValue("true") || (preferences.getBugCategories().isEmpty() && preferences.getDetectors().isEmpty())) {
 			restoreDefaultPreferences();
 		}
 	}
@@ -101,7 +106,7 @@ public class ConfigurationPanel extends JPanel {
 
 
 	private void initGui() {
-		add(getMainPanel());
+		add(getMainPanel(), BorderLayout.CENTER);
 	}
 
 
@@ -111,7 +116,7 @@ public class ConfigurationPanel extends JPanel {
 			final double border = 5;
 			final double rowsGap = 0;
 			final double colsGap = 10;
-			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.FILL, border}, // Columns
+			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, border}, // Columns
 									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, 10, TableLayout.FILL, 10, TableLayout.PREFERRED, border}};// Rows
 			final LayoutManager tbl = new TableLayout(size);
 
@@ -130,14 +135,18 @@ public class ConfigurationPanel extends JPanel {
 			checkboxPanel.add(getRunInBgCheckbox());
 			checkboxPanel.add(getAnalyzeAfterCompileCheckbox());
 			checkboxPanel.add(getToolwindowToFrontCheckbox());
-			_mainPanel.add(checkboxPanel, "1, 1, 1, 1");
+			_mainPanel.add(checkboxPanel, "1, 1, 3, 1");
 			//_mainPanel.add(_detectorThresholdChkb);
-			_mainPanel.add(getEffortPanel(), "1, 3, 1, 3");
+			_mainPanel.add(getEffortPanel(), "1, 3, 3, 3");
 
 			final Container tabPanel = new JPanel(new BorderLayout());
 			tabPanel.add(getTabbedPane(), BorderLayout.CENTER);
 			_mainPanel.add(tabPanel, "1, 5, 3, 5");
-			_mainPanel.add(getRestoreDefaultsButton(), "3, 7, 3, 7, R, T");
+
+			final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+			buttonsPanel.add(getShowAdvancedConfigsButton());
+			buttonsPanel.add(getRestoreDefaultsButton());
+			_mainPanel.add(buttonsPanel, "3, 7, 3, 7, R, T");
 
 		}
 
@@ -279,21 +288,32 @@ public class ConfigurationPanel extends JPanel {
 	private Component getTabbedPane() {
 		if (_tabbedPane == null) {
 			_tabbedPane = new JTabbedPane();
-			_tabbedPane.addTab("Detectors", getDetectorConfig().getComponent());
-			_tabbedPane.addTab("Reporting", getReporterConfig().getComponent());
-			_tabbedPane.addTab("Filters", getFilterConfig().getComponent());
 
-			if (!_plugin.isModuleComponent()) {
-				_tabbedPane.addTab("Plugins", getPluginConfig().getComponent());
-			}
-			if (!_plugin.isModuleComponent()) {
-				_tabbedPane.addTab("Import/Export", getImportExportConfig().getComponent());
-			}
-			if (!_plugin.isModuleComponent()) {
-				_tabbedPane.addTab("Annotations", getAnnotationConfig().getComponent());
+			final List<ConfigurationPage> configPages = getConfigPages();
+			for (final ConfigurationPage configPage : configPages) {
+				if (!configPage.isAdvancedConfig()) {
+					if (!_plugin.isModuleComponent()) {
+						_tabbedPane.addTab(configPage.getTitle(), configPage.getComponent());
+					} else if (configPage.showInModulePreferences()) {
+						_tabbedPane.addTab(configPage.getTitle(), configPage.getComponent());
+					}
+				}
 			}
 		}
 		return _tabbedPane;
+	}
+
+	List<ConfigurationPage> getConfigPages() {
+		if (_configPagesRegistry == null) {
+			_configPagesRegistry = new ArrayList<ConfigurationPage>();
+			_configPagesRegistry.add(getDetectorConfig());
+			_configPagesRegistry.add(getReporterConfig());
+			_configPagesRegistry.add(getFilterConfig());
+			_configPagesRegistry.add(getPluginConfig());
+			_configPagesRegistry.add(getImportExportConfig());
+			_configPagesRegistry.add(getAnnotationConfig());
+		}
+		return _configPagesRegistry;
 	}
 
 
@@ -355,6 +375,56 @@ public class ConfigurationPanel extends JPanel {
 			});
 		}
 		return _restoreDefaultsButton;
+	}
+
+
+	private Component getShowAdvancedConfigsButton() {
+		if (_showAdvancedConfigsButton == null) {
+			_showAdvancedConfigsButton = new JToggleButton("Advanced Settings");
+			_showAdvancedConfigsButton.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					if(_showAdvancedConfigsButton.isSelected()) {
+						showAdvancedConfigs(true);
+					} else {
+						showAdvancedConfigs(false);
+					}
+				}
+			});
+		}
+		return _showAdvancedConfigsButton;
+	}
+
+
+	private void showAdvancedConfigs(final boolean show) {
+		final List<ConfigurationPage> configPages = getConfigPages();
+		Component firstAdvancedPage = null;
+		for (int i = 0, configPagesSize = configPages.size(); i < configPagesSize; i++) {
+			final ConfigurationPage configPage = configPages.get(i);
+			if (configPage.isAdvancedConfig()) {
+				if (!_plugin.isModuleComponent()) {
+					if (show) {
+						if (firstAdvancedPage == null) {
+							firstAdvancedPage = configPage.getComponent();
+						}
+						_tabbedPane.addTab(configPage.getTitle(), configPage.getComponent());
+					} else {
+						_tabbedPane.remove(configPage.getComponent());
+					}
+				} else if (configPage.showInModulePreferences()) {
+					if (show) {
+						if (firstAdvancedPage == null) {
+							firstAdvancedPage = configPage.getComponent();
+						}
+						_tabbedPane.addTab(configPage.getTitle(), configPage.getComponent());
+					} else {
+						_tabbedPane.remove(configPage.getComponent());
+					}
+				}
+			}
+		}
+		if (firstAdvancedPage != null) {
+			_tabbedPane.setSelectedComponent(firstAdvancedPage);
+		}
 	}
 
 

@@ -193,4 +193,14 @@ public class ReportConfiguration implements ConfigurationPage {
 	public boolean showInModulePreferences() {
 		return true;
 	}
+
+
+	public boolean isAdvancedConfig() {
+		return false;
+	}
+
+
+	public String getTitle() {
+		return "Reporting";
+	}
 }

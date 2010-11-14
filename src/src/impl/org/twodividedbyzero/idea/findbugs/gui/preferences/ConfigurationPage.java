@@ -34,4 +34,8 @@ public interface ConfigurationPage {
 	void setEnabled(final boolean enabled);
 
 	boolean showInModulePreferences();
+
+	boolean isAdvancedConfig();
+
+	String getTitle();
 }
