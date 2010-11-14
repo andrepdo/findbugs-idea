@@ -33,7 +33,6 @@ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -116,18 +115,8 @@ public class PluginConfiguration implements ConfigurationPage {
 			}
 
 			final PluginComponent pluginPanel = new PluginComponent(currentProject, plugin, _preferences);
-			final PluginComponent pluginPanel1 = new PluginComponent(currentProject, plugin, _preferences);
-			final PluginComponent pluginPanel2 = new PluginComponent(currentProject, plugin, _preferences);
-			final PluginComponent pluginPanel3 = new PluginComponent(currentProject, plugin, _preferences);
-			final PluginComponent pluginPanel4 = new PluginComponent(currentProject, plugin, _preferences);
-			final PluginComponent pluginPanel5 = new PluginComponent(currentProject, plugin, _preferences);
 			final JPanel pluginComponent = pluginPanel.getComponent();
 			_pluginComponentPanel.add(pluginComponent);
-			_pluginComponentPanel.add(pluginPanel1.getComponent());
-			_pluginComponentPanel.add(pluginPanel2.getComponent());
-			_pluginComponentPanel.add(pluginPanel3.getComponent());
-			_pluginComponentPanel.add(pluginPanel4.getComponent());
-			_pluginComponentPanel.add(pluginPanel5.getComponent());
 
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
@@ -135,8 +124,6 @@ public class PluginConfiguration implements ConfigurationPage {
 				}
 			});
 		}
-
-		_pluginComponentPanel.add(Box.createVerticalGlue());
 	}
 
 
