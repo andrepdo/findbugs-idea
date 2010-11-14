@@ -33,6 +33,7 @@ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -84,14 +85,14 @@ public class PluginConfiguration implements ConfigurationPage {
 		if (_component == null) {
 			final double border = 5;
 			final double[][] size = {{border, TableLayout.FILL, border}, // Columns
-									 {border, TableLayout.PREFERRED, TableLayout.FILL, border}};// Rows
+									 {border, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 
 			final JComponent mainPanel = new JPanel(tbl);
-			mainPanel.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(5, 5, 5, 5), BorderFactory.createTitledBorder("Plugins")));
+			mainPanel.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(5, 5, 5, 5), BorderFactory.createTitledBorder("Installed Plugins")));
+			_component = mainPanel;
 			mainPanel.add(getPluginPanel(), "1, 1, 1, 1");
 
-			_component = mainPanel;
 		}
 		//updatePreferences();
 		return _component;
@@ -115,8 +116,18 @@ public class PluginConfiguration implements ConfigurationPage {
 			}
 
 			final PluginComponent pluginPanel = new PluginComponent(currentProject, plugin, _preferences);
+			final PluginComponent pluginPanel1 = new PluginComponent(currentProject, plugin, _preferences);
+			final PluginComponent pluginPanel2 = new PluginComponent(currentProject, plugin, _preferences);
+			final PluginComponent pluginPanel3 = new PluginComponent(currentProject, plugin, _preferences);
+			final PluginComponent pluginPanel4 = new PluginComponent(currentProject, plugin, _preferences);
+			final PluginComponent pluginPanel5 = new PluginComponent(currentProject, plugin, _preferences);
 			final JPanel pluginComponent = pluginPanel.getComponent();
 			_pluginComponentPanel.add(pluginComponent);
+			_pluginComponentPanel.add(pluginPanel1.getComponent());
+			_pluginComponentPanel.add(pluginPanel2.getComponent());
+			_pluginComponentPanel.add(pluginPanel3.getComponent());
+			_pluginComponentPanel.add(pluginPanel4.getComponent());
+			_pluginComponentPanel.add(pluginPanel5.getComponent());
 
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
@@ -124,6 +135,8 @@ public class PluginConfiguration implements ConfigurationPage {
 				}
 			});
 		}
+
+		_pluginComponentPanel.add(Box.createVerticalGlue());
 	}
 
 
@@ -132,8 +145,8 @@ public class PluginConfiguration implements ConfigurationPage {
 
 			final double border = 5;
 			final double colsGap = 10;
-			final double[][] size = {{border, TableLayout.FILL, colsGap, TableLayout.PREFERRED, border}, // Columns
-									 {border, TableLayout.FILL, border}};// Rows
+			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, border}, // Columns
+									 {border, 540, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_pluginsPanel = new JPanel(tbl);
 
