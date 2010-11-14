@@ -146,7 +146,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			_includePanel.add(buttonPanel, "3, 1, 3, 1");
 
 			final AbstractButton addButton = new JButton();
-			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTESIONS_SET), new BrowseActionCallback() {
+			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTENSIONS_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
 					final String replacement = IdeaUtilImpl.replace$PROJECT_DIR$(selectedFile.getAbsolutePath());
 					((DefaultListModel) _includeList.getModel()).addElement(replacement);
@@ -211,7 +211,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			_excludePanel.add(buttonPanel, "3, 1, 3, 1");
 
 			final AbstractButton addButton = new JButton();
-			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTESIONS_SET), new BrowseActionCallback() {
+			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTENSIONS_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
 					final String replacement = IdeaUtilImpl.replace$PROJECT_DIR$(selectedFile.getAbsolutePath());
 					((DefaultListModel) _excludeList.getModel()).addElement(replacement);
@@ -276,7 +276,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			_baselinePanel.add(buttonPanel, "3, 1, 3, 1");
 
 			final AbstractButton addButton = new JButton();
-			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTESIONS_SET), new BrowseActionCallback() {
+			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTENSIONS_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
 					final String replacement = IdeaUtilImpl.replace$PROJECT_DIR$(selectedFile.getAbsolutePath());
 					((DefaultListModel) _baselineList.getModel()).addElement(replacement);

@@ -25,7 +25,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogBuilder;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiFile;
 import edu.umd.cs.findbugs.BugCollection;
@@ -45,24 +44,18 @@ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.gui.common.ActionToolbarContainer;
+import org.twodividedbyzero.idea.findbugs.gui.common.AnalysisRunDetailsDialog;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitLayout;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitPane;
 import org.twodividedbyzero.idea.findbugs.gui.common.NDockLayout;
-import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
-import javax.swing.BorderFactory;
-import javax.swing.JEditorPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.text.html.HTMLEditorKit;
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -343,94 +336,6 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 	}
 
 
-	public DialogBuilder createDetailsDialog(final int bugCount, final ProjectStats projectStats, final FindBugsProject bugsProject) {
-		final int numAnalysedClasses = projectStats.getNumClasses();
-
-		final List<String> fileList = bugsProject.getFileList();
-		final List<String> auxClasspathEntries = bugsProject.getAuxClasspathEntryList();
-		final VirtualFile[] configuredOutputFiles = bugsProject.getConfiguredOutputFiles();
-		//bugsProject.get
-
-		final StringBuilder html = new StringBuilder();
-		html.append("<html><body>");
-		html.append("<p><h2>").append(VersionManager.getName()).append(": <b>found ").append(bugCount).append(" bugs in ").append(numAnalysedClasses).append(numAnalysedClasses > 1 ? " classes" : " class").append("</b>").append("</h2></p>");
-		html.append("<p>").append("<font size='10px'>using ").append(VersionManager.getFullVersion()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font>").append("</p>");
-
-		html.append("<p><h3>ConfiguredOutputFiles").append(" <font color='gray'>(").append(configuredOutputFiles.length).append(")</h3></p>");
-		html.append("<ul>");
-		for (final VirtualFile file : configuredOutputFiles) {
-			html.append("<li>");
-			html.append(file.getPresentableName());
-			html.append("</li>");
-		}
-		html.append("</ul>");
-
-		html.append("<p><h3>CompileOutputPath").append(" <font size='9px' color='gray'>(").append("IDEA)</h3></p>");
-		html.append("<ul>");
-		for (final String auxClasspathEntry : auxClasspathEntries) {
-			//html.append("<li>");
-			//html.append(auxClasspathEntry);
-			//html.append("</li>");
-		}
-		html.append("</ul>");
-
-
-		html.append("<p><h3>SourceDirList ").append(" <font size='9px' color='gray'>(").append(bugsProject.getNumSourceDirs()).append(")</h3></p>");
-		html.append("<ul>");
-		final List<String> sourceDirList = bugsProject.getSourceDirList();
-		for (final String sourceDir : sourceDirList) {
-			html.append("<li>");
-			html.append(sourceDir);
-			html.append("</li>");
-		}
-		html.append("</ul>");
-
-
-		html.append("<p><h3>FileList ").append(" <font size='9px' color='gray'>(").append(bugsProject.getFileCount()).append(")</h3></p>");
-		html.append("<ul>");
-		for (final String file : fileList) {
-			html.append("<li>");
-			html.append(file);
-			html.append("</li>");
-		}
-		html.append("</ul>");
-
-		html.append("<p><h3>AuxClasspathEntries ").append(" <font size='9px' color='gray'>(").append(bugsProject.getNumAuxClasspathEntries()).append(")</h3></p>");
-		html.append("<ul>");
-		for (final String auxClasspathEntry : auxClasspathEntries) {
-			html.append("<li>");
-			html.append(auxClasspathEntry);
-			html.append("</li>");
-		}
-		html.append("</ul>");
-
-		html.append("</html></body>");
-
-
-		final DialogBuilder dialogBuilder = new DialogBuilder(_project);
-		dialogBuilder.addCloseButton();
-		dialogBuilder.setTitle("FindBugs analysis settings");
-		final JPanel panel = new JPanel(new BorderLayout());
-		panel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-		final HTMLEditorKit htmlEditorKit = new HTMLEditorKit();
-		htmlEditorKit.setStyleSheet(GuiResources.EDITORPANE_STYLESHEET);
-		final JEditorPane jEditorPane = new JEditorPane();
-		jEditorPane.setPreferredSize(new Dimension(450, 600));
-		jEditorPane.setEditable(false);
-		jEditorPane.setContentType("text/html");
-		jEditorPane.setEditorKit(htmlEditorKit);
-
-
-		jEditorPane.setText(html.toString());
-
-		panel.add(new JScrollPane(jEditorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
-		panel.setBorder(BorderFactory.createTitledBorder("FindBugs analysis run configuration"));
-		dialogBuilder.setCenterPanel(panel);
-		return dialogBuilder;
-	}
-
-
 	private ComponentListener createComponentListener() {
 		return new ToolWindowComponentAdapter(this);
 	}
@@ -517,7 +422,9 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 			if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
 				final String desc = e.getDescription();
 				if (desc.equals(A_HREF_MORE_ANCHOR)) {
-					_toolWindowPanel.createDetailsDialog(_toolWindowPanel.getBugTreePanel().getGroupModel().getBugCount(), _toolWindowPanel.getBugCollection().getProjectStats(), _bugsProject).showModal(false);;
+					final int bugCount = _toolWindowPanel.getBugTreePanel().getGroupModel().getBugCount();
+					final DialogBuilder dialog = AnalysisRunDetailsDialog.create(_toolWindowPanel.getProject(), bugCount, _toolWindowPanel.getBugCollection().getProjectStats(), _bugsProject);
+					dialog.showModal(false);
 				}
 			}
 		}

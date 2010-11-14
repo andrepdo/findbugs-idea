@@ -19,10 +19,10 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
-import java.util.Set;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 /**
@@ -34,11 +34,18 @@ import java.util.Set;
  */
 public final class ExtensionFileFilter extends FileFilter {
 
-	private final Set<String> _extensions;
+	private final Map<String, String> _extensions;
+	private final String _description;
 
 
-	public ExtensionFileFilter(@NotNull final Set<String> extensions) {
-		_extensions = Collections.unmodifiableSet(extensions);
+	public ExtensionFileFilter(@NotNull final Map<String, String> extensions) {
+		_extensions = Collections.unmodifiableMap(extensions);
+		final StringBuilder buffer = new StringBuilder();
+		for (final Entry<String, String> entry : _extensions.entrySet()) {
+			final String key = entry.getKey();
+			buffer.append(entry.getValue()).append(" (").append(key).append(')');
+		}
+		_description = buffer.toString();
 	}
 
 
@@ -50,14 +57,12 @@ public final class ExtensionFileFilter extends FileFilter {
 
 		final String fileName = f.getName();
 		final int index = fileName.toLowerCase(Locale.ENGLISH).lastIndexOf('.');
-		return index != -1 && _extensions.contains(fileName.toLowerCase(Locale.ENGLISH).substring(index));
-
-		//return fileName.toLowerCase(Locale.ENGLISH).endsWith("." + _extensions);
+		return index != -1 && _extensions.containsKey(fileName.toLowerCase(Locale.ENGLISH).substring(index));
 	}
 
 
 	@Override
 	public String getDescription() {
-		return Arrays.toString(_extensions.toArray());
+		return _description;
 	}
 }

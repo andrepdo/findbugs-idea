@@ -3,8 +3,8 @@ package org.twodividedbyzero.idea.findbugs.common.util;
 import edu.umd.cs.findbugs.Version;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -16,8 +16,9 @@ import java.util.Set;
  */
 public final class FindBugsUtil {
 
-	public static final Set<String> ARCHIVE_EXTENSION_SET = new HashSet<String>();
-	public static final Set<String> XML_EXTESIONS_SET = new HashSet<String>();
+	public static final Map<String, String> ARCHIVE_EXTENSION_SET = new HashMap<String, String>();
+	public static final Map<String, String> XML_EXTENSIONS_SET = new HashMap<String, String>();
+	public static final Map<String, String> PLUGINS_EXTENSIONS_SET = new HashMap<String, String>();
 
 
 	private FindBugsUtil() {
@@ -26,13 +27,15 @@ public final class FindBugsUtil {
 
 
 	static {
-		ARCHIVE_EXTENSION_SET.add(".jar");
-		ARCHIVE_EXTENSION_SET.add(".zip");
-		ARCHIVE_EXTENSION_SET.add(".ear");
-		ARCHIVE_EXTENSION_SET.add(".war");
-		ARCHIVE_EXTENSION_SET.add(".sar");
+		ARCHIVE_EXTENSION_SET.put(".jar", "");
+		ARCHIVE_EXTENSION_SET.put(".zip", "");
+		ARCHIVE_EXTENSION_SET.put(".ear", "");
+		ARCHIVE_EXTENSION_SET.put(".war", "");
+		ARCHIVE_EXTENSION_SET.put(".sar", "");
 
-		XML_EXTESIONS_SET.add(".xml");
+		XML_EXTENSIONS_SET.put(".xml", "");
+
+		PLUGINS_EXTENSIONS_SET.put(".jar", "FindBugs Plugins");
 	}
 
 
@@ -70,7 +73,7 @@ public final class FindBugsUtil {
 				return false;
 			}
 			final String extension = fileName.substring(dot);
-			return ARCHIVE_EXTENSION_SET.contains(extension);
+			return ARCHIVE_EXTENSION_SET.containsKey(extension);
 		}
 	}
 }

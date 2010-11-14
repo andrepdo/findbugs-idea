@@ -192,10 +192,17 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer/*, 
 				bColor = getBackground();
 			}
 
+			// Path highlighting
 			final TreePath path = tree.getPathForRow(row);
 			final TreePath selectionPath = tree.getSelectionPath();
-			if (selectionPath != null && tree.getRowForPath(selectionPath) > 0 && selectionPath.isDescendant(path)) {
-				setBackgroundNonSelectionColor(Tree.HIGHLIGHT_COLOR);
+			if (selectionPath != null && selectionPath.getPathCount() > 1) {
+				final TreePath leadParentPath = new TreePath(new Object[] {selectionPath.getPathComponent(0), selectionPath.getPathComponent(1)});
+
+				if (tree.getRowForPath(leadParentPath) > 0 && leadParentPath.isDescendant(path)) {
+					setBackgroundNonSelectionColor(Tree.HIGHLIGHT_COLOR);
+				} else {
+					setBackgroundNonSelectionColor(UIManager.getColor("Tree.textBackground"));
+				}
 			} else {
 				setBackgroundNonSelectionColor(UIManager.getColor("Tree.textBackground"));
 			}

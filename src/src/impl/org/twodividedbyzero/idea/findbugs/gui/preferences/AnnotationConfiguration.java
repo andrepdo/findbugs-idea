@@ -17,14 +17,9 @@
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
 import info.clearthought.layout.TableLayout;
-import org.twodividedbyzero.idea.findbugs.gui.common.ExtensionFileFilter;
-import org.twodividedbyzero.idea.findbugs.gui.preferences.BrowseAction.BrowseActionCallback;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
-import javax.swing.AbstractButton;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -34,8 +29,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.File;
-import java.util.Collections;
 
 
 /**
@@ -125,15 +118,15 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			final Container buttonPanel = new JPanel(tableLayout);
 			_annotationPathPanel.add(buttonPanel, "3, 1, 3, 1");
 
-			final AbstractButton addButton = new JButton();
-			final Action action = new BrowseAction(_parent, "Browse...", new ExtensionFileFilter(Collections.singleton(".java")), new BrowseActionCallback() {
+			/*final AbstractButton addButton = new JButton();
+			final Action action = new BrowseAction(_parent, "Browse...", new ExtensionFileFilter(Collections.singletonMap(".java")), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
 
 					_preferences.setModified(true);
 				}
-			});
-			addButton.setAction(action);
-			buttonPanel.add(addButton, "1, 1, 1, 1");
+			});*/
+			/*addButton.setAction(action);
+			buttonPanel.add(addButton, "1, 1, 1, 1");*/
 
 
 		}

@@ -16,7 +16,10 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.tree.view;
 
+import org.jetbrains.annotations.Nullable;
+
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.Color;
@@ -35,6 +38,8 @@ public abstract class Tree extends JTree {
 
 	private TreePath _highlightPath;
 	public static final Color HIGHLIGHT_COLOR = new Color(255, 255, 204);
+	public static final Color NON_HIGHLIGHT_COLOR = UIManager.getColor("Tree.textBackground");
+	private TreePath _lastHighlightPath;
 
 
 	public Tree(final TreeModel treeModel) {
@@ -67,7 +72,7 @@ public abstract class Tree extends JTree {
 	}
 
 
-	public void setHighlightPath(final TreePath highlightPath) {
+	public void setHighlightPath(@Nullable final TreePath highlightPath) {
 		_highlightPath = highlightPath;
 		treeDidChange();
 	}
@@ -79,15 +84,38 @@ public abstract class Tree extends JTree {
 		g.setColor(getBackground());
 		g.fillRect(0, 0, getWidth(), getHeight());
 
+		if (_highlightPath != null && getRowForPath(_highlightPath) > 0) {
+			paintHighlightForPath(g, _highlightPath, HIGHLIGHT_COLOR);
+			_lastHighlightPath = _highlightPath;
+
+		} else if (_lastHighlightPath != null) {
+			paintHighlightForPath(g, _lastHighlightPath, NON_HIGHLIGHT_COLOR);
+			_lastHighlightPath = null;
+		}
+
+		setOpaque(false); // trick not to paint background
+		super.paintComponent(g);
+		setOpaque(true);
+	}
+
+
+	private void paintHighlightForPath(final Graphics g, final TreePath highlightPath, final Color highlightColor) {
 		// paint the highlight if any
-		g.setColor(HIGHLIGHT_COLOR);
-		final int fromRow = getRowForPath(_highlightPath);
+
+		for (int i = 0; i < highlightPath.getPathCount(); i++) {
+
+		}
+
+		final TreePath leadParentPath = new TreePath(new Object[] {highlightPath.getPathComponent(0), highlightPath.getPathComponent(1)});
+		final int fromRow = getRowForPath(leadParentPath);
+
 		if (fromRow != -1) {
+			g.setColor(highlightColor);
 			int toRow = fromRow;
 			final int rowCount = getRowCount();
 			while (toRow < rowCount) {
 				final TreePath path = getPathForRow(toRow);
-				if (_highlightPath.isDescendant(path)) {
+				if (leadParentPath.isDescendant(path)) {
 					toRow++;
 				} else {
 					break;
@@ -97,9 +125,5 @@ public abstract class Tree extends JTree {
 			final Rectangle toBounds = getRowBounds(toRow - 1);
 			g.fillRect(0, fromBounds.y, getWidth(), toBounds.y - fromBounds.y + toBounds.height);
 		}
-
-		setOpaque(false); // trick not to paint background
-		super.paintComponent(g);
-		setOpaque(true);
 	}
 }

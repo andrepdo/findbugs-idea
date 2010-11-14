@@ -66,7 +66,7 @@ import java.util.Map;
 /**
  * $Date$
  *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
+ * @author Andre Pfeiler<andrepdo@dev.java.net>
  * @version $Revision$
  * @since 0.0.1
  */
