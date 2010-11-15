@@ -25,7 +25,9 @@ import com.intellij.openapi.module.ModuleComponent;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiFile;
+import com.intellij.ui.content.Content;
 import edu.umd.cs.findbugs.DetectorFactory;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -124,11 +126,12 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 
 
 	public ToolWindowPanel getToolWindowPanel() {
-		/*final Content content = _toolWindow.getContentManager().getContent(0);
+		final ToolWindow toolWindow = IdeaUtilImpl.getToolWindowById(FindBugsPluginConstants.TOOL_WINDOW_ID);
+		final Content content = toolWindow.getContentManager().getContent(0);
 		if (content != null) {
-			return ((ToolWindowPanel) content.getComponent());
-		}*/
-		return (ToolWindowPanel) IdeaUtilImpl.getToolWindowById(FindBugsPluginConstants.TOOL_WINDOW_ID);
+			return (ToolWindowPanel) content.getComponent();
+		}
+		return null;
 	}
 
 

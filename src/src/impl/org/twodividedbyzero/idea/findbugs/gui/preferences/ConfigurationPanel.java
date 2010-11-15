@@ -34,6 +34,7 @@ import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -57,15 +58,16 @@ import java.util.List;
  */
 public class ConfigurationPanel extends JPanel {
 
-
+	private static final Color ADVANCED_TAB_COLOR = new Color(244, 242, 242);
+	
 	private final FindBugsPlugin _plugin;
 	private JCheckBox _compileBeforeAnalyseChkb;
 	private JCheckBox _analyzeAfterCompileChkb;
 	private JCheckBox _runInBackgroundChkb;
 	private JCheckBox _toolwindowToFront;
+
+
 	private JComboBox _effortLevelCombobox;
-
-
 	private JPanel _mainPanel;
 	private JCheckBox _detectorThresholdChkb;
 	private JPanel _effortPanel;
@@ -309,9 +311,11 @@ public class ConfigurationPanel extends JPanel {
 			_configPagesRegistry.add(getDetectorConfig());
 			_configPagesRegistry.add(getReporterConfig());
 			_configPagesRegistry.add(getFilterConfig());
-			_configPagesRegistry.add(getPluginConfig());
-			_configPagesRegistry.add(getImportExportConfig());
-			_configPagesRegistry.add(getAnnotationConfig());
+			if (!_plugin.isModuleComponent()) {
+				_configPagesRegistry.add(getPluginConfig());
+				_configPagesRegistry.add(getImportExportConfig());
+				_configPagesRegistry.add(getAnnotationConfig());
+			}
 		}
 		return _configPagesRegistry;
 	}
@@ -406,7 +410,8 @@ public class ConfigurationPanel extends JPanel {
 						if (firstAdvancedPage == null) {
 							firstAdvancedPage = configPage.getComponent();
 						}
-						_tabbedPane.addTab(configPage.getTitle(), configPage.getComponent());
+						_tabbedPane.insertTab(configPage.getTitle(), null, configPage.getComponent(), configPage.getTitle(), i);
+						_tabbedPane.setBackgroundAt(i, ADVANCED_TAB_COLOR);
 					} else {
 						_tabbedPane.remove(configPage.getComponent());
 					}
@@ -415,7 +420,8 @@ public class ConfigurationPanel extends JPanel {
 						if (firstAdvancedPage == null) {
 							firstAdvancedPage = configPage.getComponent();
 						}
-						_tabbedPane.addTab(configPage.getTitle(), configPage.getComponent());
+						_tabbedPane.insertTab(configPage.getTitle(), null, configPage.getComponent(), configPage.getTitle(), i);
+						_tabbedPane.setBackgroundAt(i, ADVANCED_TAB_COLOR);
 					} else {
 						_tabbedPane.remove(configPage.getComponent());
 					}
@@ -439,25 +445,9 @@ public class ConfigurationPanel extends JPanel {
 	@Override
 	public void setEnabled(final boolean enabled) {
 		super.setEnabled(enabled);
-		getRunInBgCheckbox().setEnabled(enabled);
-		getAnalyzeAfterCompileCheckbox().setEnabled(enabled);
-		getToolwindowToFrontCheckbox().setEnabled(enabled);
-		getEffortLevelCombobox().setEnabled(enabled);
-		getEffortSlider().setEnabled(enabled);
-		getDetectorConfig().setEnabled(enabled);
-		getReporterConfig().setEnabled(enabled);
-		getFilterConfig().setEnabled(enabled);
-
-		if (!_plugin.isModuleComponent()) {
-			getPluginConfig().setEnabled(enabled);
+		final List<ConfigurationPage> configPages = getConfigPages();
+		for (final ConfigurationPage configPage : configPages) {
+			configPage.setEnabled(enabled);
 		}
-		if (!_plugin.isModuleComponent()) {
-			getImportExportConfig().setEnabled(enabled);
-		}
-		if (!_plugin.isModuleComponent()) {
-			getAnnotationConfig().setEnabled(enabled);
-		}
-
 	}
-
 }

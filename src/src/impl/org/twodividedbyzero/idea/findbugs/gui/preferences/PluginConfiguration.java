@@ -193,7 +193,7 @@ public class PluginConfiguration implements ConfigurationPage {
 
 
 	public void setEnabled(final boolean enabled) {
-		_pluginsPanel.setEnabled(enabled);
+		getPluginPanel().setEnabled(enabled);
 	}
 
 
