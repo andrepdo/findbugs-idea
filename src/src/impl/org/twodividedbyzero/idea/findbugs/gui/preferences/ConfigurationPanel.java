@@ -286,7 +286,6 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
-	@SuppressWarnings({"HardcodedFileSeparator"})
 	private Component getTabbedPane() {
 		if (_tabbedPane == null) {
 			_tabbedPane = new JTabbedPane();

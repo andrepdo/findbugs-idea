@@ -203,7 +203,8 @@ public class DetectorConfiguration implements ConfigurationPage {
 				}
 			});
 
-			_detectorsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			final ListSelectionModel selectionModel = _detectorsTable.getSelectionModel();
+			selectionModel.addListSelectionListener(new ListSelectionListener() {
 				public void valueChanged(final ListSelectionEvent e) {
 					if (!e.getValueIsAdjusting() && e.getFirstIndex() > -1) {
 						final DetectorFactory detectorFactory = _bugPatternModel.getEntries().get(e.getFirstIndex());
@@ -230,7 +231,8 @@ public class DetectorConfiguration implements ConfigurationPage {
 			_detectorsTable.getColumnModel().getColumn(2).setPreferredWidth(100);
 			_detectorsTable.getColumnModel().getColumn(4).setPreferredWidth(400);
 			_detectorsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-			_detectorsTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			selectionModel.setSelectionInterval(0, 0);
 
 		}
 		return _detectorsTable;
