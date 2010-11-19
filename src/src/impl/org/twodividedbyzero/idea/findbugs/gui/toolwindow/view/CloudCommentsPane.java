@@ -110,7 +110,7 @@ public class CloudCommentsPane extends JPanel {
 			public void linkSelected(final LinkLabel linkLabel, final Object o) {
 				_commentEntryPanel.setVisible(true);
 				_addCommentLink.setVisible(false);
-				_commentBox.requestFocus();
+				_commentBox.requestFocusInWindow();
 				_commentBox.setSelectionStart(0);
 				_commentBox.setSelectionEnd(_commentBox.getText().length());
 				invalidate();
@@ -135,7 +135,7 @@ public class CloudCommentsPane extends JPanel {
 				}
 				_bugInstance.setUserDesignationKey(choice.name(), _bugCollection);
 				//TODO: do in background
-				_bugInstance.setAnnotationText("\n" + comment, _bugCollection);
+				_bugInstance.setAnnotationText(comment, _bugCollection);
 
 				_commentBox.setText("My comment");
 
