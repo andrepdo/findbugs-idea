@@ -61,6 +61,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED", "SE_BAD_FIELD", "SE_BAD_FIELD_STORE"})
 public class CloudCommentsPane extends JPanel {
 
 	private static final Logger LOGGER = Logger.getInstance(CloudCommentsPane.class.getName());
@@ -78,6 +79,7 @@ public class CloudCommentsPane extends JPanel {
 	private LinkLabel _signInOutLink;
 	private LinkLabel _changeLink;
 	private JTextArea _cloudDetailsLabel;
+	
 	private SortedBugCollection _bugCollection;
 	private BugInstance _bugInstance;
 
@@ -162,6 +164,7 @@ public class CloudCommentsPane extends JPanel {
 						case SIGNED_IN:
 							cloud.signOut();
 							break;
+						default:
 					}
 				}
 			}
@@ -291,6 +294,7 @@ public class CloudCommentsPane extends JPanel {
 				_signInOutLink.setText("sign out");
 				_signInOutLink.setVisible(true);
 				break;
+			default:
 		}
 	}
 

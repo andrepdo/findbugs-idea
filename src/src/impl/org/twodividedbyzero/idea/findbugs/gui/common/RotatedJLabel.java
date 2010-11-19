@@ -9,6 +9,7 @@ package org.twodividedbyzero.idea.findbugs.gui.common;
 import javax.swing.Icon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -238,16 +239,20 @@ public class RotatedJLabel extends JLabel {
    *          command line arguments.
    */
   public static void main(final String[] args) {
-    final JFrame f = new JFrame("Test");
-    f.setLayout(new FlowLayout());
-    final RotatedJLabel rl = new RotatedJLabel("BLAHBLAH");
-    rl.setBackground(Color.ORANGE);
-    rl.setOpaque(true);
-    rl.setDirection(Direction.VERTICAL_DOWN);
-    f.add(rl);
-    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    f.pack();
-    f.setVisible(true);
+	  SwingUtilities.invokeLater(new Runnable() {
+		  public void run() {
+			  final JFrame f = new JFrame("Test");
+			  f.setLayout(new FlowLayout());
+			  final RotatedJLabel rl = new RotatedJLabel("BLAHBLAH");
+			  rl.setBackground(Color.ORANGE);
+			  rl.setOpaque(true);
+			  rl.setDirection(Direction.VERTICAL_DOWN);
+			  f.add(rl);
+			  f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			  f.pack();
+			  f.setVisible(true);
+		  }
+	  });
   }
 
 

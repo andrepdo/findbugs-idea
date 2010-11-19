@@ -36,6 +36,7 @@ public final class EventDispatchThreadHelper {
 	private static final Logger LOGGER = Logger.getInstance(EventDispatchThreadHelper.class.getName());
 
 
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	public static void invokeAndWait(@NotNull final Operation operation) {
 		assert operation != null : "Operation must not be null!";
 		if (EventQueue.isDispatchThread()) {

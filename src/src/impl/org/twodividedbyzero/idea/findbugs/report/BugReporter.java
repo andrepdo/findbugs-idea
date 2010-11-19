@@ -59,7 +59,8 @@ import java.util.Set;
  * @version $Revision$
  * @since 0.0.1
  */
-@SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
+@edu.umd.cs.findbugs.annotations.SuppressWarnings({"IS2_INCONSISTENT_SYNC"})
+@SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "HardcodedFileSeparator"})
 public class BugReporter extends AbstractBugReporter implements FindBugsProgress {
 
 	private static final Logger LOGGER = Logger.getInstance(BugReporter.class.getName());
@@ -110,7 +111,10 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 	 */
 	@Override
 	protected void doReportBug(final BugInstance bug) {
-		getBugCollection().add(bug);
+		if (_bugCollection == null) {
+			throw new IllegalStateException("Expected non null _bugCollection");
+		}
+		_bugCollection.add(bug);
 		/*if (MarkerUtil.displayWarning(bug, userPrefs.getFilterSettings())) {
 			MarkerUtil.createMarker(bug, project, getBugCollection());
 			filteredBugCount++;
@@ -344,11 +348,10 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
-				final int goal = getGoal();
 				//stageNameLabel.setText(stageName);
 				//_findBugsTask.setTitle(stageName + " 0/" + goal);
 				_currentStageName = stageName;
-				_findBugsTask.setIndicatorText2(stageName + " 0/" + goal);
+				_findBugsTask.setIndicatorText2(stageName + " 0/" + getGoal());
 				//_findBugsTask.setIndicatorText("0/" + goal);
 				//countValueLabel.setText("0/" + goal);
 				//progressBar.setMaximum(goal);

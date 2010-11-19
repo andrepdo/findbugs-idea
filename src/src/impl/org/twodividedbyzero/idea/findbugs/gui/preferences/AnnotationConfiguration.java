@@ -60,6 +60,7 @@ import java.util.List;
  * @version $Revision$
  * @since 0.9.97
  */
+@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED", "SE_BAD_FIELD", "SIC_INNER_SHOULD_BE_STATIC_ANON"})
 public class AnnotationConfiguration implements ConfigurationPage {
 
 	private AnnotationTypePanel _annotationTypePanel;
@@ -368,7 +369,8 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 	private static class AnnotationTypePanel extends JPanel {
 
-		private AnnotationConfiguration _configuration;
+		private final AnnotationConfiguration _configuration;
+
 		private JCheckBox _plainBox;
 		private JCheckBox _italicBox;
 		private JCheckBox _boldBox;

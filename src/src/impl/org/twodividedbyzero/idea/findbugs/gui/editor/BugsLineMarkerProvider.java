@@ -103,6 +103,7 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 	}
 
 
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"DB_DUPLICATE_SWITCH_CLAUSES"})
 	@Nullable
 	private static Icon getIcon(final ExtendedProblemDescriptor problemDescriptor) {
 		final BugInstance bugInstance = problemDescriptor.getBugInstance();
@@ -138,11 +139,12 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 				_analysisRunning = true;
 				break;
 			case ANALYSIS_ABORTED:
-				_analysisRunning = false;
-				break;
 			case ANALYSIS_FINISHED:
 				_analysisRunning = false;
 				break;
+			case NEW_BUG_INSTANCE:
+				break;
+			default:
 		}
 	}
 

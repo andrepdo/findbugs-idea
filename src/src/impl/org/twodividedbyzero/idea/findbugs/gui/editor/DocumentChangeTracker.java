@@ -68,6 +68,7 @@ class DocumentChangeTracker implements DocumentListener {
 	}
 
 
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"})
 	@NotNull
 	RangeMarker addMarker(@NotNull final ExtendedProblemDescriptor problem, final boolean orphanMarker) {
 		final int lineStart = problem.getLineStart();

@@ -26,7 +26,6 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
-import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import edu.umd.cs.findbugs.FindBugs2;
 import edu.umd.cs.findbugs.IFindBugsEngine;
@@ -183,7 +182,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 
 	public boolean work() {
 		try {
-			registerEventListner();
+			registerEventListener();
 			final IFindBugsEngine engine = createFindBugsEngine();
 
 			// Create FindBugsTask
@@ -366,17 +365,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	}
 
 
-	/**
-	 * Return the collection of BugInstances.
-	 *
-	 * @return a collection of all bug instances
-	 */
-	public Collection<BugInstance> getBugInstances() {
-		return _bugReporter.getBugCollection().getCollection();
-	}
-
-
-	void registerEventListner() {
+	void registerEventListener() {
 		EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(_project.getName()), this);
 	}
 

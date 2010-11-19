@@ -92,9 +92,7 @@ import java.beans.PropertyChangeListener;
  * @author Tim Boudreau
  * @author Andre Pfeiler - made some tiny modification on positioning the buffered image rect
  */
-@edu.umd.cs.findbugs.annotations.SuppressWarnings(
-		value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
-		justification = "")
+@edu.umd.cs.findbugs.annotations.SuppressWarnings({"RI_REDUNDANT_INTERFACES"})
 @SuppressWarnings({"AssignmentToNull"})
 public final class ViewTooltips extends MouseAdapter implements MouseMotionListener {
 

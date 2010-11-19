@@ -105,14 +105,11 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 
 	@SuppressWarnings({"MethodMayBeStatic", "AnonymousInnerClass"})
 	private void addProblem(final BugInstanceNode leaf) {
-		final PsiFile psiFile = leaf.getPsiFile(new DoneCallback<PsiFile>() {
+		leaf.getPsiFile(new DoneCallback<PsiFile>() {
 			public void onDone(final PsiFile value) {
 				_addProblem(value, leaf);
 			}
 		});
-		/*if (psiFile != null) {
-			_addProblem(psiFile, leaf);
-		}*/
 	}
 
 

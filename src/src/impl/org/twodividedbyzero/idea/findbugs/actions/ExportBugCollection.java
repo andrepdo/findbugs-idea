@@ -165,6 +165,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 			private ProgressIndicator _indicator;
 
 
+			@edu.umd.cs.findbugs.annotations.SuppressWarnings({"REC_CATCH_EXCEPTION"})
 			@SuppressWarnings({"IOResourceOpenedButNotSafelyClosed"})
 			@Override
 			public void run(@NotNull final ProgressIndicator indicator) {

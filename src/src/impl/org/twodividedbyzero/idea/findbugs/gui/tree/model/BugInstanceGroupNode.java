@@ -351,57 +351,6 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 	}
 
 
-	private String getToString(final GroupBy groupBy) {
-		final StringBuilder buf = new StringBuilder();
-		buf.append("<html><body>");
-
-		final String toString;
-		switch (groupBy) {
-
-			case BugCategory:
-				if (getParent() instanceof BugInstanceGroupNode) {
-					buf.append(_groupName);
-				} else {
-					buf.append("<b>");
-					buf.append(_groupName);
-					buf.append("</b>");
-				}
-				buf.append("<font color='gray'>");
-				buf.append(" (");
-				buf.append(_memberCount).append(_memberCount > 1 || _memberCount == 0 ? " items" : " item");
-				buf.append(")");
-				buf.append("</font>");
-				toString = buf.toString();
-				break;
-			case Class:
-			case Package:
-			case Priority:
-				buf.append("<b>");
-				buf.append(_groupName);
-				buf.append("</b>");
-				buf.append("<font color='gray'>");
-				buf.append(" (");
-				buf.append(_memberCount).append(_memberCount > 1 || _memberCount == 0 ? " items" : " item");
-				buf.append(")");
-				buf.append("</font>");
-				toString = buf.toString();
-				break;
-			default:
-				buf.append(_groupName);
-				buf.append("<font color='gray'>");
-				buf.append(" (");
-				buf.append(_memberCount).append(_memberCount > 1 || _memberCount == 0 ? " items" : " item");
-				buf.append(")");
-				buf.append("</font>");
-				toString = buf.toString();
-		}
-
-		buf.append("</body></html>");
-
-		return toString;
-	}
-
-
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();

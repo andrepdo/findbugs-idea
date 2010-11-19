@@ -194,6 +194,7 @@ class IconLineMarkerProvider implements LineMarkerProvider {
 	}
 
 
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"REC_CATCH_EXCEPTION"})
 	@Nullable
 	private Icon getIcon(final VirtualFile file) {
 		final String path = file.getPath();
