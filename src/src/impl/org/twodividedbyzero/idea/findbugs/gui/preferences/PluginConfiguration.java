@@ -25,6 +25,7 @@ import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.PluginException;
 import edu.umd.cs.findbugs.Project;
 import info.clearthought.layout.TableLayout;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.gui.common.CustomLineBorder;
@@ -45,6 +46,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.html.HTMLEditorKit;
 import java.awt.Color;
@@ -54,6 +56,8 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 
@@ -65,7 +69,7 @@ import java.net.MalformedURLException;
  * @version $Revision$
  * @since 0.9.97
  */
-@SuppressWarnings({"AnonymousInnerClass"})
+@SuppressWarnings({"AnonymousInnerClass", "HardcodedLineSeparator"})
 public class PluginConfiguration implements ConfigurationPage {
 
 	private final FindBugsPreferences _preferences;
@@ -74,6 +78,8 @@ public class PluginConfiguration implements ConfigurationPage {
 	private JPanel _pluginsPanel;
 	private JPanel _pluginComponentPanel;
 	private static final Color PLUGIN_DESCRIPTION_BG_COLOR = UIManager.getColor("Tree.textBackground");
+	private static final Color PLUGIN_DESCRIPTION_MOUSEOVER_BG_COLOR = new Color(255, 255, 204);
+	private static final Color PLUGIN_DESCRIPTION_SELECTED_BORDER_COLOR = new Color(219, 219, 137);
 
 
 	public PluginConfiguration(final ConfigurationPanel parent, final FindBugsPreferences preferences) {
@@ -113,10 +119,11 @@ public class PluginConfiguration implements ConfigurationPage {
 			return;
 		}
 		_pluginComponentPanel.removeAll();
-		final Project currentProject = getCurrentProject();
+		final Project currentProject = getCurrentFbProject();
 		for (final Plugin plugin : Plugin.getAllPlugins()) {
+			plugin.setGloballyEnabled(true);
 			if (plugin.isCorePlugin()) {
-				continue;
+				//continue;
 			}
 
 			final PluginComponent pluginPanel = new PluginComponent(currentProject, plugin, _preferences);
@@ -138,7 +145,7 @@ public class PluginConfiguration implements ConfigurationPage {
 			final double border = 5;
 			final double colsGap = 10;
 			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, border}, // Columns
-									 {border, 540, border}};// Rows
+									 {border, TableLayout.FILL, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_pluginsPanel = new JPanel(tbl);
 
@@ -162,7 +169,7 @@ public class PluginConfiguration implements ConfigurationPage {
 			final Action action = new BrowseAction(_parent, "Install New Plugin...", new ExtensionFileFilter(FindBugsUtil.PLUGINS_EXTENSIONS_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
 					try {
-						Plugin.loadPlugin(selectedFile, getCurrentProject());
+						Plugin.loadPlugin(selectedFile, getCurrentFbProject());
 						try {
 							_preferences.addPlugin(selectedFile.toURI().toURL().toExternalForm());
 						} catch (MalformedURLException e) {
@@ -184,7 +191,8 @@ public class PluginConfiguration implements ConfigurationPage {
 	}
 
 
-	private Project getCurrentProject() {
+	@Nullable
+	private Project getCurrentFbProject() {
 		final ToolWindowPanel panel = _parent.getFindBugsPlugin().getToolWindowPanel();
 		if (panel == null) {
 			return null;
@@ -223,6 +231,7 @@ public class PluginConfiguration implements ConfigurationPage {
 		private JPanel _component;
 		private final Project _currentProject;
 		private final FindBugsPreferences _preferences;
+		private static final Border SELECTION_BORDER = BorderFactory.createLineBorder(PLUGIN_DESCRIPTION_SELECTED_BORDER_COLOR);
 
 
 		private PluginComponent(final Project currentProject, final Plugin plugin, final FindBugsPreferences preferences) {
@@ -291,12 +300,18 @@ public class PluginConfiguration implements ConfigurationPage {
 
 				editorPane.setText(html.toString());
 				_component.add(editorPane, "3, 1, 3, 1");
+
+				_component.addMouseListener(new PluginComponentMouseAdapter(editorPane, checkbox));
+				editorPane.addMouseListener(new PluginComponentMouseAdapter(editorPane, checkbox));
 			}
 			return _component;
 		}
 
 
-		boolean isEnabled(final Project project, final Plugin plugin) {
+		static boolean isEnabled(final Project project, final Plugin plugin) {
+			if (plugin.isCorePlugin()) {
+				return false;
+			}
 			if (project == null) {
 				return plugin.isGloballyEnabled();
 			}
@@ -310,6 +325,43 @@ public class PluginConfiguration implements ConfigurationPage {
 			protected void paintComponent(final Graphics g) {
 				GuiUtil.configureGraphics(g);
 				super.paintComponent(g);
+			}
+		}
+
+		private class PluginComponentMouseAdapter extends MouseAdapter {
+
+			private final JEditorPane _editorPane;
+			private final AbstractButton _checkbox;
+
+
+			private PluginComponentMouseAdapter(final JEditorPane editorPane, final AbstractButton checkbox) {
+				_editorPane = editorPane;
+				_checkbox = checkbox;
+			}
+
+
+			@Override
+			public void mouseReleased(final MouseEvent e) {
+				_component.setBackground(PLUGIN_DESCRIPTION_MOUSEOVER_BG_COLOR);
+				//_component.setBorder(SELECTION_BORDER);
+				_editorPane.setBackground(PLUGIN_DESCRIPTION_MOUSEOVER_BG_COLOR);
+				_checkbox.setBackground(PLUGIN_DESCRIPTION_MOUSEOVER_BG_COLOR);
+			}
+
+
+			@Override
+			public void mouseEntered(final MouseEvent e) {
+				_component.setBackground(PLUGIN_DESCRIPTION_MOUSEOVER_BG_COLOR);
+				_editorPane.setBackground(PLUGIN_DESCRIPTION_MOUSEOVER_BG_COLOR);
+				_checkbox.setBackground(PLUGIN_DESCRIPTION_MOUSEOVER_BG_COLOR);
+			}
+
+
+			@Override
+			public void mouseExited(final MouseEvent e) {
+				_component.setBackground(PLUGIN_DESCRIPTION_BG_COLOR);
+				_editorPane.setBackground(PLUGIN_DESCRIPTION_BG_COLOR);
+				_checkbox.setBackground(PLUGIN_DESCRIPTION_BG_COLOR);
 			}
 		}
 	}

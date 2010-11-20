@@ -23,7 +23,6 @@ import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import info.clearthought.layout.TableLayout;
-import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.gui.common.TableSorter;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.model.BugPatternTableModel;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -39,6 +38,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -51,6 +51,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Rectangle;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Collection;
@@ -130,7 +132,16 @@ public class DetectorConfiguration implements ConfigurationPage {
 			scrollPane.setBorder(null);
 			//mainPanel.add(getDetectorTextPanel(), "1, 9, 1, 9");
 
-			final Component splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, detectorPanel, getDetectorTextPanel());
+			final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, detectorPanel, getDetectorTextPanel());
+			splitPane.addHierarchyListener(new HierarchyListener() {
+				public void hierarchyChanged(final HierarchyEvent e) {
+					if (e.getChangeFlags() == HierarchyEvent.SHOWING_CHANGED) {
+						if (splitPane.isShowing()) {
+							splitPane.setDividerLocation(0.75);
+						}
+					}
+				}
+			});
 			mainPanel.add(splitPane, "1, 7, 1, 7");
 
 			_component = mainPanel;
@@ -213,7 +224,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 						final DetectorFactory detectorFactory = _bugPatternModel.getEntries().get(e.getFirstIndex());
 						final String description = getDetailedText(detectorFactory);
 						getTextArea().setText(description);
-						EventDispatchThreadHelper.invokeLater(new Runnable() {
+						SwingUtilities.invokeLater(new Runnable() {
 							public void run() {
 								getTextArea().scrollRectToVisible(new Rectangle(0, 0));
 							}
