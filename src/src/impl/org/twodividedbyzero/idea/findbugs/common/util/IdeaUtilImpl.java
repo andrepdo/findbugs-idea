@@ -919,4 +919,12 @@ public final class IdeaUtilImpl {
 		}
 		return path;
 	}
+
+
+	/*public static void collapsePathMacro() {
+		PathMacroManager macroManager = PathMacroManager.getInstance(project);
+		String pathWithMacro = macroManager.collapsePath("/path/to/your/project/your/file");
+		assert pathWithMacro.equals("$PROJECT_DIR$/your/file");
+
+	}*/
 }
