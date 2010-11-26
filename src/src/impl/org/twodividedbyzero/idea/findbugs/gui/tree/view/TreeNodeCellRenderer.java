@@ -22,6 +22,7 @@ import info.clearthought.layout.TableLayout;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceGroupNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.RootNode;
+import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -201,7 +202,7 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer/*, 
 				final TreePath leadParentPath = new TreePath(new Object[] {selectionPath.getPathComponent(0), selectionPath.getPathComponent(1)});
 
 				if (tree.getRowForPath(leadParentPath) > 0 && leadParentPath.isDescendant(path)) {
-					setBackgroundNonSelectionColor(Tree.HIGHLIGHT_COLOR);
+					setBackgroundNonSelectionColor(GuiResources.HIGHLIGHT_COLOR_LIGHTER);
 				} else {
 					setBackgroundNonSelectionColor(UIManager.getColor("Tree.textBackground"));
 				}

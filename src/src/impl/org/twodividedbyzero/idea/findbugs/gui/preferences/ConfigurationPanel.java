@@ -22,6 +22,7 @@ import info.clearthought.layout.TableLayout;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -37,7 +38,6 @@ import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -61,8 +61,7 @@ import java.util.List;
  */
 public class ConfigurationPanel extends JPanel {
 
-	private static final Color ADVANCED_TAB_COLOR = new Color(244, 242, 242);
-	
+
 	private final FindBugsPlugin _plugin;
 	private JCheckBox _compileBeforeAnalyseChkb;
 	private JCheckBox _analyzeAfterCompileChkb;
@@ -387,6 +386,7 @@ public class ConfigurationPanel extends JPanel {
 	private Component getShowAdvancedConfigsButton() {
 		if (_showAdvancedConfigsButton == null) {
 			_showAdvancedConfigsButton = new JToggleButton("Advanced Settings");
+			_showAdvancedConfigsButton.setBackground(GuiResources.HIGHLIGHT_COLOR);
 			_showAdvancedConfigsButton.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
 					if(_showAdvancedConfigsButton.isSelected()) {
@@ -413,7 +413,7 @@ public class ConfigurationPanel extends JPanel {
 							firstAdvancedPage = configPage.getComponent();
 						}
 						_tabbedPane.insertTab(configPage.getTitle(), null, configPage.getComponent(), configPage.getTitle(), i);
-						_tabbedPane.setBackgroundAt(i, ADVANCED_TAB_COLOR);
+						_tabbedPane.setBackgroundAt(i, GuiResources.HIGHLIGHT_COLOR);
 					} else {
 						_tabbedPane.remove(configPage.getComponent());
 					}
@@ -423,7 +423,7 @@ public class ConfigurationPanel extends JPanel {
 							firstAdvancedPage = configPage.getComponent();
 						}
 						_tabbedPane.insertTab(configPage.getTitle(), null, configPage.getComponent(), configPage.getTitle(), i);
-						_tabbedPane.setBackgroundAt(i, ADVANCED_TAB_COLOR);
+						_tabbedPane.setBackgroundAt(i, GuiResources.HIGHLIGHT_COLOR);
 					} else {
 						_tabbedPane.remove(configPage.getComponent());
 					}

@@ -19,6 +19,7 @@
 package org.twodividedbyzero.idea.findbugs.gui.tree.view;
 
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
 import javax.swing.JTree;
 import javax.swing.UIManager;
@@ -39,7 +40,6 @@ import java.awt.Rectangle;
 public abstract class Tree extends JTree {
 
 	private TreePath _highlightPath;
-	public static final Color HIGHLIGHT_COLOR = new Color(255, 255, 204);
 	public static final Color NON_HIGHLIGHT_COLOR = UIManager.getColor("Tree.textBackground");
 	private TreePath _lastHighlightPath;
 
@@ -87,7 +87,7 @@ public abstract class Tree extends JTree {
 		g.fillRect(0, 0, getWidth(), getHeight());
 
 		if (_highlightPath != null && getRowForPath(_highlightPath) > 0) {
-			paintHighlightForPath(g, _highlightPath, HIGHLIGHT_COLOR);
+			paintHighlightForPath(g, _highlightPath, GuiResources.HIGHLIGHT_COLOR_LIGHTER);
 			_lastHighlightPath = _highlightPath;
 
 		} else if (_lastHighlightPath != null) {

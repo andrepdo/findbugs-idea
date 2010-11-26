@@ -33,6 +33,7 @@ import org.twodividedbyzero.idea.findbugs.gui.common.ExtensionFileFilter;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.BrowseAction.BrowseActionCallback;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
 import javax.swing.AbstractButton;
 import javax.swing.Action;
@@ -78,8 +79,6 @@ public class PluginConfiguration implements ConfigurationPage {
 	private JPanel _pluginsPanel;
 	private JPanel _pluginComponentPanel;
 	private static final Color PLUGIN_DESCRIPTION_BG_COLOR = UIManager.getColor("Tree.textBackground");
-	private static final Color PLUGIN_DESCRIPTION_MOUSEOVER_BG_COLOR = new Color(255, 255, 204);
-	private static final Color PLUGIN_DESCRIPTION_SELECTED_BORDER_COLOR = new Color(219, 219, 137);
 
 
 	public PluginConfiguration(final ConfigurationPanel parent, final FindBugsPreferences preferences) {
@@ -231,7 +230,7 @@ public class PluginConfiguration implements ConfigurationPage {
 		private JPanel _component;
 		private final Project _currentProject;
 		private final FindBugsPreferences _preferences;
-		private static final Border SELECTION_BORDER = BorderFactory.createLineBorder(PLUGIN_DESCRIPTION_SELECTED_BORDER_COLOR);
+		private static final Border SELECTION_BORDER = BorderFactory.createLineBorder(GuiResources.HIGHLIGHT_COLOR);
 
 
 		private PluginComponent(final Project currentProject, final Plugin plugin, final FindBugsPreferences preferences) {
@@ -342,18 +341,18 @@ public class PluginConfiguration implements ConfigurationPage {
 
 			@Override
 			public void mouseReleased(final MouseEvent e) {
-				_component.setBackground(PLUGIN_DESCRIPTION_MOUSEOVER_BG_COLOR);
+				_component.setBackground(GuiResources.HIGHLIGHT_COLOR_LIGHTER);
 				//_component.setBorder(SELECTION_BORDER);
-				_editorPane.setBackground(PLUGIN_DESCRIPTION_MOUSEOVER_BG_COLOR);
-				_checkbox.setBackground(PLUGIN_DESCRIPTION_MOUSEOVER_BG_COLOR);
+				_editorPane.setBackground(GuiResources.HIGHLIGHT_COLOR_LIGHTER);
+				_checkbox.setBackground(GuiResources.HIGHLIGHT_COLOR_LIGHTER);
 			}
 
 
 			@Override
 			public void mouseEntered(final MouseEvent e) {
-				_component.setBackground(PLUGIN_DESCRIPTION_MOUSEOVER_BG_COLOR);
-				_editorPane.setBackground(PLUGIN_DESCRIPTION_MOUSEOVER_BG_COLOR);
-				_checkbox.setBackground(PLUGIN_DESCRIPTION_MOUSEOVER_BG_COLOR);
+				_component.setBackground(GuiResources.HIGHLIGHT_COLOR_LIGHTER);
+				_editorPane.setBackground(GuiResources.HIGHLIGHT_COLOR_LIGHTER);
+				_checkbox.setBackground(GuiResources.HIGHLIGHT_COLOR_LIGHTER);
 			}
 
 
