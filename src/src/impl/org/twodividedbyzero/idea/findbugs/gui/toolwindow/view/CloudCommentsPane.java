@@ -279,9 +279,12 @@ public class CloudCommentsPane extends JPanel {
 		final CloudPlugin plugin = cloud.getPlugin();
 		_cloudDetailsLabel.setText(plugin.getDetails());
 		final Cloud.SigninState state = cloud.getSigninState();
-		final String stateStr = state == Cloud.SigninState.NO_SIGNIN_REQUIRED ? "" : state + " - ";
+		final String stateStr = state == Cloud.SigninState.NO_SIGNIN_REQUIRED ? "" : "" + state;
 		final String userStr = cloud.getUser() == null ? "" : cloud.getUser();
-		_titleLabel.setText("<html><b>Comments - " + plugin.getDescription() + "</b>" + "<br><font style='font-size: x-small;color:darkgray'>" + stateStr + userStr);
+		_titleLabel.setText("<html><b>Comments - " + cloud.getCloudName() + "</b>"
+                + "<br><font style='font-size: x-small;color:darkgray'>" + stateStr
+                + (userStr.length() > 0 ? " - " + userStr : ""));
+        _addCommentLink.setVisible(cloud.canStoreUserAnnotation(_bugInstance));
 		switch (state) {
 			case NO_SIGNIN_REQUIRED:
 			case SIGNING_IN:

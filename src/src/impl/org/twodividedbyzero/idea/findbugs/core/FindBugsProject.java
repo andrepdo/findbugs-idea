@@ -125,16 +125,14 @@ public class FindBugsProject extends Project {
 
 	public void configureOutputFiles(final VirtualFile selectedPackage, final com.intellij.openapi.project.Project project) {
 		final VirtualFile path = IdeaUtilImpl.getCompilerOutputPath(selectedPackage, project);
-		//System.err.println(selectedPackage.getPresentableUrl());
-		//System.err.println(selectedPackage.getPresentableName());
 		assert path != null;
-		//System.err.println("####### path " + path.getPresentableUrl());
-		//System.err.println(IdeaUtilImpl.findFileByIoFile(new File(selectedPackage.getPath())));
+		_outputFiles = new VirtualFile[] {path};
 		RecurseFileCollector.addFiles(this, new File(selectedPackage.getPath()));
 	}
 
 
 	public void configureOutputFiles(final String path) {
+		_outputFiles = new VirtualFile[] {IdeaUtilImpl.findFileByPath(path)};
 		RecurseFileCollector.addFiles(this, new File(path));
 	}
 

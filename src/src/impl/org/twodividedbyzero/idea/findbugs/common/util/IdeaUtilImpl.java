@@ -100,6 +100,7 @@ import java.util.Set;
  * @version $Revision$
  * @since 0.0.1
  */
+@SuppressWarnings({"HardcodedFileSeparator"})
 public final class IdeaUtilImpl {
 
 	private static final VirtualFile[] EMPTY_VIRTUAL_FILE = new VirtualFile[0];
@@ -753,7 +754,7 @@ public final class IdeaUtilImpl {
 	 * @return the PsiClass element
 	 */
 	@Nullable
-	public static PsiClass findJavaPsiClass(final Project project, final String classname) {
+	public static PsiClass findJavaPsiClass(@NotNull final Project project, final String classname) {
 		final String fqn = classname.endsWith(".java") ? classname.replaceFirst(".java", "") : classname;
 		final String dottedName = fqn.contains("/") ? fqn.replace('/', '.') : fqn;
 		final GlobalSearchScope scope = GlobalSearchScope.allScope(project);

@@ -21,7 +21,6 @@ package org.twodividedbyzero.idea.findbugs.preferences;
 import com.intellij.openapi.module.Module;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
-import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import edu.umd.cs.findbugs.config.UserPreferences;
@@ -301,7 +300,7 @@ public class FindBugsPreferences extends Properties {
 	public static void loadPlugins(final List<String> pluginUrls) {
 		for (String pluginUrl : pluginUrls) {
 			try {
-				Plugin plugin = Plugin.loadPlugin(new URL(pluginUrl), null);
+				Plugin plugin = Plugin.loadCustomPlugin(new URL(pluginUrl), null);
 				plugin.setGloballyEnabled(false);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -577,7 +576,7 @@ public class FindBugsPreferences extends Properties {
 
 	public static Map<String, String> getDefaultBugCategories(final ProjectFilterSettings filterSettings) {
 		final Map<String, String> bugCategories = new HashMap<String, String>();
-		final Collection<String> categoryList = I18N.instance().getBugCategories();
+		final Collection<String> categoryList = DetectorFactoryCollection.instance().getBugCategories();
 		for (final String category : categoryList) {
 			bugCategories.put(category, String.valueOf(filterSettings.containsCategory(category)));
 		}
@@ -606,7 +605,7 @@ public class FindBugsPreferences extends Properties {
 
 	public static synchronized DetectorFactoryCollection getDetectorFactorCollection() {
 		if (_detectorFactoryCollection == null) {
-			_detectorFactoryCollection = DetectorFactoryCollection.rawInstance();
+			_detectorFactoryCollection = DetectorFactoryCollection.instance();
 		}
 		return _detectorFactoryCollection;
 	}

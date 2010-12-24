@@ -71,14 +71,16 @@ public class AnalysisRunDetailsDialog implements Serializable {
 		html.append("<p><h2>").append(VersionManager.getName()).append(": <b>found ").append(bugCount).append(" bugs in ").append(numAnalysedClasses).append(numAnalysedClasses > 1 ? " classes" : " class").append("</b>").append("</h2></p>");
 		html.append("<p>").append("<font size='10px'>using ").append(VersionManager.getFullVersion()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font>").append("</p>");
 
-		html.append("<p><h3>Configured Output Files").append(" <font color='gray'>(").append(configuredOutputFiles.length).append(")</h3></p>");
-		html.append("<ul>");
-		for (final VirtualFile file : configuredOutputFiles) {
-			html.append("<li>");
-			html.append(file.getPresentableName());
-			html.append("</li>");
+		if (configuredOutputFiles.length > 0) {
+			html.append("<p><h3>Configured Output Files/Paths - the analysis entry point").append(" <font color='gray'>(").append(configuredOutputFiles.length).append(")</h3></p>");
+			html.append("<ul>");
+			for (final VirtualFile file : configuredOutputFiles) {
+				html.append("<li>");
+				html.append(file.getPath());
+				html.append("</li>");
+			}
+			html.append("</ul>");
 		}
-		html.append("</ul>");
 
 		html.append("<p><h3>Compile Output Path").append(" <font size='9px' color='gray'>(").append("IDEA)</h3></p>");
 		html.append("<ul>");

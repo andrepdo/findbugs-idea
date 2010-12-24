@@ -50,7 +50,10 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
+import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
+
+import javax.swing.Icon;
 
 
 /**
@@ -69,6 +72,12 @@ public class AddSuppressReportBugFix extends SuppressIntentionAction {
 
 	private String _bugPatternId;
 	private String _key;
+
+
+	@Override
+	public Icon getIcon(final int flags) {
+		return GuiResources.FINDBUGS_ICON;
+	}
 
 
 	/*public AddSuppressBugFix(HighlightDisplayKey key) {

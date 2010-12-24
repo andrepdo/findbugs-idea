@@ -1,0 +1,305 @@
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java	(revision 137)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/ToolWindowPanel.java	(revision )
+@@ -71,8 +71,10 @@
+ 
+ 	private static final Logger LOGGER = Logger.getInstance(ToolWindowPanel.class.getName());
+ 
+-	private static final String DEFAULT_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (COLUMN weight=0.3 right.top right.bottom) (LEAF name=right weight=0.4))";
+-	private static final String PREVIEW_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (LEAF name=middle weight=0.4) (COLUMN weight=0.3 right.top right.bottom))";
++	///private static final String DEFAULT_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (COLUMN weight=0.3 right.top right.bottom) (LEAF name=right weight=0.4))";
++	private static final String DEFAULT_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.4) (LEAF name=right weight=0.6))";
++	private static final String PREVIEW_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (LEAF name=middle weight=0.4) (LEAF weight=0.3 right))";
++	///private static final String PREVIEW_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (LEAF name=middle weight=0.4) (COLUMN weight=0.3 right.top right.bottom))";
+ 	//private static final String PREVIEW_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.4) (COLUMN weight=0.6 right.top right.bottom)  (LEAF name=right))";
+ 
+ 	private final Project _project;
+@@ -158,8 +160,8 @@
+ 					_updateMultiSplitLayout(PREVIEW_LAYOUT_DEF);
+ 					getMultiSplitPane().add(getBugTreePanel(), "left");
+ 					_multiSplitPane.add(getPreviewPanel().getComponent(), "middle");
+-					getMultiSplitPane().add(getBugDetailsComponents().getBugDetailsPanel(), "right.top");
+-					getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
++					getMultiSplitPane().add(getBugDetailsComponents().getTabbedPane(), "right");
++					//getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
+ 					_isPreviewLayoutEnabled = true;
+ 
+ 				} else if (!enablePreviewLayout) {
+@@ -167,9 +169,9 @@
+ 
+ 					_updateMultiSplitLayout(DEFAULT_LAYOUT_DEF);
+ 					getMultiSplitPane().add(getBugTreePanel(), "left");
+-					getMultiSplitPane().add(getBugDetailsComponents().getBugDetailsPanel(), "right.top");
+-					getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
+-			getMultiSplitPane().add(_bugDetailsComponents.getCloudCommentsPanel(), "right"); // NON-NLS
++					getMultiSplitPane().add(getBugDetailsComponents().getTabbedPane(), "right");
++					//getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
++					////getMultiSplitPane().add(_bugDetailsComponents.getCloudCommentsPanel(), "right");
+ 
+ 					if (getPreviewPanel().getEditor() != null) {
+ 						resizeSplitNodes(ToolWindowPanel.this);
+@@ -249,7 +251,7 @@
+ 			case ANALYSIS_STARTED:
+ 				EventDispatchThreadHelper.invokeLater(new Runnable() {
+ 					public void run() {
+-										EditorFactory.getInstance().refreshAllEditors();
++						EditorFactory.getInstance().refreshAllEditors();
+ 						DaemonCodeAnalyzer.getInstance(_project).restart();
+ 					}
+ 				});
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugDetailsComponents.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugDetailsComponents.java	(revision 138)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/BugDetailsComponents.java	(revision )
+@@ -32,6 +32,8 @@
+ import javax.swing.JEditorPane;
+ import javax.swing.JPanel;
+ import javax.swing.JScrollPane;
++import javax.swing.JSplitPane;
++import javax.swing.JTabbedPane;
+ import javax.swing.border.EmptyBorder;
+ import javax.swing.event.HyperlinkEvent;
+ import javax.swing.event.HyperlinkListener;
+@@ -40,6 +42,7 @@
+ import javax.swing.tree.TreePath;
+ import java.awt.BorderLayout;
+ import java.awt.Color;
++import java.awt.Component;
+ import java.awt.Dimension;
+ import java.awt.Graphics;
+ import java.awt.Graphics2D;
+@@ -73,6 +76,8 @@
+ 	private double _splitPaneHorizontalWeight = 0.6;
+ 	private SortedBugCollection _lastBugCollection;
+ 	private BugInstance _lastBugInstance;
++	private JTabbedPane _jTabbedPane;
++	private JSplitPane _bugDetailsSplitPane;
+ 
+ 
+ 	public BugDetailsComponents(final ToolWindowPanel toolWindowPanel) {
+@@ -87,15 +92,41 @@
+ 	}
+ 
+ 
+-	public JPanel getBugDetailsPanel() {
++	JTabbedPane getTabbedPane() {
++		if (_jTabbedPane == null) {
++			_jTabbedPane = new JTabbedPane(JTabbedPane.RIGHT);
++			_jTabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
++			_jTabbedPane.addTab("bug", getBugDetailsSplitPane());
++			_jTabbedPane.setMnemonicAt(0, 1);
++			_jTabbedPane.addTab("bug", getCloudCommentsPanel());
++			_jTabbedPane.setMnemonicAt(1, 2);
++
++		}
++		return _jTabbedPane;
++	}
++
++
++	private Component getBugDetailsSplitPane() {
++		if (_bugDetailsSplitPane == null) {
++			_bugDetailsSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
++			_bugDetailsSplitPane.setContinuousLayout(true);
++			_bugDetailsSplitPane.setTopComponent(getBugDetailsPanel());
++			_bugDetailsSplitPane.setBottomComponent(getBugExplanationPanel());
++
++		}
++		return _bugDetailsSplitPane;
++	}
++
++
++	JPanel getBugDetailsPanel() {
+ 		if (_bugDetailsPanel == null) {
+-			final JScrollPane detailTextScoller = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+-			detailTextScoller.setViewportView(getBugDetailsPane());
++			final JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
++			scrollPane.setViewportView(getBugDetailsPane());
+ 
+ 			_bugDetailsPanel = new JPanel();
+ 			//_bugDetailsPanel.setPreferredSize(new Dimension((int) (_parent.getPreferredSize().width * 0.6), (int) (_parent.getPreferredSize().height * 0.6)));
+ 			_bugDetailsPanel.setLayout(new BorderLayout());
+-			_bugDetailsPanel.add(detailTextScoller, BorderLayout.CENTER);
++			_bugDetailsPanel.add(scrollPane, BorderLayout.CENTER);
+ 			_bugDetailsPane.setEditorKit(_htmlEditorKit);
+ 		}
+ 
+@@ -117,16 +148,16 @@
+ 	}
+ 
+ 
+-	public JPanel getBugExplanationPanel() {
++	JPanel getBugExplanationPanel() {
+ 		if (_explanationPanel == null) {
+-			final JScrollPane detailHtmlScoller = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+-			detailHtmlScoller.setViewportView(getExplanationPane());
++			final JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
++			scrollPane.setViewportView(getExplanationPane());
+ 
+ 			_explanationPanel = new JPanel();
+ 			_explanationPanel.setLayout(new BorderLayout());
+ 			//_explanationPanel.setMinimumSize(new Dimension((int) (_parent.getPreferredSize().width * 0.6), 100));
+ 			//_explanationPanel.setPreferredSize(new Dimension((int) (_parent.getPreferredSize().width * 0.6), 150));
+-			_explanationPanel.add(detailHtmlScoller, BorderLayout.CENTER);
++			_explanationPanel.add(scrollPane, BorderLayout.CENTER);
+ 			_explanationPane.setEditorKit(_htmlEditorKit);
+ 		}
+ 
+@@ -134,33 +165,6 @@
+ 	}
+ 
+ 
+-	public JPanel getCloudCommentsPanel() {
+-		if (_cloudCommentsPanel == null) {
+-			final JScrollPane detailHtmlScoller = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+-			detailHtmlScoller.setViewportView(getCloudCommentsPane());
+-
+-			_cloudCommentsPanel = new JPanel();
+-			_cloudCommentsPanel.setLayout(new BorderLayout());
+-			//_explanationPanel.setMinimumSize(new Dimension((int) (_parent.getPreferredSize().width * 0.6), 100));
+-			//_explanationPanel.setPreferredSize(new Dimension((int) (_parent.getPreferredSize().width * 0.6), 150));
+-			_cloudCommentsPanel.add(detailHtmlScoller, BorderLayout.CENTER);
+-		}
+-
+-		return _cloudCommentsPanel;
+-	}
+-
+-
+-	private CloudCommentsPane getCloudCommentsPane() {
+-		if (_cloudCommentsPane == null) {
+-			_cloudCommentsPane = new CloudCommentsPane(_parent);
+-			_cloudCommentsPane.setBorder(new EmptyBorder(10, 10, 10, 10));
+-			//_explanationPane.setPreferredSize(new Dimension(_parent.getPreferredSize().width, 150));
+-		}
+-
+-		return _cloudCommentsPane;
+-	}
+-
+-
+ 	private JEditorPane getExplanationPane() {
+ 		if (_explanationPane == null) {
+ 			_explanationPane = new ExplanationEditorPane();
+@@ -181,6 +185,30 @@
+ 	}
+ 
+ 
++	JPanel getCloudCommentsPanel() {
++		if (_cloudCommentsPanel == null) {
++			final JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
++			scrollPane.setViewportView(getCloudCommentsPane());
++			_cloudCommentsPanel = new JPanel();
++			_cloudCommentsPanel.setLayout(new BorderLayout());
++			_cloudCommentsPanel.add(scrollPane, BorderLayout.CENTER);
++		}
++
++		return _cloudCommentsPanel;
++	}
++
++
++	private CloudCommentsPane getCloudCommentsPane() {
++		if (_cloudCommentsPane == null) {
++			_cloudCommentsPane = new CloudCommentsPane(_parent);
++			_cloudCommentsPane.setBorder(new EmptyBorder(10, 10, 10, 10));
++			//_explanationPane.setPreferredSize(new Dimension(_parent.getPreferredSize().width, 150));
++		}
++
++		return _cloudCommentsPane;
++	}
++
++
+ 	private void setStyleSheets() {
+ 		final StyleSheet styleSheet = new StyleSheet();
+ 		styleSheet.addRule("body {font-size: 12pt}");
+@@ -202,8 +230,8 @@
+ 
+ 	private void scrollToError(final HyperlinkEvent evt) {
+ 		if (evt.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+-			if (_parent instanceof ToolWindowPanel) {
+-				final BugTreePanel bugTreePanel = ((ToolWindowPanel) _parent).getBugTreePanel();
++			if (_parent != null) {
++				final BugTreePanel bugTreePanel = _parent.getBugTreePanel();
+ 				final BugTree tree = bugTreePanel.getBugTree();
+ 				if (bugTreePanel.isScrollToSource()) {
+ 					tree.getScrollToSourceHandler().scollToSelectionSource();
+@@ -362,8 +390,7 @@
+ 	private static void scrollRectToVisible(final JEditorPane pane) {
+ 		EventDispatchThreadHelper.invokeLater(new Runnable() {
+ 			public void run() {
+-				pane.scrollRectToVisible(new Rectangle(0, 0, 0, 0));
+-				//_detailTextPane.setCaretPosition(0);
++				pane.scrollRectToVisible(new Rectangle(1, 1, 0, 0));
+ 			}
+ 		});
+ 	}
+@@ -387,6 +414,7 @@
+ 		_explanationPanel.setSize(new Dimension(width, expHeight));
+ 		//_explanationPanel.doLayout();
+ 		_explanationPanel.validate();
++		getBugDetailsSplitPane().validate();
+ 		//_parent.validate();
+ 		//}
+ 	}
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane2.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane2.java	(revision )
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane2.java	(revision )
+@@ -0,0 +1,59 @@
++/*
++ * Copyright 2010 Andre Pfeiler
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *  http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package org.twodividedbyzero.idea.findbugs.gui.toolwindow.view;
++
++import info.clearthought.layout.TableLayout;
++
++import javax.swing.JLabel;
++import javax.swing.JPanel;
++import java.awt.LayoutManager;
++
++
++/**
++ * $Date$
++ *
++ * @author Andre Pfeiler<andrep@dev.java.net>
++ * @version $Revision$
++ * @since 0.9.97
++ */
++public class CloudCommentsPane2  extends JPanel {
++
++	private final ToolWindowPanel _toolWindowPanel;
++	private JLabel _titleLabel;
++
++
++	public CloudCommentsPane2(final ToolWindowPanel toolWindowPanel) {
++		_toolWindowPanel = toolWindowPanel;
++
++		final double border = 5;
++		final double colsGap = 2;
++		final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, border}, // Columns
++								 {border, TableLayout.PREFERRED, border}};// Rows
++		final LayoutManager tbl = new TableLayout(size);
++		setLayout(tbl);
++
++		
++	}
++
++
++	private JLabel getTitleLabel() {
++		if (_titleLabel == null) {
++			_titleLabel = new JLabel("FindBugs Cloud");
++		}
++		return _titleLabel;
++	}
++}

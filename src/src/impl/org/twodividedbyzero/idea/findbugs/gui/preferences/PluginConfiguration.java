@@ -168,7 +168,7 @@ public class PluginConfiguration implements ConfigurationPage {
 			final Action action = new BrowseAction(_parent, "Install New Plugin...", new ExtensionFileFilter(FindBugsUtil.PLUGINS_EXTENSIONS_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
 					try {
-						Plugin.loadPlugin(selectedFile, getCurrentFbProject());
+						Plugin.loadCustomPlugin(selectedFile, getCurrentFbProject());
 						try {
 							_preferences.addPlugin(selectedFile.toURI().toURL().toExternalForm());
 						} catch (MalformedURLException e) {

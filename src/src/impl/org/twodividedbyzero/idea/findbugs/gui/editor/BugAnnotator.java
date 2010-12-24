@@ -174,7 +174,7 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 					annotation = annotationHolder.createErrorAnnotation(textRange, getAnnotationText(problemDescriptor));
 				}
 				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, Color.WHITE, Color.MAGENTA.darker().darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
-				annotation.registerFix(new AddSuppressWarningAnnotationFix(problemDescriptor), textRange);
+				//annotation.registerFix(new AddSuppressWarningAnnotationFix(problemDescriptor), textRange);
 				annotation.registerFix(new AddSuppressReportBugForClassFix(problemDescriptor), textRange);
 
 				break;

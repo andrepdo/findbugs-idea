@@ -1,0 +1,88 @@
+Index: src/impl/org/twodividedbyzero/idea/findbugs/preferences/FindBugsPreferences.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/preferences/FindBugsPreferences.java	(revision 157)
++++ src/impl/org/twodividedbyzero/idea/findbugs/preferences/FindBugsPreferences.java	(revision )
+@@ -21,23 +21,13 @@
+ import com.intellij.openapi.module.Module;
+ import edu.umd.cs.findbugs.DetectorFactory;
+ import edu.umd.cs.findbugs.DetectorFactoryCollection;
+-import edu.umd.cs.findbugs.I18N;
+ import edu.umd.cs.findbugs.Plugin;
+ import edu.umd.cs.findbugs.config.ProjectFilterSettings;
+ import edu.umd.cs.findbugs.config.UserPreferences;
+ import org.jetbrains.annotations.NotNull;
+ 
+ import java.net.URL;
+-import java.util.ArrayList;
+-import java.util.Arrays;
+-import java.util.Collection;
+-import java.util.Collections;
+-import java.util.Enumeration;
+-import java.util.HashMap;
+-import java.util.Iterator;
+-import java.util.List;
+-import java.util.Map;
+-import java.util.Properties;
++import java.util.*;
+ 
+ 
+ /**
+@@ -301,7 +291,7 @@
+ 	public static void loadPlugins(final List<String> pluginUrls) {
+ 		for (String pluginUrl : pluginUrls) {
+ 			try {
+-				Plugin plugin = Plugin.loadPlugin(new URL(pluginUrl), null);
++				Plugin plugin = Plugin.loadCustomPlugin(new URL(pluginUrl), null);
+ 				plugin.setGloballyEnabled(false);
+ 			} catch (Exception e) {
+ 				e.printStackTrace();
+@@ -577,7 +567,7 @@
+ 
+ 	public static Map<String, String> getDefaultBugCategories(final ProjectFilterSettings filterSettings) {
+ 		final Map<String, String> bugCategories = new HashMap<String, String>();
+-		final Collection<String> categoryList = I18N.instance().getBugCategories();
++		final Collection<String> categoryList = DetectorFactoryCollection.instance().getBugCategories();
+ 		for (final String category : categoryList) {
+ 			bugCategories.put(category, String.valueOf(filterSettings.containsCategory(category)));
+ 		}
+@@ -606,7 +596,7 @@
+ 
+ 	public static synchronized DetectorFactoryCollection getDetectorFactorCollection() {
+ 		if (_detectorFactoryCollection == null) {
+-			_detectorFactoryCollection = DetectorFactoryCollection.rawInstance();
++			_detectorFactoryCollection = DetectorFactoryCollection.instance();
+ 		}
+ 		return _detectorFactoryCollection;
+ 	}
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.java	(revision 157)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/toolwindow/view/CloudCommentsPane.java	(revision )
+@@ -279,9 +279,12 @@
+ 		final CloudPlugin plugin = cloud.getPlugin();
+ 		_cloudDetailsLabel.setText(plugin.getDetails());
+ 		final Cloud.SigninState state = cloud.getSigninState();
+-		final String stateStr = state == Cloud.SigninState.NO_SIGNIN_REQUIRED ? "" : state + " - ";
++		final String stateStr = state == Cloud.SigninState.NO_SIGNIN_REQUIRED ? "" : "" + state;
+ 		final String userStr = cloud.getUser() == null ? "" : cloud.getUser();
+-		_titleLabel.setText("<html><b>Comments - " + plugin.getDescription() + "</b>" + "<br><font style='font-size: x-small;color:darkgray'>" + stateStr + userStr);
++		_titleLabel.setText("<html><b>Comments - " + cloud.getCloudName() + "</b>"
++                + "<br><font style='font-size: x-small;color:darkgray'>" + stateStr
++                + (userStr.length() > 0 ? " - " + userStr : ""));
++        _addCommentLink.setVisible(cloud.canStoreUserAnnotation(_bugInstance));
+ 		switch (state) {
+ 			case NO_SIGNIN_REQUIRED:
+ 			case SIGNING_IN:
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/PluginConfiguration.java
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/PluginConfiguration.java	(revision 160)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/PluginConfiguration.java	(revision )
+@@ -168,7 +168,7 @@
+ 			final Action action = new BrowseAction(_parent, "Install New Plugin...", new ExtensionFileFilter(FindBugsUtil.PLUGINS_EXTENSIONS_SET), new BrowseActionCallback() {
+ 				public void addSelection(final File selectedFile) {
+ 					try {
+-						Plugin.loadPlugin(selectedFile, getCurrentFbProject());
++						Plugin.loadCustomPlugin(selectedFile, getCurrentFbProject());
+ 						try {
+ 							_preferences.addPlugin(selectedFile.toURI().toURL().toExternalForm());
+ 						} catch (MalformedURLException e) {

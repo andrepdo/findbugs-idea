@@ -190,6 +190,18 @@ class CustomGutterIconRenderer extends com.intellij.openapi.editor.markup.Gutter
 
 
 	@Override
+	public boolean equals(final Object o) {
+		return false;  //TODO: implement
+	}
+
+
+	@Override
+	public int hashCode() {
+		return 0;  //TODO: implement
+	}
+
+
+	@Override
 	public AnAction getClickAction() {
 		return new AnAction() {
 			@Override

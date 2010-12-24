@@ -141,7 +141,7 @@ public class ConfigurationPanel extends JPanel {
 			checkboxPanel.add(getToolwindowToFrontCheckbox());
 			_mainPanel.add(checkboxPanel, "1, 1, 3, 1");
 			//_mainPanel.add(_detectorThresholdChkb);
-			_mainPanel.add(getEffortPanel(), "1, 3, 3, 3");
+			////_mainPanel.add(getEffortPanel(), "1, 3, 3, 3");
 
 			final Container tabPanel = new JPanel(new BorderLayout());
 			tabPanel.add(getTabbedPane(), BorderLayout.CENTER);
@@ -247,6 +247,7 @@ public class ConfigurationPanel extends JPanel {
 	private JSlider getEffortSlider() {
 		if (_effortSlider == null) {
 			_effortSlider = new JSlider(JSlider.HORIZONTAL, 10, 30, 20);
+			_effortSlider.setBackground(GuiResources.HIGHLIGHT_COLOR);
 			_effortSlider.setMajorTickSpacing(10);
 			_effortSlider.setPaintTicks(true);
 			_effortSlider.setSnapToTicks(true);
@@ -402,6 +403,16 @@ public class ConfigurationPanel extends JPanel {
 
 
 	private void showAdvancedConfigs(final boolean show) {
+		if (show) {
+			_mainPanel.add(getEffortPanel(), "1, 3, 3, 3");
+			_mainPanel.validate();
+			_mainPanel.repaint();
+		} else {
+			_mainPanel.remove(getEffortPanel());
+			_mainPanel.validate();
+			_mainPanel.repaint();
+		}
+
 		final List<ConfigurationPage> configPages = getConfigPages();
 		Component firstAdvancedPage = null;
 		for (int i = 0, configPagesSize = configPages.size(); i < configPagesSize; i++) {
