@@ -26,6 +26,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.vfs.ReadonlyStatusHandler;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
@@ -64,17 +65,16 @@ import javax.swing.Icon;
  * @since 0.9.97
  */
 // todo:
-public class AddSuppressReportBugFix extends SuppressIntentionAction {
+public class AddSuppressReportBugFix extends SuppressIntentionAction implements Iconable {
 
 	@NonNls
 	public static final String SUPPRESS_INSPECTIONS_TAG_NAME = "noinspection";
 	public static final String SUPPRESS_INSPECTIONS_ANNOTATION_NAME = "org.twodividedbyzero.idea.findbugs.common.annotations.SuppressWarnings";
 
-	private String _bugPatternId;
+	private final String _bugPatternId;
 	private String _key;
 
 
-	@Override
 	public Icon getIcon(final int flags) {
 		return GuiResources.FINDBUGS_ICON;
 	}

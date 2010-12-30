@@ -72,6 +72,7 @@ import java.util.TreeSet;
  * @version $Revision$
  * @since 0.9.90-dev
  */
+@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON"})
 @SuppressWarnings({"HardCodedStringLiteral", "AnonymousInnerClass", "AnonymousInnerClassMayBeStatic"})
 public class DetectorConfiguration implements ConfigurationPage {
 
