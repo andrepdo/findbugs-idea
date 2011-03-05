@@ -103,7 +103,9 @@ import java.util.Set;
 @SuppressWarnings({"HardcodedFileSeparator"})
 public final class IdeaUtilImpl {
 
+	@NotNull
 	private static final VirtualFile[] EMPTY_VIRTUAL_FILE = new VirtualFile[0];
+	@NotNull
 	private static final String IDEA_PROJECT_DIR_VAR = "$PROJECT_DIR$";
 
 
@@ -111,12 +113,12 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static FindBugsPlugin getPluginComponent(final Project project) {
+	public static FindBugsPlugin getPluginComponent(@NotNull final Project project) {
 		return project.getComponent(FindBugsPlugin.class);
 	}
 
 
-	public static FindBugsPlugin getModuleComponent(final Module module) {
+	public static FindBugsPlugin getModuleComponent(@NotNull final Module module) {
 		return module.getComponent(FindBugsPlugin.class);
 	}
 
@@ -128,7 +130,7 @@ public final class IdeaUtilImpl {
 	 * @return the base path of the project.
 	 */
 	@Nullable
-	public static File getProjectPath(final Project project) {
+	public static File getProjectPath(@Nullable final Project project) {
 		if (project == null) {
 			return null;
 		}
@@ -142,11 +144,13 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static Project getProject(final DataContext dataContext) {
+	@Nullable
+	public static Project getProject(@NotNull final DataContext dataContext) {
 		return DataKeys.PROJECT.getData(dataContext);
 	}
 
 
+	@Nullable
 	public static Project getProject() {
 		return getProject(getDataContext());
 	}
@@ -163,24 +167,27 @@ public final class IdeaUtilImpl {
 	 * @param dataContext The IntelliJ DataContext (can usually be obtained from the action-event).
 	 * @return The current PsiFile or null if not found.
 	 */
-	private static PsiFile getPsiFile(final DataContext dataContext) {
+	@Nullable
+	private static PsiFile getPsiFile(@NotNull final DataContext dataContext) {
 		return (PsiFile) dataContext.getData("psi.File");
 	}
 
 
-	public static PsiFile getPsiFile(final DataContext dataContext, final VirtualFile virtualFile) {
+	@Nullable
+	public static PsiFile getPsiFile(@NotNull final DataContext dataContext, @NotNull final VirtualFile virtualFile) {
 		final Project project = IdeaUtilImpl.getProject(dataContext);
 		return PsiManager.getInstance(project).findFile(virtualFile);
 	}
 
 
-	public static PsiFile getPsiFile(final Project project, final VirtualFile virtualFile) {
+	@Nullable
+	public static PsiFile getPsiFile(@NotNull final Project project, @NotNull final VirtualFile virtualFile) {
 		return PsiManager.getInstance(project).findFile(virtualFile);
 	}
 
 
 	@Nullable
-	public static PsiFile getPsiFile(final PsiElement psiClass) {
+	public static PsiFile getPsiFile(@Nullable final PsiElement psiClass) {
 		if (psiClass == null) {
 			return null;
 		}
@@ -189,7 +196,7 @@ public final class IdeaUtilImpl {
 
 
 	@Nullable
-	private static VirtualFile getSelectedFile(final DataContext dataContext) {
+	private static VirtualFile getSelectedFile(@NotNull final DataContext dataContext) {
 		final VirtualFile[] selectedFiles = getSelectedFiles(dataContext);
 		if (selectedFiles.length == 0) {
 			return null;
@@ -199,13 +206,15 @@ public final class IdeaUtilImpl {
 	}
 
 
-	private static VirtualFile[] getSelectedFiles(final DataContext dataContext) {
+	@NotNull
+	private static VirtualFile[] getSelectedFiles(@NotNull final DataContext dataContext) {
 		final Project project = getProject(dataContext);
 		return FileEditorManager.getInstance(project).getSelectedFiles();
 	}
 
 
-	public static List<VirtualFile> getAllModifiedFiles(final DataContext dataContext) {
+	@NotNull
+	public static List<VirtualFile> getAllModifiedFiles(@NotNull final DataContext dataContext) {
 		final Project project = getProject(dataContext);
 		final ChangeListManager changeListManager = ChangeListManager.getInstance(project);
 		return changeListManager.getAffectedFiles();
@@ -222,6 +231,7 @@ public final class IdeaUtilImpl {
 	}*/
 
 
+	@Nullable
 	public static ChangeList getChangeListByName(final String name) {
 		final Project project = getProject();
 		final ChangeListManager changeListManager = ChangeListManager.getInstance(project);
@@ -229,7 +239,8 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static Collection<VirtualFile> getModifiedFilesByList(final ChangeList list, final DataContext dataContext) {
+	@NotNull
+	public static Collection<VirtualFile> getModifiedFilesByList(@NotNull final ChangeList list, final DataContext dataContext) {
 		final Collection<VirtualFile> result = new ArrayList<VirtualFile>();
 		final Collection<Change> changeCollection = list.getChanges();
 		// (Change[]) DataProvider.getData(DataConstants.CHANGES)
@@ -249,6 +260,7 @@ public final class IdeaUtilImpl {
 	}
 
 
+	@NotNull
 	public static VirtualFile[] getFilesForModules(final Module module) {
 		final ModuleRootManager mrm = ModuleRootManager.getInstance(module);
 		// TODO: test
@@ -256,14 +268,16 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static VirtualFile[] getVirtualFiles(final DataContext dataContext) {
+	@Nullable
+	public static VirtualFile[] getVirtualFiles(@NotNull final DataContext dataContext) {
 		//final VirtualFile[] files = (VirtualFile[]) e.getDataContext().getData(DataConstants.VIRTUAL_FILE_ARRAY);
 		return DataKeys.VIRTUAL_FILE_ARRAY.getData(dataContext);
 		//return files;
 	}
 
 
-	public static VirtualFile getVirtualFile(final DataContext dataContext) {
+	@Nullable
+	public static VirtualFile getVirtualFile(@NotNull final DataContext dataContext) {
 		//final VirtualFile[] files = (VirtualFile[]) e.getDataContext().getData(DataConstants.VIRTUAL_FILE_ARRAY);
 		return DataKeys.VIRTUAL_FILE.getData(dataContext);
 		//return files;
@@ -271,7 +285,7 @@ public final class IdeaUtilImpl {
 
 
 	@Nullable
-	public static VirtualFile getVirtualFile(final PsiClass psiClass) {
+	public static VirtualFile getVirtualFile(@NotNull final PsiClass psiClass) {
 		final PsiFile containingFile = psiClass.getContainingFile();
 		if (containingFile != null) {
 			return containingFile.getVirtualFile();
@@ -280,22 +294,26 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static VirtualFile getVirtualFile(final PsiFile psiFile) {
+	@Nullable
+	public static VirtualFile getVirtualFile(@NotNull final PsiFile psiFile) {
 		return psiFile.getVirtualFile();
 	}
 
 
+	@Nullable
 	public static VirtualFile getVirtualFile(final PsiElement element) {
 		return PsiUtil.getVirtualFile(element);
 	}
 
 
-	public static PsiClass[] getPsiClasses(final PsiJavaFile psiFile) {
+	@NotNull
+	public static PsiClass[] getPsiClasses(@NotNull final PsiJavaFile psiFile) {
 		return psiFile.getClasses();
 	}
 
 
-	public static PsiClass[] getContainingClasses(final DataContext dataContext) {
+	@NotNull
+	public static PsiClass[] getContainingClasses(@NotNull final DataContext dataContext) {
 		final Project project = getProject(dataContext);
 
 		final Editor selectedEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
@@ -319,6 +337,7 @@ public final class IdeaUtilImpl {
 	}
 
 
+	@NotNull
 	public static String[] getCompilerOutputUrls(final Project project) {
 		final VirtualFile[] vFiles = getCompilerOutputPaths(project);
 		final String[] files = new String[vFiles.length];
@@ -336,6 +355,7 @@ public final class IdeaUtilImpl {
 	}
 
 
+	@NotNull
 	private static VirtualFile[] getCompilerOutputPaths(final Project project) {
 		final Module[] modules = getModules(project);
 		final VirtualFile[] vFiles = new VirtualFile[modules.length];
@@ -360,12 +380,14 @@ public final class IdeaUtilImpl {
 	}
 
 
+	@Nullable
 	public static VirtualFile getCompilerOutputPath(final Module module) {
 		return CompilerModuleExtension.getInstance(module).getCompilerOutputPath();
 	}
 
 
-	public static VirtualFile getCompilerOutputPath(final DataContext dataContext) {
+	@Nullable
+	public static VirtualFile getCompilerOutputPath(@NotNull final DataContext dataContext) {
 		final Module module = getModule(dataContext);
 
 		// TODO: facade
@@ -375,7 +397,7 @@ public final class IdeaUtilImpl {
 
 
 	@Nullable
-	public static VirtualFile getCompilerOutputPath(final VirtualFile virtualFile, final Project project) {
+	public static VirtualFile getCompilerOutputPath(@NotNull final VirtualFile virtualFile, @NotNull final Project project) {
 		final Module module = findModuleForFile(virtualFile, project);
 
 		// TODO: facade
@@ -384,24 +406,26 @@ public final class IdeaUtilImpl {
 	}
 
 
-	private static VirtualFile getProjectOutputPath(final Module module) {
+	@Nullable
+	private static VirtualFile getProjectOutputPath(@NotNull final Module module) {
 		final Project project = module.getProject();
 		return CompilerProjectExtension.getInstance(project).getCompilerOutput();
 	}
 
 
-	private static String getPackage(final PsiClass psiClass) {
+	@NotNull
+	private static String getPackage(@NotNull final PsiClass psiClass) {
 		return ((PsiJavaFile) psiClass.getContainingFile()).getPackageName();
 	}
 
 
-	public static String getPackageUrl(final PsiClass psiClass) {
+	public static String getPackageUrl(@NotNull final PsiClass psiClass) {
 		return getPackage(psiClass).replace('.', '/');
 	}
 
 
 	@Nullable
-	public static PsiElement getPackage(final DataContext datacontext) {
+	public static PsiElement getPackage(@NotNull final DataContext datacontext) {
 		final PsiElement element = (PsiElement) datacontext.getData("psi.Element");
 		if (element instanceof PsiPackage) {
 			return element;
@@ -421,7 +445,7 @@ public final class IdeaUtilImpl {
 	}*/
 
 
-	private static void getSubPackages(final PsiPackage psiPackage, final GlobalSearchScope scope, final Set<PsiPackage> result) {
+	private static void getSubPackages(@NotNull final PsiPackage psiPackage, @NotNull final GlobalSearchScope scope, @NotNull final Set<PsiPackage> result) {
 		for (final PsiPackage child : psiPackage.getSubPackages(scope)) {
 			result.add(child);
 			getSubPackages(child, scope, result);
@@ -429,7 +453,7 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static SourceFolder[] getSourceFolders(final DataContext dataContext) {
+	public static SourceFolder[] getSourceFolders(@NotNull final DataContext dataContext) {
 		final Module module = getModule(dataContext);
 		final ContentEntry[] contentEntries = ModuleRootManager.getInstance(module).getContentEntries();
 
@@ -437,7 +461,7 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static String getPackageAsPath(final com.intellij.openapi.project.Project project, final VirtualFile packagePath, final VirtualFile[] sourceRoots) {
+	public static String getPackageAsPath(@NotNull final com.intellij.openapi.project.Project project, final VirtualFile packagePath, @NotNull final VirtualFile[] sourceRoots) {
 		final StringBuilder result = new StringBuilder();
 		final List<String> list = getPackagePathAsList(project, packagePath, sourceRoots);
 		for (final String dir : list) {
@@ -448,7 +472,8 @@ public final class IdeaUtilImpl {
 	}
 
 
-	private static List<String> getPackagePathAsList(final com.intellij.openapi.project.Project project, final VirtualFile packagePath, final VirtualFile[] sourceRoots) {
+	@NotNull
+	private static List<String> getPackagePathAsList(@NotNull final com.intellij.openapi.project.Project project, @Nullable final VirtualFile packagePath, @NotNull final VirtualFile[] sourceRoots) {
 		final Module module = IdeaUtilImpl.findModuleForFile(packagePath, project);
 		final List<String> parentPath = new ArrayList<String>();
 		final List<String> sourcesDirs = new ArrayList<String>();
@@ -471,7 +496,7 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static VirtualFile[] getModulesSourceRoots(final DataContext dataContext) {
+	public static VirtualFile[] getModulesSourceRoots(@NotNull final DataContext dataContext) {
 		final Project project = getProject(dataContext);
 		final ProjectRootManager projectRootManager = ProjectRootManager.getInstance(project);
 
@@ -479,20 +504,23 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static Module[] getProjectModules(final DataContext dataContext) {
+	@NotNull
+	public static Module[] getProjectModules(@NotNull final DataContext dataContext) {
 		final Project project = getProject(dataContext);
 
 		return ModuleManager.getInstance(project).getModules();
 	}
 
 
-	public static VirtualFile[] getProjectClasspath(final DataContext dataContext) {
+	@NotNull
+	public static VirtualFile[] getProjectClasspath(@NotNull final DataContext dataContext) {
 		final Module module = getModule(dataContext);
 
 		return getProjectClasspath(module);
 	}
 
 
+	@NotNull
 	public static VirtualFile[] getProjectClasspath(final Module module) {
 		final VirtualFile[] files;
 		try {
@@ -505,7 +533,8 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static Module findModuleForFile(final VirtualFile virtualFile, final Project project) {
+	@Nullable
+	public static Module findModuleForFile(@NotNull final VirtualFile virtualFile, @NotNull final Project project) {
 		return ModuleUtil.findModuleForFile(virtualFile, project);
 	}
 
@@ -533,7 +562,8 @@ public final class IdeaUtilImpl {
 	}*/
 
 
-	public static Module getModuleForFile(final VirtualFile virtualFile, final Project project) {
+	@Nullable
+	public static Module getModuleForFile(@NotNull final VirtualFile virtualFile, final Project project) {
 		final ProjectRootManager projectRootManager = ProjectRootManager.getInstance(project);
 		final ProjectFileIndex projectFileIndex = projectRootManager.getFileIndex();
 
@@ -541,7 +571,8 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static Module getModule(final DataContext dataContext) {
+	@Nullable
+	public static Module getModule(@NotNull final DataContext dataContext) {
 		final Project project = getProject(dataContext);
 		//final VirtualFile file = getVirtualFile(dataContext);
 		final VirtualFile selectedFile = getSelectedFile(dataContext);
@@ -568,6 +599,7 @@ public final class IdeaUtilImpl {
 	}
 
 
+	@NotNull
 	private static Module[] getModules(final Project project) {
 		final ModuleManager moduleManager = ModuleManager.getInstance(project);
 		return moduleManager.getModules();
@@ -577,7 +609,7 @@ public final class IdeaUtilImpl {
 	// TODO: maybe not needed
 
 
-	public static File[] getFileForModules(final Module[] modules, final FileType fileType) {
+	public static File[] getFileForModules(@NotNull final Module[] modules, final FileType fileType) {
 		final Collection<File> resolvedFiles = new HashSet<File>();
 
 		final ProjectRootsTraversing.RootTraversePolicy traversePolicy = null;
@@ -603,7 +635,8 @@ public final class IdeaUtilImpl {
 	 * @param dataContext The IntelliJ DataContext (can usually be obtained from the action-event).
 	 * @return The current PsiElement or null if not found.
 	 */
-	private static PsiElement getCurrentElement(final DataContext dataContext) {
+	@Nullable
+	private static PsiElement getCurrentElement(@NotNull final DataContext dataContext) {
 		// Try directly on dataContext
 		final PsiElement psiElement = (PsiElement) dataContext.getData("psi.Element");
 		//psiElement.getContainingFile().getOriginalFile().getVirtualFile()
@@ -633,7 +666,8 @@ public final class IdeaUtilImpl {
 	 * @param dataContext The IntelliJ DataContext (can usually be obtained from the action-event).
 	 * @return The current PsiClass or null if not found.
 	 */
-	public static PsiClass getCurrentClass(final DataContext dataContext) {
+	@Nullable
+	public static PsiClass getCurrentClass(@NotNull final DataContext dataContext) {
 		return findClass(getCurrentElement(dataContext));
 	}
 
@@ -644,12 +678,14 @@ public final class IdeaUtilImpl {
 	 * @param dataContext The IntelliJ DataContext (can usually be obtained from the action-event).
 	 * @return The current PsiField or null if not found.
 	 */
-	public static PsiField getCurrentField(final DataContext dataContext) {
+	@Nullable
+	public static PsiField getCurrentField(@NotNull final DataContext dataContext) {
 		return findField(getCurrentElement(dataContext));
 	}
 
 
-	public static VirtualFile getCurrentFolder(final DataContext dataContext) {
+	@Nullable
+	public static VirtualFile getCurrentFolder(@NotNull final DataContext dataContext) {
 		final VirtualFile file = DataKeys.VIRTUAL_FILE.getData(dataContext);
 		VirtualFile folder = null;
 
@@ -666,7 +702,8 @@ public final class IdeaUtilImpl {
 	 * @param dataContext The IntelliJ DataContext (can usually be obtained from the action-event).
 	 * @return The current PsiMethod or null if not found.
 	 */
-	public static PsiMethod getCurrentMethod(final DataContext dataContext) {
+	@Nullable
+	public static PsiMethod getCurrentMethod(@NotNull final DataContext dataContext) {
 		return findMethod(getCurrentElement(dataContext));
 	}
 
@@ -677,7 +714,8 @@ public final class IdeaUtilImpl {
 	 * @param dataContext The IntelliJ DataContext (can usually be obtained from the action-event).
 	 * @return The current SelectionModel or null if not found.
 	 */
-	public static SelectionModel getSelectionModel(final DataContext dataContext) {
+	@Nullable
+	public static SelectionModel getSelectionModel(@NotNull final DataContext dataContext) {
 		//final Editor editor = (Editor) dataContext.getData(DataConstants.EDITOR);
 		final Editor editor = DataKeys.EDITOR.getData(dataContext);
 		if (editor != null) {
@@ -696,6 +734,7 @@ public final class IdeaUtilImpl {
 	 * @param element The PsiElement to locate the class for.
 	 * @return The PsiClass you're looking for or null if not found.
 	 */
+	@Nullable
 	private static PsiClass findClass(final PsiElement element) {
 		final PsiClass psiClass = element instanceof PsiClass ? (PsiClass) element : PsiTreeUtil.getParentOfType(element, PsiClass.class);
 		if (psiClass instanceof PsiAnonymousClass) {
@@ -711,6 +750,7 @@ public final class IdeaUtilImpl {
 	 * @param element The PsiElement to locate the field for.
 	 * @return The PsiField you're looking for or null if not found.
 	 */
+	@Nullable
 	private static PsiField findField(final PsiElement element) {
 		final PsiField psiField = element instanceof PsiField ? (PsiField) element : PsiTreeUtil.getParentOfType(element, PsiField.class);
 		if (psiField != null && psiField.getContainingClass() instanceof PsiAnonymousClass) {
@@ -726,6 +766,7 @@ public final class IdeaUtilImpl {
 	 * @param element The PsiElement to locate the method for.
 	 * @return The PsiMethod you're looking for or null if not found.
 	 */
+	@Nullable
 	private static PsiMethod findMethod(final PsiElement element) {
 		final PsiMethod method = element instanceof PsiMethod ? (PsiMethod) element : PsiTreeUtil.getParentOfType(element, PsiMethod.class);
 		if (method != null && method.getContainingClass() instanceof PsiAnonymousClass) {
@@ -735,12 +776,14 @@ public final class IdeaUtilImpl {
 	}
 
 
+	@Nullable
 	public static VirtualFile findFileByIoFile(final File file) {
 		return LocalFileSystem.getInstance().findFileByIoFile(file);
 	}
 
 
-	public static VirtualFile findFileByPath(final String path) {
+	@Nullable
+	public static VirtualFile findFileByPath(@NotNull final String path) {
 		return LocalFileSystem.getInstance().findFileByPath(path.replace(File.separatorChar, '/'));
 		//return LocalFileSystem.getInstance().findFileByPath(path);
 	}
@@ -754,7 +797,7 @@ public final class IdeaUtilImpl {
 	 * @return the PsiClass element
 	 */
 	@Nullable
-	public static PsiClass findJavaPsiClass(@NotNull final Project project, final String classname) {
+	public static PsiClass findJavaPsiClass(@NotNull final Project project, @NotNull final String classname) {
 		final String fqn = classname.endsWith(".java") ? classname.replaceFirst(".java", "") : classname;
 		final String dottedName = fqn.contains("/") ? fqn.replace('/', '.') : fqn;
 		final GlobalSearchScope scope = GlobalSearchScope.allScope(project);
@@ -763,23 +806,25 @@ public final class IdeaUtilImpl {
 
 
 	@Nullable
-	private static PsiClass findJavaPsiClass(final Project project, final String dottedFqClassName, final GlobalSearchScope searchScope) {
+	private static PsiClass findJavaPsiClass(final Project project, @NotNull final String dottedFqClassName, @NotNull final GlobalSearchScope searchScope) {
 		return JavaPsiFacade.getInstance(project).findClass(dottedFqClassName, searchScope);
 	}
 
 
-	public static Module findModuleForFile(final VirtualFile vFile) {
+	@Nullable
+	public static Module findModuleForFile(@NotNull final VirtualFile vFile) {
 		return ModuleUtil.findModuleForFile(vFile, getProject());
 	}
 
 
-	public static Module findModuleForPsiElement(final PsiElement element) {
+	@Nullable
+	public static Module findModuleForPsiElement(@NotNull final PsiElement element) {
 		return ModuleUtil.findModuleForPsiElement(element);
 	}
 
 
 	@Nullable
-	public static PsiElement getElementAtLine(final PsiFile file, final int line) {
+	public static PsiElement getElementAtLine(@NotNull final PsiFile file, final int line) {
 		final Document document = PsiDocumentManager.getInstance(file.getProject()).getDocument(file);
 		PsiElement element = null;
 		try {
@@ -788,7 +833,7 @@ public final class IdeaUtilImpl {
 			if (document.getLineNumber(element.getTextOffset()) != line) {
 				element = element.getNextSibling();
 			}
-		} catch (final IndexOutOfBoundsException ignore) {
+		} catch (@NotNull final IndexOutOfBoundsException ignore) {
 		}
 
 		return element;
@@ -805,22 +850,24 @@ public final class IdeaUtilImpl {
 	}
 
 
+	@Nullable
 	public static PluginDescriptor getPluginDescriptor(final String pluginId) {
 		return PluginManager.getPlugin(PluginId.getId(pluginId));
 	}
 
 
-	public static boolean isValidFileType(final FileType fileType) {
+	public static boolean isValidFileType(@Nullable final FileType fileType) {
 		return fileType != null && StdFileTypes.JAVA.equals(fileType) || StdFileTypes.CLASS.equals(fileType);
 	}
 
 
-	public static FileType getFileTypeByName(final String filename) {
+	@NotNull
+	public static FileType getFileTypeByName(@NotNull final String filename) {
 		return FileTypeManager.getInstance().getFileTypeByFileName(filename);
 	}
 
 
-	private static ToolWindow getToolWindowById(final String uniqueIdentifier, final DataContext dataContext) {
+	private static ToolWindow getToolWindowById(final String uniqueIdentifier, @NotNull final DataContext dataContext) {
 		final Project project = getProject(dataContext);
 		return ToolWindowManager.getInstance(project).getToolWindow(uniqueIdentifier);
 	}
@@ -832,7 +879,7 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static void activateToolWindow(final String toolWindowId, final DataContext dataContext) {
+	public static void activateToolWindow(final String toolWindowId, @NotNull final DataContext dataContext) {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
 				final ToolWindow toolWindow = getToolWindowById(toolWindowId, dataContext);
@@ -842,7 +889,7 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static void activateToolWindow(final ToolWindow toolWindow) {
+	public static void activateToolWindow(@NotNull final ToolWindow toolWindow) {
 		if (!toolWindow.isActive() && toolWindow.isAvailable()) {
 			toolWindow.show(null);
 		}
@@ -857,6 +904,21 @@ public final class IdeaUtilImpl {
 
 	public static String getIdeaMajorVersion() {
 		return ApplicationInfo.getInstance().getMajorVersion();
+	}
+
+
+	public static boolean isIdea9() {
+		return "9".equals(getIdeaMajorVersion());
+	}
+
+
+	public static boolean isIdea10() {
+		return "10".equals(getIdeaMajorVersion());
+	}
+
+
+	public static boolean isVersionGreaterThanIdea9() {
+		return Integer.valueOf(getIdeaMajorVersion()) > 9;
 	}
 
 
@@ -875,14 +937,14 @@ public final class IdeaUtilImpl {
 	
 
 	@Nullable
-	public static PsiElement findAnonymousClassPsiElement(final BugInstanceNode bugInstanceNode, @NotNull final Project project) {
+	public static PsiElement findAnonymousClassPsiElement(@NotNull final BugInstanceNode bugInstanceNode, @NotNull final Project project) {
 		final PsiFile psiFile = bugInstanceNode.getPsiFile();
 		return findAnonymousClassPsiElement(psiFile, bugInstanceNode, project);
 	}
 
 
 	@Nullable
-	public static PsiElement findAnonymousClassPsiElement(final PsiFileSystemItem psiFile, final BugInstanceNode bugInstanceNode, @NotNull final Project project) {
+	public static PsiElement findAnonymousClassPsiElement(@Nullable final PsiFileSystemItem psiFile, @NotNull final BugInstanceNode bugInstanceNode, @NotNull final Project project) {
 		if (psiFile != null) {
 			final String classNameToFind = BugInstanceUtil.getSimpleClassName(bugInstanceNode.getBugInstance());
 			final RecurseClassCollector recurseClassCollector = new RecurseClassCollector(null, project, false);
@@ -908,7 +970,7 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static String replace$PROJECT_DIR$(final String path) {
+	public static String replace$PROJECT_DIR$(@NotNull final String path) {
 		final StringBuilder result = new StringBuilder();
 		final String rootPath = getProjectRootPath();
 		if(path.contains(rootPath)) {

@@ -44,6 +44,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
+import org.twodividedbyzero.idea.findbugs.common.util.CompileManagerFacade;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
@@ -217,11 +218,10 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 		//TODO: use make() with CompilerScope
 		EventDispatchThreadHelper.invokeAndWait(new OperationAdapter() {
 			public void run() {
-				final CompilerManager compilerManager = CompilerManager.getInstance(project);
 				if (afterTask != null) {
 					addCompileAfterTask(project, afterTask);
 				}
-				compilerManager.compile(virtualFiles, afterTask != null ? null : FindBugsWorker.this, false);
+				new CompileManagerFacade(project).compile(virtualFiles, afterTask != null ? null : FindBugsWorker.this, afterTask, false);
 			}
 		});
 	}
