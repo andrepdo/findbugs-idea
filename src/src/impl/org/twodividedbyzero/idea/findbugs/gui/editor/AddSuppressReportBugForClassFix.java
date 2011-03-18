@@ -37,11 +37,6 @@ import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
  */
 public class AddSuppressReportBugForClassFix extends AddSuppressReportBugFix {
 
-	public AddSuppressReportBugForClassFix(final String id) {
-		super(id);
-	}
-
-
 	public AddSuppressReportBugForClassFix(final ExtendedProblemDescriptor problemDescriptor) {
 		super(problemDescriptor);
 	}

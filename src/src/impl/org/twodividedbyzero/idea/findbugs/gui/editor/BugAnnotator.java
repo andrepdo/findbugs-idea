@@ -39,10 +39,13 @@ import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventF
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.common.util.StringUtil;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -87,20 +90,23 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 
 
 	private static void addAnnotation(@NotNull final PsiElement psiElement, final Iterable<ExtendedProblemDescriptor> problemDescriptors, @NotNull final AnnotationHolder annotationHolder) {
+		final List<ExtendedProblemDescriptor> matchingDescriptors = new ArrayList<ExtendedProblemDescriptor>();
 		for (final ExtendedProblemDescriptor descriptor : problemDescriptors) {
 			final PsiElement problemPsiElement = descriptor.getPsiElement();
 
 			final PsiAnonymousClass psiAnonymousClass = PsiTreeUtil.getParentOfType(psiElement, PsiAnonymousClass.class);
 			if (psiElement.equals(problemPsiElement)) {
-				addAnnotation(descriptor, psiElement, annotationHolder);
+				matchingDescriptors.add(descriptor);
+				addAnnotation(descriptor, matchingDescriptors, psiElement, annotationHolder);
 			} else if (psiAnonymousClass != null && psiAnonymousClass.equals(problemPsiElement)) {
-				addAnnotation(descriptor, psiAnonymousClass, annotationHolder);
+				matchingDescriptors.add(descriptor);
+				addAnnotation(descriptor, matchingDescriptors, psiAnonymousClass, annotationHolder);
 			}
 		}
 	}
 
 
-	private static void addAnnotation(final ExtendedProblemDescriptor problemDescriptor, final PsiElement psiElement, @NotNull final AnnotationHolder annotationHolder) {
+	private static void addAnnotation(final ExtendedProblemDescriptor problemDescriptor, final List<ExtendedProblemDescriptor> matchingDescriptors, final PsiElement psiElement, @NotNull final AnnotationHolder annotationHolder) {
 		final BugInstance bugInstance = problemDescriptor.getBugInstance();
 		final int priority = bugInstance.getPriority();
 		final Annotation annotation;
@@ -113,15 +119,17 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 
 				if (psiElement instanceof PsiAnonymousClass) {
 					final PsiElement firstChild = psiElement.getFirstChild();
-					annotation = annotationHolder.createErrorAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(problemDescriptor));
+					annotation = annotationHolder.createWarningAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(matchingDescriptors));
 					annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, Color.RED.brighter(), Color.WHITE, EffectType.BOXED, Font.PLAIN));
 				} else {
-					annotation = annotationHolder.createErrorAnnotation(textRange, getAnnotationText(problemDescriptor));
-					annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, Color.WHITE, Color.RED, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
+					annotation = annotationHolder.createWarningAnnotation(textRange, getAnnotationText(matchingDescriptors));
+					annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, null, Color.RED, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 				}
 
 				annotation.registerFix(new AddSuppressReportBugFix(problemDescriptor), textRange);
 				annotation.registerFix(new AddSuppressReportBugForClassFix(problemDescriptor), textRange);
+				annotation.registerFix(new ClearBugIntentionAction(problemDescriptor), textRange);
+				annotation.registerFix(new ClearAndSuppressBugAction(problemDescriptor), textRange);
 
 				break;
 
@@ -129,13 +137,15 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 
 				if (psiElement instanceof PsiAnonymousClass) {
 					final PsiElement firstChild = psiElement.getFirstChild();
-					annotation = annotationHolder.createErrorAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(problemDescriptor));
+					annotation = annotationHolder.createWarningAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(matchingDescriptors));
 				} else {
-					annotation = annotationHolder.createErrorAnnotation(textRange, getAnnotationText(problemDescriptor));
+					annotation = annotationHolder.createWarningAnnotation(textRange, getAnnotationText(matchingDescriptors));
 				}
-				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, Color.WHITE, Color.YELLOW.darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
+				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, null, Color.YELLOW.darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 				annotation.registerFix(new AddSuppressReportBugFix(problemDescriptor), textRange);
 				annotation.registerFix(new AddSuppressReportBugForClassFix(problemDescriptor), textRange);
+				annotation.registerFix(new ClearBugIntentionAction(problemDescriptor), textRange);
+				annotation.registerFix(new ClearAndSuppressBugAction(problemDescriptor), textRange);
 
 				break;
 
@@ -143,53 +153,65 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 
 				if (problemElement instanceof PsiAnonymousClass) {
 					final PsiElement firstChild = psiElement.getFirstChild();
-					annotation = annotationHolder.createErrorAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(problemDescriptor));
+					annotation = annotationHolder.createWarningAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(matchingDescriptors));
 				} else {
-					annotation = annotationHolder.createErrorAnnotation(textRange, getAnnotationText(problemDescriptor));
+					annotation = annotationHolder.createWarningAnnotation(textRange, getAnnotationText(matchingDescriptors));
 				}
-				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, Color.WHITE, Color.GRAY, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
+				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, null, Color.GRAY, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 				annotation.registerFix(new AddSuppressReportBugFix(problemDescriptor), textRange);
 				annotation.registerFix(new AddSuppressReportBugForClassFix(problemDescriptor), textRange);
+				annotation.registerFix(new ClearBugIntentionAction(problemDescriptor), textRange);
+				annotation.registerFix(new ClearAndSuppressBugAction(problemDescriptor), textRange);
 
 				break;
 			case Detector.LOW_PRIORITY:
 
 				if (psiElement instanceof PsiAnonymousClass) {
 					final PsiElement firstChild = psiElement.getFirstChild();
-					annotation = annotationHolder.createErrorAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(problemDescriptor));
+					annotation = annotationHolder.createInfoAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(matchingDescriptors));
 				} else {
-					annotation = annotationHolder.createErrorAnnotation(textRange, getAnnotationText(problemDescriptor));
+					annotation = annotationHolder.createInfoAnnotation(textRange, getAnnotationText(matchingDescriptors));
 				}
-				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, Color.WHITE, Color.GREEN, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
+				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, null, Color.GREEN, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 				annotation.registerFix(new AddSuppressReportBugFix(problemDescriptor), textRange);
 				annotation.registerFix(new AddSuppressReportBugForClassFix(problemDescriptor), textRange);
+				annotation.registerFix(new ClearBugIntentionAction(problemDescriptor), textRange);
+				annotation.registerFix(new ClearAndSuppressBugAction(problemDescriptor), textRange);
 
 				break;
 			case Detector.IGNORE_PRIORITY:
 				if (problemElement instanceof PsiAnonymousClass) {
 					final PsiElement firstChild = psiElement.getFirstChild();
-					annotation = annotationHolder.createErrorAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(problemDescriptor));
+					annotation = annotationHolder.createWarningAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(matchingDescriptors));
 					annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, Color.WHITE, Color.MAGENTA.brighter(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 				} else {
-					annotation = annotationHolder.createErrorAnnotation(textRange, getAnnotationText(problemDescriptor));
+					annotation = annotationHolder.createWarningAnnotation(textRange, getAnnotationText(matchingDescriptors));
 				}
-				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, Color.WHITE, Color.MAGENTA.darker().darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
-				//annotation.registerFix(new AddSuppressWarningAnnotationFix(problemDescriptor), textRange);
+				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, null, Color.MAGENTA.darker().darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
+				annotation.registerFix(new AddSuppressReportBugFix(problemDescriptor), textRange);
 				annotation.registerFix(new AddSuppressReportBugForClassFix(problemDescriptor), textRange);
+				annotation.registerFix(new ClearBugIntentionAction(problemDescriptor), textRange);
+				annotation.registerFix(new ClearAndSuppressBugAction(problemDescriptor), textRange);
 
 				break;
 			default:
 				break;
 		}
 	}
+	
 
-
-	private static String getAnnotationText(final ExtendedProblemDescriptor problemDescriptor) {
+	private static String getAnnotationText(final List<ExtendedProblemDescriptor> problemDescriptors) {
 		final StringBuilder buffer = new StringBuilder();
-		buffer.append(BugInstanceUtil.getBugPatternShortDescription(problemDescriptor.getBugInstance())).append("\n");
-		buffer.append(BugInstanceUtil.getDetailText(problemDescriptor.getBugInstance()));
+		for (int i = 0, problemDescriptorsSize = problemDescriptors.size(); i < problemDescriptorsSize; i++) {
+			final ExtendedProblemDescriptor problemDescriptor = problemDescriptors.get(i);
+			buffer.append(ResourcesLoader.getString("findbugs.name")).append(": ").append(StringUtil.html2text(BugInstanceUtil.getBugPatternShortDescription(problemDescriptor.getBugInstance()))).append("\n");
+			buffer.append(StringUtil.html2text(BugInstanceUtil.getDetailText(problemDescriptor.getBugInstance())));
+			if (i < problemDescriptors.size() - 1) {
+				buffer.append("\n\n");
+			}
+		}
 
-		return buffer.toString();
+		return StringUtil.addLineSeparatorAt(buffer, 250).toString();
 	}
 
 

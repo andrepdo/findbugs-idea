@@ -55,6 +55,7 @@ public class CloudCommentsPane2  extends JPanel {
 
 	private JLabel getTitleLabel() {
 		if (_titleLabel == null) {
+			
 			_titleLabel = new JLabel("FindBugs Cloud");
 		}
 		return _titleLabel;

@@ -181,6 +181,8 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 
 	private void syncModels() {
+		final String annotationSuppressWarningName = _preferences.getProperty(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS);
+		getAnnotationPathField().setText(annotationSuppressWarningName);
 		/*for (final String s : _preferences.getPlugins()) {
 			getModel(getPluginList()).addElement(s);
 		}*/
@@ -188,6 +190,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 
 	private void clearModels() {
+		getAnnotationPathField().setText("");
 		//getModel(getPluginList()).clear();
 	}
 
@@ -201,7 +204,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 									 {border, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_annotationPathPanel = new JPanel(tbl);
-			_annotationPathPanel.setBorder(BorderFactory.createTitledBorder("FindBugs Annotation class (@SuppressWarning) found on the classpath"));
+			_annotationPathPanel.setBorder(BorderFactory.createTitledBorder("FindBugs Annotation class (@SuppressWarning) need to be on the classpath"));
 
 			_annotationPathPanel.add(getAnnotationPathField(), "1, 1, 1, 1"); // col ,row, col, row
 
@@ -235,10 +238,10 @@ public class AnnotationConfiguration implements ConfigurationPage {
 	private JTextField getAnnotationPathField() {
 		if (_annotationPathField == null) {
 			_annotationPathField = new JTextField(30);
-			_annotationPathField.setEditable(false);
+			_annotationPathField.setEditable(true);
 			_annotationPathField.getDocument().addDocumentListener(new DocumentListener() {
 				public void insertUpdate(final DocumentEvent e) {
-					//_preferences.setProperty(FindBugsPreferences.EXPORT_BASE_DIR, _exportDirTextField.getText());
+					_preferences.setProperty(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS, _annotationPathField.getText());
 				}
 
 
@@ -247,7 +250,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 
 				public void changedUpdate(final DocumentEvent e) {
-					//_preferences.setProperty(FindBugsPreferences.EXPORT_BASE_DIR, _exportDirTextField.getText());
+					_preferences.setProperty(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS, _annotationPathField.getText());
 				}
 			});
 		}
@@ -343,6 +346,9 @@ public class AnnotationConfiguration implements ConfigurationPage {
 	public void setEnabled(final boolean enabled) {
 		getAnnotationTypePanel().setEnabled(enabled);
 		getAnnotationTypeList().setEnabled(enabled);
+		getMarkUpPanel().setEnabled(enabled);
+		getAnnotationPathPanel().setEnabled(enabled);
+		getAnnotationPathField().setEditable(enabled);
 
 	}
 
@@ -353,7 +359,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 
 	public boolean isAdvancedConfig() {
-		return true; // todo: change to true
+		return true;
 	}
 
 

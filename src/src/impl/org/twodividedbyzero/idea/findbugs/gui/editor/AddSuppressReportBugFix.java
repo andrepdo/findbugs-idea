@@ -34,9 +34,7 @@ import com.intellij.psi.PsiAnonymousClass;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDocCommentOwner;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierList;
@@ -47,10 +45,11 @@ import com.intellij.psi.impl.source.jsp.jspJava.JspHolderMethod;
 import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
+import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
@@ -64,15 +63,20 @@ import javax.swing.Icon;
  * @version $Revision$
  * @since 0.9.97
  */
-// todo:
 public class AddSuppressReportBugFix extends SuppressIntentionAction implements Iconable {
-
-	@NonNls
-	public static final String SUPPRESS_INSPECTIONS_TAG_NAME = "noinspection";
-	public static final String SUPPRESS_INSPECTIONS_ANNOTATION_NAME = "org.twodividedbyzero.idea.findbugs.common.annotations.SuppressWarnings";
 
 	private final String _bugPatternId;
 	private String _key;
+	private final String _suppressWarningsName;
+	private final ExtendedProblemDescriptor _problemDescriptor;
+
+
+	public AddSuppressReportBugFix(final ExtendedProblemDescriptor problemDescriptor) {
+		_problemDescriptor = problemDescriptor;
+		_bugPatternId = getBugId(problemDescriptor);
+		final FindBugsPreferences preferences = IdeaUtilImpl.getPluginComponent(IdeaUtilImpl.getProject()).getPreferences();
+		_suppressWarningsName = preferences.getProperty(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS);
+	}
 
 
 	public Icon getIcon(final int flags) {
@@ -80,23 +84,7 @@ public class AddSuppressReportBugFix extends SuppressIntentionAction implements 
 	}
 
 
-	/*public AddSuppressBugFix(HighlightDisplayKey key) {
-		this(key.getID());
-		myAlternativeID = HighlightDisplayKey.getAlternativeID(key);
-	}*/
-
-
-	public AddSuppressReportBugFix(final String ID) {
-		_bugPatternId = ID;
-	}
-
-
-	public AddSuppressReportBugFix(final ExtendedProblemDescriptor problemDescriptor) {
-		_bugPatternId = getBugId(problemDescriptor);
-	}
-
-
-	protected String getBugId(final ExtendedProblemDescriptor problemDescriptor) {
+	protected static String getBugId(final ExtendedProblemDescriptor problemDescriptor) {
 		return problemDescriptor.getBugInstance().getBugPattern().getType();
 	}
 
@@ -104,7 +92,6 @@ public class AddSuppressReportBugFix extends SuppressIntentionAction implements 
 	@Override
 	@NotNull
 	public String getText() {
-		//  myKey != null ? InspectionsBundle.message(myKey) : "Suppress for member";
 		return ResourcesLoader.getString("findbugs.inspection.quickfix.supress.warning") + " '" + _bugPatternId + '\'';
 	}
 
@@ -188,24 +175,27 @@ public class AddSuppressReportBugFix extends SuppressIntentionAction implements 
 
 
 	private void addImport(final Project project, final PsiElement element) {
-		final PsiFile file = element.getContainingFile();
+		/*final PsiFile file = element.getContainingFile();
 		if (file instanceof PsiJavaFile) {
-			final PsiElementFactory elementFactory = JavaPsiFacade.getInstance(project).getElementFactory();
-			final PsiClass psiClass = elementFactory.createClass(SUPPRESS_INSPECTIONS_ANNOTATION_NAME);
-			((PsiJavaFile) file).importClass(psiClass);
-			JavaCodeStyleManager.getInstance(project).shortenClassReferences(psiClass);
-		}
+			final PsiImportList list = ((PsiJavaFile) file).getImportList();
+			
+			if (list != null && list.findSingleClassImportStatement(_suppressWarningsName) == null && list.findOnDemandImportStatement(_suppressWarningsName.substring(0, _suppressWarningsName.lastIndexOf('.'))) == null) {
+				final PsiElementFactory elementFactory = JavaPsiFacade.getInstance(project).getElementFactory();
+				final PsiImportStatement statement = elementFactory.createImportStatementOnDemand(_suppressWarningsName);
+				list.add(statement);
+			}
+		}*/
 	}
 
 
 	public void addSuppressAnnotation(final Project project, final Editor editor, final PsiElement container, final PsiModifierList modifierList, final String id) throws IncorrectOperationException {
-		PsiAnnotation annotation = modifierList.findAnnotation(SUPPRESS_INSPECTIONS_ANNOTATION_NAME);
+		PsiAnnotation annotation = modifierList.findAnnotation(_suppressWarningsName);
 		if (annotation != null) {
 			if (!annotation.getText().contains("{")) {
 				final PsiNameValuePair[] attributes = annotation.getParameterList().getAttributes();
 				if (attributes.length == 1) {
 					final String suppressedWarnings = attributes[0].getText();
-					final PsiAnnotation newAnnotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + SUPPRESS_INSPECTIONS_ANNOTATION_NAME + "({" + suppressedWarnings + ", \"" + id + "\"})", container);
+					final PsiAnnotation newAnnotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + _suppressWarningsName + "({" + suppressedWarnings + ", \"" + id + "\"})", container);
 					annotation.replace(newAnnotation);
 				}
 			} else {
@@ -217,12 +207,20 @@ public class AddSuppressReportBugFix extends SuppressIntentionAction implements 
 				}
 			}
 		} else {
-			annotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + SUPPRESS_INSPECTIONS_ANNOTATION_NAME + "({\"" + id + "\"})", container);
+			annotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + _suppressWarningsName + "({\"" + id + "\"})", container);
 			modifierList.addBefore(annotation, modifierList.getFirstChild());
 			JavaCodeStyleManager.getInstance(project).shortenClassReferences(modifierList);
 
-			addImport(project, container);
+			if (needsImportStatement()) {
+				addImport(project, container);
+			}
 		}
+	}
+
+
+	private boolean needsImportStatement() {
+		final String result = _suppressWarningsName.substring(0, _suppressWarningsName.lastIndexOf('.'));
+		return result.indexOf('.') != -1;
 	}
 
 
@@ -248,5 +246,21 @@ public class AddSuppressReportBugFix extends SuppressIntentionAction implements 
 		}*/
 
 		return _bugPatternId;
+	}
+
+
+	public ExtendedProblemDescriptor getProblemDescriptor() {
+		return _problemDescriptor;
+	}
+
+
+	public String getBugPatternId() {
+		return _bugPatternId;
+	}
+
+
+	@Override
+	public String toString() {
+		return getText();
 	}
 }

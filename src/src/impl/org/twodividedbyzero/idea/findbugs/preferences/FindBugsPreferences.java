@@ -47,7 +47,7 @@ import java.util.Properties;
  * @since 0.9.9
  */
 @edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
-@SuppressWarnings({"HardCodedStringLiteral"})
+@SuppressWarnings({"HardCodedStringLiteral", "AssignmentToCollectionOrArrayFieldFromParameter"})
 public class FindBugsPreferences extends Properties {
 
 	private static final long serialVersionUID = 2L;
@@ -80,6 +80,8 @@ public class FindBugsPreferences extends Properties {
 	public static final String TOOLWINDOW_SCROLL_TO_SOURCE = PROPERTIES_PREFIX + "toolWindowScrollToSource";
 	public static final String TOOLWINDOW_EDITOR_PREVIEW = PROPERTIES_PREFIX + "toolWindowEditorPreview";
 	public static final String TOOLWINDOW_GROUP_BY = PROPERTIES_PREFIX + "toolWindowGroupBy";
+
+	public static final String ANNOTATION_SUPPRESS_WARNING_CLASS = PROPERTIES_PREFIX + "annotationSuppressWarningsClass";
 
 
 	public transient Map<String, String> _detectors;
@@ -558,6 +560,8 @@ public class FindBugsPreferences extends Properties {
 
 		final Map<String, String> bugCategories = getDefaultBugCategories(filterSettings);
 		preferences.setBugCategories(bugCategories);
+
+		preferences.setProperty(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS, "edu.umd.cs.findbugs.annotations.SuppressWarnings");
 
 		return preferences;
 	}

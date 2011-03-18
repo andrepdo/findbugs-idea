@@ -21,8 +21,16 @@ package org.twodividedbyzero.idea.findbugs.gui.editor;
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
+import com.intellij.codeInspection.SuppressIntentionAction;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.popup.JBPopup;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.ui.popup.PopupStep;
+import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
 import com.intellij.psi.PsiAnonymousClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -42,9 +50,11 @@ import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
 import javax.swing.Icon;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 
 /**
@@ -81,20 +91,22 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 		_problemCache = IdeaUtilImpl.getPluginComponent(psiElement.getProject()).getProblems();
 
 		if (_problemCache.containsKey(psiFile)) {
+			final List<ExtendedProblemDescriptor> matchingDescriptors = new ArrayList<ExtendedProblemDescriptor>();
 			final List<ExtendedProblemDescriptor> descriptors = _problemCache.get(psiFile);
 			for (final ExtendedProblemDescriptor problemDescriptor : descriptors) {
 
 				final PsiElement problemPsiElement = problemDescriptor.getPsiElement();
 				if (psiElement.equals(problemPsiElement)) {
-					
+					matchingDescriptors.add(problemDescriptor);
 					if(psiElement instanceof PsiAnonymousClass) {
-						final Editor[] editors = com.intellij.openapi.editor.EditorFactory.getInstance().getEditors(IdeaUtilImpl.getDocument(psiFile.getProject(), problemDescriptor));
+						//final Editor[] editors = com.intellij.openapi.editor.EditorFactory.getInstance().getEditors(IdeaUtilImpl.getDocument(psiFile.getProject(), problemDescriptor));
 						//editors[0].getMarkupModel().addRangeHighlighter()
 					}
-
-					final GutterIconNavigationHandler<PsiElement> navHandler = new BugGutterIconNavigationHandler();
-					return new LineMarkerInfo<PsiElement>(problemPsiElement, problemPsiElement.getTextRange().getStartOffset(), getIcon(problemDescriptor), 4, new TooltipProvider(problemDescriptor), navHandler, GutterIconRenderer.Alignment.LEFT);
 				}
+			}
+			if (!matchingDescriptors.isEmpty()) {
+				final GutterIconNavigationHandler<PsiElement> navHandler = new BugGutterIconNavigationHandler(psiElement, matchingDescriptors);
+				return new LineMarkerInfo<PsiElement>(psiElement, psiElement.getTextRange().getStartOffset(), getIcon(matchingDescriptors.get(0)), 4, new TooltipProvider(matchingDescriptors), navHandler, GutterIconRenderer.Alignment.LEFT);
 			}
 		}
 
@@ -154,37 +166,87 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 
 	private static class BugGutterIconNavigationHandler implements GutterIconNavigationHandler<PsiElement> {
 
-		public void navigate(final MouseEvent e, final PsiElement psiElement) {
-			//psiFileSystemItem.navigate(true);
-			
+		private final List<ExtendedProblemDescriptor> _descriptors;
+		private final PsiElement _psiElement;
+
+
+		private BugGutterIconNavigationHandler(final PsiElement psiElement, final List<ExtendedProblemDescriptor> descriptors) {
+			_descriptors = descriptors;
+			_psiElement = psiElement;
+			buildPopupMenu();
 		}
+
+
+		@SuppressWarnings({"AnonymousInnerClass", "AnonymousInnerClassMayBeStatic"})
+		private JBPopup buildPopupMenu() {
+			final List<SuppressIntentionAction> intentionActions = new ArrayList<SuppressIntentionAction>(_descriptors.size());
+
+			for (final ExtendedProblemDescriptor problemDescriptor : _descriptors) {
+				intentionActions.add(new AddSuppressReportBugFix(problemDescriptor));
+				intentionActions.add(new AddSuppressReportBugForClassFix(problemDescriptor));
+				intentionActions.add(new ClearBugIntentionAction(problemDescriptor));
+				intentionActions.add(new ClearAndSuppressBugAction(problemDescriptor));
+			}
+
+			final JBPopupFactory factory = JBPopupFactory.getInstance();
+			return factory.createListPopup(new BaseListPopupStep<SuppressIntentionAction>("FindBugs-IDEA", intentionActions) {
+				@Override
+				public PopupStep<?> onChosen(final SuppressIntentionAction selectedValue, final boolean finalChoice) {
+					final Project project = _psiElement.getProject();
+					final Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+					ApplicationManager.getApplication().runWriteAction(new Runnable() {
+						public void run() {
+							selectedValue.invoke(project, editor, _psiElement);		
+						}
+					});
+					return super.onChosen(selectedValue, finalChoice);
+				}
+			});
+		}
+
+
+		public void navigate(final MouseEvent e, final PsiElement psiElement) {
+			// todo: goto tree node - fb result panel view
+			buildPopupMenu().showInScreenCoordinates(e.getComponent(), e.getPoint());
+		}
+
 	}
 
 	private static class TooltipProvider implements Function<PsiElement, String> {
 
-		private final ExtendedProblemDescriptor _problemDescriptor;
+		private final List<ExtendedProblemDescriptor> _problemDescriptors;
+		private static final Pattern PATTERN = Pattern.compile("\n");
 
 
-		private TooltipProvider(final ExtendedProblemDescriptor problemDescriptor) {
-			_problemDescriptor = problemDescriptor;
+		private TooltipProvider(final List<ExtendedProblemDescriptor> problemDescriptors) {
+			_problemDescriptors = problemDescriptors;
 		}
 
 
 		public String fun(final PsiElement psiElement) {
-			return getTooltipText(_problemDescriptor);
+			return getTooltipText(_problemDescriptors);
 		}
 
 
-		private static String getTooltipText(final ExtendedProblemDescriptor problemDescriptor) {
+		private static String getTooltipText(final List<ExtendedProblemDescriptor> problemDescriptors) {
 			final StringBuilder buffer = new StringBuilder();
-			buffer.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
+			buffer.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
 			buffer.append("<HTML><HEAD><TITLE>");
-			buffer.append(BugInstanceUtil.getBugPatternShortDescription(problemDescriptor.getBugInstance()));
-			buffer.append("</TITLE></HEAD><BODY><H3>");
-			buffer.append(BugInstanceUtil.getBugPatternShortDescription(problemDescriptor.getBugInstance()));
-			buffer.append("</H3>\n");
-			buffer.append(BugInstanceUtil.getDetailText(problemDescriptor.getBugInstance()));
-			buffer.append("</BODY></HTML>\n");
+
+			for (int i = 0, problemDescriptorsSize = problemDescriptors.size(); i < problemDescriptorsSize; i++) {
+				final ExtendedProblemDescriptor problemDescriptor = problemDescriptors.get(i);
+				buffer.append("");
+				buffer.append("</TITLE></HEAD><BODY><H3>");
+				buffer.append(BugInstanceUtil.getBugPatternShortDescription(problemDescriptor.getBugInstance()));
+				buffer.append("</H3>");
+				buffer.append(PATTERN.matcher(BugInstanceUtil.getDetailText(problemDescriptor.getBugInstance())).replaceAll(""));
+				if (i < problemDescriptors.size() - 1) {
+					buffer.append("<HR>");
+				}
+
+			}
+
+			buffer.append("</BODY></HTML>");
 			return buffer.toString();
 		}
 
@@ -193,7 +255,7 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 		public String toString() {
 			final StringBuilder sb = new StringBuilder();
 			sb.append("TooltipProvider");
-			sb.append("{_problemDescriptor=").append(_problemDescriptor);
+			sb.append("{_problemDescriptor=").append(_problemDescriptors);
 			sb.append('}');
 			return sb.toString();
 		}

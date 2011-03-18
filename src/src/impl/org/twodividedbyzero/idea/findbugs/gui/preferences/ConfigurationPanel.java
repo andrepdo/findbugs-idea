@@ -59,6 +59,7 @@ import java.util.List;
  * @version $Revision$
  * @since 0.9.84-dev
  */
+@SuppressWarnings({"AnonymousInnerClass"})
 public class ConfigurationPanel extends JPanel {
 
 
@@ -170,9 +171,8 @@ public class ConfigurationPanel extends JPanel {
 		getFilterConfig().updatePreferences();
 		if (!_plugin.isModuleComponent()) {
 			getPluginConfig().updatePreferences();
-		}
-		if (!_plugin.isModuleComponent()) {
 			getImportExportConfig().updatePreferences();
+			getAnnotationConfig().updatePreferences();
 		}
 	}
 
