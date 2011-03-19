@@ -81,7 +81,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	private HTMLEditorKit _htmlEditorKit;
 	private JEditorPane _bugDetailsPane;
 	private JEditorPane _explanationPane;
-	private CloudCommentsPane _cloudCommentsPane;
+	private CloudCommentsPaneIntellij _cloudCommentsPane;
 	private JPanel _bugDetailsPanel;
 	private JPanel _explanationPanel;
 	private JPanel _cloudCommentsPanel;
@@ -293,9 +293,9 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	}
 
 
-	private CloudCommentsPane getCloudCommentsPane() {
+	private CloudCommentsPaneIntellij getCloudCommentsPane() {
 		if (_cloudCommentsPane == null) {
-			_cloudCommentsPane = new CloudCommentsPane(_parent);
+			_cloudCommentsPane = new CloudCommentsPaneIntellij(_parent);
 			_cloudCommentsPane.setBorder(new EmptyBorder(10, 10, 10, 10));
 		}
 
@@ -351,7 +351,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		html.append("<span class='fakeH2'>");
 		html.append(bugInstance.getAbridgedMessage());
 		html.append("</span>");
-		SortedBugCollection bc = getCloudCommentsPane().getBugCollection();
+		SortedBugCollection bc = _lastBugCollection;
 		if (bc != null) {
 			Cloud cloud = bc.getCloud();
 			if (cloud != null) {
