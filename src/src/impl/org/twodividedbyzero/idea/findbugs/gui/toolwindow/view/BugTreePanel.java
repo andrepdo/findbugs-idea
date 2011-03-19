@@ -44,6 +44,7 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.GroupTreeModel;
@@ -106,7 +107,7 @@ public class BugTreePanel extends JPanel {
 		//noinspection ThisEscapedInObjectConstruction
 		_bugTree = new BugTree(_treeModel, this, _project);
 
-		final JScrollPane treeScrollPane = new JScrollPane();
+		final JScrollPane treeScrollPane = ScrollPaneFacade.getComponent();
 		treeScrollPane.setViewportView(_bugTree);
 		add(treeScrollPane, BorderLayout.CENTER);
 	}

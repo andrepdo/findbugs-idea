@@ -22,6 +22,7 @@ import info.clearthought.layout.TableLayout;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.ExtensionFileFilter;
+import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.BrowseAction.BrowseActionCallback;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
@@ -136,7 +137,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			_includeList.setVisibleRowCount(7);
 			_includeList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-			final Component scrollPane = new JScrollPane(_includeList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final Component scrollPane = ScrollPaneFacade.getComponent(_includeList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			_includePanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 
@@ -201,7 +202,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			_excludeList.setVisibleRowCount(7);
 			_excludeList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-			final Component scrollPane = new JScrollPane(_excludeList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final Component scrollPane = ScrollPaneFacade.getComponent(_excludeList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			_excludePanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 
@@ -266,7 +267,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			_baselineList.setVisibleRowCount(7);
 			_baselineList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-			final Component scrollPane = new JScrollPane(_baselineList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final Component scrollPane = ScrollPaneFacade.getComponent(_baselineList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			_baselinePanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 

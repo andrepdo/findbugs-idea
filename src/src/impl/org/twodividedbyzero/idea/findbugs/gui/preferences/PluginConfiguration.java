@@ -30,6 +30,7 @@ import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.gui.common.CustomLineBorder;
 import org.twodividedbyzero.idea.findbugs.gui.common.ExtensionFileFilter;
+import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.BrowseAction.BrowseActionCallback;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -152,7 +153,7 @@ public class PluginConfiguration implements ConfigurationPage {
 			_pluginComponentPanel.setLayout(new BoxLayout(_pluginComponentPanel, BoxLayout.Y_AXIS));
 			rebuildPluginComponents();
 
-			final Component scrollPane = new JScrollPane(_pluginComponentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final Component scrollPane = ScrollPaneFacade.getComponent(_pluginComponentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			_pluginsPanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 

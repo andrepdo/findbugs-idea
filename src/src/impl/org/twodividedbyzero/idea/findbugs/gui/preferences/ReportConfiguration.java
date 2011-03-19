@@ -21,6 +21,7 @@ package org.twodividedbyzero.idea.findbugs.gui.preferences;
 import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import info.clearthought.layout.TableLayout;
+import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.model.BugCategoryTableModel;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
@@ -85,7 +86,7 @@ public class ReportConfiguration implements ConfigurationPage {
 
 			final JPanel categoryPanel = new JPanel();
 			categoryPanel.setBorder(BorderFactory.createTitledBorder("Reported (visible) bug categories"));
-			categoryPanel.add(new JScrollPane(getBugCategoriesTable(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+			categoryPanel.add(ScrollPaneFacade.getComponent(getBugCategoriesTable(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
 			mainPanel.add(categoryPanel, "1, 3, 3, 3");
 
