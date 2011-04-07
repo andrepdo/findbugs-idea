@@ -150,7 +150,7 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	@Nullable
 	public PsiFile getPsiFile(final DoneCallback<PsiFile> doneCallback) {
 		if(_file == null) {
-			BugInstanceUtil.getPsiElement(IdeaUtilImpl.getProject(), this, doneCallback, new DoneCallback<PsiFile>() {
+			BugInstanceUtil.findPsiElement(IdeaUtilImpl.getProject(), this, doneCallback, new DoneCallback<PsiFile>() {
 				public void onDone(final PsiFile value) {
 					_file = value;
 				}
