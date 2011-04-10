@@ -22,7 +22,7 @@
     <name>FindBugs-IDEA</name>
     <description>
         <![CDATA[
-		FindBugs for IntelliJ IDEA<br/>
+		FindBugs for IntelliJIDEA<br/>
 		Provides static byte code analysis to look for bugs in Java code from within IntelliJ IDEA.
 		FindBugs is a defect detection tool for Java that uses static analysis to look for more than 200 bug patterns,
 		such as null pointer dereferences, infinite recursive loops, bad uses of the Java libraries and deadlocks.
@@ -35,11 +35,11 @@
 		see <a href="http://findbugs.sourceforge.net/">http://findbugs.sourceforge.net/</a>.
 		<p>
 		..."We use IDEA inspections and FindBugs complementary. FindBugs is running in our continuous integration process and IDEA inspections are used during coding."
-		What about using both during coding from within IntelliJ IDEA?
+		What about using both during coding from within IntelliJIDEA?
 		</p>
 		<p>
             <ul>
-                <li>for screenshots see <a href='http://findbugs-idea.googlecode.com/#screenshots'>http://findbugs-idea.googlecode.com/#screenshots</a></li>
+                <li>for screenshots see <a href='http://findbugs-idea.googlecode.com/#Screenshots'>http://findbugs-idea.googlecode.com/#Screenshots</a></li>
                 <li>@see article at dzone: <a href='http://jetbrains.dzone.com/tips/intellij-idea-finds-bugs'>http://jetbrains.dzone.com/tips/intellij-idea-finds-bugs</a></li>
             </ul>
 		</p>
