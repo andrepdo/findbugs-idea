@@ -16,6 +16,7 @@ export PATH=$ANT_HOME/bin:$PATH
 export ANT_OPTS="-Xmx384m"
 export IDEA_HOME="/home/andrep/Apps/idea"
 export PATH="${JAVA_HOME}/bin:${PWD}/bin:${PATH}"
+export GOOGLECODE_PASSWD="mysecretpaswd"
 
 echo IDEA_HOME: $IDEA_HOME
 echo JAVA_HOME: $JAVA_HOME

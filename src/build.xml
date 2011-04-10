@@ -338,4 +338,18 @@
         </echo>
     </target>
 
+    <taskdef classname="net.bluecow.googlecode.ant.GoogleCodeUploadTask" classpath="ant/lib/ant-googlecode.jar"
+             name="gcupload"/>
+
+    <target name="gcupload" depends="init, getversion">
+        <gcupload
+                username="googleuser"
+                password="${env.GOOGLECODE_PASSWD}"
+                projectname="findbugs-idea"
+                filename="${target.dir}/zip/${final.name}.zip"
+                targetfilename="${final.name}.zip"
+                summary="${versionString} of ${component.name}"
+                labels="Featured, Type-Package, OpSys-All"/>
+    </target>
+
 </project>
