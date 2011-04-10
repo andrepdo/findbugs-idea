@@ -79,6 +79,7 @@ public class AddSuppressReportBugFix extends SuppressIntentionAction implements 
 	}
 
 
+	@SuppressWarnings( {"override"}) // idea 8 compatibility
 	public Icon getIcon(final int flags) {
 		return GuiResources.FINDBUGS_ICON;
 	}

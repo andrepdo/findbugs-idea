@@ -1,0 +1,2 @@
+find . -name entries -exec sed -i 's/fc791711-eb0b-69e6-9d37-c8cb6cd9c24e/44a26ecb-77bf-3937-1939-e0ce03f0277e/g' {} \;
+svn switch --relocate https://svn.java.net/svn/findbugs-idea~svn https://findbugs-idea.googlecode.com/svn --username username --password password
