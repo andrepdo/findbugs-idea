@@ -31,6 +31,7 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.components.StorageScheme;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
@@ -52,6 +53,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.actions.AnalyzeChangelistFiles;
 import org.twodividedbyzero.idea.findbugs.actions.AnalyzeCurrentEditorFile;
+import org.twodividedbyzero.idea.findbugs.actions.ProjectHolder;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
@@ -87,7 +89,9 @@ import java.util.Set;
  */
 @State(
 		name = FindBugsPluginConstants.PLUGIN_ID,
-		storages = {@Storage(id = "other", file = "$PROJECT_FILE$"), @Storage(id = "dir", file = "$PROJECT_CONFIG_DIR$/findbugs-idea.xml", scheme = StorageScheme.DIRECTORY_BASED)})
+		storages = {
+				@Storage(id = "other", file = "$PROJECT_FILE$"),
+				@Storage(id = "dir", file = "$PROJECT_CONFIG_DIR$/findbugs-idea.xml", scheme = StorageScheme.DIRECTORY_BASED)})
 public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Configurable, PersistentStateComponent<PersistencePreferencesBean> {
 
 	/*<category name="org.twodividedbyzero.idea.findbugs">
@@ -161,11 +165,13 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 		initToolWindow();
 		setActionGroupsIcon();
 		registerToolbarActions();
+
+		ActionManager.getInstance().registerAction(FindBugsPluginConstants.FINDBUGS_PROJECT_HOLDER, new ProjectHolder(_project), PluginId.getId(FindBugsPluginConstants.PLUGIN_ID));
 	}
 
 
 	public void projectClosed() {
-		// called when project is being closed
+		ActionManager.getInstance().unregisterAction("FindBugs.ProjectHolder");
 		LOGGER.debug("project is being closed");
 		EventManagerImpl.getInstance().removeEventListener(_project);
 		final AnalyzeChangelistFiles action = (AnalyzeChangelistFiles) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTIVE_CHANGELIST_ACTION);

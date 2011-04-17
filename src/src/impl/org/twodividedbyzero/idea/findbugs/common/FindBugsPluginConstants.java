@@ -68,6 +68,8 @@ public class FindBugsPluginConstants {
 
 	public static final String FINDBUGS_EXTERNAL_HELP_URI = "http://findbugs.sourceforge.net/manual/filter.html";
 
+	public static final String FINDBUGS_PROJECT_HOLDER = "FindBugs.ProjectHolder";
+
 
 	private FindBugsPluginConstants() {
 	}

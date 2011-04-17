@@ -20,6 +20,8 @@ package org.twodividedbyzero.idea.findbugs.common.util;
 
 import com.intellij.ide.DataManager;
 import com.intellij.ide.plugins.PluginManager;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.application.ApplicationInfo;
@@ -73,6 +75,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.actions.ProjectHolder;
 import org.twodividedbyzero.idea.findbugs.collectors.RecurseClassCollector;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
@@ -100,7 +103,7 @@ import java.util.Set;
  * @version $Revision$
  * @since 0.0.1
  */
-@SuppressWarnings({"HardcodedFileSeparator"})
+@SuppressWarnings( {"HardcodedFileSeparator", "UnusedDeclaration"})
 public final class IdeaUtilImpl {
 
 	@NotNull
@@ -144,15 +147,16 @@ public final class IdeaUtilImpl {
 	}
 
 
-	@Nullable
+	@NotNull
 	public static Project getProject(@NotNull final DataContext dataContext) {
-		return DataKeys.PROJECT.getData(dataContext);
+		return getProject();
 	}
 
 
-	@Nullable
+	@NotNull
 	public static Project getProject() {
-		return getProject(getDataContext());
+		final AnAction action = ActionManager.getInstance().getAction(FindBugsPluginConstants.FINDBUGS_PROJECT_HOLDER);
+		return ((ProjectHolder) action).getProject();
 	}
 
 
