@@ -65,7 +65,6 @@ import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
-import java.util.List;
 
 
 /**
@@ -307,7 +306,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	private void handleDetailsClick(final HyperlinkEvent evt) {
 		if (evt.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
 			if (_parent != null) {
-				String desc = evt.getDescription();
+				final String desc = evt.getDescription();
 				if (desc.equals("#class")) {
 					final BugTreePanel bugTreePanel = _parent.getBugTreePanel();
 					final BugTree tree = bugTreePanel.getBugTree();
@@ -352,11 +351,11 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		html.append("<span class='fakeH2'>");
 		html.append(bugInstance.getAbridgedMessage());
 		html.append("</span>");
-		SortedBugCollection bc = _lastBugCollection;
+		final SortedBugCollection bc = _lastBugCollection;
 		if (bc != null) {
-			Cloud cloud = bc.getCloud();
+			final Cloud cloud = bc.getCloud();
 			if (cloud != null) {
-				int reviewers = cloud.getReviewers(bugInstance).size();
+				final int reviewers = cloud.getReviewers(bugInstance).size();
 				if (reviewers > 0) {
 					html.append(" - <a href='#comments'><u>");
 					html.append(reviewers);
@@ -364,14 +363,14 @@ public class BugDetailsComponents /*extends JPanel*/ {
 					html.append(reviewers != 1 ? "s" : "");
 					html.append("</u></a>");
 				}
-				UserDesignation designation = cloud.getConsensusDesignation(bugInstance);
+				final UserDesignation designation = cloud.getConsensusDesignation(bugInstance);
 				if (designation != UserDesignation.UNCLASSIFIED) {
-					List<String> userDesignationKeys = I18N.instance().getUserDesignationKeys(true);
+					//List<String> userDesignationKeys = I18N.instance().getUserDesignationKeys(true);
 					html.append(" - \"");
 					html.append(I18N.instance().getUserDesignation(designation.name()));
 					html.append("\"");
 				}
-				int ageInDays = (int) ((System.currentTimeMillis() - cloud.getFirstSeen(bugInstance)) / (1000 * 60 * 60 * 24));
+				final int ageInDays = (int) ((System.currentTimeMillis() - cloud.getFirstSeen(bugInstance)) / (1000 * 60 * 60 * 24));
 				if (cloud.isInCloud(bugInstance) && ageInDays > 0) {
 					html.append(" - first seen ");
 					html.append(ageInDays);
@@ -390,12 +389,12 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		html.append(BugInstanceUtil.getSimpleClassName(bugInstance));
 		html.append("</u></a>");
 		html.append(" <font color='gray'>(");
-		String packageName = BugInstanceUtil.getPackageName(bugInstance);
+		final String packageName = BugInstanceUtil.getPackageName(bugInstance);
 		html.append(packageName);
 		html.append(")</font>");
 
 		if (lines[0] > -1) {
-			boolean singleLine = lines[1] == lines[0];
+			final boolean singleLine = lines[1] == lines[0];
 			if (singleLine) {
 				html.append(" line ");
 			} else {
@@ -455,11 +454,11 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		html.append(")</font>");
 		html.append("</li>");
 
-		Iterable<BugAnnotation> annotations = bugInstance.getAnnotationsForMessage(false);
+		final Iterable<BugAnnotation> annotations = bugInstance.getAnnotationsForMessage(false);
 		if (annotations.iterator().hasNext()) {
 			html.append("<p><h3>Notes:</p>");
 			html.append("<ul>");
-			for (BugAnnotation annotation : annotations) {
+			for (final BugAnnotation annotation : annotations) {
 				html.append("<li>" + annotation.toString(bugInstance.getPrimaryClass()) + "</li>");
 			}
 			html.append("</ul>");
@@ -544,7 +543,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	}
 
 
-	public void issueUpdated(BugInstance bug) {
+	public void issueUpdated(final BugInstance bug) {
 		//noinspection ObjectEquality
 		if (bug == _lastBugInstance) {
 			refreshDetailsShown();
