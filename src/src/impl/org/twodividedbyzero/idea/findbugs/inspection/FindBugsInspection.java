@@ -152,7 +152,8 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
-	@Override
+	// do not remove to be idea < 10.5.1 compatible
+	@SuppressWarnings( {"MethodMayBeStatic", "UnusedDeclaration", "UnusedDeclaration"})
 	public void inspectionStarted(final LocalInspectionToolSession session) {
 		LOGGER.debug("Inspection started...");
 	}
