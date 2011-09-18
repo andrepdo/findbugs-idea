@@ -25,11 +25,11 @@ import com.intellij.ui.components.labels.LinkLabel;
 import com.intellij.ui.components.labels.LinkListener;
 import edu.umd.cs.findbugs.cloud.CloudPlugin;
 import edu.umd.cs.findbugs.gui2.CloudCommentsPane;
+import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
-import sun.swing.SwingUtilities2;
 
-import java.awt.RenderingHints;
+import java.awt.Graphics;
 import java.util.List;
 
 public class CloudCommentsPaneIntellij extends CloudCommentsPane {
@@ -40,11 +40,24 @@ public class CloudCommentsPaneIntellij extends CloudCommentsPane {
 
     public CloudCommentsPaneIntellij(final ToolWindowPanel toolWindowPanel) {
         _toolWindowPanel = toolWindowPanel;
-        _titleLabel.putClientProperty(SwingUtilities2.AA_TEXT_PROPERTY_KEY, new SwingUtilities2.AATextInfo(RenderingHints.VALUE_TEXT_ANTIALIAS_ON, null));
-        _cloudDetailsLabel.putClientProperty(SwingUtilities2.AA_TEXT_PROPERTY_KEY, new SwingUtilities2.AATextInfo(RenderingHints.VALUE_TEXT_ANTIALIAS_ON, null));
     }
 
-    protected void setSignInOutText(String buttonText) {
+
+	@Override
+	protected void paintComponent(final Graphics g) {
+		GuiUtil.configureGraphics(g);
+		super.paintComponent(g);
+	}
+
+
+	@Override
+	protected void paintChildren(final Graphics g) {
+		GuiUtil.configureGraphics(g);
+		super.paintChildren(g);
+	}
+
+
+	protected void setSignInOutText(String buttonText) {
         ((LinkLabel)_signInOutLink).setText(buttonText);
     }
 
