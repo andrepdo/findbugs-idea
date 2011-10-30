@@ -178,6 +178,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 		ChangeListManager.getInstance(_project).removeChangeListListener(action.getChangelistAdapter());
 		unregisterToolWindow();
 		disableToolbarActions();
+		ActionManager.getInstance().unregisterAction(FindBugsPluginConstants.FINDBUGS_PROJECT_HOLDER);
 	}
 
 
