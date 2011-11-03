@@ -76,7 +76,9 @@ public class AddSuppressReportBugFix extends SuppressIntentionAction implements 
 	public AddSuppressReportBugFix(final ExtendedProblemDescriptor problemDescriptor) {
 		_problemDescriptor = problemDescriptor;
 		_bugPatternId = getBugId(problemDescriptor);
-		final FindBugsPreferences preferences = IdeaUtilImpl.getPluginComponent(IdeaUtilImpl.getProject()).getPreferences();
+
+		final Project project = IdeaUtilImpl.getProject(problemDescriptor.getPsiFile());
+		final FindBugsPreferences preferences = IdeaUtilImpl.getPluginComponent(project).getPreferences();
 		_suppressWarningsName = preferences.getProperty(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS);
 	}
 

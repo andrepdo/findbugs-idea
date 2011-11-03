@@ -19,6 +19,7 @@
 package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 
 import com.intellij.codeInspection.ProblemDescriptor;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.SourceLineAnnotation;
@@ -26,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.DoneCallback;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
-import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.tree.NodeVisitor;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.MaskIcon;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
@@ -54,6 +54,7 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	private String _description;
 	private BugInstance _bugInstance;
 	private List<VisitableTreeNode> _childs;
+	private final Project _project;
 
 	private static final Icon _expandedIcon = new MaskIcon(ResourcesLoader.findIcon("/nodes/class.png", BugInstanceNode.class), Color.BLACK);
 	private static final Icon _collapsedIcon = _expandedIcon;
@@ -65,8 +66,9 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	 * @param simpleName the text of the node.
 	 * @param parent	 the parent tree node
 	 */
-	public BugInstanceNode(final String simpleName, @Nullable final VisitableTreeNode parent) {
+	public BugInstanceNode(final String simpleName, @Nullable final VisitableTreeNode parent, final Project project) {
 
+		_project = project;
 		//_parent = parent;
 		setParent(parent);
 		_childs = new ArrayList<VisitableTreeNode>();
@@ -78,13 +80,14 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	}
 
 
-	public BugInstanceNode(@NotNull final BugInstance bugInstance, @Nullable final VisitableTreeNode parent) {
-		this(null, bugInstance, parent);
+	public BugInstanceNode(@NotNull final BugInstance bugInstance, @Nullable final VisitableTreeNode parent, final Project project) {
+		this(null, bugInstance, parent, project);
 	}
 
 
-	public BugInstanceNode(@Nullable final String simpleName, @NotNull final BugInstance bugInstance, @Nullable final VisitableTreeNode parent) {
+	public BugInstanceNode(@Nullable final String simpleName, @NotNull final BugInstance bugInstance, @Nullable final VisitableTreeNode parent, final Project project) {
 
+		_project = project;
 		//_parent = parent;
 		setParent(parent);
 		_childs = new ArrayList<VisitableTreeNode>();
@@ -97,7 +100,7 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	}
 
 
-	public BugInstanceNode(final PsiFile file, final ProblemDescriptor problem, @NotNull final BugInstance bugInstance, @Nullable final VisitableTreeNode parent) {
+	public BugInstanceNode(final PsiFile file, final ProblemDescriptor problem, @NotNull final BugInstance bugInstance, @Nullable final VisitableTreeNode parent, final Project project) {
 		if (file == null) {
 			throw new IllegalArgumentException("File may not be null");
 		}
@@ -105,6 +108,7 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 			throw new IllegalArgumentException("Problem may not be null");
 		}
 
+		_project = project;
 		//_parent = parent;
 		setParent(parent);
 		_childs = new ArrayList<VisitableTreeNode>();
@@ -140,7 +144,7 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	@Nullable
 	public PsiFile getPsiFile() {
 		if(_file == null) {
-			_file = BugInstanceUtil.getPsiElement(IdeaUtilImpl.getProject(), this);
+			_file = BugInstanceUtil.getPsiElement(_project, this);
 		}
 		return _file;
 	}
@@ -150,7 +154,7 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	@Nullable
 	public PsiFile getPsiFile(final DoneCallback<PsiFile> doneCallback) {
 		if(_file == null) {
-			BugInstanceUtil.findPsiElement(IdeaUtilImpl.getProject(), this, doneCallback, new DoneCallback<PsiFile>() {
+			BugInstanceUtil.findPsiElement(_project, this, doneCallback, new DoneCallback<PsiFile>() {
 				public void onDone(final PsiFile value) {
 					_file = value;
 				}

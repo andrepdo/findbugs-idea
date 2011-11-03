@@ -72,13 +72,8 @@ public class BalloonTipFactory {
 	}
 
 
-	public static void showToolWindowInfoNotifier(final String html) {
-		showToolWindowInfoNotifier(IdeaUtilImpl.getProject(), html, null);
-	}
-
-
-	public static void showToolWindowInfoNotifier(final String html, final HyperlinkListener hyperlinkListener) {
-		showToolWindowInfoNotifier(IdeaUtilImpl.getProject(), html, hyperlinkListener);
+	public static void showToolWindowInfoNotifier(final Project project, final String html) {
+		showToolWindowInfoNotifier(project, html, null);
 	}
 
 
@@ -91,13 +86,8 @@ public class BalloonTipFactory {
 	}
 
 
-	public static void showToolWindowWarnNotifier(final String html) {
-		showToolWindowWarnNotifier(IdeaUtilImpl.getProject(), html, null);
-	}
-
-
-	public static void showToolWindowWarnNotifier(final String html, @Nullable final HyperlinkListener hyperlinkListener) {
-		showToolWindowWarnNotifier(IdeaUtilImpl.getProject(), html, hyperlinkListener);
+	public static void showToolWindowWarnNotifier(final Project project, final String html) {
+		showToolWindowWarnNotifier(project, html, null);
 	}
 
 
@@ -110,13 +100,8 @@ public class BalloonTipFactory {
 	}
 
 
-	public static void showToolWindowErrorNotifier(final String html) {
-		showToolWindowErrorNotifier(IdeaUtilImpl.getProject(), html, null);
-	}
-
-
-	public static void showToolWindowErrorNotifier(final String html, @Nullable final HyperlinkListener hyperlinkListener) {
-		showToolWindowErrorNotifier(IdeaUtilImpl.getProject(), html, hyperlinkListener);
+	public static void showToolWindowErrorNotifier(final Project project, final String html) {
+		showToolWindowErrorNotifier(project, html, null);
 	}
 
 
@@ -129,34 +114,34 @@ public class BalloonTipFactory {
 	}
 
 
-	public static void showPopup(final Component parent, final String html, final Orientation orientation, @Nullable final Icon icon, final Color bgColor) {
+	public static void showPopup(final Project project, final Component parent, final String html, final Orientation orientation, @Nullable final Icon icon, final Color bgColor) {
 		final BalloonBuilder builder = JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(html, icon, bgColor, null);
-		_createBalloon(parent, orientation, builder);
+		_createBalloon(project, parent, orientation, builder);
 	}
 
 
-	public static void showInfoPopup(final Component parent, final String html, final Orientation orientation) {
+	public static void showInfoPopup(final Project project, final Component parent, final String html, final Orientation orientation) {
 		final MessageType type = MessageType.INFO;
 		final BalloonBuilder builder = JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(html, type.getDefaultIcon(), type.getPopupBackground(), null);
-		_createBalloon(parent, orientation, builder);
+		_createBalloon(project, parent, orientation, builder);
 	}
 
 
-	public static void showWarnPopup(final Component parent, final String html, final Orientation orientation) {
+	public static void showWarnPopup(final Project project, final Component parent, final String html, final Orientation orientation) {
 		final MessageType type = MessageType.WARNING;
 		final BalloonBuilder builder = JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(html, type.getDefaultIcon(), type.getPopupBackground(), null);
-		_createBalloon(parent, orientation, builder);
+		_createBalloon(project, parent, orientation, builder);
 	}
 
 
-	public static void showErrorPopup(final Component parent, final String html, final Orientation orientation) {
+	public static void showErrorPopup(final Project project, final Component parent, final String html, final Orientation orientation) {
 		final MessageType type = MessageType.ERROR;
 		final BalloonBuilder builder = JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(html, type.getDefaultIcon(), type.getPopupBackground(), null);
-		_createBalloon(parent, orientation, builder);
+		_createBalloon(project, parent, orientation, builder);
 	}
 
 
-	private static void _createBalloon(final Component parent, final Orientation orientation, final BalloonBuilder builder) {
+	private static void _createBalloon(final Project project, final Component parent, final Orientation orientation, final BalloonBuilder builder) {
 		builder.setHideOnClickOutside(true);
 		builder.setHideOnKeyOutside(true);
 		final Balloon balloon = builder.createBalloon();

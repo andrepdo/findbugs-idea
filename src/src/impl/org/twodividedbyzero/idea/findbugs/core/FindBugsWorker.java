@@ -113,6 +113,11 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	}
 
 
+	public Project getProject() {
+		return _project;
+	}
+
+
 	/**
 	 * Configure findbugs project settings.
 	 * Note: detectors are configured in FindBugsPreferences

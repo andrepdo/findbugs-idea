@@ -61,13 +61,20 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 
 	private boolean _analysisRunning;
 	private boolean _isRegistered;
-	private final FindBugsPreferences _preferences;
+	private FindBugsPreferences _preferences;
 
 
 	public BugAnnotator() {
 		_analysisRunning = false;
 		_isRegistered = false;
-		_preferences = IdeaUtilImpl.getPluginComponent(IdeaUtilImpl.getProject()).getPreferences();
+	}
+
+
+	private FindBugsPreferences getPreferences(final PsiElement psiElement) {
+		if (_preferences == null) {
+			_preferences = IdeaUtilImpl.getPluginComponent(psiElement.getProject()).getPreferences();
+		}
+		return _preferences;
 	}
 
 

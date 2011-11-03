@@ -31,10 +31,6 @@ import java.io.File;
 @SuppressWarnings({"HardCodedStringLiteral"})
 public class FindBugsPluginConstants {
 
-	public static final String LOCALE_RESOURCES_PKG = "org.twodividedbyzero.idea.findbugs.resources.i18n.Messages";
-
-	public static final String ICON_RESOURCES_PKG = "/org/twodividedbyzero/idea/findbugs/resources/icons";
-
 	public static final String TOOL_WINDOW_ID = "FindBugs-IDEA";
 	public static final String DEFAULT_EXPORT_DIR = System.getProperty("user.home") + File.separatorChar + TOOL_WINDOW_ID;
 
@@ -67,8 +63,6 @@ public class FindBugsPluginConstants {
 	public static final String FINDBUGS_PLUGIN_PATH = "lib/plugin";
 
 	public static final String FINDBUGS_EXTERNAL_HELP_URI = "http://findbugs.sourceforge.net/manual/filter.html";
-
-	public static final String FINDBUGS_PROJECT_HOLDER = "FindBugs.ProjectHolder";
 
 
 	private FindBugsPluginConstants() {

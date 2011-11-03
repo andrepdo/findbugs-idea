@@ -20,8 +20,6 @@ package org.twodividedbyzero.idea.findbugs.common.util;
 
 import com.intellij.ide.DataManager;
 import com.intellij.ide.plugins.PluginManager;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.application.ApplicationInfo;
@@ -75,7 +73,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.actions.ProjectHolder;
 import org.twodividedbyzero.idea.findbugs.collectors.RecurseClassCollector;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
@@ -103,7 +100,7 @@ import java.util.Set;
  * @version $Revision$
  * @since 0.0.1
  */
-@SuppressWarnings( {"HardcodedFileSeparator", "UnusedDeclaration"})
+@SuppressWarnings({"HardcodedFileSeparator", "UnusedDeclaration"})
 public final class IdeaUtilImpl {
 
 	@NotNull
@@ -147,16 +144,21 @@ public final class IdeaUtilImpl {
 	}
 
 
-	@NotNull
+	@Nullable
 	public static Project getProject(@NotNull final DataContext dataContext) {
-		return getProject();
+		return DataKeys.PROJECT.getData(dataContext);
 	}
 
 
-	@NotNull
+	@Deprecated
+	@Nullable
 	public static Project getProject() {
-		final AnAction action = ActionManager.getInstance().getAction(FindBugsPluginConstants.FINDBUGS_PROJECT_HOLDER);
-		return ((ProjectHolder) action).getProject();
+		return getProject(getDataContext());
+	}
+
+
+	public static Project getProject(final PsiElement psiElement) {
+		return psiElement.getProject();
 	}
 
 
@@ -236,8 +238,7 @@ public final class IdeaUtilImpl {
 
 
 	@Nullable
-	public static ChangeList getChangeListByName(final String name) {
-		final Project project = getProject();
+	public static ChangeList getChangeListByName(final String name, final Project project) {
 		final ChangeListManager changeListManager = ChangeListManager.getInstance(project);
 		return changeListManager.findChangeList(name);
 	}
@@ -816,13 +817,7 @@ public final class IdeaUtilImpl {
 
 
 	@Nullable
-	public static Module findModuleForFile(@NotNull final VirtualFile vFile) {
-		return ModuleUtil.findModuleForFile(vFile, getProject());
-	}
-
-
-	@Nullable
-	public static Module findModuleForPsiElement(@NotNull final PsiElement element) {
+	public static Module findModuleForPsiElement(@NotNull final PsiElement element, final Project project) {
 		return ModuleUtil.findModuleForPsiElement(element);
 	}
 
@@ -877,8 +872,7 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static ToolWindow getToolWindowById(final String uniqueIdentifier) {
-		final Project project = getProject();
+	public static ToolWindow getToolWindowById(final String uniqueIdentifier, @NotNull final Project project) {
 		return ToolWindowManager.getInstance(project).getToolWindow(uniqueIdentifier);
 	}
 

@@ -62,7 +62,7 @@ public class FindBugsInspector extends FindBugsWorker implements CompileTask {
 	@Override
 	public boolean work() {
 		try {
-			_inspection.registerEventListener();
+			_inspection.registerEventListener(getProject());
 			final IFindBugsEngine engine = createFindBugsEngine();
 			// Create FindBugsTask
 			final FindBugsTask findBugsTask = new FindBugsTask(_project, _bugCollection, "Running FindBugs inspection...", true, engine, true);

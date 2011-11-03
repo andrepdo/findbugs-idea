@@ -283,7 +283,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 				EventDispatchThreadHelper.invokeLater(new Runnable() {
 					public void run() {
 						final String text = "Analysis aborted...";
-						BalloonTipFactory.showToolWindowInfoNotifier(text);
+						BalloonTipFactory.showToolWindowInfoNotifier(_project, text);
 					}
 				});
 				break;

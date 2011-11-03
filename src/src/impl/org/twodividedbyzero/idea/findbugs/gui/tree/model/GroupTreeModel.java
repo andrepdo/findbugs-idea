@@ -58,14 +58,21 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	private transient Grouper<BugInstance> _grouper;
 	private final AtomicInteger _bugCount;
 	private final transient Map<PsiFile, List<ExtendedProblemDescriptor>> _problems;
+	private final transient Project _project;
 
 
 	public GroupTreeModel(final VisitableTreeNode root, final GroupBy[] groupBy, final Project project) {
 		_root = root;
+		_project = project;
 		_bugCount = new AtomicInteger(0);
 		_groupBy = groupBy.clone();
 		_groups = new ConcurrentHashMap<String, Map<Integer, List<BugInstanceGroupNode>>>();
 		_problems = new ConcurrentHashMap<PsiFile, List<ExtendedProblemDescriptor>>();
+	}
+
+
+	Project getProject() {
+		return _project;
 	}
 
 
@@ -166,7 +173,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 
 		final GroupBy groupBy = _groupBy[depth];
 		final String groupName = GroupBy.getGroupName(groupBy, member);
-		final BugInstanceGroupNode groupNode = new BugInstanceGroupNode(groupBy, groupName, _root, member, depth);
+		final BugInstanceGroupNode groupNode = new BugInstanceGroupNode(groupBy, groupName, _root, member, depth, _project);
 
 		addGroupIfAbsent(Arrays.toString(BugInstanceUtil.getGroupPath(member, depth, _groupBy)), depth, groupNode);
 
@@ -190,7 +197,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 		if (parentGroup != null) {
 			final GroupBy groupBy = _groupBy[depth];
 			groupName = GroupBy.getGroupName(groupBy, member);
-			final BugInstanceGroupNode childGroup = new BugInstanceGroupNode(groupBy, groupName, parentGroup, member, depth);
+			final BugInstanceGroupNode childGroup = new BugInstanceGroupNode(groupBy, groupName, parentGroup, member, depth, _project);
 
 			addGroupIfAbsent(Arrays.toString(BugInstanceUtil.getGroupPath(parent, depth, _groupBy)), depth, childGroup);
 			//addGroupIfAbsent(GroupBy.getGroupName(_groupBy[0], parent), depth, childGroup);
@@ -219,7 +226,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 		final BugInstanceGroupNode parentGroup = ((RootNode) _root).findChildNode(parent, depth, groupName);
 
 		if (parentGroup != null) {
-			final BugInstanceNode childNode = new BugInstanceNode(member, parentGroup);
+			final BugInstanceNode childNode = new BugInstanceNode(member, parentGroup, _project);
 			parentGroup.addChild(childNode);
 			addProblem(childNode);
 			nodeStructureChanged(parentGroup);

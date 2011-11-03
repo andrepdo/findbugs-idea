@@ -18,6 +18,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
+import com.intellij.openapi.project.Project;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
@@ -50,6 +51,7 @@ public final class BrowseAction extends AbstractAction {
 	private FindBugsPreferences _preferences;
 
 	private final transient BrowseActionCallback _callback;
+	private final transient Project _project;
 
 
 	public BrowseAction(final ConfigurationPanel parent, final String name, final FileFilter fileFilter, final BrowseActionCallback callback) {
@@ -57,6 +59,7 @@ public final class BrowseAction extends AbstractAction {
 		_callback = callback;
 		_fileFilter = fileFilter;
 		_parent = parent;
+		_project = _parent.getProject();
 
 		putValue(Action.NAME, name);
 		putValue(Action.SHORT_DESCRIPTION, name);

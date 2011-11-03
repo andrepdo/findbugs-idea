@@ -164,10 +164,10 @@ public class ImportExportConfiguration implements ConfigurationPage {
 	}
 
 
-	private static void showToolWindowNotifier(final String message, final MessageType type) {
+	private void showToolWindowNotifier(final String message, final MessageType type) {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
-				FindBugsPluginImpl.showToolWindowNotifier(message, type);
+				FindBugsPluginImpl.showToolWindowNotifier(_parent.getProject(), message, type);
 			}
 		});
 	}

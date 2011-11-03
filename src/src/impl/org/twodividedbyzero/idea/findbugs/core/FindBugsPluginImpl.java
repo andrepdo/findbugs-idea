@@ -31,7 +31,6 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.components.StorageScheme;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
@@ -53,7 +52,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.actions.AnalyzeChangelistFiles;
 import org.twodividedbyzero.idea.findbugs.actions.AnalyzeCurrentEditorFile;
-import org.twodividedbyzero.idea.findbugs.actions.ProjectHolder;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
@@ -87,6 +85,7 @@ import java.util.Set;
  * @version $Revision$
  * @since 0.1.1
  */
+@SuppressWarnings({"HardcodedFileSeparator", "RedundantInterfaceDeclaration"})
 @State(
 		name = FindBugsPluginConstants.PLUGIN_ID,
 		storages = {
@@ -104,18 +103,18 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 	private final Project _project;
 	private ToolWindow _toolWindow;
 	private final Application _application;
-	private static final Set<AnAction> _toolbarActions;
-	private static final Set<AnAction> _registeredActions;
+	private static final Set<AnAction> _mainToolbarActions;
+	private static final Set<AnAction> _registeredMainToolbarActions;
 
 	private ConfigurationPanel _configPanel;
 	private FindBugsPreferences _preferences;
 
 
 	static {
-		_registeredActions = new HashSet<AnAction>();
-		_toolbarActions = new HashSet<AnAction>();
+		_registeredMainToolbarActions = new HashSet<AnAction>();
+		_mainToolbarActions = new HashSet<AnAction>();
 		final AnAction action = new AnalyzeCurrentEditorFile();
-		_toolbarActions.add(action);
+		_mainToolbarActions.add(action);
 		action.getTemplatePresentation().setText("Run FindBugs analysis on the current editor file", true);
 		action.getTemplatePresentation().setIcon(GuiResources.FINDBUGS_EXECUTE_ICON);
 	}
@@ -160,25 +159,20 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 
 	public void projectOpened() {
-		// called when project is opened
 		LOGGER.debug("project is opened");
 		initToolWindow();
 		setActionGroupsIcon();
 		registerToolbarActions();
-
-		ActionManager.getInstance().registerAction(FindBugsPluginConstants.FINDBUGS_PROJECT_HOLDER, new ProjectHolder(_project), PluginId.getId(FindBugsPluginConstants.PLUGIN_ID));
 	}
 
 
 	public void projectClosed() {
-		ActionManager.getInstance().unregisterAction("FindBugs.ProjectHolder");
 		LOGGER.debug("project is being closed");
 		EventManagerImpl.getInstance().removeEventListener(_project);
 		final AnalyzeChangelistFiles action = (AnalyzeChangelistFiles) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTIVE_CHANGELIST_ACTION);
 		ChangeListManager.getInstance(_project).removeChangeListListener(action.getChangelistAdapter());
 		unregisterToolWindow();
 		disableToolbarActions();
-		ActionManager.getInstance().unregisterAction(FindBugsPluginConstants.FINDBUGS_PROJECT_HOLDER);
 	}
 
 
@@ -271,13 +265,10 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 	private static void registerToolbarActions() {
 		final DefaultActionGroup mainToolbar = (DefaultActionGroup) ActionManager.getInstance().getAction("MainToolBar");
-
-		//ActionManager.getInstance().registerAction("FindBugs.CurrentFileAction", action);
-		for (final AnAction anAction : _toolbarActions) {
+		for (final AnAction anAction : _mainToolbarActions) {
 			if (!isActionRegistered(anAction)) {
-				_registeredActions.add(anAction);
+				_registeredMainToolbarActions.add(anAction);
 				mainToolbar.add(anAction, new Constraints(Anchor.BEFORE, "RunConfiguration"));
-
 			}
 		}
 	}
@@ -298,7 +289,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 	private static void disableToolbarActions() {
 		//final DefaultActionGroup mainToolbar = (DefaultActionGroup) ActionManager.getInstance().getAction("MainToolBar");
-		for (final AnAction action : _toolbarActions) {
+		for (final AnAction action : _mainToolbarActions) {
 			//mainToolbar.remove(action);
 			action.getTemplatePresentation().setEnabled(false);
 		}
@@ -307,7 +298,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 
 	private static boolean isActionRegistered(final AnAction anAction) {
-		return _registeredActions.contains(anAction);
+		return _registeredMainToolbarActions.contains(anAction);
 	}
 
 
@@ -349,13 +340,13 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 	}
 
 
-	public static void showToolWindowNotifier(final String message, final MessageType type) {
+	public static void showToolWindowNotifier(final Project project, final String message, final MessageType type) {
 		if (MessageType.INFO.equals(type)) {
-			BalloonTipFactory.showToolWindowInfoNotifier(message);
+			BalloonTipFactory.showToolWindowInfoNotifier(project, message);
 		} else if (MessageType.WARNING.equals(type)) {
-			BalloonTipFactory.showToolWindowWarnNotifier(message);
+			BalloonTipFactory.showToolWindowWarnNotifier(project, message);
 		} else if (MessageType.ERROR.equals(type)) {
-			BalloonTipFactory.showToolWindowErrorNotifier(message);
+			BalloonTipFactory.showToolWindowErrorNotifier(project, message);
 		}
 	}
 

@@ -19,6 +19,7 @@
 
 package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 
+import com.intellij.openapi.project.Project;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.BugRankCategory;
 import org.jetbrains.annotations.Nullable;
@@ -53,6 +54,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 	private final List<VisitableTreeNode> _childs;
 	private final BugInstance _bugInstance;
 	private final RecurseNodeVisitor<BugInstanceGroupNode> _recurseNodeVisitor = new RecurseNodeVisitor<BugInstanceGroupNode>(this);
+	private final Project _project;
 
 	//private static Icon _expandedIcon = new MaskIcon(ResourcesLoader.loadIconResource("/nodes/TreeOpen.png"));
 	//private static Icon _collapsedIcon = new MaskIcon(ResourcesLoader.loadIconResource("/nodes/TreeClosed.png"));
@@ -67,11 +69,13 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 	 * @param parent	  the parent tree node
 	 * @param bugInstance the buginstance
 	 * @param depth	   the category depth from root category
+	 * @param project
 	 */
-	public BugInstanceGroupNode(final GroupBy groupBy, final String groupName, final VisitableTreeNode parent, final BugInstance bugInstance, final int depth) {
+	public BugInstanceGroupNode(final GroupBy groupBy, final String groupName, final VisitableTreeNode parent, final BugInstance bugInstance, final int depth, final Project project) {
 
 		//_parent = parent;
 		setParent(parent);
+		_project = project;
 		_bugInstance = bugInstance;
 		_childs = new ArrayList<VisitableTreeNode>();
 		_groupBy = groupBy;
@@ -83,6 +87,11 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 		setTooltip(_groupName);
 		setCollapsedIcon(new MaskIcon(getGroupByCollapsedIcon(groupBy), Color.BLACK));
 		setExpandedIcon(new MaskIcon(getGroupByExpandedIcon(groupBy), Color.BLACK));
+	}
+
+
+	Project getProject() {
+		return _project;
 	}
 
 

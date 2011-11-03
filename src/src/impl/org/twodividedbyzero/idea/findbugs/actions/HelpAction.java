@@ -80,7 +80,7 @@ public class HelpAction extends BaseAction {
 			throw new IllegalStateException("Couldn't get findbugs plugin");
 		}
 
-		BalloonTipFactory.showPopup(e.getInputEvent().getComponent(), HTML_BODY.toString(), BalloonTipFactory.Orientation.RIGHT, GuiResources.FINDBUGS_ICON, MessageType.INFO.getPopupBackground());
+		BalloonTipFactory.showPopup(DataKeys.PROJECT.getData(e.getDataContext()), e.getInputEvent().getComponent(), HTML_BODY.toString(), BalloonTipFactory.Orientation.RIGHT, GuiResources.FINDBUGS_ICON, MessageType.INFO.getPopupBackground());
 	}
 
 

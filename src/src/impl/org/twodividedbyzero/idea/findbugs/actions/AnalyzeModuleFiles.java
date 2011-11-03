@@ -79,7 +79,7 @@ public class AnalyzeModuleFiles extends BaseAction implements EventListener<BugR
 		if (preferences.getBugCategories().containsValue("true") && preferences.getDetectors().containsValue("true")) {
 			initWorker();
 		} else {
-			FindBugsPluginImpl.showToolWindowNotifier("No bug categories or bug pattern detectors selected. analysis aborted.", MessageType.WARNING);
+			FindBugsPluginImpl.showToolWindowNotifier(project, "No bug categories or bug pattern detectors selected. analysis aborted.", MessageType.WARNING);
 			ShowSettingsUtil.getInstance().editConfigurable(project, IdeaUtilImpl.getPluginComponent(project));
 		}
 	}
@@ -151,7 +151,7 @@ public class AnalyzeModuleFiles extends BaseAction implements EventListener<BugR
 		// set class files
 		final VirtualFile compilerOutpath = IdeaUtilImpl.getCompilerOutputPath(module);
 		if (compilerOutpath == null) {
-			FindBugsPluginImpl.showToolWindowNotifier("Compiler output path for module can not be null. check your module/project settings", MessageType.ERROR);
+			FindBugsPluginImpl.showToolWindowNotifier(project, "Compiler output path for module can not be null. check your module/project settings", MessageType.ERROR);
 			return;
 		}
 

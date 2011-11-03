@@ -18,6 +18,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
+import com.intellij.openapi.project.Project;
 import info.clearthought.layout.TableLayout;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
@@ -102,6 +103,11 @@ public class ConfigurationPanel extends JPanel {
 		if (!preferences.getBugCategories().containsValue("true") && !preferences.getDetectors().containsValue("true") || (preferences.getBugCategories().isEmpty() && preferences.getDetectors().isEmpty())) {
 			restoreDefaultPreferences();
 		}
+	}
+
+
+	Project getProject() {
+		return _plugin.getProject();
 	}
 
 

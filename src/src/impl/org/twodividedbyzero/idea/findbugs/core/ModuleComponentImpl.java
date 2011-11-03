@@ -129,7 +129,7 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 
 
 	public ToolWindowPanel getToolWindowPanel() {
-		final ToolWindow toolWindow = IdeaUtilImpl.getToolWindowById(FindBugsPluginConstants.TOOL_WINDOW_ID);
+		final ToolWindow toolWindow = IdeaUtilImpl.getToolWindowById(FindBugsPluginConstants.TOOL_WINDOW_ID, _project);
 		final Content content = toolWindow.getContentManager().getContent(0);
 		if (content != null) {
 			return (ToolWindowPanel) content.getComponent();
@@ -140,9 +140,9 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 
 	public void activateToolWindow(final boolean activate) {
 		if (activate) {
-			IdeaUtilImpl.getToolWindowById(FindBugsPluginConstants.TOOL_WINDOW_ID).show(null);
+			IdeaUtilImpl.getToolWindowById(FindBugsPluginConstants.TOOL_WINDOW_ID, _project).show(null);
 		} else {
-			IdeaUtilImpl.getToolWindowById(FindBugsPluginConstants.TOOL_WINDOW_ID).hide(null);
+			IdeaUtilImpl.getToolWindowById(FindBugsPluginConstants.TOOL_WINDOW_ID, _project).hide(null);
 		}
 	}
 

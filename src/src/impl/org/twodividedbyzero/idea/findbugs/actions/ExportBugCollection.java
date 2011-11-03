@@ -176,12 +176,12 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 				setProgressIndicator(indicator);
 				FileWriter writer = null;
 				try {
-					createDirIfAbsent(finalExportDir);
+					createDirIfAbsent(project, finalExportDir);
 					String exportDir = finalExportDir;
 					final boolean createSubDir = preferences.getBooleanProperty(FindBugsPreferences.EXPORT_CREATE_ARCHIVE_DIR, true);
 					if(createSubDir) {
 						exportDir = finalExportDir + File.separatorChar + new SimpleDateFormat("yyyy_MM_dd", Locale.ENGLISH).format(currentDate);
-						createDirIfAbsent(exportDir);
+						createDirIfAbsent(project, exportDir);
 					}
 
 					if (_bugCollection != null) {
@@ -197,25 +197,25 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 						}
 						_bugCollection.setWithMessages(false);
 
-						showToolWindowNotifier("Exported bug collection to " + exportDir + '.', MessageType.INFO);
+						showToolWindowNotifier(project, "Exported bug collection to " + exportDir + '.', MessageType.INFO);
 						if((!finalExportXml || finalExportBoth) && preferences.getBooleanProperty(FindBugsPreferences.EXPORT_OPEN_BROWSER, true)) {
 							BrowserUtil.launchBrowser(new File(exportDirAndFilenameWithoutSuffix).getAbsolutePath());
 						}
 					}
 				} catch (IOException e1) {
 					final String message = "Export failed";
-					showToolWindowNotifier(message, MessageType.ERROR);
+					showToolWindowNotifier(project, message, MessageType.ERROR);
 					LOGGER.error(message, e1);
 				} catch (TransformerConfigurationException e1) {
 					final String message = "Transform to html failed due to configuration problems.";
-					showToolWindowNotifier(message, MessageType.ERROR);
+					showToolWindowNotifier(project, message, MessageType.ERROR);
 					LOGGER.error(message, e1);
 				} catch (TransformerException e1) {
 					final String message = "Transformation to exportXml failed.";
-					showToolWindowNotifier(message, MessageType.ERROR);
+					showToolWindowNotifier(project, message, MessageType.ERROR);
 					LOGGER.error(message, e1);
 				} catch (final Exception e) {
-					showToolWindowNotifier(e.getMessage(), MessageType.ERROR);
+					showToolWindowNotifier(project, e.getMessage(), MessageType.ERROR);
 					LOGGER.error(e.getMessage(), e);
 				} finally {
 					if (writer != null) {
@@ -243,7 +243,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 
 		final File file = new File(exportDir + fileName);
 		if (file.getParentFile() == null) {
-			showToolWindowNotifier("Exporting bug collection failed. not a directory. " + exportDir + fileName + '.', MessageType.ERROR);
+			showToolWindowNotifier(project, "Exporting bug collection failed. not a directory. " + exportDir + fileName + '.', MessageType.ERROR);
 		} else {
 			exportTask.get().queue();
 		}
@@ -271,22 +271,22 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 	}
 
 
-	private static void createDirIfAbsent(final String dir) {
+	private void createDirIfAbsent(final Project project, final String dir) {
 		final File exportDir = new File(dir);
 		if(!exportDir.exists()) {
 			if(!exportDir.mkdirs()) {
 				final String message = "Creating the export directory '" + exportDir + "' failed.";
-				showToolWindowNotifier(message, MessageType.ERROR);
+				showToolWindowNotifier(project, message, MessageType.ERROR);
 				LOGGER.error(message);
 			}
 		}
 	}
 
 
-	private static void showToolWindowNotifier(final String message, final MessageType type) {
+	private void showToolWindowNotifier(final Project project, final String message, final MessageType type) {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
-				FindBugsPluginImpl.showToolWindowNotifier(message, type);
+				FindBugsPluginImpl.showToolWindowNotifier(project, message, type);
 			}
 		});
 	}

@@ -122,13 +122,8 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
-	public static InspectionManager getManager(final PsiFile psiFile) {
-		return getManager(psiFile.getProject());
-	}
-
-
-	private static InspectionManager getManager() {
-		return getManager(IdeaUtilImpl.getProject());
+	public static InspectionManager getManager(final PsiElement psiElement) {
+		return getManager(psiElement.getProject());
 	}
 
 
@@ -195,6 +190,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	 * @param bugInstance
 	 * @return the created ProblemDescriptor
 	 */
+	@SuppressWarnings({"HardcodedLineSeparator"})
 	private static ProblemDescriptor createProblemDescriptor(final PsiFile psiFile, final BugInstance bugInstance) {
 		final int[] lines = BugInstanceUtil.getSourceLines(bugInstance);
 		final MethodAnnotation methodAnnotation = BugInstanceUtil.getPrimaryMethod(bugInstance);
@@ -238,9 +234,9 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 						//final SurroundWithTagFix surroundWithTagFix = new SurroundWithTagFix(element, element, element, "qwertz");
 						final SuppressWarningFix fix = new SuppressWarningFix("org.twodividedbyzero.idea.findbugs.common.annotations.SuppressWarnings", BugInstanceUtil.getBugType(bugInstance));
 						//problemDescriptor[0] = getManager().createProblemDescriptor(element, description.toString(), ProblemHighlightType.GENERIC_ERROR_OR_WARNING, null, surroundWithTagFix, fix);
-						problemDescriptor[0] = getManager().createProblemDescriptor(element, description.toString(), ProblemHighlightType.GENERIC_ERROR_OR_WARNING, null, fix);
+						problemDescriptor[0] = getManager(element).createProblemDescriptor(element, description.toString(), ProblemHighlightType.GENERIC_ERROR_OR_WARNING, null, fix);
 					} else {
-						problemDescriptor[0] = getManager().createProblemDescriptor(psiFile, description.toString(), ProblemHighlightType.GENERIC_ERROR_OR_WARNING, null);
+						problemDescriptor[0] = getManager(psiFile).createProblemDescriptor(psiFile, description.toString(), ProblemHighlightType.GENERIC_ERROR_OR_WARNING, null);
 					}
 				} catch (final ProcessCanceledException ignore) {
 				}
@@ -270,7 +266,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 
 
 	private void initWorker(final PsiFile psiFile) {
-		final com.intellij.openapi.project.Project project = IdeaUtilImpl.getProject();
+		final com.intellij.openapi.project.Project project = IdeaUtilImpl.getProject(psiFile);
 
 		/*final CompilerManager compilerManager = CompilerManager.getInstance(project);
 		compilerManager.compile(new VirtualFile[] {psiFile.getVirtualFile()}, null, true);*/
@@ -320,9 +316,9 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
-	public void registerEventListener() {
+	public void registerEventListener(final Project project) {
 		if (!_isListener) {
-			EventManagerImpl.getInstance().addEventListener(new BugReporterInspectionEventFilter(IdeaUtilImpl.getProject().getName()), this);
+			EventManagerImpl.getInstance().addEventListener(new BugReporterInspectionEventFilter(project.getName()), this);
 			_isListener = true;
 
 		}

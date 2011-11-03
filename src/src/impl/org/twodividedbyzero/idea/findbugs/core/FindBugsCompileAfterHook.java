@@ -96,7 +96,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		final VirtualFile[] affectedFiles = compileScope.getFiles(StdFileTypes.JAVA, true);
 
 		if (Boolean.valueOf(preferences.getProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT))) {
-			final ToolWindow toolWindow = IdeaUtilImpl.getToolWindowById(findBugsPlugin.getInternalToolWindowId());
+			final ToolWindow toolWindow = IdeaUtilImpl.getToolWindowById(findBugsPlugin.getInternalToolWindowId(), project);
 			IdeaUtilImpl.activateToolWindow(toolWindow);
 		}
 

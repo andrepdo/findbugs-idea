@@ -177,7 +177,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 						EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.NEW_BUG_INSTANCE, bugInstance, bugCounter, projectStats, project.getName()));
 					}
 
-					showToolWindowNotifier("Imported bug collection from '" + fileToImport + "'.", MessageType.INFO);
+					showToolWindowNotifier(project, "Imported bug collection from '" + fileToImport + "'.", MessageType.INFO);
 
 					_importBugCollection.setDoNotUseCloud(false);
 					_importBugCollection.setTimestamp(System.currentTimeMillis());
@@ -185,13 +185,13 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 				} catch (IOException e1) {
 					EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_ABORTED, project.getName()));
 					final String message = "Import failed";
-					showToolWindowNotifier(message, MessageType.ERROR);
+					showToolWindowNotifier(project, message, MessageType.ERROR);
 					LOGGER.error(message, e1);
 
 				} catch (DocumentException e1) {
 					EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_ABORTED, project.getName()));
 					final String message = "Import failed";
-					showToolWindowNotifier(message, MessageType.ERROR);
+					showToolWindowNotifier(project, message, MessageType.ERROR);
 					LOGGER.error(message, e1);
 
 				} finally {
@@ -220,10 +220,10 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 	}
 
 
-	private static void showToolWindowNotifier(final String message, final MessageType type) {
+	private void showToolWindowNotifier(final Project project, final String message, final MessageType type) {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
-				FindBugsPluginImpl.showToolWindowNotifier(message, type);
+				FindBugsPluginImpl.showToolWindowNotifier(project, message, type);
 			}
 		});
 	}
