@@ -38,7 +38,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.text.html.HTMLEditorKit;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.io.Serializable;
 import java.util.List;
 
@@ -49,6 +52,7 @@ import java.util.List;
  * @version $Revision$
  * @since 0.9.97
  */
+@SuppressWarnings({"HardcodedFileSeparator"})
 public class AnalysisRunDetailsDialog implements Serializable {
 
 	private static final long serialVersionUID = 0L;
@@ -132,7 +136,17 @@ public class AnalysisRunDetailsDialog implements Serializable {
 
 		final HTMLEditorKit htmlEditorKit = new HTMLEditorKit();
 		htmlEditorKit.setStyleSheet(GuiResources.EDITORPANE_STYLESHEET);
-		final JEditorPane jEditorPane = new JEditorPane();
+		final JEditorPane jEditorPane = new JEditorPane() {
+
+			@Override
+			protected void paintComponent(final Graphics g) {
+				super.paintComponent(g);
+				final Graphics2D g2d = (Graphics2D) g;
+				g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+				g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+			}
+
+		};
 		jEditorPane.setPreferredSize(new Dimension(550, 650));
 		jEditorPane.setEditable(false);
 		jEditorPane.setContentType("text/html");

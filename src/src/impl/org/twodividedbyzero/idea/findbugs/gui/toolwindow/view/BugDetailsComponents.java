@@ -368,7 +368,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 					//List<String> userDesignationKeys = I18N.instance().getUserDesignationKeys(true);
 					html.append(" - \"");
 					html.append(I18N.instance().getUserDesignation(designation.name()));
-					html.append("\"");
+					html.append('\"');
 				}
 				final int ageInDays = (int) ((System.currentTimeMillis() - cloud.getFirstSeen(bugInstance)) / (1000 * 60 * 60 * 24));
 				if (cloud.isInCloud(bugInstance) && ageInDays > 0) {
@@ -381,7 +381,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 			}
 		}
 
-		html.append("<table border=1 cellpadding=10><tr valign=top><td valign=top>");
+		html.append("<table border=0><tr valign=top><td valign=top>");
 		html.append("<h3>Class:</h3>");
 		html.append("<ul>");
 		html.append("<li>");
@@ -402,7 +402,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 			}
 			html.append(lines[0]);
 			if (!singleLine) {
-				html.append("-").append(lines[1]);
+				html.append('-').append(lines[1]);
 			}
 		}
 		html.append("</ul>");
@@ -437,7 +437,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		html.append(BugInstanceUtil.getPriorityTypeString(bugInstance));
 		html.append("</li>");
 		html.append("</ul>");
-		html.append("</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td valign=top>");
+		html.append("</td><td width='20px'>&nbsp;</td><td valign=top>");
 
 		html.append("<h3>Problem classification:</h3>");
 		html.append("<ul>");

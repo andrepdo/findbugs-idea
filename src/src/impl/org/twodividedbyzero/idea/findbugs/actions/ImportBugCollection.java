@@ -220,7 +220,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 	}
 
 
-	private void showToolWindowNotifier(final Project project, final String message, final MessageType type) {
+	private static void showToolWindowNotifier(final Project project, final String message, final MessageType type) {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
 				FindBugsPluginImpl.showToolWindowNotifier(project, message, type);

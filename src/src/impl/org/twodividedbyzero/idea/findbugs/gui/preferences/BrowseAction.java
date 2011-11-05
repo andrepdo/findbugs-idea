@@ -51,16 +51,17 @@ public final class BrowseAction extends AbstractAction {
 	private FindBugsPreferences _preferences;
 
 	private final transient BrowseActionCallback _callback;
-	private final transient Project _project;
 
 
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"})
 	public BrowseAction(final ConfigurationPanel parent, final String name, final FileFilter fileFilter, final BrowseActionCallback callback) {
 
 		_callback = callback;
 		_fileFilter = fileFilter;
 		_parent = parent;
-		_project = _parent.getProject();
-		_lastDir = IdeaUtilImpl.getProjectRootPath(_project);
+		final Project project = _parent.getProject();
+		//noinspection AssignmentToStaticFieldFromInstanceMethod
+		_lastDir = IdeaUtilImpl.getProjectRootPath(project);
 
 		putValue(Action.NAME, name);
 		putValue(Action.SHORT_DESCRIPTION, name);
@@ -75,6 +76,7 @@ public final class BrowseAction extends AbstractAction {
 		final int result = fileChooser.showOpenDialog(_parent);
 		if (result == JFileChooser.APPROVE_OPTION) {
 			final File selectedFile = fileChooser.getSelectedFile();
+			//noinspection AssignmentToStaticFieldFromInstanceMethod
 			_lastDir = selectedFile.getPath();
 			_callback.addSelection(selectedFile);
 		}

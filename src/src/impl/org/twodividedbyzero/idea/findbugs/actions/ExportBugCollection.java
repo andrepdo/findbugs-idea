@@ -271,7 +271,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 	}
 
 
-	private void createDirIfAbsent(final Project project, final String dir) {
+	private static void createDirIfAbsent(final Project project, final String dir) {
 		final File exportDir = new File(dir);
 		if(!exportDir.exists()) {
 			if(!exportDir.mkdirs()) {
@@ -283,7 +283,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 	}
 
 
-	private void showToolWindowNotifier(final Project project, final String message, final MessageType type) {
+	private static void showToolWindowNotifier(final Project project, final String message, final MessageType type) {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
 				FindBugsPluginImpl.showToolWindowNotifier(project, message, type);
