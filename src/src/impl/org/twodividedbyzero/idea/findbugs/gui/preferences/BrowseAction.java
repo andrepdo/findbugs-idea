@@ -42,7 +42,7 @@ import java.util.Collection;
 public final class BrowseAction extends AbstractAction {
 
 	private static final long serialVersionUID = 0L;
-	private static String _lastDir = IdeaUtilImpl.getProjectRootPath();
+	private static String _lastDir;
 
 	private final ConfigurationPanel _parent;
 	private final transient FileFilter _fileFilter;
@@ -60,6 +60,7 @@ public final class BrowseAction extends AbstractAction {
 		_fileFilter = fileFilter;
 		_parent = parent;
 		_project = _parent.getProject();
+		_lastDir = IdeaUtilImpl.getProjectRootPath(_project);
 
 		putValue(Action.NAME, name);
 		putValue(Action.SHORT_DESCRIPTION, name);

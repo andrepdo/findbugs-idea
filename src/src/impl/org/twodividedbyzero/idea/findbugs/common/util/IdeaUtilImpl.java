@@ -59,6 +59,7 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnonymousClass;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiClassOwner;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
@@ -150,6 +151,11 @@ public final class IdeaUtilImpl {
 	}
 
 
+	/**
+	 * @deprecated use {@link #getProject(com.intellij.psi.PsiElement)} or {@link #getProject(com.intellij.openapi.actionSystem.DataContext)}
+	 *
+	 * @return Project the current idea project
+	 */
 	@Deprecated
 	@Nullable
 	public static Project getProject() {
@@ -162,6 +168,7 @@ public final class IdeaUtilImpl {
 	}
 
 
+	@Deprecated
 	public static DataContext getDataContext() {
 		return DataManager.getInstance().getDataContext();
 	}
@@ -182,7 +189,10 @@ public final class IdeaUtilImpl {
 	@Nullable
 	public static PsiFile getPsiFile(@NotNull final DataContext dataContext, @NotNull final VirtualFile virtualFile) {
 		final Project project = IdeaUtilImpl.getProject(dataContext);
-		return PsiManager.getInstance(project).findFile(virtualFile);
+		if (project != null) {
+			return PsiManager.getInstance(project).findFile(virtualFile);
+		}
+		return null;
 	}
 
 
@@ -275,20 +285,17 @@ public final class IdeaUtilImpl {
 
 	@Nullable
 	public static VirtualFile[] getVirtualFiles(@NotNull final DataContext dataContext) {
-		//final VirtualFile[] files = (VirtualFile[]) e.getDataContext().getData(DataConstants.VIRTUAL_FILE_ARRAY);
 		return DataKeys.VIRTUAL_FILE_ARRAY.getData(dataContext);
-		//return files;
 	}
 
 
 	@Nullable
 	public static VirtualFile getVirtualFile(@NotNull final DataContext dataContext) {
-		//final VirtualFile[] files = (VirtualFile[]) e.getDataContext().getData(DataConstants.VIRTUAL_FILE_ARRAY);
 		return DataKeys.VIRTUAL_FILE.getData(dataContext);
-		//return files;
 	}
 
 
+	@SuppressWarnings({"TypeMayBeWeakened"})
 	@Nullable
 	public static VirtualFile getVirtualFile(@NotNull final PsiClass psiClass) {
 		final PsiFile containingFile = psiClass.getContainingFile();
@@ -300,8 +307,8 @@ public final class IdeaUtilImpl {
 
 
 	@Nullable
-	public static VirtualFile getVirtualFile(@NotNull final PsiFile psiFile) {
-		return psiFile.getVirtualFile();
+	public static VirtualFile getVirtualFile(@NotNull final PsiFileSystemItem fileSystemItem) {
+		return fileSystemItem.getVirtualFile();
 	}
 
 
@@ -312,8 +319,8 @@ public final class IdeaUtilImpl {
 
 
 	@NotNull
-	public static PsiClass[] getPsiClasses(@NotNull final PsiJavaFile psiFile) {
-		return psiFile.getClasses();
+	public static PsiClass[] getPsiClasses(@NotNull final PsiClassOwner psiClassOwner) {
+		return psiClassOwner.getClasses();
 	}
 
 
@@ -322,7 +329,12 @@ public final class IdeaUtilImpl {
 		final Project project = getProject(dataContext);
 
 		final Editor selectedEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-		assert selectedEditor != null;
+		if (selectedEditor == null) {
+			throw new NullPointerException("Expected not null Editor");
+		}
+		if (project == null) {
+			throw new NullPointerException("Expected not null project");
+		}
 		final PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(selectedEditor.getDocument());
 
 		//noinspection ZeroLengthArrayAllocation
@@ -345,9 +357,10 @@ public final class IdeaUtilImpl {
 	@NotNull
 	public static String[] getCompilerOutputUrls(final Project project) {
 		final VirtualFile[] vFiles = getCompilerOutputPaths(project);
-		final String[] files = new String[vFiles.length];
+		final int length = vFiles.length;
+		final String[] files = new String[length];
 
-		for (int i = 0; i < vFiles.length; i++) {
+		for (int i = 0; i < length; i++) {
 			final VirtualFile file = vFiles[i];
 			if (file != null) {
 				files[i] = file.getPresentableUrl();
@@ -363,9 +376,10 @@ public final class IdeaUtilImpl {
 	@NotNull
 	private static VirtualFile[] getCompilerOutputPaths(final Project project) {
 		final Module[] modules = getModules(project);
-		final VirtualFile[] vFiles = new VirtualFile[modules.length];
+		final int length = modules.length;
+		final VirtualFile[] vFiles = new VirtualFile[length];
 
-		for (int i = 0; i < modules.length; i++) {
+		for (int i = 0; i < length; i++) {
 			final Module module = modules[i];
 			final CompilerModuleExtension extension = CompilerModuleExtension.getInstance(module);
 			VirtualFile path = null;
@@ -387,7 +401,11 @@ public final class IdeaUtilImpl {
 
 	@Nullable
 	public static VirtualFile getCompilerOutputPath(final Module module) {
-		return CompilerModuleExtension.getInstance(module).getCompilerOutputPath();
+		final CompilerModuleExtension compilerModuleExtension = CompilerModuleExtension.getInstance(module);
+		if (compilerModuleExtension != null) {
+			return compilerModuleExtension.getCompilerOutputPath();
+		}
+		return null;
 	}
 
 
@@ -396,7 +414,11 @@ public final class IdeaUtilImpl {
 		final Module module = getModule(dataContext);
 
 		// TODO: facade
-		return CompilerModuleExtension.getInstance(module).getCompilerOutputPath();
+		final CompilerModuleExtension compilerModuleExtension = CompilerModuleExtension.getInstance(module);
+		if (compilerModuleExtension != null) {
+			return compilerModuleExtension.getCompilerOutputPath();
+		}
+		return null;
 		//return ModuleRootManager.getInstance(module).getCompilerOutputPath();
 	}
 
@@ -406,7 +428,11 @@ public final class IdeaUtilImpl {
 		final Module module = findModuleForFile(virtualFile, project);
 
 		// TODO: facade
-		return CompilerModuleExtension.getInstance(module).getCompilerOutputPath();
+		final CompilerModuleExtension compilerModuleExtension = CompilerModuleExtension.getInstance(module);
+		if (compilerModuleExtension != null) {
+			return compilerModuleExtension.getCompilerOutputPath();
+		}
+		return null;
 		//return ModuleRootManager.getInstance(module).getCompilerOutputPath();
 	}
 
@@ -414,18 +440,22 @@ public final class IdeaUtilImpl {
 	@Nullable
 	private static VirtualFile getProjectOutputPath(@NotNull final Module module) {
 		final Project project = module.getProject();
-		return CompilerProjectExtension.getInstance(project).getCompilerOutput();
+		final CompilerProjectExtension compilerProjectExtension = CompilerProjectExtension.getInstance(project);
+		if (compilerProjectExtension != null) {
+			return compilerProjectExtension.getCompilerOutput();
+		}
+		return null;
 	}
 
 
 	@NotNull
-	private static String getPackage(@NotNull final PsiClass psiClass) {
-		return ((PsiJavaFile) psiClass.getContainingFile()).getPackageName();
+	private static String getPackage(@NotNull final PsiElement psiElement) {
+		return ((PsiClassOwner) psiElement.getContainingFile()).getPackageName();
 	}
 
 
-	public static String getPackageUrl(@NotNull final PsiClass psiClass) {
-		return getPackage(psiClass).replace('.', '/');
+	public static String getPackageUrl(@NotNull final PsiElement psiElement) {
+		return getPackage(psiElement).replace('.', '/');
 	}
 
 
@@ -467,7 +497,7 @@ public final class IdeaUtilImpl {
 
 
 	public static String getPackageAsPath(@NotNull final com.intellij.openapi.project.Project project, final VirtualFile packagePath, @NotNull final VirtualFile[] sourceRoots) {
-		final StringBuilder result = new StringBuilder();
+		final StringBuilder result = new StringBuilder(30);
 		final List<String> list = getPackagePathAsList(project, packagePath, sourceRoots);
 		for (final String dir : list) {
 			result.append(dir);
@@ -478,19 +508,19 @@ public final class IdeaUtilImpl {
 
 
 	@NotNull
-	private static List<String> getPackagePathAsList(@NotNull final com.intellij.openapi.project.Project project, @Nullable final VirtualFile packagePath, @NotNull final VirtualFile[] sourceRoots) {
+	private static List<String> getPackagePathAsList(@NotNull final com.intellij.openapi.project.Project project, @NotNull final VirtualFile packagePath, @NotNull final VirtualFile[] sourceRoots) {
 		final Module module = IdeaUtilImpl.findModuleForFile(packagePath, project);
+		if (module == null) {
+			throw new NullPointerException("Expected not null module.");
+		}
 		final List<String> parentPath = new ArrayList<String>();
-		final List<String> sourcesDirs = new ArrayList<String>();
+		final Collection<String> sourcesDirs = new ArrayList<String>();
 
 		for (final VirtualFile vFile : sourceRoots) {
 			sourcesDirs.add(vFile.getName());
 		}
 
-		VirtualFile parent = null;
-		if (packagePath != null) {
-			parent = packagePath;
-		}
+		VirtualFile parent = packagePath;
 		while (parent != null && !parent.getName().equals(module.getName()) && !sourcesDirs.contains(parent.getName())) {
 			parentPath.add(FindBugsPluginConstants.FILE_SEPARATOR + parent.getName());
 			parent = parent.getParent();
@@ -593,7 +623,7 @@ public final class IdeaUtilImpl {
 		if (module == null) {
 			final Module[] modules = getModules(project);
 			if (modules.length < 1) {
-				throw new FindBugsPluginException("You have no modules configured inside your project (" + project.getName() + ")");
+				throw new FindBugsPluginException("You have no modules configured inside your project (" + project + ')');
 			}
 			module = modules[0];
 		}
@@ -619,7 +649,7 @@ public final class IdeaUtilImpl {
 
 		final ProjectRootsTraversing.RootTraversePolicy traversePolicy = null;
 		for (final Module module : modules) {
-			final List<VirtualFile> virtualFiles = new ArrayList<VirtualFile>();
+			final Collection<VirtualFile> virtualFiles = new ArrayList<VirtualFile>();
 			final VirtualFile outputDirectory = CompilerPaths.getModuleOutputDirectory(module, false);
 			if (outputDirectory != null) {
 				virtualFiles.add(outputDirectory);
@@ -960,17 +990,16 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static String getProjectRootPath() {
-		final Project project = getProject();
+	public static String getProjectRootPath(final Project project) {
 		final ProjectRootManager projectManager = ProjectRootManager.getInstance(project);
         final VirtualFile rootFiles[] = projectManager.getContentRoots();
 		return rootFiles[0].getPath();
 	}
 
 
-	public static String replace$PROJECT_DIR$(@NotNull final String path) {
-		final StringBuilder result = new StringBuilder();
-		final String rootPath = getProjectRootPath();
+	public static String replace$PROJECT_DIR$(final Project project, @NotNull final String path) {
+		final StringBuilder result = new StringBuilder(20);
+		final String rootPath = getProjectRootPath(project);
 		if(path.contains(rootPath)) {
 			result.append(path.replace(rootPath, IDEA_PROJECT_DIR_VAR));
 			return result.toString();

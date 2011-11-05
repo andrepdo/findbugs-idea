@@ -152,7 +152,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			final AbstractButton addButton = new JButton();
 			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTENSIONS_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
-					final String replacement = IdeaUtilImpl.replace$PROJECT_DIR$(selectedFile.getAbsolutePath());
+					final String replacement = IdeaUtilImpl.replace$PROJECT_DIR$(_parent.getProject(), selectedFile.getAbsolutePath());
 					((DefaultListModel) _includeList.getModel()).addElement(replacement);
 					_preferences.getIncludeFilters().add(replacement);
 					_preferences.setModified(true);
@@ -217,7 +217,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			final AbstractButton addButton = new JButton();
 			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTENSIONS_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
-					final String replacement = IdeaUtilImpl.replace$PROJECT_DIR$(selectedFile.getAbsolutePath());
+					final String replacement = IdeaUtilImpl.replace$PROJECT_DIR$(_parent.getProject(), selectedFile.getAbsolutePath());
 					((DefaultListModel) _excludeList.getModel()).addElement(replacement);
 					_preferences.getExcludeFilters().add(replacement);
 					_preferences.setModified(true);
@@ -282,7 +282,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			final AbstractButton addButton = new JButton();
 			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTENSIONS_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
-					final String replacement = IdeaUtilImpl.replace$PROJECT_DIR$(selectedFile.getAbsolutePath());
+					final String replacement = IdeaUtilImpl.replace$PROJECT_DIR$(_parent.getProject(), selectedFile.getAbsolutePath());
 					((DefaultListModel) _baselineList.getModel()).addElement(replacement);
 					_preferences.getExcludeBaselineBugs().add(replacement);
 					_preferences.setModified(true);
