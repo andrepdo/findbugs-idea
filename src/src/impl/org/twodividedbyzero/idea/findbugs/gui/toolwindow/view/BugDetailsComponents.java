@@ -348,9 +348,9 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 		final StringBuilder html = new StringBuilder();
 		html.append("<html><body>");
-		html.append("<span class='fakeH2'>");
+		html.append("<h2>");
 		html.append(bugInstance.getAbridgedMessage());
-		html.append("</span>");
+		html.append("</h2><p/>");
 		final SortedBugCollection bc = _lastBugCollection;
 		if (bc != null) {
 			final Cloud cloud = bc.getCloud();
