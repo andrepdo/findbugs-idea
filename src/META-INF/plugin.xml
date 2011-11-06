@@ -178,7 +178,7 @@
     <id>FindBugs-IDEA</id>
     <version>@VERSION@</version>
     <vendor logo="/org/twodividedbyzero/idea/findbugs/resources/icons/bug.png"
-            email="andrepdo@dev.java.net" url="http://code.google.com/p/findbugs-idea/">Andre Pfeiler
+            email="see@http://findbugs-idea.googlecode.com" url="http://findbugs-idea.googlecode.com">Andre Pfeiler
     </vendor>
     <idea-version since-build="9013"/>
     <!-- until-build="10762" min="8.0"-->
