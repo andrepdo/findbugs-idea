@@ -107,7 +107,7 @@ public class BugTreePanel extends JPanel {
 		//noinspection ThisEscapedInObjectConstruction
 		_bugTree = new BugTree(_treeModel, this, _project);
 
-		final JScrollPane treeScrollPane = ScrollPaneFacade.getComponent();
+		final JScrollPane treeScrollPane = ScrollPaneFacade.createScrollPane();
 		treeScrollPane.setViewportView(_bugTree);
 		add(treeScrollPane, BorderLayout.CENTER);
 	}

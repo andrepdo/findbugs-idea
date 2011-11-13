@@ -25,6 +25,7 @@ import com.intellij.ui.ColorChooser;
 import com.intellij.ui.UIBundle;
 import com.intellij.util.ui.UIUtil;
 import info.clearthought.layout.TableLayout;
+import org.twodividedbyzero.idea.findbugs.gui.common.ListFacade;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import javax.swing.BorderFactory;
@@ -63,6 +64,7 @@ import java.util.List;
  * @version $Revision$
  * @since 0.9.97
  */
+@SuppressWarnings({"HardcodedFileSeparator"})
 @edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED", "SE_BAD_FIELD", "SIC_INNER_SHOULD_BE_STATIC_ANON"})
 public class AnnotationConfiguration implements ConfigurationPage {
 
@@ -72,11 +74,11 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 		HighPriority(HighlightSeverity.ERROR, Color.RED, Color.WHITE, Color.RED, EffectType.WAVE_UNDERSCORE, Font.BOLD),
 		NormalPriority(HighlightSeverity.WARNING, Color.BLACK, Color.WHITE, Color.YELLOW.darker(), EffectType.WAVE_UNDERSCORE, Font.ITALIC),
-		ExpPriority(HighlightSeverity.INFO, Color.BLACK, Color.WHITE, Color.GRAY, EffectType.WAVE_UNDERSCORE, Font.PLAIN),
-		LowPriority(HighlightSeverity.INFO, Color.BLACK, Color.WHITE, Color.GREEN, EffectType.BOXED, Font.PLAIN),
-		IgnorePriority(HighlightSeverity.INFO, Color.BLACK, Color.WHITE, Color.MAGENTA.darker().darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
+		ExpPriority(HighlightSeverity.INFORMATION, Color.BLACK, Color.WHITE, Color.GRAY, EffectType.WAVE_UNDERSCORE, Font.PLAIN),
+		LowPriority(HighlightSeverity.INFORMATION, Color.BLACK, Color.WHITE, Color.GREEN, EffectType.BOXED, Font.PLAIN),
+		IgnorePriority(HighlightSeverity.INFORMATION, Color.BLACK, Color.WHITE, Color.MAGENTA.darker().darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
 
-		private final HighlightSeverity _severity;
+		private final transient HighlightSeverity _severity;
 		private final Color _foregroundColor;
 		private final Color _backgroundColor;
 		private final Color _effectColor;
@@ -270,7 +272,6 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			_markUpPanel.setBorder(BorderFactory.createTitledBorder("Annotation/MarkUp Settings"));
 
 			_markUpPanel.add(getGutterIconCheckbox(), "1, 1, 1, 1"); // col ,row, col, row
-			//_markUpPanel.add(getTextRangeMarkupCheckbox(), "1, 3, 1, 3"); // col ,row, col, row
 			_markUpPanel.add(getAnnotationTypeSettingsPanel(), "1, 3, 1, 3"); // col ,row, col, row
 
 		}
@@ -301,7 +302,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 	private JList getAnnotationTypeList() {
 		if (_annotationTypeList == null) {
-			_annotationTypeList = new JList(AnnotationType.values());
+			_annotationTypeList = ListFacade.createList(AnnotationType.values());
 			_annotationTypeList.addListSelectionListener(new ListSelectionListener() {
 				public void valueChanged(final ListSelectionEvent e) {
 					if (!e.getValueIsAdjusting()) {

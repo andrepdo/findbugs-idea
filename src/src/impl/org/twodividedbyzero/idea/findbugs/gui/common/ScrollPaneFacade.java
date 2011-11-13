@@ -17,6 +17,7 @@
 package org.twodividedbyzero.idea.findbugs.gui.common;
 
 import com.intellij.openapi.diagnostic.Logger;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 
 import javax.swing.JScrollPane;
@@ -37,8 +38,13 @@ public final class ScrollPaneFacade implements ScrollPaneConstants {
 
 	private static final Logger LOGGER = Logger.getInstance(ScrollPaneFacade.class.getName());
 
+
+	private ScrollPaneFacade() {
+	}
+
+
 	@SuppressWarnings( {"UndesirableClassUsage"})
-	public static JScrollPane getComponent(final Component view, final int vsbPolicy, final int hsbPolicy) {
+	public static JScrollPane createScrollPane(@Nullable final Component view, final int vsbPolicy, final int hsbPolicy) {
 		if (IdeaUtilImpl.isVersionGreaterThanIdea9()) {
 			try {
 				final Class<?> clazz = Class.forName("com.intellij.ui.components.JBScrollPane");
@@ -61,17 +67,17 @@ public final class ScrollPaneFacade implements ScrollPaneConstants {
 	}
 
 
-	public static JScrollPane getComponent(final Component view) {
-		return getComponent(view, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	public static JScrollPane createScrollPane(final Component view) {
+		return createScrollPane(view, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	}
 
 
-	public static JScrollPane getComponent(final int vsbPolicy, final int hsbPolicy) {
-		return getComponent(null, vsbPolicy, hsbPolicy);
+	public static JScrollPane createScrollPane(final int vsbPolicy, final int hsbPolicy) {
+		return createScrollPane(null, vsbPolicy, hsbPolicy);
 	}
 
 
-	public static JScrollPane getComponent() {
-		return getComponent(null, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	public static JScrollPane createScrollPane() {
+		return createScrollPane(null, VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	}
 }

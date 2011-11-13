@@ -86,7 +86,7 @@ public class ReportConfiguration implements ConfigurationPage {
 
 			final JPanel categoryPanel = new JPanel();
 			categoryPanel.setBorder(BorderFactory.createTitledBorder("Reported (visible) bug categories"));
-			categoryPanel.add(ScrollPaneFacade.getComponent(getBugCategoriesTable(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+			categoryPanel.add(ScrollPaneFacade.createScrollPane(getBugCategoriesTable(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
 			mainPanel.add(categoryPanel, "1, 3, 3, 3");
 

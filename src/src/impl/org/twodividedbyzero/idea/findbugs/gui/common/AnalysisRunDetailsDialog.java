@@ -155,7 +155,7 @@ public class AnalysisRunDetailsDialog implements Serializable {
 
 		jEditorPane.setText(html.toString());
 
-		panel.add(ScrollPaneFacade.getComponent(jEditorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+		panel.add(ScrollPaneFacade.createScrollPane(jEditorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 		panel.setBorder(BorderFactory.createTitledBorder("FindBugs analysis run configuration"));
 		dialogBuilder.setCenterPanel(panel);
 

@@ -153,7 +153,7 @@ public class PluginConfiguration implements ConfigurationPage {
 			_pluginComponentPanel.setLayout(new BoxLayout(_pluginComponentPanel, BoxLayout.Y_AXIS));
 			rebuildPluginComponents();
 
-			final Component scrollPane = ScrollPaneFacade.getComponent(_pluginComponentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final Component scrollPane = ScrollPaneFacade.createScrollPane(_pluginComponentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			_pluginsPanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 

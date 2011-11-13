@@ -123,10 +123,10 @@ public class DetectorConfiguration implements ConfigurationPage {
 									  {TableLayout.FILL}};// Rows
 			final TableLayout tbl1 = new TableLayout(size1);
 			final JPanel detectorPanel = new JPanel(tbl1);
-			detectorPanel.add(ScrollPaneFacade.getComponent(getDetectorsTable(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), "0, 0, 0, 0");
+			detectorPanel.add(ScrollPaneFacade.createScrollPane(getDetectorsTable(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), "0, 0, 0, 0");
 			//mainPanel.add(detectorPanel, "1, 7, 1, 7");
 
-			final JComponent scrollPane = ScrollPaneFacade.getComponent(getTextArea(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final JComponent scrollPane = ScrollPaneFacade.createScrollPane(getTextArea(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			getDetectorTextPanel().add(scrollPane, BorderLayout.CENTER);
 			final Dimension preferredSize = getDetectorTextPanel().getPreferredSize();
 			preferredSize.height = 150;
