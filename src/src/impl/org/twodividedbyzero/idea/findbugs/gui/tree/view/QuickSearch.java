@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.gui.common.AbstractBar;
+import org.twodividedbyzero.idea.findbugs.gui.common.ListFacade;
 import org.twodividedbyzero.idea.findbugs.gui.common.ToolBarButton;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
@@ -636,7 +637,7 @@ public abstract class QuickSearch<E> {
 				}
 
 
-				protected void doFind() {
+				void doFind() {
 					final String text = _searchField.getText().trim();
 					if (text.length() != 0) {
 						final int found = find(text);
@@ -884,7 +885,7 @@ public abstract class QuickSearch<E> {
 			_label.setVerticalAlignment(JLabel.CENTER);
 
 			_listModel = new DefaultListModel();
-			_list = new JList();
+			_list = ListFacade.createList();
 			_list.setModel(_listModel);
 			_list.setBorder(BorderFactory.createEmptyBorder(8, 5, 8, 5));
 			_list.setAutoscrolls(true);

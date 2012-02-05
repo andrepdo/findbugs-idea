@@ -22,6 +22,7 @@ import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import info.clearthought.layout.TableLayout;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
+import org.twodividedbyzero.idea.findbugs.gui.common.TableFacade;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.model.BugCategoryTableModel;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
@@ -121,7 +122,7 @@ public class ReportConfiguration implements ConfigurationPage {
 
 	private JTable getBugCategoriesTable() {
 		if (_categoryTable == null) {
-			_categoryTable = new JTable();
+			_categoryTable = TableFacade.createTable();
 			_categoryTable.setShowGrid(false);
 			_categoryTable.setShowHorizontalLines(false);
 			_categoryTable.setShowVerticalLines(false);

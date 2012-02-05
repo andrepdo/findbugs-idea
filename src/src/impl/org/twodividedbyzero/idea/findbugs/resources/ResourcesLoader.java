@@ -187,7 +187,7 @@ public final class ResourcesLoader {
 	}
 
 
-	protected ImageIcon loadImageIcon(final String filename, final String description) {
+	ImageIcon loadImageIcon(final String filename, final String description) {
 		final java.net.URL imgURL = getClass().getResource(ICON_RESOURCES_PKG + "/" + filename);
 		if (imgURL != null) {
 			return new ImageIcon(imgURL, description);

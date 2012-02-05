@@ -27,8 +27,7 @@ import org.jsoup.Jsoup;
  */
 public class StringUtil {
 
-	public StringUtil() {
-		throw new UnsupportedOperationException();
+	private StringUtil() {
 	}
 
 

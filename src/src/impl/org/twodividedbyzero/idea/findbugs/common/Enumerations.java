@@ -28,6 +28,10 @@ import java.util.Iterator;
  */
 public final class Enumerations {
 
+	private Enumerations() {
+	}
+
+
 	/**
 	 * Allows using of {@link Enumeration} with the for-each statement. The
 	 * implementation is not using any heap space and such is able to serve

@@ -307,7 +307,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		if (evt.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
 			if (_parent != null) {
 				final String desc = evt.getDescription();
-				if (desc.equals("#class")) {
+				if ("#class".equals(desc)) {
 					final BugTreePanel bugTreePanel = _parent.getBugTreePanel();
 					final BugTree tree = bugTreePanel.getBugTree();
 					if (bugTreePanel.isScrollToSource()) {
@@ -317,7 +317,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 						tree.getScrollToSourceHandler().scollToSelectionSource();
 						bugTreePanel.setScrollToSource(false);
 					}
-				} else if (desc.equals("#comments")) {
+				} else if ("#comments".equals(desc)) {
 					getTabbedPane().setSelectedComponent(getCloudCommentsPanel());
 				}
 			}
@@ -459,7 +459,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 			html.append("<p><h3>Notes:</p>");
 			html.append("<ul>");
 			for (final BugAnnotation annotation : annotations) {
-				html.append("<li>" + annotation.toString(bugInstance.getPrimaryClass()) + "</li>");
+				html.append("<li>").append(annotation.toString(bugInstance.getPrimaryClass())).append("</li>");
 			}
 			html.append("</ul>");
 		}

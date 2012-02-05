@@ -133,7 +133,7 @@ public class FindBugsPreferences extends Properties {
 	 *
 	 * @return a map of FindBugs-IDEA property names to values.
 	 */
-	public Map<String, String> getDefinedProperies() {
+	public Map<String, String> getDefinedProperties() {
 		final Map<String, String> values = new HashMap<String, String>();
 
 		for (final Enumeration<?> properties = propertyNames(); properties.hasMoreElements(); ) {
@@ -164,7 +164,7 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public void setDefinedProperies(final Map<String, String> properties) {
+	public void setDefinedProperties(final Map<String, String> properties) {
 		if (properties == null || properties.isEmpty()) {
 			return;
 		}
@@ -565,7 +565,8 @@ public class FindBugsPreferences extends Properties {
 
 		final FindBugsPreferences that = (FindBugsPreferences) o;
 
-		return COMPILE_BEFORE_ANALYZE == that.COMPILE_BEFORE_ANALYZE;
+		//noinspection AccessStaticViaInstance
+		return COMPILE_BEFORE_ANALYZE.equals(that.COMPILE_BEFORE_ANALYZE);
 
 	}
 

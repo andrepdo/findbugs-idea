@@ -24,6 +24,7 @@ import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import info.clearthought.layout.TableLayout;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
+import org.twodividedbyzero.idea.findbugs.gui.common.TableFacade;
 import org.twodividedbyzero.idea.findbugs.gui.common.TableSorter;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.model.BugPatternTableModel;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -198,7 +199,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 			_bugPatternModel = new BugPatternTableModel(_preferences);
 			_tableSorter = new TableSorter(_bugPatternModel);
 
-			_detectorsTable = new JTable(_tableSorter);
+			_detectorsTable = TableFacade.createTable(_tableSorter);
 
 			final TableCellRenderer colorRenderer = new ColorRenderer(getModel(), _preferences);
 			_detectorsTable.setDefaultRenderer(String.class, colorRenderer);

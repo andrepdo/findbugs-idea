@@ -494,7 +494,7 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 	}
 
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "UseOfObsoleteCollectionType"})
 	private void readObject(final ObjectInputStream s) throws IOException, ClassNotFoundException {
 		s.defaultReadObject();
 
@@ -509,7 +509,7 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 	}
 
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "UseOfObsoleteCollectionType"})
 	private void writeObject(final ObjectOutputStream s) throws IOException {
 		final Vector values = new Vector();
 

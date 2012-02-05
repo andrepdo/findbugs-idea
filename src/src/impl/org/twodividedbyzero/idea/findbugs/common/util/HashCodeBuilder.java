@@ -30,6 +30,10 @@ import java.util.Arrays;
  */
 class HashCodeBuilder {
 
+	private HashCodeBuilder() {
+	}
+
+
 	/**
 	 * Returns true if given two objects are same.
 	 * <p/>
