@@ -32,15 +32,18 @@ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import java.awt.Graphics;
 import java.util.List;
 
+
+@SuppressWarnings({"override"})
 public class CloudCommentsPaneIntellij extends CloudCommentsPane {
 
 	private static final Logger LOGGER = Logger.getInstance(CloudCommentsPane.class.getName());
 
-    private final ToolWindowPanel _toolWindowPanel;
+	private final ToolWindowPanel _toolWindowPanel;
 
-    public CloudCommentsPaneIntellij(final ToolWindowPanel toolWindowPanel) {
-        _toolWindowPanel = toolWindowPanel;
-    }
+
+	public CloudCommentsPaneIntellij(final ToolWindowPanel toolWindowPanel) {
+		_toolWindowPanel = toolWindowPanel;
+	}
 
 
 	@Override
@@ -57,76 +60,80 @@ public class CloudCommentsPaneIntellij extends CloudCommentsPane {
 	}
 
 
-	protected void setSignInOutText(String buttonText) {
-        ((LinkLabel)_signInOutLink).setText(buttonText);
-    }
-
-    protected void setupLinksOrButtons() {
-        _addCommentLink = new LinkLabel();
-        ((LinkLabel)_addCommentLink).setText("add comment");
-        ((LinkLabel)_addCommentLink).setListener(new LinkListener() {
-            public void linkSelected(final LinkLabel linkLabel, final Object o) {
-                addCommentClicked();
-            }
-        }, null);
-        _cancelLink = new LinkLabel();
-        ((LinkLabel)_cancelLink).setText("cancel");
-        ((LinkLabel)_cancelLink).setListener(new LinkListener() {
-            public void linkSelected(final LinkLabel linkLabel, final Object o) {
-                cancelClicked();
-            }
-        }, null);
-        _signInOutLink = new LinkLabel();
-        ((LinkLabel)_signInOutLink).setText("sign in");
-        ((LinkLabel)_signInOutLink).setListener(new LinkListener() {
-            public void linkSelected(final LinkLabel linkLabel, final Object o) {
-                signInOrOutClicked();
-            }
-        }, null);
-        _changeLink = new LinkLabel();
-        ((LinkLabel)_changeLink).setText("change");
-        ((LinkLabel)_changeLink).setListener(new LinkListener() {
-            public void linkSelected(final LinkLabel linkLabel, final Object o) {
-                changeClicked();
-            }
-        }, null);
-
-    }
-
-    protected void showCloudChooser(final List<CloudPlugin> plugins, final List<String> descriptions) {
-        final JBPopupFactory factory = JBPopupFactory.getInstance();
-        final ListPopup popup = factory.createListPopup(new BaseListPopupStep<String>("Store comments in:", descriptions) {
-            @Override
-            public PopupStep<?> onChosen(final String selectedValue, final boolean finalChoice) {
-                if (selectedValue != null) {
-                    final int index = descriptions.indexOf(selectedValue);
-                    if (index == -1) {
-                        LOGGER.error("Error - not found - '" + selectedValue + "' among " + descriptions);
-                    } else {
-                        final CloudPlugin newPlugin = plugins.get(index);
-                        final String newCloudId = newPlugin.getId();
-                        changeCloud(newCloudId);
-                    }
-                }
-                return super.onChosen(selectedValue, finalChoice);
-            }
+	protected void setSignInOutText(final String buttonText) {
+		((LinkLabel) signInOutLink).setText(buttonText);
+	}
 
 
-            @Override
-            public void canceled() {
-                super.canceled();
-            }
-        });
-        popup.showInCenterOf(_changeLink);
-    }
+	protected void setupLinksOrButtons() {
+		/* _addCommentLink = new LinkLabel();
+				((LinkLabel)_addCommentLink).setText("add comment");
+				((LinkLabel)_addCommentLink).setListener(new LinkListener() {
+					public void linkSelected(final LinkLabel linkLabel, final Object o) {
+						addCommentClicked();
+					}
+				}, null);*/
+		cancelLink = new LinkLabel();
+		((LinkLabel) cancelLink).setText("cancel");
+		((LinkLabel) cancelLink).setListener(new LinkListener() {
+			public void linkSelected(final LinkLabel linkLabel, final Object o) {
+				cancelClicked();
+			}
+		}, null);
+		signInOutLink = new LinkLabel();
+		((LinkLabel) signInOutLink).setText("sign in");
+		((LinkLabel) signInOutLink).setListener(new LinkListener() {
+			public void linkSelected(final LinkLabel linkLabel, final Object o) {
+				signInOrOutClicked();
+			}
+		}, null);
+		/*changeLink = new LinkLabel();
+				((LinkLabel)_changeLink).setText("change");
+				((LinkLabel)_changeLink).setListener(new LinkListener() {
+					public void linkSelected(final LinkLabel linkLabel, final Object o) {
+						changeClicked();
+					}
+				}, null);*/
 
-    protected boolean isDisabled(CloudPlugin plugin) {
-        final FindBugsPlugin findBugsPlugin = _toolWindowPanel.getProject().getComponent(FindBugsPlugin.class);
-        final FindBugsPreferences prefs = findBugsPlugin.getPreferences();
-        return prefs.isPluginDisabled(plugin.getFindbugsPluginId());
-    }
+	}
 
-    protected void issueUpdated() {
-        _toolWindowPanel.getBugDetailsComponents().issueUpdated(_bugInstance);
-    }
+
+	protected void showCloudChooser(final List<CloudPlugin> plugins, final List<String> descriptions) {
+		final JBPopupFactory factory = JBPopupFactory.getInstance();
+		final ListPopup popup = factory.createListPopup(new BaseListPopupStep<String>("Store comments in:", descriptions) {
+			@Override
+			public PopupStep<?> onChosen(final String selectedValue, final boolean finalChoice) {
+				if (selectedValue != null) {
+					final int index = descriptions.indexOf(selectedValue);
+					if (index == -1) {
+						LOGGER.error("Error - not found - '" + selectedValue + "' among " + descriptions);
+					} else {
+						final CloudPlugin newPlugin = plugins.get(index);
+						final String newCloudId = newPlugin.getId();
+						changeCloud(newCloudId);
+					}
+				}
+				return super.onChosen(selectedValue, finalChoice);
+			}
+
+
+			@Override
+			public void canceled() {
+				super.canceled();
+			}
+		});
+		popup.showInCenterOf(signInOutLink);
+	}
+
+
+	protected boolean isDisabled(CloudPlugin plugin) {
+		final FindBugsPlugin findBugsPlugin = _toolWindowPanel.getProject().getComponent(FindBugsPlugin.class);
+		final FindBugsPreferences prefs = findBugsPlugin.getPreferences();
+		return prefs.isPluginDisabled(plugin.getFindbugsPluginId());
+	}
+
+
+	protected void issueUpdated() {
+		_toolWindowPanel.getBugDetailsComponents().issueUpdated(_bugInstance);
+	}
 }

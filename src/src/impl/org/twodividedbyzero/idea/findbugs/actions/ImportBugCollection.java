@@ -152,13 +152,13 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 				indicator.setText(fileToImport);
 				try {
 					_bugCollection = new SortedBugCollection();
-					FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(project);
+					final FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(project);
 					_importBugCollection = _bugCollection.createEmptyCollectionWithMetadata();
-					edu.umd.cs.findbugs.Project importProject = _importBugCollection.getProject();
+					final edu.umd.cs.findbugs.Project importProject = _importBugCollection.getProject();
 					importProject.setGuiCallback(new PluginGuiCallback(pluginComponent));
 					_importBugCollection.setDoNotUseCloud(true);
-					for (Plugin plugin : Plugin.getAllPlugins()) {
-						importProject.setPluginStatus(plugin, !preferences.isPluginDisabled(plugin.getPluginId()));
+					for (final Plugin plugin : Plugin.getAllPlugins()) {
+						importProject.setPluginStatusTrinary(plugin.getPluginId(), !preferences.isPluginDisabled(plugin.getPluginId()));
 					}
 					_importBugCollection.readXML(fileToImport);
 

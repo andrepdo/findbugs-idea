@@ -87,8 +87,11 @@ public class FindBugsPreferences extends Properties {
 	public transient Map<String, String> _detectors;
 	public transient Map<String, String> _bugCategories;
 	public transient List<String> _includeFilters;
+	public transient Map<String, Boolean> _includeFiltersMap;
 	public transient List<String> _excludeFilters;
+	public transient Map<String, Boolean> _excludeFiltersMap;
 	public transient List<String> _excludeBaselineBugs;
+	public transient Map<String, Boolean> _excludeBaselineBugsMap;
 	/** URL's of extra plugins to load */
 	public transient List<String> _plugins;
 	/** A list of plugin ID's */
@@ -112,8 +115,11 @@ public class FindBugsPreferences extends Properties {
 		_detectors = new HashMap<String, String>();
 		_bugCategories = new HashMap<String, String>(/*getBugCategories()*/);
 		_includeFilters = new ArrayList<String>();
+		_includeFiltersMap = new HashMap<String, Boolean>();
 		_excludeFilters = new ArrayList<String>();
+		_excludeFiltersMap = new HashMap<String, Boolean>();
 		_excludeBaselineBugs = new ArrayList<String>();
+		_excludeBaselineBugsMap = new HashMap<String, Boolean>();
 		_plugins = new ArrayList<String>();
 		_enabledPlugins = new ArrayList<String>();
 		_disabledPlugins = new ArrayList<String>();
@@ -130,7 +136,7 @@ public class FindBugsPreferences extends Properties {
 	public Map<String, String> getDefinedProperies() {
 		final Map<String, String> values = new HashMap<String, String>();
 
-		for (final Enumeration<?> properties = propertyNames(); properties.hasMoreElements();) {
+		for (final Enumeration<?> properties = propertyNames(); properties.hasMoreElements(); ) {
 			final String propertyName = (String) properties.nextElement();
 			if (propertyName.startsWith(PROPERTIES_PREFIX)) {
 				final String configPropertyName = propertyName.substring(PROPERTIES_PREFIX.length());
@@ -147,7 +153,7 @@ public class FindBugsPreferences extends Properties {
 
 	public void setDefaults(final FindBugsPreferences properties) {
 		clear();
-		for (final Enumeration<?> confNames = properties.propertyNames(); confNames.hasMoreElements();) {
+		for (final Enumeration<?> confNames = properties.propertyNames(); confNames.hasMoreElements(); ) {
 			final String elementName = (String) confNames.nextElement();
 			final String value = properties.getProperty(elementName);
 			setProperty(elementName, value);
@@ -185,7 +191,7 @@ public class FindBugsPreferences extends Properties {
 	public void clearDefinedProperies() {
 		final Collection<String> propertiesToRemove = new ArrayList<String>();
 
-		for (final Enumeration<?> properties = propertyNames(); properties.hasMoreElements();) {
+		for (final Enumeration<?> properties = propertyNames(); properties.hasMoreElements(); ) {
 			final String propertyName = (String) properties.nextElement();
 			if (propertyName.startsWith(PROPERTIES_PREFIX)) {
 				// delay to stop concurrent modification
@@ -300,9 +306,9 @@ public class FindBugsPreferences extends Properties {
 
 
 	public static void loadPlugins(final List<String> pluginUrls) {
-		for (String pluginUrl : pluginUrls) {
+		for (final String pluginUrl : pluginUrls) {
 			try {
-				Plugin plugin = Plugin.loadCustomPlugin(new URL(pluginUrl), null);
+				final Plugin plugin = Plugin.loadCustomPlugin(new URL(pluginUrl), null);
 				plugin.setGloballyEnabled(false);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -352,15 +358,48 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
+	public Map<String, Boolean> getIncludeFiltersMap() {
+		if (_includeFiltersMap.isEmpty()) {
+			for (final String includeFilter : _includeFilters) {
+				_includeFiltersMap.put(includeFilter, true);
+			}
+
+		}
+		return _includeFiltersMap;
+	}
+
+
 	public List<String> getExcludeFilters() {
 		//noinspection ReturnOfCollectionOrArrayField
 		return _excludeFilters;
 	}
 
 
+	public Map<String, Boolean> getExcludeFiltersMap() {
+		if (_excludeFiltersMap.isEmpty()) {
+			for (final String excludeFilter : _excludeFilters) {
+				_excludeFiltersMap.put(excludeFilter, true);
+			}
+
+		}
+		return _excludeFiltersMap;
+	}
+
+
 	public List<String> getExcludeBaselineBugs() {
 		//noinspection ReturnOfCollectionOrArrayField
 		return _excludeBaselineBugs;
+	}
+
+
+	public Map<String, Boolean> getExcludeBaselineBugsMap() {
+		if (_excludeBaselineBugsMap.isEmpty()) {
+			for (final String excludeBaseLineBug : _excludeBaselineBugs) {
+				_excludeBaselineBugsMap.put(excludeBaseLineBug, true);
+			}
+
+		}
+		return _excludeBaselineBugsMap;
 	}
 
 
@@ -499,8 +538,11 @@ public class FindBugsPreferences extends Properties {
 		getDetectors().clear();
 		getBugCategories().clear();
 		getIncludeFilters().clear();
+		getIncludeFiltersMap().clear();
 		getExcludeFilters().clear();
+		getExcludeFiltersMap().clear();
 		getExcludeBaselineBugs().clear();
+		getExcludeBaselineBugsMap().clear();
 		getEnabledModuleConfigs().clear();
 		getPlugins().clear();
 		_enabledPlugins.clear();

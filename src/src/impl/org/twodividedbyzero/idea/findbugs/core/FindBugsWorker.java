@@ -53,7 +53,7 @@ import org.twodividedbyzero.idea.findbugs.report.BugReporter;
 import org.twodividedbyzero.idea.findbugs.tasks.FindBugsTask;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.Map;
 import java.util.Map.Entry;
 
 
@@ -142,19 +142,19 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 		configureSelectedCategories(preferences, projectFilterSettings);
 		//_userPrefs.setFilterSettings(projectFilterSettings);
 
-		_userPrefs.setIncludeFilterFiles(preferences.getIncludeFilters());
-		_userPrefs.setExcludeBugsFiles(preferences.getExcludeBaselineBugs());
-		_userPrefs.setExcludeFilterFiles(preferences.getExcludeFilters());
+		_userPrefs.setIncludeFilterFiles(preferences.getIncludeFiltersMap());
+		_userPrefs.setExcludeBugsFiles(preferences.getExcludeBaselineBugsMap());
+		_userPrefs.setExcludeFilterFiles(preferences.getExcludeFiltersMap());
 		//_userPrefs.setUserDetectorThreshold(preferences.getProperty(FindBugsPreferences.MIN_PRIORITY_TO_REPORT)); // todo: needed?
 
 		_findBugsProject = new FindBugsProject();
 		_findBugsProject.setProjectName(_project.getName());
-		for (Plugin plugin : Plugin.getAllPlugins()) {
-			_findBugsProject.setPluginStatus(plugin, !preferences.isPluginDisabled(plugin.getPluginId()));
+		for (final Plugin plugin : Plugin.getAllPlugins()) {
+			_findBugsProject.setPluginStatusTrinary(plugin.getPluginId(), !preferences.isPluginDisabled(plugin.getPluginId()));
 		}
 
 		_bugCollection = new SortedBugCollection();
-		FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(_project);
+		final FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(_project);
 		_bugCollection.getProject().setGuiCallback(new PluginGuiCallback(pluginComponent));
 		_bugCollection.setDoNotUseCloud(true);
 
@@ -280,26 +280,26 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 
 
 	private void configureFilter(final IFindBugsEngine engine) {
-		final Collection<String> excludeFilterFiles = _userPrefs.getExcludeFilterFiles();
-		for (final String excludeFileName : excludeFilterFiles) {
+		final Map<String, Boolean> excludeFilterFiles = _userPrefs.getExcludeFilterFiles();
+		for (final Entry<String, Boolean> excludeFileName : excludeFilterFiles.entrySet()) {
 			try {
-				engine.addFilter(IdeaUtilImpl.replace$PROJECT_DIR$(_project, excludeFileName), false);
+				engine.addFilter(IdeaUtilImpl.replace$PROJECT_DIR$(_project, excludeFileName.getKey()), false);
 			} catch (IOException e) {
 				LOGGER.error("ExcludeFilter configuration failed.", e);
 			}
 		}
-		final Collection<String> includeFilterFiles = _userPrefs.getIncludeFilterFiles();
-		for (final String includeFileName : includeFilterFiles) {
+		final Map<String, Boolean> includeFilterFiles = _userPrefs.getIncludeFilterFiles();
+		for (final Entry<String, Boolean> includeFileName : includeFilterFiles.entrySet()) {
 			try {
-				engine.addFilter(IdeaUtilImpl.replace$PROJECT_DIR$(_project, includeFileName), true);
+				engine.addFilter(IdeaUtilImpl.replace$PROJECT_DIR$(_project, includeFileName.getKey()), true);
 			} catch (IOException e) {
 				LOGGER.error("IncludeFilter configuration failed.", e);
 			}
 		}
-		final Collection<String> excludeBugFiles = _userPrefs.getExcludeBugsFiles();
-		for (final String excludeBugFile : excludeBugFiles) {
+		final Map<String, Boolean> excludeBugFiles = _userPrefs.getExcludeBugsFiles();
+		for (final Entry<String, Boolean> excludeBugFile : excludeBugFiles.entrySet()) {
 			try {
-				engine.excludeBaselineBugs(IdeaUtilImpl.replace$PROJECT_DIR$(_project, excludeBugFile));
+				engine.excludeBaselineBugs(IdeaUtilImpl.replace$PROJECT_DIR$(_project, excludeBugFile.getKey()));
 			} catch (IOException e) {
 				LOGGER.error("ExcludeBaseLineBug files configuration failed.", e);
 			} catch (DocumentException e) {

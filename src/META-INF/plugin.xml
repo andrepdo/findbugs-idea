@@ -86,7 +86,8 @@
         <![CDATA[<html>
         <h3>0.9.97</h3>
         <ul>
-		    <li></li>
+		    <li>findbugs-2 support</li>
+		    <li>annotate, suppress findbugs patterns</li>
 		</ul>
         <h3>0.9.96</h3>
 		<ul>

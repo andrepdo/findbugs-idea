@@ -291,7 +291,7 @@ public class PluginConfiguration implements ConfigurationPage {
 				html.append(longText);
 				html.append("</p>");
 
-				if (website.length() > 0) {
+				if (website != null && website.length() > 0) {
 					html.append("<br><p>");
 					html.append("<font style='font-weight: bold; color:gray; font-size: 8px'>Website: ").append(website).append("</font>");
 					html.append("</p>");
@@ -315,7 +315,8 @@ public class PluginConfiguration implements ConfigurationPage {
 			if (project == null) {
 				return plugin.isGloballyEnabled();
 			}
-			return project.getPluginStatus(plugin);
+			final Boolean pluginStatus = project.getPluginStatus(plugin);
+			return pluginStatus != null;
 		}
 
 

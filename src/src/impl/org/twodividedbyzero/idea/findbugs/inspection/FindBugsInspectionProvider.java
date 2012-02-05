@@ -26,6 +26,7 @@ import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.extensions.PluginId;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 
 import java.io.File;
 
@@ -52,11 +53,10 @@ public class FindBugsInspectionProvider implements InspectionToolProvider, Appli
 
 
 	public void initComponent() {
-		// no action required
-		Application app = ApplicationManager.getApplication();
-		IdeaPluginDescriptor plugin = app.getPlugin(PluginId.getId("FindBugs-IDEA"));
-		File jar = new File(plugin.getPath(), "lib/webCloudClient.jar");
-		System.setProperty("findbugs.plugin.appengine", jar.toURI().toString());
+		final Application app = ApplicationManager.getApplication();
+		final IdeaPluginDescriptor plugin = app.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
+		final File jar = new File(plugin.getPath(), FindBugsPluginConstants.FINDBUGS_WEBCLOUD_CLIENT_JAR);
+		System.setProperty(FindBugsPluginConstants.FINDBUGS_APP_ENGINE_PROPERTY_NAME, jar.toURI().toString());
 	}
 
 

@@ -40,9 +40,9 @@ public class VersionManager {
 	private static final String _branch = "";
 
 
-	private static final String NAME = "FindBugs-IDEA";
+	private static final String NAME = FindBugsPluginConstants.PLUGIN_NAME;
 
-	private static final String WEBSITE = "http://findbugs-idea.dev.java.net";
+	private static final String WEBSITE = "http://findbugs-idea.googlecode.com/";
 
 	private static final String DOWNLOAD_WEBSITE = "http://plugins.intellij.net/plugin/?id=3847";
 

@@ -113,6 +113,7 @@ public class GuiResources {
 		EDITORPANE_STYLESHEET = new StyleSheet();
 		EDITORPANE_STYLESHEET.addRule("body {font-size: 12pt}");
 		EDITORPANE_STYLESHEET.addRule("H1 {color: #005555;  font-size: 120%; font-weight: bold;}");
+		EDITORPANE_STYLESHEET.addRule("H1 a {color: #005555;  font-size: 120%; font-weight: bold;}");
 		EDITORPANE_STYLESHEET.addRule("H2, .fakeH2 {color: #005555;  font-size: 12pt; font-weight: bold;}");
 		EDITORPANE_STYLESHEET.addRule("H3 {color: #005555;  font-size: 12pt; font-weight: bold;}");
 		EDITORPANE_STYLESHEET.addRule("code {font-family: courier; font-size: 12pt}");

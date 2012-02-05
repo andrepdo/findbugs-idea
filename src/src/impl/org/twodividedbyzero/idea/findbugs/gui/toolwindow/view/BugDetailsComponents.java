@@ -504,7 +504,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		} finally {
 			reader.close(); // polite, but doesn't do much in StringReader
 		}
-		_cloudCommentsPane.setBugInstance(_lastBugCollection, _lastBugInstance);
+		_cloudCommentsPane.setBugInstance(_lastBugInstance);
 		scrollRectToVisible(_bugDetailsPane);
 	}
 
