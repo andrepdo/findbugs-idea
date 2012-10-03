@@ -12,7 +12,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="IDEA IU-117.117" jdkType="IDEA JDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
       <library name="lib">
@@ -20,7 +20,15 @@
           <root url="file://$MODULE_DIR$/lib" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../findbugs-2.0.1-rc2/src/tools" />
+          <root url="file://$MODULE_DIR$/../findbugs-2.0.1-rc2/src/antTask" />
+          <root url="file://$MODULE_DIR$/../findbugs-2.0.1-rc2/src/java" />
+          <root url="file://$MODULE_DIR$/../findbugs-2.0.1-rc2/src/gui" />
+          <root url="file://$MODULE_DIR$/../findbugs-2.0.1-rc2/src/obsolete" />
+          <root url="file://$MODULE_DIR$/../findbugs-2.0.1-rc2/src/infonodeJava" />
+          <root url="file://$MODULE_DIR$/../findbugs-2.0.1-rc2/src/junit" />
+        </SOURCES>
         <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
       </library>
     </orderEntry>

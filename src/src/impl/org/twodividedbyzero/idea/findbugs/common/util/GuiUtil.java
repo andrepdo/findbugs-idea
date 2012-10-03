@@ -20,8 +20,14 @@ package org.twodividedbyzero.idea.findbugs.common.util;
 
 import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiElement;
+import edu.umd.cs.findbugs.BugInstance;
+import edu.umd.cs.findbugs.Detector;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
+import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
+import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
+import javax.swing.Icon;
 import javax.swing.JScrollPane;
 import java.awt.Component;
 import java.awt.Graphics;
@@ -86,7 +92,95 @@ public final class GuiUtil {
 				graphics2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			}
 		}
+	}
 
+
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"DB_DUPLICATE_SWITCH_CLAUSES"})
+	@Nullable
+	public static Icon getIcon(final ExtendedProblemDescriptor problemDescriptor) {
+		final BugInstance bugInstance = problemDescriptor.getBugInstance();
+		final int priority = bugInstance.getPriority();
+		final Icon icon;
+		switch (priority) {
+			case Detector.HIGH_PRIORITY :
+				icon = GuiResources.PRIORITY_HIGH_ICON;
+				break;
+			case Detector.NORMAL_PRIORITY :
+				icon = GuiResources.PRIORITY_NORMAL_ICON;
+				break;
+			case Detector.LOW_PRIORITY :
+				icon = GuiResources.PRIORITY_LOW_ICON;
+				break;
+			case Detector.EXP_PRIORITY :
+				icon = GuiResources.PRIORITY_EXP_ICON;
+				break;
+			case Detector.IGNORE_PRIORITY :
+			default:
+				icon = GuiResources.PRIORITY_HIGH_ICON;
+			break;
+
+		}
+		return icon;
+	}
+
+
+	@SuppressWarnings("HardcodedFileSeparator")
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"DB_DUPLICATE_SWITCH_CLAUSES"})
+	@Nullable
+	public static Icon getTinyIcon(final ExtendedProblemDescriptor problemDescriptor) {
+		final BugInstance bugInstance = problemDescriptor.getBugInstance();
+		final int priority = bugInstance.getPriority();
+		final Icon icon;
+		switch (priority) {
+			case Detector.HIGH_PRIORITY :
+				icon = ResourcesLoader.loadIcon("priority/bug_high_tiny.png");
+				break;
+			case Detector.NORMAL_PRIORITY :
+				icon = ResourcesLoader.loadIcon("priority/bug_normal_tiny.png");
+				break;
+			case Detector.LOW_PRIORITY :
+				icon = ResourcesLoader.loadIcon("priority/bug_low_tiny.png");
+				break;
+			case Detector.EXP_PRIORITY :
+				icon = ResourcesLoader.loadIcon("priority/bug_exp_tiny.png");
+				break;
+			case Detector.IGNORE_PRIORITY :
+			default:
+				icon = ResourcesLoader.loadIcon("priority/bug_high_tiny.png");
+			break;
+
+		}
+		return icon;
+	}
+
+
+	@SuppressWarnings("HardcodedFileSeparator")
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"DB_DUPLICATE_SWITCH_CLAUSES"})
+	@Nullable
+	public static Icon getCombinedIcon(final ExtendedProblemDescriptor problemDescriptor) {
+		final BugInstance bugInstance = problemDescriptor.getBugInstance();
+		final int priority = bugInstance.getPriority();
+		final Icon icon;
+		switch (priority) {
+			case Detector.HIGH_PRIORITY :
+				icon = ResourcesLoader.loadIcon("intentions/bugBulbHigh.png");
+				break;
+			case Detector.NORMAL_PRIORITY :
+				icon = ResourcesLoader.loadIcon("intentions/bugBulbNormal.png");
+				break;
+			case Detector.LOW_PRIORITY :
+				icon = ResourcesLoader.loadIcon("intentions/bugBulbLow.png");
+				break;
+			case Detector.EXP_PRIORITY :
+				icon = ResourcesLoader.loadIcon("intentions/bugBulbExt.png");
+				break;
+			case Detector.IGNORE_PRIORITY :
+			default:
+				icon = ResourcesLoader.loadIcon("intentions/bugBulbHigh.png");
+			break;
+
+		}
+		return icon;
 	}
 
 }

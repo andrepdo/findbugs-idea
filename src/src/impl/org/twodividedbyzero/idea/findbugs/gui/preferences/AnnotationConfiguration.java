@@ -19,7 +19,6 @@
 
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
-import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.ui.ColorChooser;
 import com.intellij.ui.UIBundle;
@@ -53,8 +52,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -69,71 +67,6 @@ import java.util.List;
 public class AnnotationConfiguration implements ConfigurationPage {
 
 	private AnnotationTypePanel _annotationTypePanel;
-
-	enum AnnotationType {
-
-		HighPriority(HighlightSeverity.ERROR, Color.RED, Color.WHITE, Color.RED, EffectType.WAVE_UNDERSCORE, Font.BOLD),
-		NormalPriority(HighlightSeverity.WARNING, Color.BLACK, Color.WHITE, Color.YELLOW.darker(), EffectType.WAVE_UNDERSCORE, Font.ITALIC),
-		ExpPriority(HighlightSeverity.INFORMATION, Color.BLACK, Color.WHITE, Color.GRAY, EffectType.WAVE_UNDERSCORE, Font.PLAIN),
-		LowPriority(HighlightSeverity.INFORMATION, Color.BLACK, Color.WHITE, Color.GREEN, EffectType.BOXED, Font.PLAIN),
-		IgnorePriority(HighlightSeverity.INFORMATION, Color.BLACK, Color.WHITE, Color.MAGENTA.darker().darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
-
-		private final transient HighlightSeverity _severity;
-		private final Color _foregroundColor;
-		private final Color _backgroundColor;
-		private final Color _effectColor;
-		private final EffectType _effectType;
-		private final int _font;
-
-
-		AnnotationType(final HighlightSeverity severity, final Color foregroundColor, final Color backgroundColor, final Color effectColor, final EffectType effectType, final int font) {
-			_severity = severity;
-			_foregroundColor = foregroundColor;
-			_backgroundColor = backgroundColor;
-			_effectColor = effectColor;
-			_effectType = effectType;
-			_font = font;
-		}
-
-
-		public HighlightSeverity getSeverity() {
-			return _severity;
-		}
-
-
-		public Color getForegroundColor() {
-			return _foregroundColor;
-		}
-
-
-		public Color getBackgroundColor() {
-			return _backgroundColor;
-		}
-
-
-		public Color getEffectColor() {
-			return _effectColor;
-		}
-
-
-		public EffectType getEffectType() {
-			return _effectType;
-		}
-
-
-		public int getFont() {
-			return _font;
-		}
-
-
-		public static List<EffectType> getEffectTypes() {
-			final List<EffectType> result = new ArrayList<EffectType>();
-			for (final AnnotationType annotationType : values()) {
-				result.add(annotationType.getEffectType());
-			}
-			return result;
-		}
-	}
 
 
 	private final FindBugsPreferences _preferences;
@@ -185,6 +118,28 @@ public class AnnotationConfiguration implements ConfigurationPage {
 	private void syncModels() {
 		final String annotationSuppressWarningName = _preferences.getProperty(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS);
 		getAnnotationPathField().setText(annotationSuppressWarningName);
+
+		getGutterIconCheckbox().setSelected(_preferences.getBooleanProperty(FindBugsPreferences.ANNOTATION_GUTTER_ICON_ENABLED, true));
+		if (_preferences.getBooleanProperty(FindBugsPreferences.ANNOTATION_TEXT_RAGE_MARKUP_ENABLED, true)) {
+			getTextRangeMarkupCheckbox().doClick();
+		} else {
+			getAnnotationTypePanel().setEnabled(false);
+			getAnnotationTypeList().setEnabled(false);
+		}
+
+
+		// todo:
+
+		final Map<String,Map<String,String>> annotationTypeSettings = _preferences.getAnnotationTypeSettings();
+		for (final AnnotationType annotationType : AnnotationType.values()) {
+			/*annotationType.setForegroundColor();
+			annotationType.setBackgroundColor();
+			annotationType.setEffectColor();
+			annotationType.setEffectType();
+			annotationType.setFont();*/
+		}
+
+
 		/*for (final String s : _preferences.getPlugins()) {
 			getModel(getPluginList()).addElement(s);
 		}*/
@@ -206,7 +161,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 									 {border, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_annotationPathPanel = new JPanel(tbl);
-			_annotationPathPanel.setBorder(BorderFactory.createTitledBorder("FindBugs Annotation class (@SuppressWarning) need to be on the classpath"));
+			_annotationPathPanel.setBorder(BorderFactory.createTitledBorder("FindBugs Annotation class (@SuppressWarning) needs to be on the classpath"));
 
 			_annotationPathPanel.add(getAnnotationPathField(), "1, 1, 1, 1"); // col ,row, col, row
 
@@ -243,16 +198,17 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			_annotationPathField.setEditable(true);
 			_annotationPathField.getDocument().addDocumentListener(new DocumentListener() {
 				public void insertUpdate(final DocumentEvent e) {
-					_preferences.setProperty(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS, _annotationPathField.getText());
+					_preferences.setAnnotationSuppressWarningsClass(_annotationPathField.getText());
 				}
 
 
 				public void removeUpdate(final DocumentEvent e) {
+					_preferences.setAnnotationSuppressWarningsClass(_annotationPathField.getText());
 				}
 
 
 				public void changedUpdate(final DocumentEvent e) {
-					_preferences.setProperty(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS, _annotationPathField.getText());
+					_preferences.setAnnotationSuppressWarningsClass(_annotationPathField.getText());
 				}
 			});
 		}
@@ -317,13 +273,13 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 	private JCheckBox getTextRangeMarkupCheckbox() {
 		if (_enableTextRangeMarkUp == null) {
-			_enableTextRangeMarkUp = new JCheckBox("Enable editor TextRange markup");
+			_enableTextRangeMarkUp = new JCheckBox("Enable editor TextRange markup & Suppress bug pattern feature");
 			_enableTextRangeMarkUp.addItemListener(new ItemListener() {
 				public void itemStateChanged(final ItemEvent e) {
 					final boolean selected = e.getStateChange() == ItemEvent.SELECTED;
 					getAnnotationTypePanel().setEnabled(selected);
 					getAnnotationTypeList().setEnabled(selected);
-					//_preferences.setProperty(FindBugsPreferences.EXPORT_AS_XML, e.getStateChange() == ItemEvent.SELECTED);
+					_preferences.setAnnotationTextRangeMarkupEnabled(selected);
 				}
 			});
 		}
@@ -336,7 +292,8 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			_enableGutterIcon = new JCheckBox("Enable editor GutterIcon markup");
 			_enableGutterIcon.addItemListener(new ItemListener() {
 				public void itemStateChanged(final ItemEvent e) {
-					//_preferences.setProperty(FindBugsPreferences.EXPORT_AS_XML, e.getStateChange() == ItemEvent.SELECTED);
+					final boolean selected = e.getStateChange() == ItemEvent.SELECTED;
+					_preferences.setAnnotationGutterIconEnabled(selected);
 				}
 			});
 		}
@@ -468,10 +425,12 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 		public void setAnnotationType(final AnnotationType annotationType) {
 			_annotationType = annotationType;
+
 			_foreground.setColor(annotationType.getForegroundColor());
 			_background.setColor(annotationType.getBackgroundColor());
 			_effectTypeColor.setColor(annotationType.getEffectColor());
 			_typeComboBox.setSelectedItem(annotationType.getEffectType());
+
 			final int fontType = annotationType.getFont();
 			switch (fontType) {
 				case Font.BOLD :

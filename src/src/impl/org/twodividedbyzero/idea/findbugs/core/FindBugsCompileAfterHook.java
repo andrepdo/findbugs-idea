@@ -59,6 +59,10 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 	}
 
 
+	public void fileGenerated(final String s, final String s1) {
+	}
+
+
 	@NotNull
 	public String getComponentName() {
 		return FindBugsPluginConstants.PLUGIN_ID + "#FindBugsCompileAfterHook";

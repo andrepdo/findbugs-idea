@@ -18,6 +18,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.gui.tree.NodeVisitor;
 
 import javax.swing.Icon;
@@ -34,6 +35,7 @@ import java.util.List;
  * @version $Revision$
  * @since 0.9.29-dev
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public abstract class AbstractTreeNode<T extends VisitableTreeNode & TreeNode> extends AbstractNodeDescriptor<T> implements TreeNode {
 
 	private T _parent;
@@ -95,7 +97,7 @@ public abstract class AbstractTreeNode<T extends VisitableTreeNode & TreeNode> e
 	}
 
 
-	void setParent(final T parent) {
+	void setParent(@Nullable final T parent) {
 		_parent = parent;
 	}
 

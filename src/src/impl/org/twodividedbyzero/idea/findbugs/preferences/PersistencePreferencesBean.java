@@ -49,6 +49,11 @@ public class PersistencePreferencesBean {
 
 	public List<String> _enabledModuleConfigs;
 
+	public boolean _annotationTextRangeMarkupEnabled;
+	public boolean _annotationGutterIconEnabled;
+	public String _annotationSuppressWarningsClass;
+	public Map<String, String> _annotationTypeSettings;
+
 
 	public PersistencePreferencesBean() {
 		_basePreferences = new HashMap<String, String>();
@@ -64,6 +69,11 @@ public class PersistencePreferencesBean {
 		_disabledPlugins = new ArrayList<String>();
 
 		_enabledModuleConfigs = new ArrayList<String>();
+
+		_annotationGutterIconEnabled = true;
+		_annotationSuppressWarningsClass = FindBugsPreferences.DEFAULT_ANNOTATION_CLASS_NAME;
+		_annotationTextRangeMarkupEnabled = true;
+		_annotationTypeSettings = new HashMap<String, String>();
 	}
 
 
@@ -135,4 +145,44 @@ public class PersistencePreferencesBean {
 		collection.addAll(collection);
 	}*/
 
+
+	public boolean isAnnotationTextRangeMarkupEnabled() {
+		return _annotationTextRangeMarkupEnabled;
+	}
+
+
+	public void setAnnotationTextRangeMarkupEnabled(final boolean annotationTextRangeMarkupEnabled) {
+		_annotationTextRangeMarkupEnabled = annotationTextRangeMarkupEnabled;
+	}
+
+
+	public boolean isAnnotationGutterIconEnabled() {
+		return _annotationGutterIconEnabled;
+	}
+
+
+	public void setAnnotationGutterIconEnabled(final boolean annotationGutterIconEnabled) {
+		_annotationGutterIconEnabled = annotationGutterIconEnabled;
+	}
+
+
+	public String getAnnotationSuppressWarningsClass() {
+		return _annotationSuppressWarningsClass;
+	}
+
+
+	public void setAnnotationSuppressWarningsClass(final String annotationSuppressWarningsClass) {
+		_annotationSuppressWarningsClass = annotationSuppressWarningsClass;
+	}
+
+
+	public Map<String, String> getAnnotationTypeSettings() {
+		return _annotationTypeSettings;
+	}
+
+
+	public void setAnnotationTypeSettings(final Map<String, String> annotationTypeSettings) {
+		//noinspection AssignmentToCollectionOrArrayFieldFromParameter
+		_annotationTypeSettings = annotationTypeSettings;
+	}
 }

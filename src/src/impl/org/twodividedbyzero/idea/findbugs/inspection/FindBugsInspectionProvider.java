@@ -20,9 +20,9 @@ package org.twodividedbyzero.idea.findbugs.inspection;
 
 import com.intellij.codeInspection.InspectionToolProvider;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.openapi.application.Application;
-import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.components.ApplicationComponent;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.PluginId;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -39,6 +39,8 @@ import java.io.File;
  */
 public class FindBugsInspectionProvider implements InspectionToolProvider, ApplicationComponent {
 
+	private static final Logger LOGGER = Logger.getInstance(FindBugsInspectionProvider.class.getName());
+
 
 	public Class<?>[] getInspectionClasses() {
 		return new Class[] {FindBugsInspection.class};
@@ -53,10 +55,14 @@ public class FindBugsInspectionProvider implements InspectionToolProvider, Appli
 
 
 	public void initComponent() {
-		final Application app = ApplicationManager.getApplication();
-		final IdeaPluginDescriptor plugin = app.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
+		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
 		final File jar = new File(plugin.getPath(), FindBugsPluginConstants.FINDBUGS_WEBCLOUD_CLIENT_JAR);
-		System.setProperty(FindBugsPluginConstants.FINDBUGS_APP_ENGINE_PROPERTY_NAME, jar.toURI().toString());
+		if (jar.exists() && jar.canRead()) {
+			System.setProperty(FindBugsPluginConstants.FINDBUGS_APP_ENGINE_PROPERTY_NAME, jar.toURI().toString());
+		} else {
+			LOGGER.info(FindBugsPluginConstants.FINDBUGS_APP_ENGINE_PROPERTY_NAME + " jar not found." + jar.toURI().toString());
+		}
+
 	}
 
 

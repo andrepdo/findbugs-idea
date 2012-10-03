@@ -40,6 +40,10 @@ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.StringUtil;
+import org.twodividedbyzero.idea.findbugs.intentions.ClearAndSuppressBugIntentionAction;
+import org.twodividedbyzero.idea.findbugs.intentions.ClearBugIntentionAction;
+import org.twodividedbyzero.idea.findbugs.intentions.SuppressReportBugForClassIntentionAction;
+import org.twodividedbyzero.idea.findbugs.intentions.SuppressReportBugIntentionAction;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
@@ -79,6 +83,9 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 
 
 	public void annotate(@NotNull final PsiElement psiElement, @NotNull final AnnotationHolder annotationHolder) {
+		if (! getPreferences(psiElement).isAnnotationTextRangeMarkupEnabled()) {
+			return;
+		}
 		if (_analysisRunning) {
 			return;
 		}
@@ -91,7 +98,7 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 
 		final PsiFile psiFile = psiElement.getContainingFile();
 		if (problems.containsKey(psiFile)) {
-			addAnnotation(psiElement, problems.get(psiFile), annotationHolder);
+			addAnnotation(psiElement, new ArrayList<ExtendedProblemDescriptor>(problems.get(psiFile)), annotationHolder);
 		}
 	}
 
@@ -133,10 +140,10 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 					annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, null, Color.RED, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 				}
 
-				annotation.registerFix(new AddSuppressReportBugFix(problemDescriptor), textRange);
-				annotation.registerFix(new AddSuppressReportBugForClassFix(problemDescriptor), textRange);
+				annotation.registerFix(new SuppressReportBugIntentionAction(problemDescriptor), textRange);
+				annotation.registerFix(new SuppressReportBugForClassIntentionAction(problemDescriptor), textRange);
 				annotation.registerFix(new ClearBugIntentionAction(problemDescriptor), textRange);
-				annotation.registerFix(new ClearAndSuppressBugAction(problemDescriptor), textRange);
+				annotation.registerFix(new ClearAndSuppressBugIntentionAction(problemDescriptor), textRange);
 
 				break;
 
@@ -148,11 +155,13 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 				} else {
 					annotation = annotationHolder.createWarningAnnotation(textRange, getAnnotationText(matchingDescriptors));
 				}
+
 				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, null, Color.YELLOW.darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
-				annotation.registerFix(new AddSuppressReportBugFix(problemDescriptor), textRange);
-				annotation.registerFix(new AddSuppressReportBugForClassFix(problemDescriptor), textRange);
+
+				annotation.registerFix(new SuppressReportBugIntentionAction(problemDescriptor), textRange);
+				annotation.registerFix(new SuppressReportBugForClassIntentionAction(problemDescriptor), textRange);
 				annotation.registerFix(new ClearBugIntentionAction(problemDescriptor), textRange);
-				annotation.registerFix(new ClearAndSuppressBugAction(problemDescriptor), textRange);
+				annotation.registerFix(new ClearAndSuppressBugIntentionAction(problemDescriptor), textRange);
 
 				break;
 
@@ -164,11 +173,13 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 				} else {
 					annotation = annotationHolder.createWarningAnnotation(textRange, getAnnotationText(matchingDescriptors));
 				}
+
 				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, null, Color.GRAY, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
-				annotation.registerFix(new AddSuppressReportBugFix(problemDescriptor), textRange);
-				annotation.registerFix(new AddSuppressReportBugForClassFix(problemDescriptor), textRange);
+
+				annotation.registerFix(new SuppressReportBugIntentionAction(problemDescriptor), textRange);
+				annotation.registerFix(new SuppressReportBugForClassIntentionAction(problemDescriptor), textRange);
 				annotation.registerFix(new ClearBugIntentionAction(problemDescriptor), textRange);
-				annotation.registerFix(new ClearAndSuppressBugAction(problemDescriptor), textRange);
+				annotation.registerFix(new ClearAndSuppressBugIntentionAction(problemDescriptor), textRange);
 
 				break;
 			case Detector.LOW_PRIORITY:
@@ -179,11 +190,13 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 				} else {
 					annotation = annotationHolder.createInfoAnnotation(textRange, getAnnotationText(matchingDescriptors));
 				}
+
 				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, null, Color.GREEN, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
-				annotation.registerFix(new AddSuppressReportBugFix(problemDescriptor), textRange);
-				annotation.registerFix(new AddSuppressReportBugForClassFix(problemDescriptor), textRange);
+
+				annotation.registerFix(new SuppressReportBugIntentionAction(problemDescriptor), textRange);
+				annotation.registerFix(new SuppressReportBugForClassIntentionAction(problemDescriptor), textRange);
 				annotation.registerFix(new ClearBugIntentionAction(problemDescriptor), textRange);
-				annotation.registerFix(new ClearAndSuppressBugAction(problemDescriptor), textRange);
+				annotation.registerFix(new ClearAndSuppressBugIntentionAction(problemDescriptor), textRange);
 
 				break;
 			case Detector.IGNORE_PRIORITY:
@@ -194,15 +207,17 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 				} else {
 					annotation = annotationHolder.createWarningAnnotation(textRange, getAnnotationText(matchingDescriptors));
 				}
+
 				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, null, Color.MAGENTA.darker().darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
-				annotation.registerFix(new AddSuppressReportBugFix(problemDescriptor), textRange);
-				annotation.registerFix(new AddSuppressReportBugForClassFix(problemDescriptor), textRange);
+
+				annotation.registerFix(new SuppressReportBugIntentionAction(problemDescriptor), textRange);
+				annotation.registerFix(new SuppressReportBugForClassIntentionAction(problemDescriptor), textRange);
 				annotation.registerFix(new ClearBugIntentionAction(problemDescriptor), textRange);
-				annotation.registerFix(new ClearAndSuppressBugAction(problemDescriptor), textRange);
+				annotation.registerFix(new ClearAndSuppressBugIntentionAction(problemDescriptor), textRange);
 
 				break;
 			default:
-				break;
+				throw new IllegalArgumentException("Unknown bugInstance.getPriority() == " + priority);
 		}
 	}
 	
@@ -214,6 +229,7 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 			buffer.append(ResourcesLoader.getString("findbugs.name")).append(": ").append(StringUtil.html2text(BugInstanceUtil.getBugPatternShortDescription(problemDescriptor.getBugInstance()))).append("\n");
 			buffer.append(StringUtil.html2text(BugInstanceUtil.getDetailText(problemDescriptor.getBugInstance())));
 			if (i < problemDescriptors.size() - 1) {
+				//noinspection HardcodedLineSeparator
 				buffer.append("\n\n");
 			}
 		}

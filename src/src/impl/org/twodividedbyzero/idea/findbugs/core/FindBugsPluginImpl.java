@@ -18,19 +18,20 @@
  */
 package org.twodividedbyzero.idea.findbugs.core;
 
+import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Anchor;
 import com.intellij.openapi.actionSystem.Constraints;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.application.Application;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.components.StorageScheme;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
@@ -46,6 +47,7 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.DetectorFactory;
+import edu.umd.cs.findbugs.FindBugs;
 import edu.umd.cs.findbugs.ba.AnalysisException;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -60,6 +62,7 @@ import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginExcepti
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
+import org.twodividedbyzero.idea.findbugs.gui.preferences.AnnotationType;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.ConfigurationPanel;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -93,6 +96,7 @@ import java.util.Set;
 				@Storage(id = "dir", file = "$PROJECT_CONFIG_DIR$/findbugs-idea.xml", scheme = StorageScheme.DIRECTORY_BASED)})
 public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Configurable, PersistentStateComponent<PersistencePreferencesBean> {
 
+	// idea_home/bin/log.xml
 	/*<category name="org.twodividedbyzero.idea.findbugs">
    		<priority value="DEBUG" />
    		<appender-ref ref="CONSOLE-DEBUG"/>
@@ -102,7 +106,6 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 	private final Project _project;
 	private ToolWindow _toolWindow;
-	private final Application _application;
 	private static final Set<AnAction> _mainToolbarActions;
 	private static final Set<AnAction> _registeredMainToolbarActions;
 
@@ -111,6 +114,14 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 
 	static {
+		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
+		FindBugs.setHome(plugin.getPath().toURI().toString());
+
+		// todo: extract plugins to /home/findbugs-idea/... ???
+		// build fb-bundled-plugins.jar
+		//plugin.getPath()
+
+
 		_registeredMainToolbarActions = new HashSet<AnAction>();
 		_mainToolbarActions = new HashSet<AnAction>();
 		final AnAction action = new AnalyzeCurrentEditorFile();
@@ -125,7 +136,6 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 	public FindBugsPluginImpl(final Project project) {
 		_project = project;
-		_application = ApplicationManager.getApplication();
 
 		try {
 			if (project != null) {
@@ -143,12 +153,14 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 
 	public void initComponent() {
-		LOGGER.debug("initComponent");
+		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
+		LOGGER.debug("initComponent: " + plugin.getName() + " project="  + getProject());
 	}
 
 
 	public void disposeComponent() {
-		LOGGER.debug("disposeComponent");
+		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
+		LOGGER.debug("disposeComponent: " + plugin.getName() + " project="  + getProject());
 	}
 
 
@@ -159,7 +171,8 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 
 	public void projectOpened() {
-		LOGGER.debug("project is opened");
+		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
+		LOGGER.debug("project is opened: " + plugin.getName() + " project="  + getProject());
 		initToolWindow();
 		setActionGroupsIcon();
 		registerToolbarActions();
@@ -167,7 +180,8 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 
 	public void projectClosed() {
-		LOGGER.debug("project is being closed");
+		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
+		LOGGER.debug("project is being closed: " + plugin.getName() + " project="  + getProject());
 		EventManagerImpl.getInstance().removeEventListener(_project);
 		final AnalyzeChangelistFiles action = (AnalyzeChangelistFiles) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTIVE_CHANGELIST_ACTION);
 		ChangeListManager.getInstance(_project).removeChangeListListener(action.getChangelistAdapter());
@@ -184,21 +198,12 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 		_toolWindow.setType(ToolWindowType.DOCKED, null);
 
 
-		// TODO: facade
-		//final ContentFactory contentFactory = PeerFactory.getInstance().getContentFactory();
 		final ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
 
 		final JComponent toolWindowPanel = new ToolWindowPanel(_project, _toolWindow);
 		final Content content = contentFactory.createContent(toolWindowPanel, "FindBugs Analysis Results", false);
-		//final Content content1 = contentFactory.createContent(toolWindowPanel, "Found Bugs View", false);
-		//final Content content1 = contentFactory.createContent(_contentPanel1, "Bug Details", false);
-		//final JComponent toolWindowPanel1 = new ToolWindowPanel(_project, _toolWindow);
-		//final Content content1 = contentFactory.createContent(toolWindowPanel1, "Found Bugs View (import)", true);
-		//content1.setPinned();
 
 		_toolWindow.getContentManager().addContent(content);
-		//_toolWindow.getContentManager().addContent(content1);
-		//_toolWindow.getContentManager().addContent(content1);
 		_toolWindow.setIcon(GuiResources.FINDBUGS_ICON);
 	}
 
@@ -230,11 +235,6 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 	}
 
 
-	/**
-	 * Get the tool window panel for result display.
-	 *
-	 * @return the tool window panel.
-	 */
 	public ToolWindowPanel getToolWindowPanel() {
 		final Content content = _toolWindow.getContentManager().getContent(0);
 		if (content != null) {
@@ -288,12 +288,9 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 
 	private static void disableToolbarActions() {
-		//final DefaultActionGroup mainToolbar = (DefaultActionGroup) ActionManager.getInstance().getAction("MainToolBar");
 		for (final AnAction action : _mainToolbarActions) {
-			//mainToolbar.remove(action);
 			action.getTemplatePresentation().setEnabled(false);
 		}
-		//_registeredActions.clear();
 	}
 
 
@@ -331,12 +328,6 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 	@SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
 	public static void processError(final Map<String, Map<String, Throwable>> status) {
-		/*for (final Entry<String, Map<String, Throwable>> error : status.entrySet()) {
-
-
-			//for()
-			//processError(error.getKey(), error.getValue().);
-		}*/
 	}
 
 
@@ -466,6 +457,16 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 				LOGGER.debug("empty detectors loading defaults.");
 				_preferences.setDetectors(FindBugsPreferences.getAvailableDetectors(_preferences.getUserPreferences()));
 			}
+
+			_preferences.setAnnotationSuppressWarningsClass(state.getAnnotationSuppressWarningsClass());
+			_preferences.setAnnotationGutterIconEnabled(state.isAnnotationGutterIconEnabled());
+			_preferences.setAnnotationTextRangeMarkupEnabled(state.isAnnotationTextRangeMarkupEnabled());
+			_preferences.setFlattendAnnotationTypeSettings(state.getAnnotationTypeSettings());
+			if (_preferences.getAnnotationTypeSettings().isEmpty()) {
+				_preferences.setAnnotationTypeSettings(FindBugsPreferences.createDefaultAnnotationTypeSettings());
+			}
+			AnnotationType.configureFrom(_preferences.getAnnotationTypeSettings());
+
 		} else {
 			_preferences.clear();
 			_preferences = FindBugsPreferences.createDefault();
@@ -494,6 +495,12 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 		preferencesBean.getDisabledPlugins().addAll(_preferences.getDisabledPlugins());
 
 		preferencesBean.getEnabledModuleConfigs().addAll(_preferences.getEnabledModuleConfigs());
+
+		preferencesBean.setAnnotationSuppressWarningsClass(_preferences.getAnnotationSuppressWarningsClass());
+		preferencesBean.setAnnotationGutterIconEnabled(_preferences.isAnnotationGutterIconEnabled());
+		preferencesBean.setAnnotationTextRangeMarkupEnabled(_preferences.isAnnotationTextRangeMarkupEnabled());
+		preferencesBean.setAnnotationTypeSettings(_preferences.getFlattendAnnotationTypeSettings());
+
 
 		return preferencesBean;
 	}

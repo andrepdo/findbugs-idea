@@ -39,14 +39,15 @@ import java.util.List;
  *
  * @version $Revision$
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements VisitableTreeNode {
 
 	private int _bugCount;
 	private int _classesCount;
 	private final List<VisitableTreeNode> _childs;
 
-	private static final Icon _expandedIcon = new MaskIcon(ResourcesLoader.findIcon("/general/ijLogo.png", RootNode.class), Color.BLACK);
-	private static final Icon _collapsedIcon = _expandedIcon;
+	private static final Icon EXPAND_ICON = new MaskIcon(ResourcesLoader.loadIcon("fb-idea-logo_16x16.png"), Color.BLACK);
+	private static final Icon COLLAPSE_ICON = EXPAND_ICON;
 	private final RecurseNodeVisitor<RootNode> _recurseNodeVisitor = new RecurseNodeVisitor<RootNode>(this);
 
 
@@ -59,8 +60,8 @@ public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements Vis
 		_bugCount = -1;
 		_classesCount = 0;
 
-		setCollapsedIcon(_collapsedIcon);
-		setExpandedIcon(_expandedIcon);
+		setCollapsedIcon(COLLAPSE_ICON);
+		setExpandedIcon(EXPAND_ICON);
 	}
 
 

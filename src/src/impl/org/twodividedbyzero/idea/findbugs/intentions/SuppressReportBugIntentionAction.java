@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.twodividedbyzero.idea.findbugs.gui.editor;
+package org.twodividedbyzero.idea.findbugs.intentions;
 
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.codeInspection.InspectionsBundle;
@@ -50,10 +50,11 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
-import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.Icon;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -63,29 +64,30 @@ import javax.swing.Icon;
  * @version $Revision$
  * @since 0.9.97
  */
-@SuppressWarnings( {"RedundantInterfaceDeclaration"})
+@SuppressWarnings({"RedundantInterfaceDeclaration"})
 @edu.umd.cs.findbugs.annotations.SuppressWarnings({"RI_REDUNDANT_INTERFACES"})
-public class AddSuppressReportBugFix extends SuppressIntentionAction implements Iconable {
+public class SuppressReportBugIntentionAction extends SuppressIntentionAction implements Iconable {
 
 	private final String _bugPatternId;
 	private String _key;
-	private final String _suppressWarningsName;
+	private final String _suppressWarningsClassName;
 	private final ExtendedProblemDescriptor _problemDescriptor;
 
 
-	public AddSuppressReportBugFix(final ExtendedProblemDescriptor problemDescriptor) {
+	public SuppressReportBugIntentionAction(final ExtendedProblemDescriptor problemDescriptor) {
 		_problemDescriptor = problemDescriptor;
 		_bugPatternId = getBugId(problemDescriptor);
 
 		final Project project = IdeaUtilImpl.getProject(problemDescriptor.getPsiFile());
 		final FindBugsPreferences preferences = IdeaUtilImpl.getPluginComponent(project).getPreferences();
-		_suppressWarningsName = preferences.getProperty(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS);
+		_suppressWarningsClassName = preferences.getProperty(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS);
 	}
 
 
-	@SuppressWarnings( {"override"}) // idea 8 compatibility
+	@SuppressWarnings({"override", "HardcodedFileSeparator"}) // idea 8 compatibility
 	public Icon getIcon(final int flags) {
-		return GuiResources.FINDBUGS_ICON;
+		return ResourcesLoader.loadIcon("intentions/inspectionsOff.png");
+		//return GuiUtil.getIcon(_problemDescriptor);
 	}
 
 
@@ -97,13 +99,13 @@ public class AddSuppressReportBugFix extends SuppressIntentionAction implements 
 	@Override
 	@NotNull
 	public String getText() {
-		return ResourcesLoader.getString("findbugs.inspection.quickfix.supress.warning") + " '" + _bugPatternId + '\'';
+		return ResourcesLoader.getString("findbugs.inspection.quickfix.suppress.warning") + " '" + _bugPatternId + '\'';
 	}
 
 
 	@NotNull
 	public String getFamilyName() {
-		return ResourcesLoader.getString("findbugs.inspection.quickfix.supress.warning");
+		return ResourcesLoader.getString("findbugs.inspection.quickfix.bug.pattern") + " '" + _bugPatternId + '\'';
 	}
 
 
@@ -175,6 +177,8 @@ public class AddSuppressReportBugFix extends SuppressIntentionAction implements 
 				}*/
 			}
 		}
+		final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = IdeaUtilImpl.getPluginComponent(project).getProblems();
+		problems.get(element.getContainingFile()).remove(getProblemDescriptor());
 		DaemonCodeAnalyzer.getInstance(project).restart();
 	}
 
@@ -194,13 +198,13 @@ public class AddSuppressReportBugFix extends SuppressIntentionAction implements 
 
 
 	public void addSuppressAnnotation(final Project project, final Editor editor, final PsiElement container, final PsiModifierList modifierList, final String id) throws IncorrectOperationException {
-		PsiAnnotation annotation = modifierList.findAnnotation(_suppressWarningsName);
+		PsiAnnotation annotation = modifierList.findAnnotation(_suppressWarningsClassName);
 		if (annotation != null) {
 			if (!annotation.getText().contains("{")) {
 				final PsiNameValuePair[] attributes = annotation.getParameterList().getAttributes();
 				if (attributes.length == 1) {
 					final String suppressedWarnings = attributes[0].getText();
-					final PsiAnnotation newAnnotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + _suppressWarningsName + "({" + suppressedWarnings + ", \"" + id + "\"})", container);
+					final PsiAnnotation newAnnotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + _suppressWarningsClassName + "({" + suppressedWarnings + ", \"" + id + "\"})", container);
 					annotation.replace(newAnnotation);
 				}
 			} else {
@@ -212,7 +216,7 @@ public class AddSuppressReportBugFix extends SuppressIntentionAction implements 
 				}
 			}
 		} else {
-			annotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + _suppressWarningsName + "({\"" + id + "\"})", container);
+			annotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + _suppressWarningsClassName + "({\"" + id + "\"})", container);
 			modifierList.addBefore(annotation, modifierList.getFirstChild());
 			JavaCodeStyleManager.getInstance(project).shortenClassReferences(modifierList);
 
@@ -224,7 +228,7 @@ public class AddSuppressReportBugFix extends SuppressIntentionAction implements 
 
 
 	private boolean needsImportStatement() {
-		final String result = _suppressWarningsName.substring(0, _suppressWarningsName.lastIndexOf('.'));
+		final String result = _suppressWarningsClassName.substring(0, _suppressWarningsClassName.lastIndexOf('.'));
 		return result.indexOf('.') != -1;
 	}
 

@@ -122,8 +122,8 @@ public class DetectorConfiguration implements ConfigurationPage {
 
 			final double[][] size1 = {{TableLayout.FILL}, // Columns
 									  {TableLayout.FILL}};// Rows
-			final TableLayout tbl1 = new TableLayout(size1);
-			final JPanel detectorPanel = new JPanel(tbl1);
+			final TableLayout tableLayout = new TableLayout(size1);
+			final JPanel detectorPanel = new JPanel(tableLayout);
 			detectorPanel.add(ScrollPaneFacade.createScrollPane(getDetectorsTable(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), "0, 0, 0, 0");
 			//mainPanel.add(detectorPanel, "1, 7, 1, 7");
 

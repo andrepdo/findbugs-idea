@@ -96,7 +96,7 @@ public class SuppressWarningFix /*extends SuppressIntentionAction*/ implements L
 
 	@NotNull
 	public String getName() {
-		return ResourcesLoader.getString("findbugs.inspection.quickfix.supress.warning") + " '" + _bugType + "' waring";
+		return ResourcesLoader.getString("findbugs.inspection.quickfix.suppress.warning") + " '" + _bugType + "' waring";
 	}
 
 
@@ -106,6 +106,7 @@ public class SuppressWarningFix /*extends SuppressIntentionAction*/ implements L
 	}
 
 
+	@SuppressWarnings("HardcodedLineSeparator")
 	public void applyFix(@NotNull final Project project, @NotNull final ProblemDescriptor descriptor) {
 		try {
 			/*final PsiBinaryExpression binaryExpression = (PsiBinaryExpression) descriptor.getPsiElement();
@@ -122,7 +123,7 @@ public class SuppressWarningFix /*extends SuppressIntentionAction*/ implements L
 			final PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
 			//final PsiAnnotation annotation = factory.createAnnotationFromText("@SomeAnnotation(someVariable = true)", descriptor.getPsiElement());
 			//final PsiAnnotation annotation = factory.createAnnotationFromText("@" + _annotation + "({" + _bugType + "})", descriptor.getPsiElement().getContext());
-			final PsiAnnotation annotation = factory.createAnnotationFromText("@" + _annotation + "({\"" + _bugType + "\"})\r\n", descriptor.getPsiElement());
+			final PsiAnnotation annotation = factory.createAnnotationFromText('@' + _annotation + "({\"" + _bugType + "\"})\r\n", descriptor.getPsiElement());
 			//factory.createImportStatement()
 			descriptor.getPsiElement().addBefore(annotation, descriptor.getStartElement());
 

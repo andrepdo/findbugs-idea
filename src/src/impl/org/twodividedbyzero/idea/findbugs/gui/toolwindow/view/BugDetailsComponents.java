@@ -26,6 +26,7 @@ import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.FieldAnnotation;
 import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.MethodAnnotation;
+import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import edu.umd.cs.findbugs.cloud.Cloud;
 import edu.umd.cs.findbugs.cloud.Cloud.UserDesignation;
@@ -127,8 +128,6 @@ public class BugDetailsComponents /*extends JPanel*/ {
 					g2d.setFont(font);
 					final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), detailsTabTitle);
 					g2d.drawString(detailsTabTitle, getIconHeight() / 2 - width / 2 + GuiResources.FINDBUGS_ICON.getIconHeight() + y - 5, -getIconWidth());
-
-
 				}
 
 
@@ -148,39 +147,40 @@ public class BugDetailsComponents /*extends JPanel*/ {
 			//_jTabbedPane.setDisplayedMnemonicIndexAt(0, 0);
 
 
-			final String cloudTabTitle = "Comments";
-			final Icon cloudIcon = new Icon() {
-				public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
-					final Graphics2D g2d = (Graphics2D) g.create();
-					g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-					g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-					g2d.transform(AffineTransform.getRotateInstance(1 * Math.PI / 2.0));
-					g2d.translate(0, -getIconWidth());
+			if (Plugin.getByPluginId("edu.umd.cs.findbugs.plugins.webCloud") != null) {
+				final String cloudTabTitle = "Comments";
+				final Icon cloudIcon = new Icon() {
+					public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
+						final Graphics2D g2d = (Graphics2D) g.create();
+						g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+						g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+						g2d.transform(AffineTransform.getRotateInstance(1 * Math.PI / 2.0));
+						g2d.translate(0, -getIconWidth());
 
-					GuiResources.FINDBUGS_CLOUD_ICON.paintIcon(c, g, getIconWidth(), y + 8);
-					g2d.setColor(Color.BLACK);
-					final Font font = _jTabbedPane.getFont().deriveFont(Font.PLAIN);
-					g2d.setFont(font);
-					final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), cloudTabTitle);
-					g2d.drawString(cloudTabTitle, getIconHeight() / 2 - width / 2 + GuiResources.FINDBUGS_ICON.getIconHeight() + y - 5, -getIconWidth());
-				}
-
-
-				public int getIconWidth() {
-					return 5;
-				}
+						GuiResources.FINDBUGS_CLOUD_ICON.paintIcon(c, g, getIconWidth(), y + 8);
+						g2d.setColor(Color.BLACK);
+						final Font font = _jTabbedPane.getFont().deriveFont(Font.PLAIN);
+						g2d.setFont(font);
+						final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), cloudTabTitle);
+						g2d.drawString(cloudTabTitle, getIconHeight() / 2 - width / 2 + GuiResources.FINDBUGS_ICON.getIconHeight() + y - 5, -getIconWidth());
+					}
 
 
-				public int getIconHeight() {
-					final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), cloudTabTitle);
-					return width + GuiResources.FINDBUGS_CLOUD_ICON.getIconHeight() + 20;
-				}
-			};
-			_jTabbedPane.addTab(null, cloudIcon, getCloudCommentsPanel(), "Comments from the FindBugs Cloud");
-			_jTabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
-			//_jTabbedPane.setDisplayedMnemonicIndexAt(1, 0);
+					public int getIconWidth() {
+						return 5;
+					}
 
+
+					public int getIconHeight() {
+						final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), cloudTabTitle);
+						return width + GuiResources.FINDBUGS_CLOUD_ICON.getIconHeight() + 20;
+					}
+				};
+				_jTabbedPane.addTab(null, cloudIcon, getCloudCommentsPanel(), "Comments from the FindBugs Cloud");
+				_jTabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
+			}
 		}
+
 		return _jTabbedPane;
 	}
 
@@ -504,7 +504,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		} finally {
 			reader.close(); // polite, but doesn't do much in StringReader
 		}
-		_cloudCommentsPane.setBugInstance(_lastBugInstance);
+		getCloudCommentsPane().setBugInstance(_lastBugInstance);
 		scrollRectToVisible(_bugDetailsPane);
 	}
 

@@ -74,12 +74,13 @@ import java.net.MalformedURLException;
 @SuppressWarnings({"AnonymousInnerClass", "HardcodedLineSeparator"})
 public class PluginConfiguration implements ConfigurationPage {
 
+	private static final Color PLUGIN_DESCRIPTION_BG_COLOR = UIManager.getColor("Tree.textBackground");
+
 	private final FindBugsPreferences _preferences;
 	private final ConfigurationPanel _parent;
 	private Component _component;
 	private JPanel _pluginsPanel;
 	private JPanel _pluginComponentPanel;
-	private static final Color PLUGIN_DESCRIPTION_BG_COLOR = UIManager.getColor("Tree.textBackground");
 
 
 	public PluginConfiguration(final ConfigurationPanel parent, final FindBugsPreferences preferences) {

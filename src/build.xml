@@ -17,6 +17,14 @@
             <include name="*.jar"/>
         </fileset>
 
+        <fileset id="findbugs.plugin.dir" dir="${findbugs.plugin.dir}">
+            <include name="*.jar"/>
+        </fileset>
+
+        <fileset id="findbugs.optionalPlugin.dir" dir="${findbugs.optionalPlugin.dir}">
+            <include name="*.jar"/>
+        </fileset>
+
         <fileset id="idea-libs" dir="${idea.home}/lib">
             <include name="*.jar"/>
         </fileset>
@@ -241,7 +249,7 @@
         <delete file="plugin.xml"/>
     </target>
 
-    <target name="assemble-all" depends="assemble-plugin, assemble-src"/>
+    <target name="assemble-all" depends="clean, assemble-plugin, assemble-src"/>
 
     <target name="assemble-plugin" depends="assemble">
         <mkdir dir="${target.dir}/tmp/${final.name}"/>
@@ -268,11 +276,21 @@
         </copy>
 
         <!--<antcall target="makePluginXml"/>-->
-        <copy file="${target.dir}/jar/${final.name}.jar"
-              tofile="${target.dir}/tmp/${final.name}/lib/${final.name}.jar"/>
+        <copy file="${target.dir}/jar/${final.name}.jar" tofile="${target.dir}/tmp/${final.name}/lib/${final.name}.jar"/>
+
         <copy todir="${target.dir}/tmp/${final.name}/lib">
             <fileset refid="libs"/>
+            <!--<fileset refid="findbugs.plugin.dir"/>
+            <fileset refid="findbugs.optionalPlugin.dir"/>-->
         </copy>
+
+        <!--<copy todir="${target.dir}/tmp/${final.name}/plugin">
+            <fileset refid="findbugs.plugin.dir"/>
+        </copy>-->
+
+        <!--<copy todir="${target.dir}/tmp/${final.name}/optionalPlugin">
+           <fileset refid="findbugs.optionalPlugin.dir"/>
+       </copy>-->
 
         <zip destfile="${target.dir}/zip/${final.name}.zip" basedir="${target.dir}/tmp"/>
 
@@ -332,8 +350,7 @@
 
     <target name="print-environment">
         <echo>
-            JAVA_HOME=${env.JAVA_HOME}
-            JDK_HOME=${env.JDK_HOME}
+            JAVA_HOME=${java.home}
             IDEA.LIB=${idea.home}
         </echo>
     </target>

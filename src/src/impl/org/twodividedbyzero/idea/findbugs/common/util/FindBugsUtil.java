@@ -33,6 +33,7 @@ import java.util.Map;
  * @version $Revision$
  * @since 0.0.1
  */
+@SuppressWarnings("UnusedDeclaration")
 public final class FindBugsUtil {
 
 	public static final Map<String, String> ARCHIVE_EXTENSION_SET = new HashMap<String, String>();

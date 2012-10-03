@@ -84,10 +84,11 @@
     </description>
     <change-notes>
         <![CDATA[<html>
-        <h3>0.9.97</h3>
+        <h3>0.9.97 (5/28/2012)</h3>
         <ul>
 		    <li>findbugs-2 support</li>
 		    <li>annotate, suppress findbugs patterns</li>
+		    <li>idea 11 compatibility</li>
 		</ul>
         <h3>0.9.96</h3>
 		<ul>
@@ -178,7 +179,7 @@
     </change-notes>
     <id>FindBugs-IDEA</id>
     <version>@VERSION@</version>
-    <vendor logo="/org/twodividedbyzero/idea/findbugs/resources/icons/bug.png"
+    <vendor logo="/org/twodividedbyzero/idea/findbugs/resources/icons/fb-idea-logo_16x16.png"
             email="see@http://findbugs-idea.googlecode.com" url="http://findbugs-idea.googlecode.com">Andre Pfeiler
     </vendor>
     <idea-version since-build="9013"/>

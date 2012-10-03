@@ -18,6 +18,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.preferences;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
@@ -25,7 +26,9 @@ import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import edu.umd.cs.findbugs.config.UserPreferences;
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.gui.preferences.AnnotationType;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,8 +53,9 @@ import java.util.Properties;
 @SuppressWarnings({"HardCodedStringLiteral", "AssignmentToCollectionOrArrayFieldFromParameter"})
 public class FindBugsPreferences extends Properties {
 
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 
+	private static final Logger LOGGER = Logger.getInstance(FindBugsPreferences.class.getName());
 	private static DetectorFactoryCollection _detectorFactoryCollection;
 
 	//public static final String DEFAULT_CONFIG = "";
@@ -82,7 +86,14 @@ public class FindBugsPreferences extends Properties {
 	public static final String TOOLWINDOW_GROUP_BY = PROPERTIES_PREFIX + "toolWindowGroupBy";
 
 	public static final String ANNOTATION_SUPPRESS_WARNING_CLASS = PROPERTIES_PREFIX + "annotationSuppressWarningsClass";
+	public static final String ANNOTATION_GUTTER_ICON_ENABLED = PROPERTIES_PREFIX + "annotationGutterIconEnabled";
+	public static final String ANNOTATION_TEXT_RAGE_MARKUP_ENABLED = PROPERTIES_PREFIX + "annotationTextRangeMarkupEnabled";
+	public static final String ANNOTATION_TYPE_SETTINGS = PROPERTIES_PREFIX + "annotationTypeSettings";
+	public static final String DEFAULT_ANNOTATION_CLASS_NAME = "edu.umd.cs.findbugs.annotations.SuppressWarnings";
 
+	public transient boolean _annotationTextRangeMarkupEnabled;
+	public transient boolean _annotationGutterIconEnabled;
+	public transient String _annotationSuppressWarningsClass;
 
 	public transient Map<String, String> _detectors;
 	public transient Map<String, String> _bugCategories;
@@ -102,6 +113,8 @@ public class FindBugsPreferences extends Properties {
 	public transient List<String> _enabledModuleConfigs;
 
 	public transient UserPreferences _userPreferences;
+
+	public transient Map<String, Map<String, String>> _annotationTypeSettings;
 
 	private boolean _isModified;
 
@@ -124,7 +137,30 @@ public class FindBugsPreferences extends Properties {
 		_enabledPlugins = new ArrayList<String>();
 		_disabledPlugins = new ArrayList<String>();
 		_enabledModuleConfigs = new ArrayList<String>();
+
+		_annotationGutterIconEnabled = true;
+		_annotationSuppressWarningsClass = DEFAULT_ANNOTATION_CLASS_NAME;
+		_annotationTextRangeMarkupEnabled = true;
+
+		_annotationTypeSettings = createDefaultAnnotationTypeSettings();
+
 		_userPreferences = UserPreferences.createDefaultUserPreferences();
+	}
+
+
+	public static Map<String, Map<String, String>> createDefaultAnnotationTypeSettings() {
+		final Map<String, Map<String, String>> annotationTypeSettings = new HashMap<String, Map<String, String>>();
+		for (final AnnotationType annotationType : AnnotationType.values()) {
+			final Map<String, String> value = new HashMap<String, String>();
+			value.put(AnnotationType.FOREGROUND, String.valueOf(annotationType.getForegroundColor().getRGB()));
+			value.put(AnnotationType.BACKGROUND, String.valueOf(annotationType.getBackgroundColor().getRGB()));
+			value.put(AnnotationType.EFFECT_COLOR, String.valueOf(annotationType.getEffectColor().getRGB()));
+			value.put(AnnotationType.EFFECT_TYPE, String.valueOf(annotationType.getEffectType().name()));
+			value.put(AnnotationType.FONT, String.valueOf(annotationType.getFont()));
+			annotationTypeSettings.put(annotationType.name(), value);
+		}
+
+		return annotationTypeSettings;
 	}
 
 
@@ -159,6 +195,7 @@ public class FindBugsPreferences extends Properties {
 			setProperty(elementName, value);
 			setBugCategories(properties.getBugCategories());
 			setDetectors(properties.getDetectors());
+			setAnnotationTypeSettings(properties.getAnnotationTypeSettings());
 			setModified(true);
 		}
 	}
@@ -340,9 +377,22 @@ public class FindBugsPreferences extends Properties {
 
 	public void setPlugins(final List<String> plugins) {
 		_plugins.clear();
-		//noinspection AssignmentToCollectionOrArrayFieldFromParameter
-		_plugins = plugins;
-		//loadPlugins(_plugins);
+		_plugins = checkPlugins(plugins);
+	}
+
+
+	private static List<String> checkPlugins(final Iterable<String> plugins) {
+		final List<String> result = new ArrayList<String>();
+		for (final String plugin : plugins) {
+			final File file = new File(plugin);
+			if (file.exists() && file.canRead()) {
+				result.add(plugin);
+			} else {
+				LOGGER.info("Plugin '" + plugin + "' not loaded. Archive does not exists.");
+			}
+		}
+
+		return result;
 	}
 
 
@@ -545,8 +595,14 @@ public class FindBugsPreferences extends Properties {
 		getExcludeBaselineBugsMap().clear();
 		getEnabledModuleConfigs().clear();
 		getPlugins().clear();
+		getAnnotationTypeSettings().clear();
 		_enabledPlugins.clear();
 		_disabledPlugins.clear();
+		_annotationTypeSettings.clear();
+		_annotationGutterIconEnabled = true;
+		_annotationTextRangeMarkupEnabled = true;
+		_annotationSuppressWarningsClass = DEFAULT_ANNOTATION_CLASS_NAME;
+
 		setModified(true);
 	}
 
@@ -604,7 +660,12 @@ public class FindBugsPreferences extends Properties {
 		final Map<String, String> bugCategories = getDefaultBugCategories(filterSettings);
 		preferences.setBugCategories(bugCategories);
 
-		preferences.setProperty(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS, "edu.umd.cs.findbugs.annotations.SuppressWarnings");
+		preferences.setProperty(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS, DEFAULT_ANNOTATION_CLASS_NAME);
+		preferences.setProperty(FindBugsPreferences.ANNOTATION_GUTTER_ICON_ENABLED, true);
+		preferences.setProperty(FindBugsPreferences.ANNOTATION_TEXT_RAGE_MARKUP_ENABLED, true);
+
+		preferences.setAnnotationTypeSettings(createDefaultAnnotationTypeSettings());
+
 
 		return preferences;
 	}
@@ -616,6 +677,8 @@ public class FindBugsPreferences extends Properties {
 
 		final Map<String, String> detectorsAvailableList = getAvailableDetectors(userPrefs);
 		preferences.setDetectors(detectorsAvailableList);
+
+		preferences.setAnnotationTypeSettings(createDefaultAnnotationTypeSettings());
 
 		return preferences;
 	}
@@ -658,7 +721,7 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public void enablePlugin(String pluginId, boolean selected) {
+	public void enablePlugin(final String pluginId, final boolean selected) {
 		if (selected) {
 			_enabledPlugins.add(pluginId);
 			_disabledPlugins.remove(pluginId);
@@ -679,17 +742,74 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public void setDisabledPlugins(List<String> disabledPlugins) {
+	public void setDisabledPlugins(final List<String> disabledPlugins) {
 		_disabledPlugins = disabledPlugins;
 	}
 
 
-	public void setEnabledPlugins(List<String> enabledPlugins) {
+	public void setEnabledPlugins(final List<String> enabledPlugins) {
 		_enabledPlugins = enabledPlugins;
 	}
 
 
-	public boolean isPluginDisabled(String pluginId) {
+	public boolean isPluginDisabled(final String pluginId) {
 		return _disabledPlugins.contains(pluginId);
+	}
+
+
+	public boolean isAnnotationTextRangeMarkupEnabled() {
+		return _annotationTextRangeMarkupEnabled;
+	}
+
+
+	public void setAnnotationTextRangeMarkupEnabled(final boolean annotationTextRangeMarkupEnabled) {
+		_annotationTextRangeMarkupEnabled = annotationTextRangeMarkupEnabled;
+		setProperty(ANNOTATION_TEXT_RAGE_MARKUP_ENABLED, annotationTextRangeMarkupEnabled);
+	}
+
+
+	public boolean isAnnotationGutterIconEnabled() {
+		return _annotationGutterIconEnabled;
+	}
+
+
+	public void setAnnotationGutterIconEnabled(final boolean annotationGutterIconEnabled) {
+		_annotationGutterIconEnabled = annotationGutterIconEnabled;
+		setProperty(ANNOTATION_GUTTER_ICON_ENABLED, annotationGutterIconEnabled);
+	}
+
+
+	public String getAnnotationSuppressWarningsClass() {
+		return _annotationSuppressWarningsClass;
+	}
+
+
+	public void setAnnotationSuppressWarningsClass(final String annotationSuppressWarningsClass) {
+		_annotationSuppressWarningsClass = annotationSuppressWarningsClass == null ? DEFAULT_ANNOTATION_CLASS_NAME : annotationSuppressWarningsClass;
+		setProperty(ANNOTATION_SUPPRESS_WARNING_CLASS, annotationSuppressWarningsClass);
+	}
+
+
+	public Map<String, Map<String, String>> getAnnotationTypeSettings() {
+		if (_annotationTypeSettings == null || _annotationTypeSettings.isEmpty()) {
+			_annotationTypeSettings = createDefaultAnnotationTypeSettings();
+		}
+		return _annotationTypeSettings;
+	}
+
+
+	public Map<String, String> getFlattendAnnotationTypeSettings() {
+		return AnnotationType.flatten(getAnnotationTypeSettings());
+	}
+
+
+	public void setAnnotationTypeSettings(final Map<String, Map<String, String>> annotationTypeSettings) {
+		_annotationTypeSettings = annotationTypeSettings;
+		getAnnotationTypeSettings();
+	}
+
+
+	public void setFlattendAnnotationTypeSettings(final Map<String, String> annotationTypeSettings) {
+		_annotationTypeSettings = AnnotationType.complex(annotationTypeSettings);
 	}
 }

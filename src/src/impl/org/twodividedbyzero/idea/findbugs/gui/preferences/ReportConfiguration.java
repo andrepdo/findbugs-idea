@@ -80,7 +80,7 @@ public class ReportConfiguration implements ConfigurationPage {
 			final TableLayout tbl = new TableLayout(size);
 
 			final JPanel mainPanel = new JPanel(tbl);
-			mainPanel.add(new JLabel("Minimum priority to report"), "1, 1, 1, 1");
+			mainPanel.add(new JLabel("Minimum confidence to report"), "1, 1, 1, 1");
 			final JPanel comp = new JPanel(new FlowLayout(FlowLayout.LEFT));
 			comp.add(getPriorityCombobox());
 			mainPanel.add(comp, "3, 1, 3, 1");

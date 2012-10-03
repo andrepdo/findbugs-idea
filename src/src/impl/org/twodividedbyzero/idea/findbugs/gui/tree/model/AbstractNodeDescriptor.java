@@ -31,6 +31,7 @@ import javax.swing.Icon;
  * @version $Revision$
  * @since 0.9.29-dev
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public abstract class AbstractNodeDescriptor<E> {
 
 	GroupBy _groupBy;

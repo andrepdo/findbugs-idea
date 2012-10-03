@@ -33,7 +33,7 @@ public class FindBugsPluginConstants {
 
 	public static final String PLUGIN_NAME = "FindBugs-IDEA";
 	public static final String TOOL_WINDOW_ID = PLUGIN_NAME;
-	public static final String FINDBUGS_WEBCLOUD_CLIENT_JAR = "lib/findbugsCommunalCloud.jar";
+	public static final String FINDBUGS_WEBCLOUD_CLIENT_JAR = "plugin/findbugsCommunalCloud.jar";
 	public static final String FINDBUGS_APP_ENGINE_PROPERTY_NAME = "findbugs.plugin.appengine";
 	public static final String DEFAULT_EXPORT_DIR = System.getProperty("user.home") + File.separatorChar + TOOL_WINDOW_ID;
 
@@ -62,8 +62,6 @@ public class FindBugsPluginConstants {
 	public static final String ACTIVE_CHANGELIST_ACTION = "FindBugs.ActiveChangeListAction";
 
 	public static final String FILE_SEPARATOR = File.separator;
-
-	public static final String FINDBUGS_PLUGIN_PATH = "lib/plugin";
 
 	public static final String FINDBUGS_EXTERNAL_HELP_URI = "http://findbugs.sourceforge.net/manual/filter.html";
 

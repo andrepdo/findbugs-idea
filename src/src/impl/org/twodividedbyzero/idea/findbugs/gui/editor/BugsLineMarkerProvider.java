@@ -21,22 +21,14 @@ package org.twodividedbyzero.idea.findbugs.gui.editor;
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
-import com.intellij.codeInspection.SuppressIntentionAction;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.ui.popup.PopupStep;
-import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
 import com.intellij.psi.PsiAnonymousClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.ui.awt.RelativePoint;
 import com.intellij.util.Function;
-import edu.umd.cs.findbugs.BugInstance;
-import edu.umd.cs.findbugs.Detector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
@@ -45,10 +37,16 @@ import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.gui.intentions.GroupBugIntentionListPopupStep;
+import org.twodividedbyzero.idea.findbugs.gui.intentions.RootGroupBugIntentionListPopupStep;
+import org.twodividedbyzero.idea.findbugs.intentions.ClearAndSuppressBugIntentionAction;
+import org.twodividedbyzero.idea.findbugs.intentions.ClearBugIntentionAction;
+import org.twodividedbyzero.idea.findbugs.intentions.SuppressReportBugForClassIntentionAction;
+import org.twodividedbyzero.idea.findbugs.intentions.SuppressReportBugIntentionAction;
 
-import javax.swing.Icon;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -79,6 +77,11 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 
 	@Nullable
 	public LineMarkerInfo<?> getLineMarkerInfo(final PsiElement psiElement) {
+		final FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(psiElement.getProject());
+		if (! pluginComponent.getPreferences().isAnnotationGutterIconEnabled()) {
+			return null;
+		}
+
 		if(!_isRegistered) {
 			EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(psiElement.getProject().getName()), this);
 			_isRegistered = true;
@@ -88,11 +91,11 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 		}
 
 		final PsiFile psiFile = IdeaUtilImpl.getPsiFile(psiElement);
-		_problemCache = IdeaUtilImpl.getPluginComponent(psiElement.getProject()).getProblems();
+		_problemCache = pluginComponent.getProblems();
 
 		if (_problemCache.containsKey(psiFile)) {
 			final List<ExtendedProblemDescriptor> matchingDescriptors = new ArrayList<ExtendedProblemDescriptor>();
-			final List<ExtendedProblemDescriptor> descriptors = _problemCache.get(psiFile);
+			final Iterable<ExtendedProblemDescriptor> descriptors = new ArrayList<ExtendedProblemDescriptor>(_problemCache.get(psiFile));
 			for (final ExtendedProblemDescriptor problemDescriptor : descriptors) {
 
 				final PsiElement problemPsiElement = problemDescriptor.getPsiElement();
@@ -106,7 +109,7 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 			}
 			if (!matchingDescriptors.isEmpty()) {
 				final GutterIconNavigationHandler<PsiElement> navHandler = new BugGutterIconNavigationHandler(psiElement, matchingDescriptors);
-				return new LineMarkerInfo<PsiElement>(psiElement, psiElement.getTextRange().getStartOffset(), getIcon(matchingDescriptors.get(0)), 4, new TooltipProvider(matchingDescriptors), navHandler, GutterIconRenderer.Alignment.LEFT);
+				return new LineMarkerInfo<PsiElement>(psiElement, psiElement.getTextRange().getStartOffset(), GuiUtil.getTinyIcon(matchingDescriptors.get(0)), 4, new TooltipProvider(matchingDescriptors), navHandler, GutterIconRenderer.Alignment.LEFT);
 			}
 		}
 
@@ -115,35 +118,6 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 
 
 	public void collectSlowLineMarkers(final List<PsiElement> elements, final Collection<LineMarkerInfo> result) {
-	}
-
-
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"DB_DUPLICATE_SWITCH_CLAUSES"})
-	@Nullable
-	private static Icon getIcon(final ExtendedProblemDescriptor problemDescriptor) {
-		final BugInstance bugInstance = problemDescriptor.getBugInstance();
-		final int priority = bugInstance.getPriority();
-		final Icon icon;
-		switch (priority) {
-			case Detector.HIGH_PRIORITY :
-				icon = GuiResources.PRIORITY_HIGH_ICON;
-				break;
-			case Detector.NORMAL_PRIORITY :
-				icon = GuiResources.PRIORITY_NORMAL_ICON;
-				break;
-			case Detector.LOW_PRIORITY :
-				icon = GuiResources.PRIORITY_LOW_ICON;
-				break;
-			case Detector.EXP_PRIORITY :
-				icon = GuiResources.PRIORITY_EXP_ICON;
-				break;
-			case Detector.IGNORE_PRIORITY :
-			default:
-				icon = GuiResources.PRIORITY_HIGH_ICON;
-			break;
-
-		}
-		return icon;
 	}
 
 
@@ -173,23 +147,28 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 		private BugGutterIconNavigationHandler(final PsiElement psiElement, final List<ExtendedProblemDescriptor> descriptors) {
 			_descriptors = descriptors;
 			_psiElement = psiElement;
-			buildPopupMenu();
+			//buildPopupMenu();
 		}
 
 
 		@SuppressWarnings({"AnonymousInnerClass", "AnonymousInnerClassMayBeStatic"})
 		private JBPopup buildPopupMenu() {
-			final List<SuppressIntentionAction> intentionActions = new ArrayList<SuppressIntentionAction>(_descriptors.size());
+			final List<GroupBugIntentionListPopupStep> intentionGroups = new ArrayList<GroupBugIntentionListPopupStep>();
 
 			for (final ExtendedProblemDescriptor problemDescriptor : _descriptors) {
-				intentionActions.add(new AddSuppressReportBugFix(problemDescriptor));
-				intentionActions.add(new AddSuppressReportBugForClassFix(problemDescriptor));
+				final List<SuppressReportBugIntentionAction> intentionActions = new ArrayList<SuppressReportBugIntentionAction>(_descriptors.size());
+
+				intentionActions.add(new SuppressReportBugIntentionAction(problemDescriptor));
+				intentionActions.add(new SuppressReportBugForClassIntentionAction(problemDescriptor));
 				intentionActions.add(new ClearBugIntentionAction(problemDescriptor));
-				intentionActions.add(new ClearAndSuppressBugAction(problemDescriptor));
+				intentionActions.add(new ClearAndSuppressBugIntentionAction(problemDescriptor));
+
+				final GroupBugIntentionListPopupStep intentionActionGroup = new GroupBugIntentionListPopupStep(_psiElement, intentionActions);
+				intentionGroups.add(intentionActionGroup);
 			}
 
 			final JBPopupFactory factory = JBPopupFactory.getInstance();
-			return factory.createListPopup(new BaseListPopupStep<SuppressIntentionAction>("FindBugs-IDEA", intentionActions) {
+			/*return factory.createListPopup(new BaseListPopupStep<SuppressIntentionAction>(FindBugsPluginConstants.PLUGIN_NAME, intentionActions) {
 				@Override
 				public PopupStep<?> onChosen(final SuppressIntentionAction selectedValue, final boolean finalChoice) {
 					final Project project = _psiElement.getProject();
@@ -201,14 +180,16 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 					});
 					return super.onChosen(selectedValue, finalChoice);
 				}
-			});
+			});*/
+			return factory.createListPopup(new RootGroupBugIntentionListPopupStep(intentionGroups));
 		}
 
 
 		public void navigate(final MouseEvent e, final PsiElement psiElement) {
 			// todo: goto tree node - fb result panel view
-			buildPopupMenu().showInScreenCoordinates(e.getComponent(), e.getPoint());
+			buildPopupMenu().show(new RelativePoint(e));
 		}
+
 
 	}
 
@@ -228,6 +209,7 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 		}
 
 
+		@SuppressWarnings({"HardcodedFileSeparator"})
 		private static String getTooltipText(final List<ExtendedProblemDescriptor> problemDescriptors) {
 			final StringBuilder buffer = new StringBuilder();
 			buffer.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
@@ -260,4 +242,5 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 			return sb.toString();
 		}
 	}
+
 }

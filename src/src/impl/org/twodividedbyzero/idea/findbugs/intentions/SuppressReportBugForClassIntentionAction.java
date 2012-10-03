@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.twodividedbyzero.idea.findbugs.gui.editor;
+package org.twodividedbyzero.idea.findbugs.intentions;
 
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDeclarationStatement;
@@ -28,16 +28,16 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 
 
-/** todo
+/**
  * $Date$
  *
  * @author Andre Pfeiler<andrepdo@dev.java.net>
  * @version $Revision$
  * @since 0.9.97
  */
-public class AddSuppressReportBugForClassFix extends AddSuppressReportBugFix {
+public class SuppressReportBugForClassIntentionAction extends SuppressReportBugIntentionAction {
 
-	public AddSuppressReportBugForClassFix(final ExtendedProblemDescriptor problemDescriptor) {
+	public SuppressReportBugForClassIntentionAction(final ExtendedProblemDescriptor problemDescriptor) {
 		super(problemDescriptor);
 	}
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.twodividedbyzero.idea.findbugs.gui.editor;
+package org.twodividedbyzero.idea.findbugs.intentions;
 
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.openapi.editor.Editor;
@@ -31,6 +31,7 @@ import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
+import javax.swing.Icon;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ import java.util.Map;
  * @version $Revision$
  * @since 0.9.97
  */
-public class ClearBugIntentionAction extends AddSuppressReportBugFix {
+public class ClearBugIntentionAction extends SuppressReportBugIntentionAction {
 
 	public ClearBugIntentionAction(final ExtendedProblemDescriptor problemDescriptor) {
 		super(problemDescriptor);
@@ -79,5 +80,12 @@ public class ClearBugIntentionAction extends AddSuppressReportBugFix {
 	@NotNull
 	public String getText() {
 		return ResourcesLoader.getString("findbugs.inspection.quickfix.clear") + " '" + getBugPatternId() + '\'';
+	}
+
+
+	@SuppressWarnings("HardcodedFileSeparator")
+	@Override
+	public Icon getIcon(final int flags) {
+		return ResourcesLoader.loadIcon("intentions/stop.png");
 	}
 }

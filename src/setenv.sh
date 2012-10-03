@@ -20,7 +20,7 @@ export GOOGLECODE_PASSWD="mysecretpaswd"
 
 echo IDEA_HOME: $IDEA_HOME
 echo JAVA_HOME: $JAVA_HOME
-echo AT_HOME: $ANT_HOME
+echo ANT_HOME: $ANT_HOME
 
 which java javac ant rmiregistry
 ant -version
