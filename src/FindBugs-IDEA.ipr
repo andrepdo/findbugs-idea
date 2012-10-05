@@ -3245,6 +3245,7 @@
         <w>Util</w>
         <w>changelist</w>
         <w>classname</w>
+        <w>clazzes</w>
         <w>findbugs</w>
         <w>flattend</w>
         <w>multi</w>

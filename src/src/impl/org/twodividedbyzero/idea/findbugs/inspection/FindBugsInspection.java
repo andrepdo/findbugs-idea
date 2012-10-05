@@ -26,9 +26,10 @@ import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.lang.annotation.HighlightSeverity;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -270,14 +271,12 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 
 		/*final CompilerManager compilerManager = CompilerManager.getInstance(project);
 		compilerManager.compile(new VirtualFile[] {psiFile.getVirtualFile()}, null, true);*/
-
-
-		final DataContext dataContext = IdeaUtilImpl.getDataContext();
 		//IdeaUtilImpl.activateToolWindow(IdeaUtilImpl.getPluginInterface(project).getInternalToolWindowId(), dataContext);
 		final FindBugsInspector worker = new FindBugsInspector(project, this);
 
 		// set aux classpath
-		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(dataContext);
+		final Module module = ModuleUtil.findModuleForFile(psiFile.getVirtualFile(), project);
+		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(module);
 		worker.configureAuxClasspathEntries(files);
 
 		// set source dirs

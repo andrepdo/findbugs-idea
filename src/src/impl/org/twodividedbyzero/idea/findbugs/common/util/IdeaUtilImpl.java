@@ -18,7 +18,6 @@
  */
 package org.twodividedbyzero.idea.findbugs.common.util;
 
-import com.intellij.ide.DataManager;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DataKeys;
@@ -44,7 +43,7 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.roots.ProjectRootsTraversing;
+import com.intellij.openapi.roots.ProjectRootsTraversing.RootTraversePolicy;
 import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.vcs.FilePath;
 import com.intellij.openapi.vcs.changes.Change;
@@ -151,26 +150,9 @@ public final class IdeaUtilImpl {
 	}
 
 
-	/**
-	 * @deprecated use {@link #getProject(com.intellij.psi.PsiElement)} or {@link #getProject(com.intellij.openapi.actionSystem.DataContext)}
-	 *
-	 * @return Project the current idea project
-	 */
-	@Deprecated
-	@Nullable
-	public static Project getProject() {
-		return getProject(getDataContext());
-	}
-
 
 	public static Project getProject(final PsiElement psiElement) {
 		return psiElement.getProject();
-	}
-
-
-	@Deprecated
-	public static DataContext getDataContext() {
-		return DataManager.getInstance().getDataContext();
 	}
 
 
@@ -346,6 +328,7 @@ public final class IdeaUtilImpl {
 				// one needs to find public class or class with name = name of
 				// file w/o extension
 				// so adjust the index accordingly
+				//noinspection UseOfSystemOutOrSystemErr
 				System.out.println(clazzes[0].getQualifiedName());
 			}
 		}
@@ -647,7 +630,7 @@ public final class IdeaUtilImpl {
 	public static File[] getFileForModules(@NotNull final Module[] modules, final FileType fileType) {
 		final Collection<File> resolvedFiles = new HashSet<File>();
 
-		final ProjectRootsTraversing.RootTraversePolicy traversePolicy = null;
+		final RootTraversePolicy traversePolicy = null;
 		for (final Module module : modules) {
 			final Collection<VirtualFile> virtualFiles = new ArrayList<VirtualFile>();
 			final VirtualFile outputDirectory = CompilerPaths.getModuleOutputDirectory(module, false);
@@ -925,7 +908,7 @@ public final class IdeaUtilImpl {
 
 
 	public static String getIdeaBuildNumber() {
-		return ApplicationInfo.getInstance().getBuildNumber();
+		return ApplicationInfo.getInstance().getBuild().asString();
 
 	}
 
@@ -942,6 +925,11 @@ public final class IdeaUtilImpl {
 
 	public static boolean isIdea10() {
 		return "10".equals(getIdeaMajorVersion());
+	}
+
+
+	public static boolean isIdea11() {
+		return "11".equals(getIdeaMajorVersion());
 	}
 
 
