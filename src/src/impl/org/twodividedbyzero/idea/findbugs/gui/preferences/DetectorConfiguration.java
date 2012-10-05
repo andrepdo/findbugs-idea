@@ -223,8 +223,9 @@ public class DetectorConfiguration implements ConfigurationPage {
 			final ListSelectionModel selectionModel = _detectorsTable.getSelectionModel();
 			selectionModel.addListSelectionListener(new ListSelectionListener() {
 				public void valueChanged(final ListSelectionEvent e) {
-					if (!e.getValueIsAdjusting() && e.getFirstIndex() > -1) {
-						final DetectorFactory detectorFactory = _bugPatternModel.getEntries().get(e.getFirstIndex());
+					if (!e.getValueIsAdjusting() && _detectorsTable.getSelectedRow() > -1) {
+						final int modelIndex = _tableSorter.modelIndex(_detectorsTable.getSelectedRow());
+						final DetectorFactory detectorFactory = _bugPatternModel.getEntries().get(modelIndex);
 						final String description = getDetailedText(detectorFactory);
 						getTextArea().setText(description);
 						SwingUtilities.invokeLater(new Runnable() {
