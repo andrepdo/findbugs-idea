@@ -115,6 +115,12 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
+	@Override
+	public String loadDescription() {
+		return getStaticDescription();
+	}
+
+
 	@Nls
 	@Override
 	@NotNull

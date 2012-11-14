@@ -22,7 +22,6 @@ package org.twodividedbyzero.idea.findbugs.gui.preferences;
 import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.ui.ColorChooser;
 import com.intellij.ui.UIBundle;
-import com.intellij.util.ui.UIUtil;
 import info.clearthought.layout.TableLayout;
 import org.twodividedbyzero.idea.findbugs.gui.common.ListFacade;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -37,6 +36,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -470,7 +470,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 	private static class ColorBox extends JComponent {
 
 		public static final String RGB = "RGB";
-		public static final Color DISABLED_COLOR = UIUtil.getPanelBackgound();
+		public static final Color DISABLED_COLOR = UIManager.getColor("Panel.background");
 
 		private final Dimension _size;
 		private final boolean _isSelectable;

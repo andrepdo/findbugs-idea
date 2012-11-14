@@ -18,10 +18,12 @@
  */
 package org.twodividedbyzero.idea.findbugs.intentions;
 
+import com.intellij.codeInsight.CodeInsightUtilBase;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.codeInspection.InspectionsBundle;
 import com.intellij.codeInspection.SuppressIntentionAction;
 import com.intellij.codeInspection.SuppressManager;
+import com.intellij.lang.StdLanguages;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
@@ -111,7 +113,15 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 
 	@Nullable
 	protected PsiDocCommentOwner getContainer(final PsiElement context) {
-		if (context == null /*|| !(context.getContainingFile().getLanguage() instanceof JavaLanguage)*/ || context instanceof PsiFile) {
+		if (context == null || !context.getManager().isInProject(context)) {
+			return null;
+		}
+		final PsiFile containingFile = context.getContainingFile();
+		if (containingFile == null) {
+			// for PsiDirectory
+			return null;
+		}
+		if (!containingFile.getLanguage().isKindOf(StdLanguages.JAVA) || context instanceof PsiFile) {
 			return null;
 		}
 		PsiElement container = context;
@@ -139,9 +149,12 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 
 
 	@Override
-	public void invoke(final Project project, final Editor editor, final PsiElement element) throws IncorrectOperationException {
+	public void invoke(@NotNull final Project project, final Editor editor, @NotNull final PsiElement element) throws IncorrectOperationException {
 		final PsiDocCommentOwner container = getContainer(element);
 		assert container != null;
+		if (!CodeInsightUtilBase.preparePsiElementForWrite(container)) {
+			return;
+		}
 		@SuppressWarnings({"ConstantConditions"})
 		final ReadonlyStatusHandler.OperationStatus status = ReadonlyStatusHandler.getInstance(project).ensureFilesWritable(container.getContainingFile().getVirtualFile());
 		if (status.hasReadonlyFiles()) {
@@ -204,19 +217,19 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 				final PsiNameValuePair[] attributes = annotation.getParameterList().getAttributes();
 				if (attributes.length == 1) {
 					final String suppressedWarnings = attributes[0].getText();
-					final PsiAnnotation newAnnotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + _suppressWarningsClassName + "({" + suppressedWarnings + ", \"" + id + "\"})", container);
+					final PsiAnnotation newAnnotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + _suppressWarningsClassName + "({" + suppressedWarnings + ", \"" + id + "\"})\n", container);
 					annotation.replace(newAnnotation);
 				}
 			} else {
 				final int curlyBraceIndex = annotation.getText().lastIndexOf('}');
 				if (curlyBraceIndex > 0) {
-					annotation.replace(JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText(annotation.getText().substring(0, curlyBraceIndex) + ", \"" + id + "\"})", container));
+					annotation.replace(JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText(annotation.getText().substring(0, curlyBraceIndex) + ", \"" + id + "\"})\n", container));
 				} else if (!ApplicationManager.getApplication().isUnitTestMode() && editor != null) {
 					Messages.showErrorDialog(editor.getComponent(), InspectionsBundle.message("suppress.inspection.annotation.syntax.error", annotation.getText()));
 				}
 			}
 		} else {
-			annotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + _suppressWarningsClassName + "({\"" + id + "\"})", container);
+			annotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + _suppressWarningsClassName + "({\"" + id + "\"})\n", container);
 			modifierList.addBefore(annotation, modifierList.getFirstChild());
 			JavaCodeStyleManager.getInstance(project).shortenClassReferences(modifierList);
 

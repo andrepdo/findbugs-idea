@@ -51,7 +51,7 @@ public class ClearBugIntentionAction extends SuppressReportBugIntentionAction {
 
 
 	@Override
-	public void invoke(final Project project, final Editor editor, final PsiElement element) throws IncorrectOperationException {
+	public void invoke(@NotNull final Project project, final Editor editor, @NotNull final PsiElement element) throws IncorrectOperationException {
 		final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = IdeaUtilImpl.getPluginComponent(project).getProblems();
 		problems.get(element.getContainingFile()).remove(getProblemDescriptor());
 		DaemonCodeAnalyzer.getInstance(project).restart();

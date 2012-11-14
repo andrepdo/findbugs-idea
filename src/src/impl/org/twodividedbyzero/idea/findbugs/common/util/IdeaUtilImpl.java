@@ -43,7 +43,6 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.roots.ProjectRootsTraversing.RootTraversePolicy;
 import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.vcs.FilePath;
 import com.intellij.openapi.vcs.changes.Change;
@@ -258,7 +257,7 @@ public final class IdeaUtilImpl {
 
 
 	@NotNull
-	public static VirtualFile[] getFilesForModules(final Module module) {
+	public static VirtualFile[] getSourceFilesForModules(final Module module) {
 		final ModuleRootManager mrm = ModuleRootManager.getInstance(module);
 		// TODO: test
 		return mrm.getFiles(OrderRootType.SOURCES);
@@ -630,7 +629,6 @@ public final class IdeaUtilImpl {
 	public static File[] getFileForModules(@NotNull final Module[] modules, final FileType fileType) {
 		final Collection<File> resolvedFiles = new HashSet<File>();
 
-		final RootTraversePolicy traversePolicy = null;
 		for (final Module module : modules) {
 			final Collection<VirtualFile> virtualFiles = new ArrayList<VirtualFile>();
 			final VirtualFile outputDirectory = CompilerPaths.getModuleOutputDirectory(module, false);

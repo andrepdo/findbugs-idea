@@ -1,50 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module relativePaths="true" type="PLUGIN_MODULE" version="4">
-  <component name="DevKit.ModuleBuildProperties" url="file://$MODULE_DIR$/META-INF/plugin.xml" />
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/target/impl" />
-    <output-test url="file://$MODULE_DIR$/target/test" />
-    <exclude-output />
-    <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/src/api" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/dev" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/impl" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="true" />
-      <excludeFolder url="file://$MODULE_DIR$/target" />
-    </content>
-    <orderEntry type="jdk" jdkName="IDEA IU-117.117" jdkType="IDEA JDK" />
-    <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
-      <library name="lib">
-        <CLASSES>
-          <root url="file://$MODULE_DIR$/lib" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../../findbugs-2.0.1-rc2/src/tools" />
-          <root url="file://$MODULE_DIR$/../../findbugs-2.0.1-rc2/src/antTask" />
-          <root url="file://$MODULE_DIR$/../../findbugs-2.0.1-rc2/src/java" />
-          <root url="file://$MODULE_DIR$/../../findbugs-2.0.1-rc2/src/gui" />
-          <root url="file://$MODULE_DIR$/../../findbugs-2.0.1-rc2/src/obsolete" />
-          <root url="file://$MODULE_DIR$/../../findbugs-2.0.1-rc2/src/infonodeJava" />
-          <root url="file://$MODULE_DIR$/../../findbugs-2.0.1-rc2/src/junit" />
-        </SOURCES>
-        <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
-      </library>
-    </orderEntry>
-  </component>
-  <component name="copyright">
-    <Base>
-      <setting name="state" value="2" />
-    </Base>
-  </component>
+<project version="4">
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">
       <map>
-        <entry key="property.analysisEffortLevel" value="default" />
-        <entry key="property.minPriorityToReport" value="Medium" />
-        <entry key="property.runAnalysisInBackground" value="false" />
+        <entry key="property.analysisEffortLevel" value="max" />
+        <entry key="property.analyzeAfterCompile" value="false" />
+        <entry key="property.exportAsHtml" value="true" />
+        <entry key="property.exportAsXml" value="true" />
+        <entry key="property.exportBaseDir" value="" />
+        <entry key="property.exportCreateArchiveDir" value="false" />
+        <entry key="property.exportOpenBrowser" value="true" />
+        <entry key="property.minPriorityToReport" value="Low" />
+        <entry key="property.runAnalysisInBackground" value="true" />
         <entry key="property.showHiddenDetectors" value="false" />
+        <entry key="property.toolWindowGroupBy" value="BugCategory" />
         <entry key="property.toolWindowToFront" value="true" />
       </map>
     </option>
@@ -221,5 +190,5 @@
       </map>
     </option>
   </component>
-</module>
+</project>
 

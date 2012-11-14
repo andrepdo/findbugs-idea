@@ -1,0 +1,7 @@
+<component name="CopyrightManager">
+  <settings default="FindBugs-IDEA - Apache License, Version 2">
+    <module2copyright>
+      <element module="All" copyright="FindBugs-IDEA - Apache License, Version 2" />
+    </module2copyright>
+  </settings>
+</component>
