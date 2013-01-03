@@ -98,6 +98,16 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor {
 	}
 
 
+	@Nullable
+	public String getProblemGroup() {
+		return "FindBugs-IDEA";
+	}
+
+
+	public void setProblemGroup(@Nullable final String s) {
+	}
+
+
 	public PsiElement getEndElement() {
 		return getPsiElement();
 	}

@@ -490,7 +490,7 @@
                     class="org.twodividedbyzero.idea.findbugs.actions.ImportBugCollection"
                     text="Import previous saved Bug Collection"
                     description="FindBugs plugin import previous saved bug collection."
-                    icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/import.png"/>
+                    icon="/toolbarDecorator/import.png"/>
 
         </group>
 

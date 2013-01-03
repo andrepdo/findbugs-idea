@@ -10,7 +10,7 @@ fi
 
 echo "Setting up environment ..."
 
-export JAVA_HOME=/opt/java/jdk1.5.0
+export JAVA_HOME=/opt/java/jdk1.6.0
 export ANT_HOME="${PWD}/bin/ant"
 export PATH=$ANT_HOME/bin:$PATH
 export ANT_OPTS="-Xmx384m"

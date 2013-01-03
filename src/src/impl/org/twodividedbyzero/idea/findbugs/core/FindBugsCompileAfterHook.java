@@ -54,12 +54,18 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		_project = project;
 	}
 
+
 	public void compilationFinished(final boolean aborted, final int errors, final int warnings, final CompileContext compileContext) {
 		initWorker(compileContext);
 	}
 
 
 	public void fileGenerated(final String s, final String s1) {
+	}
+
+
+	@SuppressWarnings("UnusedDeclaration")
+	public void fileGenerated(final String s) {
 	}
 
 

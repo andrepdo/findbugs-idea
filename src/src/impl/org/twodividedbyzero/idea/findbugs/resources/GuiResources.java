@@ -128,6 +128,7 @@ public class GuiResources {
 
 
 	public static final Color HIGHLIGHT_COLOR = new Color(219, 219, 137);
+	public static final Color HIGHLIGHT_COLOR_DARKER = new Color(135, 135, 69, 254);
 	public static final Color HIGHLIGHT_COLOR_LIGHTER = new Color(255, 255, 204);
 
 

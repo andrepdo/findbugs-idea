@@ -272,7 +272,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
-	private void initWorker(final PsiFile psiFile) {
+	private void initWorker(@SuppressWarnings("TypeMayBeWeakened") final PsiFile psiFile) {
 		final com.intellij.openapi.project.Project project = IdeaUtilImpl.getProject(psiFile);
 
 		/*final CompilerManager compilerManager = CompilerManager.getInstance(project);

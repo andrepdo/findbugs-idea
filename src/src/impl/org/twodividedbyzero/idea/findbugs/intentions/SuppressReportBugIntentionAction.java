@@ -148,8 +148,14 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 	}
 
 
+
+
+
 	@Override
 	public void invoke(@NotNull final Project project, final Editor editor, @NotNull final PsiElement element) throws IncorrectOperationException {
+		/*final IntentionsInfo intentionsInfo = new IntentionsInfo();
+		intentionsInfo.filterActions();
+		IntentionHintComponent.showIntentionHint(project, element.getContainingFile(), editor, intentionsInfo, true);*/
 		final PsiDocCommentOwner container = getContainer(element);
 		assert container != null;
 		if (!CodeInsightUtilBase.preparePsiElementForWrite(container)) {
@@ -192,7 +198,7 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 		}
 		final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = IdeaUtilImpl.getPluginComponent(project).getProblems();
 		problems.get(element.getContainingFile()).remove(getProblemDescriptor());
-		DaemonCodeAnalyzer.getInstance(project).restart();
+		DaemonCodeAnalyzer.getInstance(project).restart(element.getContainingFile());
 	}
 
 

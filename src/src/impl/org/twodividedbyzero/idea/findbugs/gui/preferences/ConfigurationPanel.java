@@ -431,6 +431,7 @@ public class ConfigurationPanel extends JPanel {
 						}
 						_tabbedPane.insertTab(configPage.getTitle(), null, configPage.getComponent(), configPage.getTitle(), i);
 						_tabbedPane.setBackgroundAt(i, GuiResources.HIGHLIGHT_COLOR);
+						_tabbedPane.setForegroundAt(i, GuiResources.HIGHLIGHT_COLOR_DARKER);
 					} else {
 						_tabbedPane.remove(configPage.getComponent());
 					}
@@ -441,6 +442,7 @@ public class ConfigurationPanel extends JPanel {
 						}
 						_tabbedPane.insertTab(configPage.getTitle(), null, configPage.getComponent(), configPage.getTitle(), i);
 						_tabbedPane.setBackgroundAt(i, GuiResources.HIGHLIGHT_COLOR);
+						_tabbedPane.setForegroundAt(i, GuiResources.HIGHLIGHT_COLOR_DARKER);
 					} else {
 						_tabbedPane.remove(configPage.getComponent());
 					}

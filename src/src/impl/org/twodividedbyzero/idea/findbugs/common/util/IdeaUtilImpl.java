@@ -40,6 +40,7 @@ import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.CompilerProjectExtension;
 import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.OrderEntry;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
@@ -86,6 +87,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -99,7 +101,7 @@ import java.util.Set;
  * @version $Revision$
  * @since 0.0.1
  */
-@SuppressWarnings({"HardcodedFileSeparator", "UnusedDeclaration"})
+@SuppressWarnings({"HardcodedFileSeparator"})
 public final class IdeaUtilImpl {
 
 	@NotNull
@@ -147,7 +149,6 @@ public final class IdeaUtilImpl {
 	public static Project getProject(@NotNull final DataContext dataContext) {
 		return DataKeys.PROJECT.getData(dataContext);
 	}
-
 
 
 	public static Project getProject(final PsiElement psiElement) {
@@ -248,19 +249,6 @@ public final class IdeaUtilImpl {
 			}
 		}
 		return result;
-	}
-
-
-	public static VirtualFile[] getFilesForAllModules(final Project project) {
-		return ProjectRootManager.getInstance(project).getFilesFromAllModules(OrderRootType.CLASSES);
-	}
-
-
-	@NotNull
-	public static VirtualFile[] getSourceFilesForModules(final Module module) {
-		final ModuleRootManager mrm = ModuleRootManager.getInstance(module);
-		// TODO: test
-		return mrm.getFiles(OrderRootType.SOURCES);
 	}
 
 
@@ -541,12 +529,66 @@ public final class IdeaUtilImpl {
 	public static VirtualFile[] getProjectClasspath(final Module module) {
 		final VirtualFile[] files;
 		try {
+			final List<VirtualFile> found = new LinkedList<VirtualFile>();
 			final ModuleRootManager mrm = ModuleRootManager.getInstance(module);
-			files = mrm.getFiles(OrderRootType.COMPILATION_CLASSES);
+			final OrderEntry[] orderEntries = mrm.getOrderEntries();
+			for (final OrderEntry entry : orderEntries) {
+				Collections.addAll(found, entry.getFiles(OrderRootType.CLASSES));
+			}
+			files = found.toArray(new VirtualFile[found.size()]);
 		} catch (Exception e) {
 			throw new FindBugsPluginException("ModuleRootManager must not be null. may be the current class is not a project/module class. check your project/module outpath configuration.", e);
 		}
 		return files;
+	}
+
+
+	/*private Collection<? extends VirtualFile> findClassPathElements(final Module module) {
+		final Collection<VirtualFile> found = new LinkedList<VirtualFile>();
+
+		*//* our module output *//*
+		final CompilerModuleExtension compilerModuleExtension = CompilerModuleExtension.getInstance(module);
+		if (compilerModuleExtension != null) {
+			final VirtualFile[] outputRoots = compilerModuleExtension.getOutputRoots(true);
+			Collections.addAll(found, outputRoots);
+		}
+
+		*//* all our dependencies (recursively where needed) *//*
+		final ModuleRootManager mrm = ModuleRootManager.getInstance(module);
+		for (final OrderEntry entry : mrm.getOrderEntries()) {
+			final Collection<VirtualFile> files = new LinkedList<VirtualFile>();
+
+			if (entry instanceof ModuleOrderEntry) {
+				*//* other modules we depend on -> they could depend on modules themselves, so we need to add them recursively *//*
+				final ModuleOrderEntry moduleOrderEntry = (ModuleOrderEntry) entry;
+				final Module currentModule = moduleOrderEntry.getModule();
+				if (currentModule != null) {
+					files.addAll(Arrays.asList(OrderEnumerator.orderEntries(currentModule).compileOnly().recursively().classes().getRoots()));
+				}
+			} else if (entry instanceof LibraryOrderEntry) {
+				*//* libraries cannot be recursive and we only need the classes of them *//*
+				final LibraryOrSdkOrderEntry libraryOrderEntry = (LibraryOrderEntry) entry;
+				files.addAll(Arrays.asList(libraryOrderEntry.getRootFiles(OrderRootType.CLASSES)));
+			} else {
+				*//* all other cases (whichever they are) we want to have their classes outputs *//*
+				files.addAll(Arrays.asList(entry.getFiles(OrderRootType.CLASSES)));
+			}
+			for (final VirtualFile virtualFile : files) {
+				found.add(virtualFile);
+			}
+		}
+
+		return found;
+	}*/
+
+
+	private static boolean isLegacyApiAvailable() {
+		try {
+			OrderRootType.class.getField("COMPILATION_CLASSES");
+			return true;
+		} catch (NoSuchFieldException e) {
+			return false;
+		}
 	}
 
 
@@ -905,12 +947,6 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static String getIdeaBuildNumber() {
-		return ApplicationInfo.getInstance().getBuild().asString();
-
-	}
-
-
 	public static String getIdeaMajorVersion() {
 		return ApplicationInfo.getInstance().getMajorVersion();
 	}
@@ -948,7 +984,7 @@ public final class IdeaUtilImpl {
 		final PsiFile psiFile = getPsiFile(project, issue);
 		return psiFile == null ? null : PsiDocumentManager.getInstance(project).getDocument(psiFile);
 	}
-	
+
 
 	@Nullable
 	public static PsiElement findAnonymousClassPsiElement(@NotNull final BugInstanceNode bugInstanceNode, @NotNull final Project project) {
@@ -978,7 +1014,7 @@ public final class IdeaUtilImpl {
 
 	public static String getProjectRootPath(final Project project) {
 		final ProjectRootManager projectManager = ProjectRootManager.getInstance(project);
-        final VirtualFile rootFiles[] = projectManager.getContentRoots();
+		final VirtualFile rootFiles[] = projectManager.getContentRoots();
 		return rootFiles[0].getPath();
 	}
 
@@ -986,7 +1022,7 @@ public final class IdeaUtilImpl {
 	public static String replace$PROJECT_DIR$(final Project project, @NotNull final String path) {
 		final StringBuilder result = new StringBuilder(20);
 		final String rootPath = getProjectRootPath(project);
-		if(path.contains(rootPath)) {
+		if (path.contains(rootPath)) {
 			result.append(path.replace(rootPath, IDEA_PROJECT_DIR_VAR));
 			return result.toString();
 		} else if (path.contains(IDEA_PROJECT_DIR_VAR)) {

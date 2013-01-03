@@ -23,8 +23,10 @@ import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.ui.ColorChooser;
 import com.intellij.ui.UIBundle;
 import info.clearthought.layout.TableLayout;
+import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.gui.common.ListFacade;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -41,6 +43,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -48,6 +51,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
@@ -103,6 +107,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			mainPanel.add(getAnnotationPathPanel(), "1, 3, 1, 3");
 
 			_component = mainPanel;
+			setEnabled(true);
 		}
 		//updatePreferences();
 		return _component;
@@ -161,7 +166,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 									 {border, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_annotationPathPanel = new JPanel(tbl);
-			_annotationPathPanel.setBorder(BorderFactory.createTitledBorder("FindBugs Annotation class (@SuppressWarning) needs to be on the classpath"));
+			_annotationPathPanel.setBorder(BorderFactory.createTitledBorder("FindBugs Annotation class (@SuppressWarnings). e.g. edu.umd.cs.findbugs.annotations.SuppressWarnings"));
 
 			_annotationPathPanel.add(getAnnotationPathField(), "1, 1, 1, 1"); // col ,row, col, row
 
@@ -224,7 +229,22 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, border}, // Columns
 									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
-			_markUpPanel = new JPanel(tbl);
+			_markUpPanel = new JPanel(tbl) {
+				@Override
+				public void paint(final Graphics g) {
+					super.paint(g);
+					final Graphics2D graphics = (Graphics2D) g.create();
+					graphics.setColor(GuiResources.HIGHLIGHT_COLOR);
+					GuiUtil.configureGraphics(graphics);
+					graphics.setFont(getFont().deriveFont(Font.BOLD, 33f));
+					graphics.rotate(.3);
+					graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .7f));
+					final String str = "Work in progress ...";
+					final int strWidth = SwingUtilities.computeStringWidth(getFontMetrics(getFont()), str);
+					graphics.drawString(str, getSize().width / 2 - strWidth / 2, 10);
+					graphics.dispose();
+				}
+			};
 			_markUpPanel.setBorder(BorderFactory.createTitledBorder("Annotation/MarkUp Settings"));
 
 			_markUpPanel.add(getGutterIconCheckbox(), "1, 1, 1, 1"); // col ,row, col, row
@@ -302,9 +322,11 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 
 	public void setEnabled(final boolean enabled) {
-		getAnnotationTypePanel().setEnabled(enabled);
-		getAnnotationTypeList().setEnabled(enabled);
-		getMarkUpPanel().setEnabled(enabled);
+		getGutterIconCheckbox().setEnabled(false);
+		getTextRangeMarkupCheckbox().setEnabled(false);
+		getAnnotationTypePanel().setEnabled(false);
+		getAnnotationTypeList().setEnabled(false);
+		getMarkUpPanel().setEnabled(false);
 		getAnnotationPathPanel().setEnabled(enabled);
 		getAnnotationPathField().setEditable(enabled);
 
