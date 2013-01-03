@@ -50,7 +50,7 @@ public class ClearAndSuppressBugIntentionAction extends SuppressReportBugIntenti
 		final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = IdeaUtilImpl.getPluginComponent(project).getProblems();
 		problems.get(element.getContainingFile()).remove(getProblemDescriptor());
 		super.invoke(project, editor, element);
-		DaemonCodeAnalyzer.getInstance(project).restart();
+		DaemonCodeAnalyzer.getInstance(project).restart(element.getContainingFile());
 	}
 
 
