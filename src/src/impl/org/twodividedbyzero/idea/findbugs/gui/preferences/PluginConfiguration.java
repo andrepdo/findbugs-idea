@@ -22,7 +22,6 @@ package org.twodividedbyzero.idea.findbugs.gui.preferences;
 import com.intellij.openapi.ui.Messages;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.Plugin;
-import edu.umd.cs.findbugs.PluginException;
 import edu.umd.cs.findbugs.Project;
 import info.clearthought.layout.TableLayout;
 import org.jetbrains.annotations.Nullable;
@@ -173,11 +172,12 @@ public class PluginConfiguration implements ConfigurationPage {
 						Plugin.loadCustomPlugin(selectedFile, getCurrentFbProject());
 						try {
 							_preferences.addPlugin(selectedFile.toURI().toURL().toExternalForm());
+							Messages.showInfoMessage(_parent, "Restart Intellij IDEA to load custom findbugs plugins.", "Intellij Needs to Be Restarted");
 						} catch (MalformedURLException e) {
 							Messages.showErrorDialog(e.getMessage(), e.getClass().getSimpleName());
 						}
 						updatePreferences();
-					} catch (PluginException e) {
+					} catch (Throwable e) {
 						Messages.showErrorDialog(_parent, "Error loading " + selectedFile.getPath() + ":\n\n" + e.getClass().getSimpleName() + ": " + e.getMessage(), "Error loading plugin");
 					}
 					_preferences.setModified(true);
