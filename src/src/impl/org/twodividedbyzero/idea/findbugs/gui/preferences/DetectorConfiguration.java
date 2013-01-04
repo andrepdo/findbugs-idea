@@ -250,8 +250,9 @@ public class DetectorConfiguration implements ConfigurationPage {
 			_detectorsTable.getColumnModel().getColumn(4).setPreferredWidth(400);
 			_detectorsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 			selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			selectionModel.setSelectionInterval(0, 0);
-
+			if (_detectorsTable.getModel().getRowCount() > 0) {
+				selectionModel.setSelectionInterval(0, 0);
+			}
 		}
 		return _detectorsTable;
 	}

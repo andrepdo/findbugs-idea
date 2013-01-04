@@ -666,6 +666,8 @@ public class FindBugsPreferences extends Properties {
 
 		preferences.setAnnotationTypeSettings(createDefaultAnnotationTypeSettings());
 
+		preferences.setDetectors(FindBugsPreferences.getAvailableDetectors(preferences.getUserPreferences()));
+
 
 		return preferences;
 	}
