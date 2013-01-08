@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Keith Lea
+ * Copyright 2008-2013 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *

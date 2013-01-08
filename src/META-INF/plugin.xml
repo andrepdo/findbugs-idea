@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2010 Andre Pfeiler
+  ~ Copyright 2008-2013 Andre Pfeiler
   ~
   ~ This file is part of FindBugs-IDEA.
   ~
@@ -22,7 +22,7 @@
     <name>FindBugs-IDEA</name>
     <description>
         <![CDATA[
-		FindBugs for IntelliJIDEA<br/>
+		The FindBugs plugin for IntelliJIDEA<br/>
 		Provides static byte code analysis to look for bugs in Java code from within IntelliJ IDEA.
 		FindBugs is a defect detection tool for Java that uses static analysis to look for more than 200 bug patterns,
 		such as null pointer dereferences, infinite recursive loops, bad uses of the Java libraries and deadlocks.
@@ -44,7 +44,7 @@
             </ul>
 		</p>
 		<p>
-		FindBugs-IDEA plugin supports:
+		FindBugs-IDEA plugin features:
 		<ul>
 		    <li>findbugs-2 support</li>
 		    <li>Quickfix: annotate, suppress findbugs patterns (GutterIcon and document markup (alt+enter))</li>
@@ -87,11 +87,11 @@
     </description>
     <change-notes>
         <![CDATA[<html>
-        <h3>0.9.97 (5/28/2012)</h3>
+        <h3>0.9.97</h3>
         <ul>
 		    <li>findbugs-2 support</li>
 		    <li>Quickfix: annotate, suppress findbugs patterns</li>
-		    <li>idea 11/12 compatibility</li>
+		    <li>idea 9 until idea 12 compatibility</li>
 		</ul>
         <h3>0.9.96</h3>
 		<ul>
