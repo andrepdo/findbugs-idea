@@ -179,7 +179,6 @@ public class AnalyzeChangelistFiles extends BaseAction implements EventListener<
 		if (!isRegistered(projectName)) {
 			EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(projectName), this);
 			addRegisteredProject(projectName);
-			ChangeListManager.getInstance(project).addChangeListListener(getChangelistAdapter());
 		}
 	}
 
@@ -249,7 +248,31 @@ public class AnalyzeChangelistFiles extends BaseAction implements EventListener<
 
 		@Override
 		public void defaultListChanged(final ChangeList oldDefaultList, final ChangeList newDefaultList) {
-			_activeChangeList = newDefaultList;
+			changeListChanged(newDefaultList);
+		}
+
+
+		@Override
+		public void changeListChanged(final ChangeList list) {
+			_activeChangeList = list;
+		}
+
+
+		@Override
+		public void changeListAdded(final ChangeList list) {
+			changeListChanged(list);
+		}
+
+
+		@Override
+		public void changeListRemoved(final ChangeList list) {
+			changeListChanged(list);
+		}
+
+
+		@Override
+		public void changeListRenamed(final ChangeList list, final String oldName) {
+			changeListChanged(list);
 		}
 	}
 }
