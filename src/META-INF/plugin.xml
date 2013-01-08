@@ -46,6 +46,9 @@
 		<p>
 		FindBugs-IDEA plugin supports:
 		<ul>
+		    <li>findbugs-2 support</li>
+		    <li>Quickfix: annotate, suppress findbugs patterns (GutterIcon and document markup (alt+enter))</li>
+			<li>idea 9 until 12 compatibility</li>
 		    <li>configure findbugs on idea project and module level</li>
 		    <li>jump to source from results shown in toolwindow including anonymous classes</li>
 		    <li>bug descriptions, solutions</li>
@@ -87,8 +90,8 @@
         <h3>0.9.97 (5/28/2012)</h3>
         <ul>
 		    <li>findbugs-2 support</li>
-		    <li>annotate, suppress findbugs patterns</li>
-		    <li>idea 11 compatibility</li>
+		    <li>Quickfix: annotate, suppress findbugs patterns</li>
+		    <li>idea 11/12 compatibility</li>
 		</ul>
         <h3>0.9.96</h3>
 		<ul>
