@@ -5,16 +5,32 @@ rem *** Set up project environment
 rem ****************************************
 echo Setting up environment ...
 
-set PATH=%JAVA_HOME%\bin;%PATH%;%CD%\bin;%ANT_HOME%\bin
 set ANT_OPTS=-Xmx512m
 set JAVA_HOME=
 set ANT_HOME=
-set IDEA_HOME
+set IDEA_HOME=
+set PATH=%JAVA_HOME%\bin;%PATH%;%CD%\bin;%ANT_HOME%\bin
 
 rem *** Display configuration
 rem *************************
-which java.exe javac.exe
-java -version
-call ant.bat
+echo Check java.exe ...
+where java.exe || GOTO EXIT
+
+echo Check javac.exe ...
+where javac.exe || GOTO EXIT
+
+echo Check ANT ...
+where ant || GOTO EXIT
+
+echo Java version:
+java -version || GOTO EXIT
+
+echo Javac version:
+javac -version || GOTO EXIT
+
+echo ANT version:
+call ant -version || GOTO EXIT
+
+echo Environment OK
 
 :EXIT

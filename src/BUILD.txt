@@ -1,5 +1,4 @@
 - adapt build.properties - path to idea.home should be something like idea.home=/home/andrep/Apps/dev/idea-8.1-jdk15 to be idea 8 and jdk 1.5 compatible
-- adapt .setnenv.sh or setenv.bat - setup IDEA_HOME and JAVA_HOME
-- execute '. setenv.sh'
+- adapt .setnenv.sh or setenv.bat - setup IDEA_HOME, JAVA_HOME and ANT_HOME
+- execute '. setenv.sh' or setenv.bat
 - run 'ant assemble-all'
-
