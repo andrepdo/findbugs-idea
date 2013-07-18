@@ -20,7 +20,6 @@ package org.twodividedbyzero.idea.findbugs.gui.preferences.model;
 
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.I18N;
-import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.DetectorConfiguration;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
@@ -74,26 +73,6 @@ public class BugPatternTableModel extends AbstractTableModel {
 				fireTableRowsInserted(index, index);
 			}
 		}
-	}
-
-
-	@Override
-	public void fireTableRowsInserted(final int firstRow, final int lastRow) {
-		EventDispatchThreadHelper.invokeLater(new Runnable() {
-			public void run() {
-				BugPatternTableModel.super.fireTableRowsInserted(firstRow, lastRow);
-			}
-		});
-	}
-
-
-	@Override
-	public void fireTableRowsDeleted(final int firstRow, final int lastRow) {
-		EventDispatchThreadHelper.invokeLater(new Runnable() {
-			public void run() {
-				BugPatternTableModel.super.fireTableRowsDeleted(firstRow, lastRow);
-			}
-		});
 	}
 
 
