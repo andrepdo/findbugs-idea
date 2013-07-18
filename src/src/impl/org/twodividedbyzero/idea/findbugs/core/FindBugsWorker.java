@@ -204,7 +204,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 			//_compilerManager.compile(_findBugsProject.getOutputFiles(), null, true);
 			return true;
 		} catch (Exception e) {
-			LOGGER.debug("FindBugs analysis failed.", e);
+			LOGGER.error("FindBugs analysis failed.", e);
 			unregisterEventListener();
 			return false;
 		}/* finally {
