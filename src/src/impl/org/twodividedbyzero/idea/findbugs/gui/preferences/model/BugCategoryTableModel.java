@@ -18,13 +18,10 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.preferences.model;
 
-import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
-
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 
@@ -39,12 +36,11 @@ public class BugCategoryTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 0L;
 
-	private final Object _guardedLock = new Object();
 	private final List<BugCategory> _entries;
 
 
 	public BugCategoryTableModel() {
-		_entries = Collections.synchronizedList(new LinkedList<BugCategory>());
+		_entries = new ArrayList<BugCategory>();
 	}
 
 
@@ -59,123 +55,82 @@ public class BugCategoryTableModel extends AbstractTableModel {
 
 
 	public void add(final String name, final String description, final boolean enabled) {
-		synchronized (_guardedLock) {
-			//noinspection ThrowableResultOfMethodCallIgnored
-			final BugCategory entry = new BugCategory(name, description, enabled);
-			add(entry);
-		}
+		//noinspection ThrowableResultOfMethodCallIgnored
+		final BugCategory entry = new BugCategory(name, description, enabled);
+		add(entry);
 	}
 
 
 	public void add(final BugCategory entry) {
-		synchronized (_guardedLock) {
-			_entries.add(entry);
-			final int index = indexOf(entry);
-			fireTableRowsInserted(index, index);
-		}
-	}
-
-
-	@Override
-	public void fireTableRowsInserted(final int firstRow, final int lastRow) {
-		EventDispatchThreadHelper.invokeLater(new Runnable() {
-			public void run() {
-				BugCategoryTableModel.super.fireTableRowsInserted(firstRow, lastRow);
-			}
-		});
-	}
-
-
-	@Override
-	public void fireTableRowsDeleted(final int firstRow, final int lastRow) {
-		EventDispatchThreadHelper.invokeLater(new Runnable() {
-			public void run() {
-				BugCategoryTableModel.super.fireTableRowsDeleted(firstRow, lastRow);
-			}
-		});
+		_entries.add(entry);
+		final int index = indexOf(entry);
+		fireTableRowsInserted(index, index);
 	}
 
 
 	public void remove(final BugCategory entry) {
-		synchronized (_guardedLock) {
-			final int index = indexOf(entry);
-			_entries.remove(entry);
-			fireTableRowsDeleted(index, index);
-		}
+		final int index = indexOf(entry);
+		_entries.remove(entry);
+		fireTableRowsDeleted(index, index);
 	}
 
 
 	public void remove(final Collection<BugCategory> entries) {
-		synchronized (_guardedLock) {
-			if (!entries.isEmpty()) {
-				_entries.removeAll(entries);
-				//fireTableStructureChanged();
-				fireTableDataChanged();
-			}
+		if (!entries.isEmpty()) {
+			_entries.removeAll(entries);
+			fireTableDataChanged();
 		}
 	}
 
 
 	public void remove(final int[] rows) {
 		final Collection<BugCategory> result = new ArrayList<BugCategory>();
-		synchronized (_guardedLock) {
-			for (final int row : rows) {
-				result.add(_entries.get(row));
-			}
-			_entries.removeAll(result);
-			fireTableRowsDeleted(rows[0], rows[rows.length - 1]);
+		for (final int row : rows) {
+			result.add(_entries.get(row));
 		}
+		_entries.removeAll(result);
+		fireTableRowsDeleted(rows[0], rows[rows.length - 1]);
 	}
 
 
 	public void remove(final int row) {
-		synchronized (_guardedLock) {
-			_entries.remove(row);
-			fireTableRowsDeleted(row, row);
-		}
+		_entries.remove(row);
+		fireTableRowsDeleted(row, row);
 	}
 
 
 	public int getEntryRow(final BugCategory logEntry) {
-		synchronized (_guardedLock) {
-			return _entries.indexOf(logEntry);
-		}
+		return _entries.indexOf(logEntry);
 	}
 
 
 	public int[] getCheckedRows() {
-		synchronized (_guardedLock) {
-			final int[] result = new int[_entries.size()];
-			for (int i = 0; i < _entries.size(); i++) {
-				final BugCategory entry = _entries.get(i);
-				final boolean selected = entry.isEnabled();
-				if (selected) {
-					result[i] = i;
-				}
+		final int[] result = new int[_entries.size()];
+		for (int i = 0; i < _entries.size(); i++) {
+			final BugCategory entry = _entries.get(i);
+			final boolean selected = entry.isEnabled();
+			if (selected) {
+				result[i] = i;
 			}
-			return result;
 		}
+		return result;
 	}
 
 
 	public List<BugCategory> getCheckedEntries() {
-		synchronized (_guardedLock) {
-			final List<BugCategory> result = new ArrayList<BugCategory>();
-			for (final BugCategory entry : _entries) {
-				final boolean selected = entry.isEnabled();
-				if (selected) {
-					result.add(entry);
-				}
+		final List<BugCategory> result = new ArrayList<BugCategory>();
+		for (final BugCategory entry : _entries) {
+			final boolean selected = entry.isEnabled();
+			if (selected) {
+				result.add(entry);
 			}
-			return result;
 		}
+		return result;
 	}
 
 
 	public BugCategory getNewestEntry() {
-		synchronized (_guardedLock) {
-			return _entries.get(_entries.size() - 1);
-		}
+		return _entries.get(_entries.size() - 1);
 	}
 
 
@@ -190,11 +145,9 @@ public class BugCategoryTableModel extends AbstractTableModel {
 
 
 	public void clear() {
-		synchronized (_guardedLock) {
-			if (!_entries.isEmpty()) {
-				_entries.clear();
-				fireTableRowsDeleted(0, 0);
-			}
+		if (!_entries.isEmpty()) {
+			_entries.clear();
+			fireTableRowsDeleted(0, 0);
 		}
 	}
 
@@ -205,31 +158,27 @@ public class BugCategoryTableModel extends AbstractTableModel {
 
 
 	public Object getValueAt(final int rowIndex, final int columnIndex) {
-		synchronized (_guardedLock) {
-			switch (columnIndex) {
-				case 0:
-					return _entries.get(rowIndex).isEnabled();
-				case 1:
-					return _entries.get(rowIndex).getName();
-				case 2:
-					return _entries.get(rowIndex).getDescription();
-				default:
-					return "???";
-			}
+		switch (columnIndex) {
+			case 0:
+				return _entries.get(rowIndex).isEnabled();
+			case 1:
+				return _entries.get(rowIndex).getName();
+			case 2:
+				return _entries.get(rowIndex).getDescription();
+			default:
+				throw new IllegalArgumentException("Not supported columnIndex: " + columnIndex);
 		}
 	}
 
 
 	@Override
 	public void setValueAt(final Object aValue, final int rowIndex, final int columnIndex) {
-		synchronized (_guardedLock) {
-			switch (columnIndex) {
-				case 0:
-					_entries.get(rowIndex).setEnabled((Boolean) aValue);
-					fireTableCellUpdated(rowIndex, columnIndex);
-					break;
-				default:
-			}
+		switch (columnIndex) {
+			case 0:
+				_entries.get(rowIndex).setEnabled((Boolean) aValue);
+				fireTableCellUpdated(rowIndex, columnIndex);
+				break;
+			default: // ignore
 		}
 	}
 
@@ -267,8 +216,6 @@ public class BugCategoryTableModel extends AbstractTableModel {
 			entry.setEnabled(select);
 			fireTableCellUpdated(indexOf(entry), 0);
 		}
-		//fireTableDataChanged();
-		//fireTableStructureChanged();
 	}
 
 
