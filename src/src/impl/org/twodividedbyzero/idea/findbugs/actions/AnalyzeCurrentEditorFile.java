@@ -161,7 +161,7 @@ public class AnalyzeCurrentEditorFile extends BaseAction implements EventListene
 
 		// set class files
 		worker.configureOutputFiles(selectedSourceFiles);
-		worker.work();
+		worker.work("Running FindBugs analysis for editor files...");
 
 		// Create IFindBugsEngine
 		/*final FindBugs2 engine = new FindBugs2();

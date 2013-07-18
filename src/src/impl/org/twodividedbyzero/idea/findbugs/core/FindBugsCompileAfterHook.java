@@ -130,6 +130,6 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 
 		// set class files
 		worker.configureOutputFiles(affectedFiles);
-		worker.work();
+		worker.work("Running FindBugs analysis for affectes files...");
 	}
 }

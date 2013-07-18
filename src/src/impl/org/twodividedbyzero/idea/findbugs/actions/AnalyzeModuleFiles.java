@@ -157,7 +157,7 @@ public class AnalyzeModuleFiles extends BaseAction implements EventListener<BugR
 
 		final String outPath = compilerOutpath.getPresentableUrl();
 		worker.configureOutputFiles(outPath);
-		worker.work();
+		worker.work("Running FindBugs analysis for module'" + module.getName() + "'...");
 
 	}
 

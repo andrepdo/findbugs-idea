@@ -158,7 +158,7 @@ public class AnalyzeClassUnderCursor extends BaseAction implements EventListener
 		// set class files
 		final PsiClass psiClass = IdeaUtilImpl.getCurrentClass(_dataContext);
 		worker.configureOutputFile(psiClass);
-		worker.work();
+		worker.work("Running FindBugs analysis for current class...");
 
 	}
 

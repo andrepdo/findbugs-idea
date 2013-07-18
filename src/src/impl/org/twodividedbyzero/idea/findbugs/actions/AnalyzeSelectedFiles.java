@@ -155,7 +155,7 @@ public class AnalyzeSelectedFiles extends BaseAction implements EventListener<Bu
 
 		// set class files
 		worker.configureOutputFiles(selectedSourceFiles);
-		worker.work();
+		worker.work("Running FindBugs analysis for selected files...");
 	}
 
 

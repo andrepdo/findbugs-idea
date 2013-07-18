@@ -161,7 +161,7 @@ public class AnalyzeAllModifiedFiles extends BaseAction implements EventListener
 
 		// set class files
 		worker.configureOutputFiles(selectedSourceFiles);
-		worker.work();
+		worker.work("Running FindBugs analysis for modified files...");
 	}
 
 

@@ -60,7 +60,7 @@ public class FindBugsInspector extends FindBugsWorker implements CompileTask {
 	 * @return true on success otherwise false
 	 */
 	@Override
-	public boolean work() {
+	public boolean work(String text) {
 		try {
 			_inspection.registerEventListener(getProject());
 			final IFindBugsEngine engine = createFindBugsEngine();
@@ -89,7 +89,7 @@ public class FindBugsInspector extends FindBugsWorker implements CompileTask {
 		//DaemonCodeAnalyzer.getInstance(project).updateVisibleHighlighters(editor)
 		//DaemonCodeAnalyser.getInstance(project).restart();
 		DaemonCodeAnalyzer.getInstance(_project).restart();
-		return work();
+		return work("Running FindBugs inspection...");
 	}
 
 

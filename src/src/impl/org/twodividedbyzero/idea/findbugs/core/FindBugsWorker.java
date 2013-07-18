@@ -188,13 +188,13 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	}*/
 
 
-	public boolean work() {
+	public boolean work(String text) {
 		try {
 			registerEventListener();
 			final IFindBugsEngine engine = createFindBugsEngine();
 
 			// Create FindBugsTask
-			final FindBugsTask findBugsTask = new FindBugsTask(_project, _bugCollection, "Running FindBugs analysis...", true, engine, _startInBackground);
+			final FindBugsTask findBugsTask = new FindBugsTask(_project, _bugCollection, text, true, engine, _startInBackground);
 			_bugReporter.setFindBugsTask(findBugsTask);
 			queue(findBugsTask);
 

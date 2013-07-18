@@ -162,14 +162,15 @@ public class AnalyzeChangelistFiles extends BaseAction implements EventListener<
 
 		// set source dirs
 		//final VirtualFile[] files1 = IdeaUtilImpl.getSelectedFiles(_dataContext);
-		final Collection<VirtualFile> modifiedFiles = IdeaUtilImpl.getModifiedFilesByList(getActiveChangeList(), _dataContext);
+		final ChangeList changeList = getActiveChangeList();
+		final Collection<VirtualFile> modifiedFiles = IdeaUtilImpl.getModifiedFilesByList(changeList, _dataContext);
 		if (modifiedFiles != null) {
 			final VirtualFile[] selectedSourceFiles = modifiedFiles.toArray(new VirtualFile[modifiedFiles.size()]);
 			worker.configureSourceDirectories(selectedSourceFiles);
 
 			// set class files
 			worker.configureOutputFiles(selectedSourceFiles);
-			worker.work();
+			worker.work("Running FindBugs analysis for changelist '" + changeList.getName() + "'...");
 		}
 	}
 

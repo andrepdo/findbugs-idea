@@ -176,7 +176,7 @@ public class AnalyzePackageFiles extends BaseAction implements EventListener<Bug
 
 		if (outPath != null) {
 			worker.configureOutputFiles(outPath.getPresentableUrl() + packageUrl);
-			worker.work();
+			worker.work("Running FindBugs analysis for package '" + packagePath + "'...");
 		}
 	}
 

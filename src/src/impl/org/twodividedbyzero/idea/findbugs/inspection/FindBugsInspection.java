@@ -298,7 +298,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 			worker.compile(new VirtualFile[] {selectedSourceFiles}, project, null);
 		}
 
-		worker.work();
+		worker.work("Running FindBugs inspection...");
 	}
 
 

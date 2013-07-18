@@ -146,7 +146,7 @@ public class AnalyzeProjectFiles extends BaseAction implements EventListener<Bug
 		// set class files
 		final String[] outPath = IdeaUtilImpl.getCompilerOutputUrls(project);
 		worker.configureOutputFiles(outPath);
-		worker.work();
+		worker.work("Running FindBugs analysis for project '" + project.getName() + "'...");
 
 	}
 
