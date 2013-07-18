@@ -123,6 +123,7 @@ public class PluginConfiguration implements ConfigurationPage {
 		}
 		_pluginComponentPanel.removeAll();
 		final Project currentProject = getCurrentFbProject();
+		JPanel pluginComponent = null;
 		for (final Plugin plugin : Plugin.getAllPlugins()) {
 			plugin.setGloballyEnabled(true);
 			if (plugin.isCorePlugin()) {
@@ -130,12 +131,14 @@ public class PluginConfiguration implements ConfigurationPage {
 			}
 
 			final PluginComponent pluginPanel = new PluginComponent(currentProject, plugin, _preferences);
-			final JPanel pluginComponent = pluginPanel.getComponent();
+			pluginComponent = pluginPanel.getComponent();
 			_pluginComponentPanel.add(pluginComponent);
-
+		}
+		if (pluginComponent != null) {
+			final JPanel scrollToThis = pluginComponent;
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
-					pluginComponent.scrollRectToVisible(new Rectangle(0, 0));
+					scrollToThis.scrollRectToVisible(new Rectangle(0, 0));
 				}
 			});
 		}
