@@ -41,4 +41,6 @@ public interface ConfigurationPage {
 	boolean isAdvancedConfig();
 
 	String getTitle();
+
+	void filter(String filter);
 }

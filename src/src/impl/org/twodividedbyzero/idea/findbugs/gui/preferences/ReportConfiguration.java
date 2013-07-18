@@ -208,4 +208,9 @@ public class ReportConfiguration implements ConfigurationPage {
 	public String getTitle() {
 		return "Reporting";
 	}
+
+
+	public void filter(String filter) {
+		// TODO support search
+	}
 }

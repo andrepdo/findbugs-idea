@@ -367,6 +367,11 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
+	public void filter(String filter) {
+		// TODO support search
+	}
+
+
 	private static class IncludeListSelectionListener implements ListSelectionListener {
 
 		private final JButton _removeButton;

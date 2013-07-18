@@ -20,6 +20,7 @@ package org.twodividedbyzero.idea.findbugs.core;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
+import com.intellij.ide.ui.search.SearchableOptionsRegistrar;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Anchor;
@@ -33,8 +34,8 @@ import com.intellij.openapi.components.StorageScheme;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
@@ -46,6 +47,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import edu.umd.cs.findbugs.BugCollection;
+import edu.umd.cs.findbugs.BugPattern;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.FindBugs;
 import edu.umd.cs.findbugs.ba.AnalysisException;
@@ -79,6 +81,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -94,7 +97,7 @@ import java.util.Set;
 		storages = {
 				@Storage(id = "other", file = "$PROJECT_FILE$"),
 				@Storage(id = "dir", file = "$PROJECT_CONFIG_DIR$/findbugs-idea.xml", scheme = StorageScheme.DIRECTORY_BASED)})
-public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Configurable, PersistentStateComponent<PersistencePreferencesBean> {
+public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, SearchableConfigurable, PersistentStateComponent<PersistencePreferencesBean> {
 
 	// idea_home/bin/log.xml
 	/*<category name="org.twodividedbyzero.idea.findbugs">
@@ -103,6 +106,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
    		<appender-ref ref="FILE"/>
 	</category>*/
 	private static final Logger LOGGER = Logger.getInstance(FindBugsPluginImpl.class.getName());
+	private static final AtomicBoolean SEARCH_INDEX_CREATED = new AtomicBoolean(false);
 
 	private final Project _project;
 	private ToolWindow _toolWindow;
@@ -473,6 +477,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 			_preferences.clear();
 			_preferences = FindBugsPreferences.createDefault();
 		}
+		buildSearchIndexIfNecessary();
 	}
 
 
@@ -505,5 +510,42 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Con
 
 
 		return preferencesBean;
+	}
+
+
+	@NotNull
+	public String getId() {
+		return FindBugsPluginConstants.PLUGIN_ID;
+	}
+
+
+	public Runnable enableSearch(final String option) {
+		return new Runnable(){
+			public void run() {
+				if (_configPanel != null) {
+					_configPanel.setFilter(option);
+				}
+			}
+		};
+	}
+
+
+	private void buildSearchIndexIfNecessary() {
+		final SearchableOptionsRegistrar registrar = SearchableOptionsRegistrar.getInstance();
+		if (registrar == null) {
+			return;
+		}
+		if (!SEARCH_INDEX_CREATED.getAndSet(true)) {
+			for (final Entry<String, String> entry : _preferences.getDetectors().entrySet()) {
+				final DetectorFactory factory = FindBugsPreferences.getDetectorFactorCollection().getFactory(entry.getKey());
+				if (factory != null) {
+					final Set<BugPattern> patterns = factory.getReportedBugPatterns();
+					for (BugPattern pattern : patterns) {
+						final String type = pattern.getType().toLowerCase();
+						registrar.addOption(type, type, type, FindBugsPluginConstants.PLUGIN_ID, FindBugsPluginConstants.PLUGIN_NAME);
+					}
+				}
+			}
+		}
 	}
 }

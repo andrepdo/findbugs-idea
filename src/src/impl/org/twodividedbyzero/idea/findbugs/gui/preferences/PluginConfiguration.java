@@ -234,6 +234,11 @@ public class PluginConfiguration implements ConfigurationPage {
 	}
 
 
+	public void filter(String filter) {
+		// TODO support search
+	}
+
+
 	public void importPreferences(com.intellij.openapi.project.Project project, PersistencePreferencesBean prefs, ImportCallback callback) {
 		final List<String> invalid = FindBugsPreferences.collectInvalidPlugins(prefs.getPlugins());
 		if (invalid.isEmpty()) {

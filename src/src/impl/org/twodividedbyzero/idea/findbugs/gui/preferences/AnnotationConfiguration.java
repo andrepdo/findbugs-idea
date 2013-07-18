@@ -356,6 +356,11 @@ public class AnnotationConfiguration implements ConfigurationPage {
 	}
 
 
+	public void filter(String filter) {
+		// TODO support search
+	}
+
+
 	private static class AnnotationTypePanel extends JPanel {
 
 		private final AnnotationConfiguration _configuration;

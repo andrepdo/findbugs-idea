@@ -472,6 +472,11 @@ public class DetectorConfiguration implements ConfigurationPage {
 	}
 
 
+	public void filter(String filter) {
+		_bugPatternModel.filter(filter);
+	}
+
+
 	private static class ColorRenderer extends JLabel implements TableCellRenderer {
 
 		private static final Color BG_COLOR = new Color(226, 225, 225);

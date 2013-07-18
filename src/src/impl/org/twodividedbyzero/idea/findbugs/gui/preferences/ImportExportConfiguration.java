@@ -288,6 +288,11 @@ public class ImportExportConfiguration implements ConfigurationPage {
 	}
 
 
+	public void filter(String filter) {
+		// TODO support search
+	}
+
+
 	private class FileChooserActionListener implements ActionListener {
 
 		public void actionPerformed(final ActionEvent e) {

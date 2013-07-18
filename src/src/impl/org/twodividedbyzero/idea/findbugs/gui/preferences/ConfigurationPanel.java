@@ -29,6 +29,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
+import com.intellij.ui.FilterComponent;
 import com.intellij.util.xmlb.XmlSerializer;
 import info.clearthought.layout.TableLayout;
 import org.jdom.Document;
@@ -104,6 +105,7 @@ public class ConfigurationPanel extends JPanel {
 	private JToggleButton _showAdvancedConfigsButton;
 	private JButton _exportButton;
 	private JButton _importButton;
+	private MyFilter _myFilter;
 
 
 	public ConfigurationPanel(final FindBugsPlugin plugin) {
@@ -173,6 +175,7 @@ public class ConfigurationPanel extends JPanel {
 			_mainPanel.add(tabPanel, "1, 5, 3, 5");
 
 			final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+			buttonsPanel.add(getMyFilter());
 			buttonsPanel.add(getExportButton());
 			buttonsPanel.add(getImportButton());
 			buttonsPanel.add(getShowAdvancedConfigsButton());
@@ -454,6 +457,14 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
+	private MyFilter getMyFilter() {
+		if (_myFilter == null) {
+			_myFilter = new MyFilter();
+		}
+		return _myFilter;
+	}
+
+
 	private void showAdvancedConfigs(final boolean show) {
 		if (show) {
 			_mainPanel.add(getEffortPanel(), "1, 3, 3, 3");
@@ -575,6 +586,26 @@ public class ConfigurationPanel extends JPanel {
 		final List<ConfigurationPage> configPages = getConfigPages();
 		for (final ConfigurationPage configPage : configPages) {
 			configPage.setEnabled(enabled);
+		}
+	}
+
+
+	public void setFilter(String filter) {
+		_myFilter.setSelectedItem(filter);
+	}
+
+
+	public class MyFilter extends FilterComponent {
+
+		public MyFilter() {
+			super("FILTER", 5);
+		}
+
+		public void filter() {
+			final String filter = getFilter().toLowerCase();
+			for (ConfigurationPage page : _configPagesRegistry) {
+				page.filter(filter);
+			}
 		}
 	}
 }

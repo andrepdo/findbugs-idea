@@ -18,17 +18,24 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.preferences.model;
 
+import com.intellij.ide.ui.search.SearchableOptionsRegistrar;
+import com.intellij.openapi.util.text.StringUtil;
+import edu.umd.cs.findbugs.BugPattern;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.I18N;
+import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.DetectorConfiguration;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
+import javax.annotation.Nullable;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -45,6 +52,7 @@ public class BugPatternTableModel extends AbstractTableModel {
 
 	private final Object _guardedLock = new Object();
 	private final transient List<DetectorFactory> _entries;
+	private final List<DetectorFactory> _filtered = new ArrayList<DetectorFactory>();
 	private final FindBugsPreferences _preferences;
 
 
@@ -289,5 +297,59 @@ public class BugPatternTableModel extends AbstractTableModel {
 	}
 
 
+	public void filter(String filter) {
+		final SearchableOptionsRegistrar optionsRegistrar = SearchableOptionsRegistrar.getInstance();
+		final Set<String> search = optionsRegistrar.getProcessedWords(filter);
+
+		final ArrayList<DetectorFactory> accept = new ArrayList<DetectorFactory>();
+
+		final List<DetectorFactory> toProcess = new ArrayList<DetectorFactory>(_entries);
+		toProcess.addAll(_filtered);
+		_filtered.clear();
+		for (DetectorFactory detector : toProcess) {
+			if (isAccepted(filter, search, detector)) {
+				accept.add(detector);
+			} else {
+				_filtered.add(detector);
+			}
+		}
+		_entries.clear();
+		_entries.addAll(accept);
+		fireTableDataChanged();
+	}
+
+
+	private static boolean isAccepted(String filter, Set<String> search, DetectorFactory detector) {
+		if (StringUtil.isEmpty(filter)) return true;
+		if (isAccepted(search, filter, detector.getShortName())) {
+			return true;
+		}
+		if (isAccepted(search, filter, detector.getFullName())) {
+			return true;
+		}
+		final Set<BugPattern> patterns = detector.getReportedBugPatterns();
+		for (BugPattern pattern : patterns) {
+			if (isAccepted(search, filter, pattern.getType())) {
+				return true;
+			}
+			if (isAccepted(search, filter, pattern.getShortDescription())) {
+				return true;
+			}
+			if (isAccepted(search, filter, pattern.getLongDescription())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+	private static boolean isAccepted(final Set<String> search, @NotNull final String filter, @Nullable final String description) {
+		if (null == description) return false;
+		if (StringUtil.containsIgnoreCase(description, filter)) return true;
+		final SearchableOptionsRegistrar optionsRegistrar = SearchableOptionsRegistrar.getInstance();
+		final HashSet<String> descriptionSet = new HashSet<String>(search);
+		descriptionSet.removeAll(optionsRegistrar.getProcessedWords(description));
+		return descriptionSet.isEmpty();
+	}
 }
 
