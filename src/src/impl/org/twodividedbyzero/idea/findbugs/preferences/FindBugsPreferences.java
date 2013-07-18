@@ -382,22 +382,53 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
+	public static List<String> collectInvalidPlugins(final Iterable<String> plugins) {
+		final List<String> invalid = new ArrayList<String>();
+		for (String plugin : plugins) {
+			try {
+				final File file = getPluginAsFile(plugin);
+				if (!checkPlugin(file)) {
+					invalid.add(plugin);
+				}
+			} catch (MalformedURLException e) {
+				invalid.add(plugin);
+			}
+		}
+		return invalid;
+	}
+
+
 	private static List<String> checkPlugins(final Iterable<String> plugins) {
 		final List<String> result = new ArrayList<String>();
 		for (final String plugin : plugins) {
 			try {
-				final File file = new File(new URL(plugin).getFile());
-				if (file.exists() && file.canRead()) {
+				final File file = getPluginAsFile(plugin);
+				if (checkPlugin(file)) {
 					result.add(plugin);
 				} else {
-					LOGGER.info("Plugin '" + plugin + "' not loaded. Archive does not exists.");
+					LOGGER.warn("Plugin '" + plugin + "' not loaded. Archive '" + file + "' does not exists.");
 				}
 			} catch (MalformedURLException e) {
-				LOGGER.warn("Plugin '" + plugin + "' not loaded.", e);
+				LOGGER.warn("Plugin '" + plugin + "' not loaded. Archive '" + plugin + "' is malformed.", e);
 			}
 		}
 
 		return result;
+	}
+
+
+	public static boolean checkPlugin(File plugin) {
+		return plugin.exists() && plugin.canRead();
+	}
+
+
+	public static String getPluginAsString(File plugin) throws MalformedURLException {
+		return plugin.toURI().toURL().toExternalForm();
+	}
+
+
+	public static File getPluginAsFile(String plugin) throws MalformedURLException {
+		return new File(new URL(plugin).getFile());
 	}
 
 

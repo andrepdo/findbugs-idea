@@ -19,6 +19,7 @@
 
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.Plugin;
@@ -33,6 +34,7 @@ import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.BrowseAction.BrowseActionCallback;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
 import javax.swing.AbstractButton;
@@ -61,6 +63,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.List;
 
 
 /**
@@ -171,8 +174,8 @@ public class PluginConfiguration implements ConfigurationPage {
 					try {
 						Plugin.loadCustomPlugin(selectedFile, getCurrentFbProject());
 						try {
-							_preferences.addPlugin(selectedFile.toURI().toURL().toExternalForm());
-							Messages.showInfoMessage(_parent, "Restart Intellij IDEA to load custom findbugs plugins.", "Intellij Needs to Be Restarted");
+							_preferences.addPlugin(FindBugsPreferences.getPluginAsString(selectedFile));
+							showRestartHint(_parent);
 						} catch (MalformedURLException e) {
 							Messages.showErrorDialog(e.getMessage(), e.getClass().getSimpleName());
 						}
@@ -189,6 +192,11 @@ public class PluginConfiguration implements ConfigurationPage {
 		}
 
 		return _pluginsPanel;
+	}
+
+
+	static void showRestartHint(Component parent) {
+		Messages.showInfoMessage(parent, "Restart Intellij IDEA to load custom findbugs plugins.", "Intellij Needs to Be Restarted");
 	}
 
 
@@ -223,6 +231,29 @@ public class PluginConfiguration implements ConfigurationPage {
 
 	public String getTitle() {
 		return "Plugins";
+	}
+
+
+	public void importPreferences(com.intellij.openapi.project.Project project, PersistencePreferencesBean prefs, ImportCallback callback) {
+		final List<String> invalid = FindBugsPreferences.collectInvalidPlugins(prefs.getPlugins());
+		if (invalid.isEmpty()) {
+			callback.validated(prefs);
+		} else {
+			showImportDialog(project, prefs, callback, invalid);
+		}
+	}
+
+
+	private void showImportDialog(com.intellij.openapi.project.Project project, PersistencePreferencesBean prefs, ImportCallback callback, List<String> invalidPlugins) {
+		final ImportPluginsDialog dialog = new ImportPluginsDialog(project, prefs, invalidPlugins);
+		dialog.setModal(true);
+		dialog.pack();
+		dialog.show();
+		if(DialogWrapper.OK_EXIT_CODE == dialog.getExitCode()) {
+			prefs.getPlugins().clear();
+			prefs.getPlugins().addAll(dialog.getPlugins());
+			callback.validated(prefs);
+		} // else do not import
 	}
 
 
@@ -368,4 +399,8 @@ public class PluginConfiguration implements ConfigurationPage {
 		}
 	}
 
+
+	public static interface ImportCallback {
+		void validated(PersistencePreferencesBean prefs);
+	}
 }

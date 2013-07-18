@@ -18,11 +18,25 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.fileChooser.FileChooserFactory;
+import com.intellij.openapi.fileChooser.FileSaverDescriptor;
+import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.JDOMUtil;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileWrapper;
+import com.intellij.util.xmlb.XmlSerializer;
 import info.clearthought.layout.TableLayout;
+import org.jdom.Document;
+import org.jdom.Element;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
 import javax.swing.AbstractButton;
@@ -47,6 +61,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -63,6 +78,7 @@ import java.util.List;
 @SuppressWarnings({"AnonymousInnerClass"})
 public class ConfigurationPanel extends JPanel {
 
+	private static final Logger LOGGER = Logger.getInstance(ConfigurationPanel.class.getName());
 
 	private final FindBugsPlugin _plugin;
 	private JCheckBox _compileBeforeAnalyseChkb;
@@ -86,6 +102,8 @@ public class ConfigurationPanel extends JPanel {
 	private transient AnnotationConfiguration _annotationConfig;
 	private List<ConfigurationPage> _configPagesRegistry;
 	private JToggleButton _showAdvancedConfigsButton;
+	private JButton _exportButton;
+	private JButton _importButton;
 
 
 	public ConfigurationPanel(final FindBugsPlugin plugin) {
@@ -117,7 +135,7 @@ public class ConfigurationPanel extends JPanel {
 
 
 	private void initGui() {
-		add(getMainPanel(), BorderLayout.CENTER);
+		add( getMainPanel(), BorderLayout.CENTER );
 	}
 
 
@@ -155,6 +173,8 @@ public class ConfigurationPanel extends JPanel {
 			_mainPanel.add(tabPanel, "1, 5, 3, 5");
 
 			final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+			buttonsPanel.add(getExportButton());
+			buttonsPanel.add(getImportButton());
 			buttonsPanel.add(getShowAdvancedConfigsButton());
 			buttonsPanel.add(getRestoreDefaultsButton());
 			_mainPanel.add(buttonsPanel, "3, 7, 3, 7, R, T");
@@ -205,12 +225,12 @@ public class ConfigurationPanel extends JPanel {
 	private AbstractButton getAnalyzeAfterCompileCheckbox() {
 		if (_analyzeAfterCompileChkb == null) {
 			_analyzeAfterCompileChkb = new JCheckBox("Analyze affected files after compile");
-			_analyzeAfterCompileChkb.setFocusable(false);
-			_analyzeAfterCompileChkb.addItemListener(new ItemListener() {
-				public void itemStateChanged(final ItemEvent e) {
-					getPreferences().setProperty(FindBugsPreferences.ANALYZE_AFTER_COMPILE, e.getStateChange() == ItemEvent.SELECTED);
+			_analyzeAfterCompileChkb.setFocusable( false );
+			_analyzeAfterCompileChkb.addItemListener( new ItemListener() {
+				public void itemStateChanged( final ItemEvent e ) {
+					getPreferences().setProperty( FindBugsPreferences.ANALYZE_AFTER_COMPILE, e.getStateChange() == ItemEvent.SELECTED );
 				}
-			});
+			} );
 		}
 		return _analyzeAfterCompileChkb;
 	}
@@ -243,7 +263,7 @@ public class ConfigurationPanel extends JPanel {
 			_effortPanel = new JPanel(tbl);
 			_effortPanel.add(new JLabel("Analysis effort"), "1, 1, 1, 1");
 			_effortPanel.setBorder(null);
-			_effortPanel.add(getEffortSlider(), "3, 1, 3, 1, l, t");
+			_effortPanel.add( getEffortSlider(), "3, 1, 3, 1, l, t" );
 		}
 		return _effortPanel;
 	}
@@ -408,6 +428,32 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
+	private Component getExportButton() {
+		if (_exportButton == null) {
+			_exportButton = new JButton("Export");
+			_exportButton.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					exportPreferences();
+				}
+			});
+		}
+		return _exportButton;
+	}
+
+
+	private Component getImportButton() {
+		if (_importButton == null) {
+			_importButton = new JButton("Import");
+			_importButton.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					importPreferences();
+				}
+			});
+		}
+		return _importButton;
+	}
+
+
 	private void showAdvancedConfigs(final boolean show) {
 		if (show) {
 			_mainPanel.add(getEffortPanel(), "1, 3, 3, 3");
@@ -460,6 +506,66 @@ public class ConfigurationPanel extends JPanel {
 		bugsPreferences.setDefaults(FindBugsPreferences.createDefault());
 		updatePreferences();
 		bugsPreferences.setModified(true);
+	}
+
+
+	private void exportPreferences() {
+		final PersistencePreferencesBean prefs = _plugin.getState();
+		final VirtualFileWrapper wrapper = FileChooserFactory.getInstance().createSaveFileDialog(
+				new FileSaverDescriptor("Export FindBugs Preferences to File...", "", "xml"), this).save( null, null );
+		if (wrapper == null) return;
+		final Element el= XmlSerializer.serialize(prefs);
+		el.setName("findbugs"); // rename "PersistencePreferencesBean"
+		final Document document = new Document(el);
+		try {
+			JDOMUtil.writeDocument(document, wrapper.getFile(), "\n");
+		} catch (IOException ex) {
+			LOGGER.error(ex);
+			final String msg = ex.getLocalizedMessage();
+			Messages.showErrorDialog(this, msg != null && msg.length() > 0 ? msg : ex.toString(), "Export failed");
+		}
+	}
+
+
+	private void importPreferences() {
+		final FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, true, false, true, false) {
+			@Override
+			public boolean isFileVisible(VirtualFile file, boolean showHiddenFiles) {
+				return super.isFileVisible(file, showHiddenFiles) &&
+						(file.isDirectory() || "xml".equals(file.getExtension()) || file.getFileType() == StdFileTypes.ARCHIVE);
+			}
+
+			@Override
+			public boolean isFileSelectable(VirtualFile file) {
+				return file.getFileType() == StdFileTypes.XML;
+			}
+		};
+		descriptor.setDescription( "Please select the configuration file (usually named findbugs.xml) to import." );
+		descriptor.setTitle( "Import Configuration" );
+
+		final VirtualFile [] files = FileChooser.chooseFiles(this, descriptor);
+		if (files.length != 1) {
+			return;
+		}
+		final PersistencePreferencesBean prefs;
+		try {
+			final Document document = JDOMUtil.loadDocument(files[0].getInputStream());
+			prefs = XmlSerializer.deserialize(document, PersistencePreferencesBean.class);
+		} catch (Exception ex) {
+			LOGGER.warn(ex);
+			final String msg = ex.getLocalizedMessage();
+			Messages.showErrorDialog(this, msg != null && msg.length() > 0 ? msg : ex.toString(), "Import failed");
+			return;
+		}
+		_pluginConfig.importPreferences( getProject(), prefs, new PluginConfiguration.ImportCallback() {
+			public void validated( PersistencePreferencesBean prefs ) {
+				_plugin.loadState( prefs );
+				updatePreferences();
+				if ( !prefs.getPlugins().isEmpty() ) {
+					PluginConfiguration.showRestartHint( ConfigurationPanel.this );
+				}
+			}
+		} );
 	}
 
 

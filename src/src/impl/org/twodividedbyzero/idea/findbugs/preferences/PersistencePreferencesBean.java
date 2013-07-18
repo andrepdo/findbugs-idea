@@ -43,6 +43,10 @@ public class PersistencePreferencesBean {
 	public List<String> _includeFilters;
 	public List<String> _excludeFilters;
 	public List<String> _excludeBaselineBugs;
+
+	/**
+	 * URL's, use {@link FindBugsPreferences#getPluginAsFile(String)} and {@link FindBugsPreferences#getPluginAsString(java.io.File)}.
+	 */
 	public List<String> _plugins;
 	public List<String> _enabledPlugins;
 	public List<String> _disabledPlugins;
