@@ -95,6 +95,9 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 
 	private static void initWorker(final CompileContext compileContext) {
 		final com.intellij.openapi.project.Project project = compileContext.getProject();
+		if (null == project) { // project reload, eg: open IDEA project with unknown JRE and fix it
+			return;
+		}
 		final FindBugsPlugin findBugsPlugin = IdeaUtilImpl.getPluginComponent(project);
 		final FindBugsPreferences preferences = findBugsPlugin.getPreferences();
 
