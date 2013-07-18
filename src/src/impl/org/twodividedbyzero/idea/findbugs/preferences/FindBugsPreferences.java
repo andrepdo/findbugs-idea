@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.AnnotationType;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -384,11 +385,15 @@ public class FindBugsPreferences extends Properties {
 	private static List<String> checkPlugins(final Iterable<String> plugins) {
 		final List<String> result = new ArrayList<String>();
 		for (final String plugin : plugins) {
-			final File file = new File(plugin);
-			if (file.exists() && file.canRead()) {
-				result.add(plugin);
-			} else {
-				LOGGER.info("Plugin '" + plugin + "' not loaded. Archive does not exists.");
+			try {
+				final File file = new File(new URL(plugin).getFile());
+				if (file.exists() && file.canRead()) {
+					result.add(plugin);
+				} else {
+					LOGGER.info("Plugin '" + plugin + "' not loaded. Archive does not exists.");
+				}
+			} catch (MalformedURLException e) {
+				LOGGER.warn("Plugin '" + plugin + "' not loaded.", e);
 			}
 		}
 
