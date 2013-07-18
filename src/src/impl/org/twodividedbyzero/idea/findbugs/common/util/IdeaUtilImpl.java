@@ -856,7 +856,7 @@ public final class IdeaUtilImpl {
 	 */
 	@Nullable
 	public static PsiClass findJavaPsiClass(@NotNull final Project project, @NotNull final String classname) {
-		final String fqn = classname.endsWith(".java") ? classname.replaceFirst(".java", "") : classname;
+		final String fqn = classname.endsWith(".java") ? classname.substring(0, classname.length()-".java".length()) : classname;
 		final String dottedName = fqn.contains("/") ? fqn.replace('/', '.') : fqn;
 		final GlobalSearchScope scope = GlobalSearchScope.allScope(project);
 		return findJavaPsiClass(project, dottedName, scope);
