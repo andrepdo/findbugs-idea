@@ -199,7 +199,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 			_bugPatternModel = new BugPatternTableModel(_preferences);
 			_tableSorter = new TableSorter(_bugPatternModel);
 
-			_detectorsTable = TableFacade.createTable(_tableSorter);
+			_detectorsTable = TableFacade.createStripeTable(_tableSorter);
 
 			final TableCellRenderer colorRenderer = new ColorRenderer(getModel(), _preferences);
 			_detectorsTable.setDefaultRenderer(String.class, colorRenderer);
@@ -271,7 +271,6 @@ public class DetectorConfiguration implements ConfigurationPage {
 		if (_textArea == null) {
 			_textArea = new JTextArea();
 			_textArea.setEditable(false);
-			_textArea.setBackground(Color.WHITE);
 		}
 		return _textArea;
 	}
@@ -481,7 +480,6 @@ public class DetectorConfiguration implements ConfigurationPage {
 
 		private static final Color BG_COLOR = new Color(226, 225, 225);
 		private static final Color FG_COLOR = new Color(125, 124, 124);
-		private static final Color ROW_COLOR = new Color(249, 247, 247);
 
 		private final BugPatternTableModel _model;
 		private final FindBugsPreferences _preferences;
@@ -507,12 +505,6 @@ public class DetectorConfiguration implements ConfigurationPage {
 			} else {
 				setBackground(table.getBackground());
 				setForeground(table.getForeground());
-
-				if (row % 2 == 0 && !isSelected) {
-					setBackground(ROW_COLOR);
-				} else {
-					setBackground(getBackground());
-				}
 
 				if (factory != null && !isFactoryVisible(factory)) {
 					setBackground(BG_COLOR);

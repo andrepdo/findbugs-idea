@@ -20,12 +20,11 @@
 package org.twodividedbyzero.idea.findbugs.gui.common;
 
 import com.intellij.openapi.diagnostic.Logger;
-import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import com.intellij.openapi.ui.StripeTable;
+import com.intellij.ui.table.JBTable;
 
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 
 /**
@@ -44,51 +43,18 @@ public final class TableFacade {
 	private TableFacade() {
 	}
 
-
-	@SuppressWarnings({"UndesirableClassUsage"})
-	public static JTable createTable(final TableModel dataModel) {
-		if (IdeaUtilImpl.isVersionGreaterThanIdea9()) {
-			try {
-				final Class<?> clazz = Class.forName("com.intellij.ui.table.JBTable");
-				final Constructor<?> constructor = clazz.getConstructor(TableModel.class);
-				return (JTable) constructor.newInstance(dataModel);
-			} catch (ClassNotFoundException e) {
-				LOGGER.error(e);
-			} catch (NoSuchMethodException e) {
-				LOGGER.error(e);
-			} catch (InvocationTargetException e) {
-				LOGGER.error(e.getTargetException());
-			} catch (InstantiationException e) {
-				LOGGER.error(e);
-			} catch (IllegalAccessException e) {
-				LOGGER.error(e);
-			}
-		}
-		return new JTable(dataModel);
+	public static JTable createStripeTable(final TableModel dataModel) {
+		return new StripeTable(dataModel);
 	}
 
 
+	public static JTable createTable(final TableModel dataModel) {
+		return new JBTable(dataModel);
+	}
 
-	@SuppressWarnings({"UndesirableClassUsage"})
+
 	public static JTable createTable() {
-		if (IdeaUtilImpl.isVersionGreaterThanIdea9()) {
-			try {
-				final Class<?> clazz = Class.forName("com.intellij.ui.table.JBTable");
-				final Constructor<?> constructor = clazz.getConstructor();
-				return (JTable) constructor.newInstance();
-			} catch (ClassNotFoundException e) {
-				LOGGER.error(e);
-			} catch (NoSuchMethodException e) {
-				LOGGER.error(e);
-			} catch (InvocationTargetException e) {
-				LOGGER.error(e.getTargetException());
-			} catch (InstantiationException e) {
-				LOGGER.error(e);
-			} catch (IllegalAccessException e) {
-				LOGGER.error(e);
-			}
-		}
-		return new JTable();
+		return new JBTable();
 	}
 
 }

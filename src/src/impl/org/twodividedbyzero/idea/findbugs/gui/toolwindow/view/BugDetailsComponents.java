@@ -227,7 +227,6 @@ public class BugDetailsComponents /*extends JPanel*/ {
 			_bugDetailsPane = new BugDetailsEditorPane();
 			_bugDetailsPane.setBorder(new EmptyBorder(10, 10, 10, 10));
 			_bugDetailsPane.setEditable(false);
-			_bugDetailsPane.setBackground(Color.white);
 			_bugDetailsPane.setContentType("text/html");
 			_bugDetailsPane.setEditorKit(_htmlEditorKit);
 			_bugDetailsPane.addHyperlinkListener(new HyperlinkListener() {
@@ -265,7 +264,6 @@ public class BugDetailsComponents /*extends JPanel*/ {
 			_explanationPane = new ExplanationEditorPane();
 			_explanationPane.setBorder(new EmptyBorder(10, 10, 10, 10));
 			_explanationPane.setEditable(false);
-			_explanationPane.setBackground(Color.white);
 			_explanationPane.setContentType("text/html");
 			_explanationPane.setEditorKit(_htmlEditorKit);
 			_explanationPane.addHyperlinkListener(new HyperlinkListener() {

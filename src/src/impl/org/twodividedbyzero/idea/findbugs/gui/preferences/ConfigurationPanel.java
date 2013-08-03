@@ -147,7 +147,7 @@ public class ConfigurationPanel extends JPanel {
 			final double border = 5;
 			final double rowsGap = 0;
 			final double colsGap = 10;
-			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, border}, // Columns
+			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.FILL, border}, // Columns
 									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, 10, TableLayout.FILL, 10, TableLayout.PREFERRED, border}};// Rows
 			final LayoutManager tbl = new TableLayout(size);
 
@@ -602,6 +602,9 @@ public class ConfigurationPanel extends JPanel {
 		}
 
 		public void filter() {
+			if (!_showAdvancedConfigsButton.isSelected()) {
+				showAdvancedConfigs(true);
+			}
 			final String filter = getFilter().toLowerCase();
 			for (ConfigurationPage page : _configPagesRegistry) {
 				page.filter(filter);

@@ -18,6 +18,8 @@
  */
 package org.twodividedbyzero.idea.findbugs.resources;
 
+import com.intellij.openapi.editor.colors.EditorColorsManager;
+
 import javax.swing.Icon;
 import javax.swing.text.html.StyleSheet;
 import java.awt.Color;
@@ -112,10 +114,6 @@ public class GuiResources {
 	static {
 		EDITORPANE_STYLESHEET = new StyleSheet();
 		EDITORPANE_STYLESHEET.addRule("body {font-size: 12pt}");
-		EDITORPANE_STYLESHEET.addRule("H1 {color: #005555;  font-size: 120%; font-weight: bold;}");
-		EDITORPANE_STYLESHEET.addRule("H1 a {color: #005555;  font-size: 120%; font-weight: bold;}");
-		EDITORPANE_STYLESHEET.addRule("H2, .fakeH2 {color: #005555;  font-size: 12pt; font-weight: bold;}");
-		EDITORPANE_STYLESHEET.addRule("H3 {color: #005555;  font-size: 12pt; font-weight: bold;}");
 		EDITORPANE_STYLESHEET.addRule("code {font-family: courier; font-size: 12pt}");
 		EDITORPANE_STYLESHEET.addRule("pre {color: gray; font-family: courier; font-size: 12pt}");
 		EDITORPANE_STYLESHEET.addRule("a {color: blue; font-decoration: underline}");
@@ -124,12 +122,28 @@ public class GuiResources {
 		EDITORPANE_STYLESHEET.addRule("#Medium {background-color: yellow; width: 15px; height: 15px;}");
 		EDITORPANE_STYLESHEET.addRule("#High {background-color: red; width: 15px; height: 15px;}");
 		EDITORPANE_STYLESHEET.addRule("#Exp {background-color: black; width: 15px; height: 15px;}");
+		if (!isDarcula()) {
+			EDITORPANE_STYLESHEET.addRule("H1 {color: #005555;  font-size: 120%; font-weight: bold;}");
+			EDITORPANE_STYLESHEET.addRule("H1 a {color: #005555;  font-size: 120%; font-weight: bold;}");
+			EDITORPANE_STYLESHEET.addRule("H2, .fakeH2 {color: #005555;  font-size: 12pt; font-weight: bold;}");
+			EDITORPANE_STYLESHEET.addRule("H3 {color: #005555;  font-size: 12pt; font-weight: bold;}");
+		} else {
+			EDITORPANE_STYLESHEET.addRule("H1 {color: #E8E8E8;  font-size: 120%; font-weight: bold;}");
+			EDITORPANE_STYLESHEET.addRule("H1 a {color: #E8E8E8;  font-size: 120%; font-weight: bold;}");
+			EDITORPANE_STYLESHEET.addRule("H2, .fakeH2 {color: #E8E8E8;  font-size: 12pt; font-weight: bold;}");
+			EDITORPANE_STYLESHEET.addRule("H3 {color: #E8E8E8;  font-size: 12pt; font-weight: bold;}");
+		}
 	}
 
 
 	public static final Color HIGHLIGHT_COLOR = new Color(219, 219, 137);
 	public static final Color HIGHLIGHT_COLOR_DARKER = new Color(135, 135, 69, 254);
-	public static final Color HIGHLIGHT_COLOR_LIGHTER = new Color(255, 255, 204);
+	public static final Color HIGHLIGHT_COLOR_LIGHTER = isDarcula() ? new Color(100, 100, 100) : new Color(255, 255, 204);
+
+
+	private static boolean isDarcula() {
+		return "Darcula".equals(EditorColorsManager.getInstance().getGlobalScheme().getName());
+	}
 
 
 	private GuiResources() {
