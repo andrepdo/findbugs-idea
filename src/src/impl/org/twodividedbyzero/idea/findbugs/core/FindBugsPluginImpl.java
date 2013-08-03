@@ -539,13 +539,24 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 			for (final Entry<String, String> entry : _preferences.getDetectors().entrySet()) {
 				final DetectorFactory factory = FindBugsPreferences.getDetectorFactorCollection().getFactory(entry.getKey());
 				if (factory != null) {
+					addToSearchIndex(registrar, factory.getShortName()); // eg: FindFieldSelfAssignment
 					final Set<BugPattern> patterns = factory.getReportedBugPatterns();
 					for (BugPattern pattern : patterns) {
-						final String type = pattern.getType().toLowerCase();
-						registrar.addOption(type, type, type, FindBugsPluginConstants.PLUGIN_ID, FindBugsPluginConstants.PLUGIN_NAME);
+						addToSearchIndex(registrar, pattern.getType()); // eg: SA_FIELD_SELF_ASSIGNMENT
 					}
 				}
 			}
 		}
+	}
+
+
+	private void addToSearchIndex(SearchableOptionsRegistrar registrar, String option) {
+		registrar.addOption(
+				option.toLowerCase(), // should be lowercase
+				null, // path
+				null, // hit
+				FindBugsPluginConstants.PLUGIN_ID,
+				FindBugsPluginConstants.PLUGIN_NAME
+		);
 	}
 }
