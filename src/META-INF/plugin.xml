@@ -87,6 +87,14 @@
     </description>
     <change-notes>
         <![CDATA[<html>
+        <h3>0.9.98</h3>
+        <ul>
+            <li>thanks to Reto Merz for contributing lot of fixes, enhancements and compatibility issues fixes</li>
+            <li>removed idea8 compatibility</li>
+            <li><for details see revision: r201 - r219</li>
+            <li>import/export plugins findbugs settings</li>
+            <li>make plugin searchable</li>
+        </ul>
         <h3>0.9.97</h3>
         <ul>
 		    <li>findbugs-2 support</li>
