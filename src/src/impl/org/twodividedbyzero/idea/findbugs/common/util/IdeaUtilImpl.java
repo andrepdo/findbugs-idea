@@ -45,6 +45,7 @@ import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.roots.SourceFolder;
+import com.intellij.openapi.roots.impl.DirectoryIndex;
 import com.intellij.openapi.vcs.FilePath;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ChangeList;
@@ -466,9 +467,9 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static String getPackageAsPath(@NotNull final com.intellij.openapi.project.Project project, final VirtualFile packagePath, @NotNull final VirtualFile[] sourceRoots) {
+	public static String getPackageAsPath(@NotNull final com.intellij.openapi.project.Project project, final VirtualFile packagePath) {
 		final StringBuilder result = new StringBuilder(30);
-		final List<String> list = getPackagePathAsList(project, packagePath, sourceRoots);
+		final List<String> list = getPackagePathAsList(project, packagePath);
 		for (final String dir : list) {
 			result.append(dir);
 		}
@@ -478,25 +479,15 @@ public final class IdeaUtilImpl {
 
 
 	@NotNull
-	private static List<String> getPackagePathAsList(@NotNull final com.intellij.openapi.project.Project project, @NotNull final VirtualFile packagePath, @NotNull final VirtualFile[] sourceRoots) {
-		final Module module = IdeaUtilImpl.findModuleForFile(packagePath, project);
-		if (module == null) {
-			throw new NullPointerException("Expected not null module.");
-		}
+	private static List<String> getPackagePathAsList(@NotNull final com.intellij.openapi.project.Project project, @NotNull final VirtualFile packagePath) {
 		final List<String> parentPath = new ArrayList<String>();
-		final Collection<String> sourcesDirs = new ArrayList<String>();
-
-		for (final VirtualFile vFile : sourceRoots) {
-			sourcesDirs.add(vFile.getName());
+		final String packageName = DirectoryIndex.getInstance(project).getPackageName(packagePath);
+		if (packageName != null && !packageName.isEmpty()) {
+			final String [] path = packageName.split("\\.");
+			for (String p : path) {
+				parentPath.add(FindBugsPluginConstants.FILE_SEPARATOR + p);
+			}
 		}
-
-		VirtualFile parent = packagePath;
-		while (parent != null && !parent.getName().equals(module.getName()) && !sourcesDirs.contains(parent.getName())) {
-			parentPath.add(FindBugsPluginConstants.FILE_SEPARATOR + parent.getName());
-			parent = parent.getParent();
-		}
-
-		Collections.reverse(parentPath);
 		return parentPath;
 	}
 

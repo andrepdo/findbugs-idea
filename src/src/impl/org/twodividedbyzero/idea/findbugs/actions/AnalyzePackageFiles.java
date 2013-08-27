@@ -164,19 +164,17 @@ public class AnalyzePackageFiles extends BaseAction implements EventListener<Bug
 		worker.configureAuxClasspathEntries(files);
 
 		// set source dirs
-		//final VirtualFile[] selectedSourceFiles = IdeaUtilImpl.getSelectedFiles(_dataContext);
-		//final VirtualFile[] selectedSourceFiles = IdeaUtilImpl.getVirtualFiles(_dataContext);
 		final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(_dataContext);
 		worker.configureSourceDirectories(sourceRoots);
 
 		// set class files
 		final VirtualFile outPath = IdeaUtilImpl.getCompilerOutputPath(packagePath, project);
-		final String packageUrl = IdeaUtilImpl.getPackageAsPath(project, packagePath, sourceRoots);
-
+		final String packageUrl = IdeaUtilImpl.getPackageAsPath(project, packagePath);
 
 		if (outPath != null) {
-			worker.configureOutputFiles(outPath.getPresentableUrl() + packageUrl);
-			worker.work("Running FindBugs analysis for package '" + packagePath + "'...");
+			final String output = outPath.getPresentableUrl() + packageUrl;
+			worker.configureOutputFiles(output);
+			worker.work("Running FindBugs analysis for directory '" + output + "'...");
 		}
 	}
 
