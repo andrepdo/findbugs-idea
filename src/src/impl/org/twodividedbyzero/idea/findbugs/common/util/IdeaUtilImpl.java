@@ -60,6 +60,7 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnonymousClass;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassOwner;
+import com.intellij.psi.PsiCompiledElement;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
@@ -856,7 +857,21 @@ public final class IdeaUtilImpl {
 
 	@Nullable
 	private static PsiClass findJavaPsiClass(final Project project, @NotNull final String dottedFqClassName, @NotNull final GlobalSearchScope searchScope) {
-		return JavaPsiFacade.getInstance(project).findClass(dottedFqClassName, searchScope);
+		/**
+		 * Do not use findClass(), the returned class is "random" (eg: could be ClsClassImpl or PsiClassImpl), see javadoc
+		 */
+		final PsiClass[] classes = JavaPsiFacade.getInstance(project).findClasses(dottedFqClassName, searchScope);
+		if (classes.length > 0) {
+			if (classes.length > 1) {
+				for (PsiClass c : classes) {
+					if (!(c instanceof PsiCompiledElement)) { // prefer non compiled
+						return c;
+					}
+				}
+			}
+			return classes[0];
+		}
+		return null;
 	}
 
 
