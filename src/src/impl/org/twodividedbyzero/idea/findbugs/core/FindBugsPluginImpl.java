@@ -210,7 +210,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 		final Content content = contentFactory.createContent(toolWindowPanel, "FindBugs Analysis Results", false);
 
 		_toolWindow.getContentManager().addContent(content);
-		_toolWindow.setIcon(GuiResources.FINDBUGS_ICON);
+		_toolWindow.setIcon(GuiResources.FINDBUGS_ICON_13X13);
 	}
 
 

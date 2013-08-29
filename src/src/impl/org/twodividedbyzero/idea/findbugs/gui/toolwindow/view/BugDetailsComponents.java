@@ -57,6 +57,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -122,12 +123,17 @@ public class BugDetailsComponents /*extends JPanel*/ {
 					g2d.transform(AffineTransform.getRotateInstance(1 * Math.PI / 2.0));
 					g2d.translate(0, -getIconWidth());
 
-					GuiResources.FINDBUGS_ICON.paintIcon(c, g, getIconWidth(), y + 8);
+					GuiResources.FINDBUGS_ICON_13X13.paintIcon(c, g, getIconWidth() - 2, y + 8);
 					g2d.setColor(Color.BLACK);
 					final Font font = _jTabbedPane.getFont().deriveFont(Font.PLAIN);
 					g2d.setFont(font);
-					final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), detailsTabTitle);
-					g2d.drawString(detailsTabTitle, getIconHeight() / 2 - width / 2 + GuiResources.FINDBUGS_ICON.getIconHeight() + y - 5, -getIconWidth());
+					final FontMetrics fontMetrics = _jTabbedPane.getFontMetrics(_jTabbedPane.getFont());
+					final int width = SwingUtilities.computeStringWidth(fontMetrics, detailsTabTitle);
+					g2d.drawString(
+							detailsTabTitle,
+							getIconHeight() / 2 - width / 2 + GuiResources.FINDBUGS_ICON.getIconHeight() + y - 5,
+							-getIconWidth() + (fontMetrics.getAscent() / 2)
+							);
 				}
 
 

@@ -38,6 +38,7 @@ import java.util.Map;
 public class GuiResources {
 
 	public static final Icon FINDBUGS_ICON = ResourcesLoader.loadIcon("bug.png");
+	public static final Icon FINDBUGS_ICON_13X13 = ResourcesLoader.loadIcon("bug13x13.png");
 	public static final Icon FINDBUGS_CONFIGURATION_ICON = ResourcesLoader.loadIcon("smallBuggy.png");
 	public static final Icon FINDBUGS_EXECUTE_ICON = ResourcesLoader.loadIcon("actions/bug18x18.png");
 	public static final Icon FINDBUGS_CLOUD_ICON = ResourcesLoader.loadIcon("bug_cloud.png");
