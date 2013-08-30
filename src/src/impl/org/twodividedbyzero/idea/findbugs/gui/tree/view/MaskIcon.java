@@ -18,6 +18,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.tree.view;
 
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.Icon;
@@ -62,7 +63,7 @@ public class MaskIcon implements Icon {
 
 
 	private void createMask(final Color color, final float alpha) {
-		_mask = new BufferedImage(_delegate.getIconWidth(), _delegate.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+		_mask = UIUtil.createImage(_delegate.getIconWidth(), _delegate.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D gbi = (Graphics2D) _mask.getGraphics();
 		_delegate.paintIcon(new JLabel(), gbi, 0, 0);
 		gbi.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_IN, alpha));

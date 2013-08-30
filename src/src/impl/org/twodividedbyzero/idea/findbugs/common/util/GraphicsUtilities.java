@@ -17,7 +17,9 @@
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.twodividedbyzero.idea.findbugs.common.util;import javax.imageio.ImageIO;
+package org.twodividedbyzero.idea.findbugs.common.util;
+
+import javax.imageio.ImageIO;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -86,6 +88,7 @@ public class GraphicsUtilities {
 	 */
 	public static BufferedImage createColorModelCompatibleImage(final BufferedImage image) {
 		final ColorModel cm = image.getColorModel();
+		//noinspection UndesirableClassUsage
 		return new BufferedImage(cm, cm.createCompatibleWritableRaster(image.getWidth(), image.getHeight()), cm.isAlphaPremultiplied(), null);
 	}
 

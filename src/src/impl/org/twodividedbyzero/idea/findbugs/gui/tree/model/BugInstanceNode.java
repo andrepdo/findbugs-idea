@@ -21,6 +21,7 @@ package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
+import com.intellij.ui.JBColor;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.SourceLineAnnotation;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +35,6 @@ import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 import javax.swing.Icon;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -56,7 +56,7 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	private List<VisitableTreeNode> _childs;
 	private final Project _project;
 
-	private static final Icon _expandedIcon = new MaskIcon(ResourcesLoader.findIcon("/nodes/class.png", BugInstanceNode.class), Color.BLACK);
+	private static final Icon _expandedIcon = new MaskIcon(ResourcesLoader.findIcon("/nodes/class.png", BugInstanceNode.class), JBColor.BLACK);
 	private static final Icon _collapsedIcon = _expandedIcon;
 
 

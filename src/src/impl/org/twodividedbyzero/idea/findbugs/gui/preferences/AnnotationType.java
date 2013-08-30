@@ -21,6 +21,7 @@ package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
 import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.editor.markup.EffectType;
+import com.intellij.ui.JBColor;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -42,11 +43,11 @@ import java.util.Set;
 public enum AnnotationType {
 
 	// todo: name should be rank based scary scariest ...
-	HighPriority(HighlightSeverity.ERROR, Color.RED, Color.WHITE, Color.RED, EffectType.WAVE_UNDERSCORE, Font.BOLD),
-	NormalPriority(HighlightSeverity.WARNING, Color.BLACK, Color.WHITE, Color.YELLOW.darker(), EffectType.WAVE_UNDERSCORE, Font.ITALIC),
-	ExpPriority(HighlightSeverity.INFORMATION, Color.BLACK, Color.WHITE, Color.GRAY, EffectType.WAVE_UNDERSCORE, Font.PLAIN),
-	LowPriority(HighlightSeverity.INFORMATION, Color.BLACK, Color.WHITE, Color.GREEN, EffectType.BOXED, Font.PLAIN),
-	IgnorePriority(HighlightSeverity.INFORMATION, Color.BLACK, Color.WHITE, Color.MAGENTA.darker().darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
+	HighPriority(HighlightSeverity.ERROR, JBColor.RED, JBColor.WHITE, JBColor.RED, EffectType.WAVE_UNDERSCORE, Font.BOLD),
+	NormalPriority(HighlightSeverity.WARNING, JBColor.BLACK, JBColor.WHITE, JBColor.YELLOW.darker(), EffectType.WAVE_UNDERSCORE, Font.ITALIC),
+	ExpPriority(HighlightSeverity.INFORMATION, JBColor.BLACK, JBColor.WHITE, JBColor.GRAY, EffectType.WAVE_UNDERSCORE, Font.PLAIN),
+	LowPriority(HighlightSeverity.INFORMATION, JBColor.BLACK, JBColor.WHITE, JBColor.GREEN, EffectType.BOXED, Font.PLAIN),
+	IgnorePriority(HighlightSeverity.INFORMATION, JBColor.BLACK, JBColor.WHITE, JBColor.MAGENTA.darker().darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN);
 
 
 	public static final String FOREGROUND = "foreground";

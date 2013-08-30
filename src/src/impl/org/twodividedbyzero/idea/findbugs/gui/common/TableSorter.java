@@ -19,6 +19,8 @@
 package org.twodividedbyzero.idea.findbugs.gui.common;
 
 
+import com.intellij.ui.JBColor;
+
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -589,7 +591,7 @@ public class TableSorter extends AbstractTableModel {
 
 
 		public void paintIcon(final Component c, final Graphics g, final int x, int y) {
-			final Color color = c == null ? Color.GRAY : c.getBackground();
+			final Color color = c == null ? JBColor.GRAY : c.getBackground();
 			// In a compound sort, make each succesive triangle 20%
 			// smaller than the previous one.
 			final int dx = _size / 2 * (int) Math.pow(0.8, _priority);

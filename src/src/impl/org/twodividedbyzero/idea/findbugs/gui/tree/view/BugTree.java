@@ -105,7 +105,11 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 		addMouseMotionListener(new TreeMouseMotionListener());
 		addMouseListener(_treeMouseListener);
 
-		UIUtil.setLineStyleAngled(this);
+		if (UIUtil.isUnderDarcula()) {
+			putClientProperty("JTree.lineStyle", "None");
+		} else {
+			UIUtil.setLineStyleAngled(this);
+		}
 		setScrollsOnExpand(true);
 		getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		setRootVisible(true);

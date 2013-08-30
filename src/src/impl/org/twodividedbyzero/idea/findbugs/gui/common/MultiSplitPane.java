@@ -19,6 +19,7 @@
 
 package org.twodividedbyzero.idea.findbugs.gui.common;
 
+import com.intellij.ui.JBColor;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitLayout.Divider;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitLayout.Node;
 
@@ -26,7 +27,6 @@ import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -172,7 +172,7 @@ public class MultiSplitPane extends JPanel {
 		public void paint(final Graphics g, final Divider divider) {
 			if (divider == activeDivider() && !isContinuousLayout()) {
 				final Graphics2D g2d = (Graphics2D) g;
-				g2d.setColor(Color.black);
+				g2d.setColor(JBColor.black);
 				g2d.fill(divider.getBounds());
 			}
 		}

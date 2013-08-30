@@ -19,6 +19,9 @@
 
 package org.twodividedbyzero.idea.findbugs.gui.tree.view;
 
+import com.intellij.ui.JBColor;
+import com.intellij.util.ui.UIUtil;
+
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
@@ -478,7 +481,7 @@ public final class ViewTooltips extends MouseAdapter implements MouseMotionListe
 		private transient BufferedImage img;
 		private Dimension d;
 
-		private Color bg = Color.WHITE;
+		private Color bg = JBColor.WHITE;
 		private JScrollPane comp;
 
 		private Object node;
@@ -575,7 +578,7 @@ public final class ViewTooltips extends MouseAdapter implements MouseMotionListe
 		 */
 		public void setComponent(final Component jc) {
 			final Dimension d = jc.getPreferredSize();
-			final BufferedImage nue = new BufferedImage(d.width, d.height, BufferedImage.TYPE_INT_ARGB_PRE);// was height +2
+			final BufferedImage nue = UIUtil.createImage(d.width, d.height, BufferedImage.TYPE_INT_ARGB_PRE);// was height +2
 			SwingUtilities.paintComponent(nue.getGraphics(), jc, this, 0, 0, d.width, d.height); // was height +2
 			setImage(nue);
 		}
@@ -618,7 +621,7 @@ public final class ViewTooltips extends MouseAdapter implements MouseMotionListe
 			g.fillRect(0, 0, d.width, d.height);
 			final Graphics2D g2d = (Graphics2D) g;
 			g2d.drawRenderedImage(img, at);
-			g.setColor(Color.BLACK);
+			g.setColor(JBColor.BLACK);
 			g.drawLine(0, 0, d.width, 0);
 			g.drawLine(0, d.height - 1, d.width, d.height - 1);
 			if (isRight) {

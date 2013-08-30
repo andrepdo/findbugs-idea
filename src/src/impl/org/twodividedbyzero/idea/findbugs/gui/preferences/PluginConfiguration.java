@@ -21,10 +21,12 @@ package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.ui.JBColor;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.Project;
 import info.clearthought.layout.TableLayout;
+import info.clearthought.layout.TableLayoutConstants;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
@@ -46,7 +48,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -95,8 +97,8 @@ public class PluginConfiguration implements ConfigurationPage {
 	public Component getComponent() {
 		if (_component == null) {
 			final double border = 5;
-			final double[][] size = {{border, TableLayout.FILL, border}, // Columns
-									 {border, TableLayout.PREFERRED, border}};// Rows
+			final double[][] size = {{border, TableLayoutConstants.FILL, border}, // Columns
+									 {border, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 
 			final JComponent mainPanel = new JPanel(tbl);
@@ -150,8 +152,8 @@ public class PluginConfiguration implements ConfigurationPage {
 
 			final double border = 5;
 			final double colsGap = 10;
-			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, border}, // Columns
-									 {border, TableLayout.FILL, border}};// Rows
+			final double[][] size = {{border, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.PREFERRED, border}, // Columns
+									 {border, TableLayoutConstants.FILL, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_pluginsPanel = new JPanel(tbl);
 
@@ -159,13 +161,13 @@ public class PluginConfiguration implements ConfigurationPage {
 			_pluginComponentPanel.setLayout(new BoxLayout(_pluginComponentPanel, BoxLayout.Y_AXIS));
 			rebuildPluginComponents();
 
-			final Component scrollPane = ScrollPaneFacade.createScrollPane(_pluginComponentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final Component scrollPane = ScrollPaneFacade.createScrollPane(_pluginComponentPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			_pluginsPanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 
 			final double rowsGap = 5;
-			final double[][] bPanelSize = {{border, TableLayout.PREFERRED}, // Columns
-										   {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
+			final double[][] bPanelSize = {{border, TableLayoutConstants.PREFERRED}, // Columns
+										   {border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tableLayout = new TableLayout(bPanelSize);
 
 			final Container buttonPanel = new JPanel(tableLayout);
@@ -184,6 +186,7 @@ public class PluginConfiguration implements ConfigurationPage {
 						}
 						updatePreferences();
 					} catch (Throwable e) {
+						//noinspection DialogTitleCapitalization
 						Messages.showErrorDialog(_parent, "Error loading " + selectedFile.getPath() + ":\n\n" + e.getClass().getSimpleName() + ": " + e.getMessage(), "Error loading plugin");
 					}
 					_preferences.setModified(true);
@@ -271,7 +274,7 @@ public class PluginConfiguration implements ConfigurationPage {
 		private JPanel _component;
 		private final Project _currentProject;
 		private final FindBugsPreferences _preferences;
-		private static final Border SELECTION_BORDER = BorderFactory.createLineBorder(GuiResources.HIGHLIGHT_COLOR);
+		private static final Border SELECTION_BORDER = BorderFactory.createLineBorder(GuiResources.HIGHLIGHT_COLOR_DARKER);
 
 
 		private PluginComponent(final Project currentProject, final Plugin plugin, final FindBugsPreferences preferences) {
@@ -284,11 +287,11 @@ public class PluginConfiguration implements ConfigurationPage {
 		JPanel getComponent() {
 			if (_component == null) {
 				final double border = 5;
-				final double[][] size = {{border, TableLayout.PREFERRED, 5, TableLayout.FILL, border}, // Columns
-										 {border, TableLayout.PREFERRED, border}};// Rows
+				final double[][] size = {{border, TableLayoutConstants.PREFERRED, 5, TableLayoutConstants.FILL, border}, // Columns
+										 {border, TableLayoutConstants.PREFERRED, border}};// Rows
 				final TableLayout tbl = new TableLayout(size);
 				_component = new JPanel(tbl);
-				_component.setBorder(new CustomLineBorder(Color.GRAY, 0, 0, 1, 0));
+				_component.setBorder(new CustomLineBorder(JBColor.GRAY, 0, 0, 1, 0));
 				_component.setBackground(PLUGIN_DESCRIPTION_BG_COLOR);
 
 				String text = _plugin.getShortDescription();

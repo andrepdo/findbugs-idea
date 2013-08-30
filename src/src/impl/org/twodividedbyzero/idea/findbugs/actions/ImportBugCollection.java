@@ -130,6 +130,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 		final FindBugsPlugin findBugsPlugin = getPluginInterface(project);
 		final BugCollection bugCollection = findBugsPlugin.getToolWindowPanel().getBugCollection();
 		if (bugCollection != null && !bugCollection.getCollection().isEmpty()) {
+			//noinspection DialogTitleCapitalization
 			final int result = Messages.showYesNoDialog(project, "Current result in the 'Found bugs view' will be deleted. Continue ?", "Delete found bugs?", Messages.getQuestionIcon());
 			if (result == 1) {
 				return;

@@ -20,6 +20,7 @@ package org.twodividedbyzero.idea.findbugs.gui.toolwindow.view;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.ui.JBColor;
 import edu.umd.cs.findbugs.BugAnnotation;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.DetectorFactory;
@@ -124,7 +125,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 					g2d.translate(0, -getIconWidth());
 
 					GuiResources.FINDBUGS_ICON_13X13.paintIcon(c, g, getIconWidth() - 2, y + 8);
-					g2d.setColor(Color.BLACK);
+					g2d.setColor(JBColor.BLACK);
 					final Font font = _jTabbedPane.getFont().deriveFont(Font.PLAIN);
 					g2d.setFont(font);
 					final FontMetrics fontMetrics = _jTabbedPane.getFontMetrics(_jTabbedPane.getFont());
@@ -164,7 +165,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 						g2d.translate(0, -getIconWidth());
 
 						GuiResources.FINDBUGS_CLOUD_ICON.paintIcon(c, g, getIconWidth(), y + 8);
-						g2d.setColor(Color.BLACK);
+						g2d.setColor(JBColor.BLACK);
 						final Font font = _jTabbedPane.getFont().deriveFont(Font.PLAIN);
 						g2d.setFont(font);
 						final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), cloudTabTitle);
@@ -210,12 +211,13 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	}
 
 
+	@SuppressWarnings("MagicNumber")
 	JPanel getBugDetailsPanel() {
 		if (_bugDetailsPanel == null) {
 			final JScrollPane scrollPane = ScrollPaneFacade.createScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			scrollPane.setViewportView(getBugDetailsPane());
 			//scrollPane.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(0, 0, 0, 3), new CustomLineBorder(new Color(98, 95, 89), 0, 0, 1, 1)));
-			scrollPane.setBorder(new CustomLineBorder(new Color(98, 95, 89), 0, 0, 1, 0));
+			scrollPane.setBorder(new CustomLineBorder(new JBColor(new Color(98, 95, 89), new Color(53, 51, 48)), 0, 0, 1, 0));
 			//scrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 
 			_bugDetailsPanel = new JPanel();
@@ -252,7 +254,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		if (_explanationPanel == null) {
 			final JScrollPane scrollPane = ScrollPaneFacade.createScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			scrollPane.setViewportView(getExplanationPane());
-			scrollPane.setBorder(BorderFactory.createCompoundBorder(new CustomLineBorder(new Color(208, 206, 203), 1, 0, 0, 0), new CustomLineBorder(new Color(98, 95, 89), 1, 0, 0, 0)));
+			scrollPane.setBorder(BorderFactory.createCompoundBorder(new CustomLineBorder(new JBColor(new Color(208, 206, 203), new Color(170, 168, 165)), 1, 0, 0, 0), new CustomLineBorder(new JBColor(new Color(98, 95, 89), new Color(71, 68, 62)), 1, 0, 0, 0)));
 
 			_explanationPanel = new JPanel();
 			_explanationPanel.setBorder(new EmptyBorder(0, 2, 0, 3));

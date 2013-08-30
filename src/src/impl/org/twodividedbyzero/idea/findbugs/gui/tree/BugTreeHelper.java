@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.AbstractTreeNode;
+import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceGroupNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.GroupTreeModel;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.VisitableTreeNode;
@@ -148,30 +149,26 @@ public class BugTreeHelper {
 			return null;
 		}
 
-		//_tree.expandPath(treepath.getParentPath());
-		//final TreePath path = _tree.getPathForRow(_tree.getRowForPath(treepath) - 1);
-		//_tree.setSelectionPath(path);
-		//scrollPathToVisible(path);
 
-		//treepath.
-		final TreePath treePath = _tree.getPathForRow(_tree.getRowForPath(treepath) - 1);
 		@SuppressWarnings({"unchecked"})
-		final AbstractTreeNode<VisitableTreeNode> treeNode = (AbstractTreeNode<VisitableTreeNode>) treePath.getLastPathComponent();
+		final AbstractTreeNode<VisitableTreeNode> treeNode = (AbstractTreeNode<VisitableTreeNode>) treepath.getLastPathComponent();
 
 
-		final BugInstanceNode bugInstanceNode = findPreviousBugNode(treeNode, treepath, _tree.getModel());
+		final BugInstanceNode bugInstanceNode = getPreviousBugInstanceLeafNode(treeNode);
 
 		if (bugInstanceNode != null) {
 			final TreePath path = getPath(bugInstanceNode);
+			_tree.expandPath(path);
 			_tree.setExpandsSelectedPaths(true);
 			_tree.setSelectionPath(path);
 			scrollPathToVisible(path);
 		}
 
-		return null;
+		return bugInstanceNode;
 	}
 
 
+	@Nullable
 	public BugInstanceNode selectNextNode() {
 		final TreePath treepath = _tree.getSelectionPath();
 		if (treepath == null) {
@@ -179,8 +176,61 @@ public class BugTreeHelper {
 		}
 
 		final TreePath path = _tree.getPathForRow(_tree.getRowForPath(treepath) + 1);
-		_tree.setSelectionPath(path);
-		scrollPathToVisible(path);
+
+		//noinspection unchecked
+		final AbstractTreeNode<VisitableTreeNode> lastPathComponent = (AbstractTreeNode<VisitableTreeNode>) path.getLastPathComponent();
+		final BugInstanceNode nextBugInstanceLeafNode = getNextBugInstanceLeafNode(lastPathComponent);
+		if (nextBugInstanceLeafNode == null) {
+			return null;
+		}
+		final TreePath treePath = getPath(nextBugInstanceLeafNode);
+
+
+		_tree.setExpandsSelectedPaths(true);
+		_tree.expandPath(treePath);
+		_tree.setSelectionPath(treePath);
+		scrollPathToVisible(treePath);
+
+		return nextBugInstanceLeafNode;
+	}
+
+
+	@Nullable
+	private static BugInstanceNode getNextBugInstanceLeafNode(final AbstractTreeNode<VisitableTreeNode> node) {
+		if (node instanceof BugInstanceNode) {
+			return (BugInstanceNode) node;
+		}
+		final List<VisitableTreeNode> childList = node.getChildsList();
+		for (final VisitableTreeNode childNode : childList) {
+			//noinspection unchecked
+			final BugInstanceNode result = childNode instanceof BugInstanceNode ? (BugInstanceNode) childNode : getNextBugInstanceLeafNode((AbstractTreeNode<VisitableTreeNode>) childNode);
+			if (result != null) {
+				return result;
+			}
+		}
+		return null;
+	}
+
+
+	// todo: fix me
+	@Nullable
+	private BugInstanceNode getPreviousBugInstanceLeafNode(final AbstractTreeNode<VisitableTreeNode> node) {
+		if (node instanceof BugInstanceNode) {
+			return (BugInstanceNode) node;
+		}
+		if (_tree.getModel().getRoot().equals(node)) {
+			return null;
+		}
+
+		final List<VisitableTreeNode> childList = (List<VisitableTreeNode>) node.getParent().getChildsList();
+		Collections.reverse(childList);
+		for (final VisitableTreeNode childNode : childList) {
+			if (childNode instanceof BugInstanceNode && childList != node) {
+				return  (BugInstanceNode) childNode;
+			} else if (childNode instanceof BugInstanceGroupNode) {
+				return getPreviousBugInstanceLeafNode((AbstractTreeNode<VisitableTreeNode>) childNode);
+			}
+		}
 
 		return null;
 	}
@@ -259,42 +309,6 @@ public class BugTreeHelper {
 			final Object childNode = model.getChild(node, i);
 			_buildElementsCache(childNode, path.pathByAddingChild(childNode), model);
 		}
-	}
-
-
-	@Nullable
-	public BugInstanceNode findPreviousBugNode(final Object node, final TreePath path, final TreeModel model) {
-
-		final Object root = _tree.getModel().getRoot();
-		BugInstanceNode resultNode = null;
-		if (!root.equals(node)) {
-
-			//final TreePath treePath = _tree.getPathForRow(_tree.getRowForPath(path) - 1);
-			//if (treePath != null) {
-
-
-			//@SuppressWarnings({"unchecked"})
-			//final AbstractTreeNode<VisitableTreeNode> treeNode = (AbstractTreeNode<VisitableTreeNode>) treePath.getLastPathComponent();
-
-
-			@SuppressWarnings({"unchecked"})
-			final List<VisitableTreeNode> childList = ((AbstractTreeNode<VisitableTreeNode>) node).getChildsList();
-			Collections.reverse(childList);
-			for (final VisitableTreeNode childNode : childList) {
-				if (childNode instanceof BugInstanceNode) {
-					resultNode = (BugInstanceNode) childNode;
-				} else {
-					final TreePath path1 = getPath(childNode);
-					resultNode = findPreviousBugNode(childNode, path1, model);
-				}
-
-				if (resultNode != null) {
-					break;
-				}
-			}
-		}
-
-		return resultNode;
 	}
 
 

@@ -19,6 +19,7 @@
 
 package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 
+import com.intellij.ui.JBColor;
 import edu.umd.cs.findbugs.BugInstance;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.gui.tree.NodeVisitor;
@@ -29,7 +30,6 @@ import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.Icon;
 import javax.swing.tree.TreeNode;
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +46,7 @@ public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements Vis
 	private int _classesCount;
 	private final List<VisitableTreeNode> _childs;
 
-	private static final Icon EXPAND_ICON = new MaskIcon(ResourcesLoader.loadIcon("fb-idea-logo_16x16.png"), Color.BLACK);
+	private static final Icon EXPAND_ICON = new MaskIcon(ResourcesLoader.loadIcon("fb-idea-logo_16x16.png"), JBColor.BLACK);
 	private static final Icon COLLAPSE_ICON = EXPAND_ICON;
 	private final RecurseNodeVisitor<RootNode> _recurseNodeVisitor = new RecurseNodeVisitor<RootNode>(this);
 

@@ -333,12 +333,21 @@ public final class ResourcesLoader {
 			}
 		}
 
+		if (ret == null || ret.getIconWidth() == 0 || ret.getIconHeight() == 0) {
+			return IconLoader.getIcon(pkgName.replace(ICON_RESOURCES_PKG + '/', "") + filename);
+		}
+
 		return ret;
 	}
 
 
 	public static Icon findIcon(final String iconName) {
 		return findIcon(ICON_RESOURCES_PKG + '/' + iconName, ResourcesLoader.class);
+	}
+
+
+	public static Icon getIcon(final String path) {
+		return findIcon(path);
 	}
 
 
@@ -355,6 +364,10 @@ public final class ResourcesLoader {
 			_iconCache.put(ICON_RESOURCES_PKG + '!' + path, icon);
 		}
 
+		if (icon == null || icon.getIconWidth() == 0 || icon.getIconHeight() == 0) {
+			return  IconLoader.getIcon(path.replace(ICON_RESOURCES_PKG + '/', ""));
+		}
+
 		return icon;
 	}
 
@@ -369,6 +382,9 @@ public final class ResourcesLoader {
 
 		synchronized (_iconCache) {
 			_iconCache.put(ICON_RESOURCES_PKG + '!' + iconName, icon);
+		}
+		if (icon == null || icon.getIconWidth() == 0 || icon.getIconHeight() == 0) {
+			return  IconLoader.getIcon(iconName.replace(ICON_RESOURCES_PKG + '/', ""));
 		}
 
 		return icon;

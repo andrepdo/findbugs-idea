@@ -18,11 +18,12 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.common;
 
+import com.intellij.ui.JBColor;
+
 import javax.swing.Icon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
@@ -256,7 +257,7 @@ public class RotatedJLabel extends JLabel {
 			  final JFrame f = new JFrame("Test");
 			  f.setLayout(new FlowLayout());
 			  final RotatedJLabel rl = new RotatedJLabel("BLAHBLAH");
-			  rl.setBackground(Color.ORANGE);
+			  rl.setBackground(JBColor.ORANGE);
 			  rl.setOpaque(true);
 			  rl.setDirection(Direction.VERTICAL_DOWN);
 			  f.add(rl);

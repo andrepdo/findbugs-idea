@@ -20,6 +20,7 @@
 package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.JBColor;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.BugRankCategory;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +35,6 @@ import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 import javax.swing.Icon;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,9 +55,6 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 	private final BugInstance _bugInstance;
 	private final RecurseNodeVisitor<BugInstanceGroupNode> _recurseNodeVisitor = new RecurseNodeVisitor<BugInstanceGroupNode>(this);
 	private final Project _project;
-
-	//private static Icon _expandedIcon = new MaskIcon(ResourcesLoader.loadIconResource("/nodes/TreeOpen.png"));
-	//private static Icon _collapsedIcon = new MaskIcon(ResourcesLoader.loadIconResource("/nodes/TreeClosed.png"));
 
 
 	/**
@@ -85,8 +82,8 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 		_depthFromRoot = depth;
 
 		setTooltip(_groupName);
-		setCollapsedIcon(new MaskIcon(getGroupByCollapsedIcon(groupBy), Color.BLACK));
-		setExpandedIcon(new MaskIcon(getGroupByExpandedIcon(groupBy), Color.BLACK));
+		setCollapsedIcon(new MaskIcon(getGroupByCollapsedIcon(groupBy), JBColor.BLACK));
+		setExpandedIcon(new MaskIcon(getGroupByExpandedIcon(groupBy), JBColor.BLACK));
 	}
 
 

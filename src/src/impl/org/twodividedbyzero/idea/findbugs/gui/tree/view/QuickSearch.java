@@ -19,6 +19,7 @@
 package org.twodividedbyzero.idea.findbugs.gui.tree.view;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
@@ -65,6 +66,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -101,8 +103,8 @@ public abstract class QuickSearch<E> {
 	private FocusListener _focusListener;
 	private ComponentListener _componentListener;
 	private int _cursor = -1;
-	private Color _foregroundColor = UIManager.getColor("ToolTip.foreground");
-	private Color _backgroundColor = new Color(255, 255, 200);
+	private Color _foregroundColor = JBColor.BLACK;
+	private Color _backgroundColor = new JBColor(new Color(255, 255, 200), JBColor.LIGHT_GRAY);
 	private final Stack<String> _recentSearches;
 
 
@@ -346,13 +348,13 @@ public abstract class QuickSearch<E> {
 
 
 	protected static boolean isFindPreviousOccurenceKey(final KeyEvent e) {
-		return e.getKeyCode() == KeyEvent.VK_F3 && e.getModifiersEx() == KeyEvent.SHIFT_DOWN_MASK;
+		return e.getKeyCode() == KeyEvent.VK_F3 && e.getModifiersEx() == InputEvent.SHIFT_DOWN_MASK;
 	}
 
 
 	protected static boolean isActivationKey(final KeyEvent e) {
 		final char keyChar = e.getKeyChar();
-		return e.getID() == KeyEvent.KEY_TYPED && e.getKeyCode() != KeyEvent.VK_F4 && e.getModifiersEx() != KeyEvent.ALT_MASK && e.getModifiersEx() != KeyEvent.ALT_DOWN_MASK && (Character.isLetterOrDigit(keyChar) || keyChar == '*' || keyChar == '?');
+		return e.getID() == KeyEvent.KEY_TYPED && e.getKeyCode() != KeyEvent.VK_F4 && e.getModifiersEx() != InputEvent.ALT_MASK && e.getModifiersEx() != InputEvent.ALT_DOWN_MASK && (Character.isLetterOrDigit(keyChar) || keyChar == '*' || keyChar == '?');
 	}
 
 
@@ -394,28 +396,32 @@ public abstract class QuickSearch<E> {
 
 	protected Color getNoMatchForeground() {
 		if (_noMatchForeground == null) {
-			return Color.RED;
+			return JBColor.RED;
 		} else {
 			return _noMatchForeground;
 		}
 	}
 
 
+	@SuppressWarnings("UnusedDeclaration")
 	protected Color getForegroundColor() {
 		return _foregroundColor;
 	}
 
 
+	@SuppressWarnings("UnusedDeclaration")
 	protected void setForegroundColor(final Color foregroundColor) {
 		_foregroundColor = foregroundColor;
 	}
 
 
+	@SuppressWarnings("UnusedDeclaration")
 	protected Color getBackgroundColor() {
 		return _backgroundColor;
 	}
 
 
+	@SuppressWarnings("UnusedDeclaration")
 	protected void setBackgroundColor(final Color backgroundColor) {
 		_backgroundColor = backgroundColor;
 	}
@@ -600,9 +606,10 @@ public abstract class QuickSearch<E> {
 			//addKeyListener(_keyListener);
 
 			_label = new JLabel("Search for: ");
+			//noinspection MagicNumber
 			_label.setFont(new Font(getFont().getName(), Font.BOLD, 12));
 			_label.setForeground(_foregroundColor);
-			_label.setVerticalAlignment(JLabel.BOTTOM);
+			_label.setVerticalAlignment(SwingConstants.BOTTOM);
 
 			_toolBar = new NavigationToolBar("test", false, SwingConstants.HORIZONTAL);
 			_toolBar.setForeground(_foregroundColor);
@@ -682,7 +689,7 @@ public abstract class QuickSearch<E> {
 			_searchField.setText(text);
 
 			setBackground(_backgroundColor);
-			setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY, 1), BorderFactory.createEmptyBorder(1, 6, 1, 6)));
+			setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(JBColor.GRAY, 1), BorderFactory.createEmptyBorder(1, 6, 1, 6)));
 			setLayout(new BorderLayout(2, 0));
 			/*final Dimension size = _label.getPreferredSize();
 			size.height = _searchField.getPreferredSize().height;
@@ -814,12 +821,12 @@ public abstract class QuickSearch<E> {
 			setRollover(false);
 			setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
-			final AbstractBar.AbstractComponentAction prevAction = new AbstractComponentAction("Previous Occurence", "Previous Occurence (Ctrl+F3)", KeyEvent.VK_F3, KeyEvent.SHIFT_DOWN_MASK, KeyEvent.VK_F3) {
+			final AbstractBar.AbstractComponentAction prevAction = new AbstractComponentAction("Previous Occurence", "Previous Occurence (Ctrl+F3)", KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK, KeyEvent.VK_F3) {
 				private static final long serialVersionUID = 0L;
 
 
 				public void actionPerformed(final ActionEvent e) {
-					_popup.processKeyEvent(new KeyEvent(_prevButton, 401, System.currentTimeMillis(), KeyEvent.SHIFT_DOWN_MASK, KeyEvent.VK_F3, KeyEvent.CHAR_UNDEFINED));
+					_popup.processKeyEvent(new KeyEvent(_prevButton, 401, System.currentTimeMillis(), InputEvent.SHIFT_DOWN_MASK, KeyEvent.VK_F3, KeyEvent.CHAR_UNDEFINED));
 				}
 			};
 			_prevButton = new ToolBarButton(prevAction, _prevIcon);
@@ -882,8 +889,8 @@ public abstract class QuickSearch<E> {
 			_label.setForeground(_foregroundColor);
 			_label.setBackground(_backgroundColor);
 			_label.setOpaque(true);
-			_label.setHorizontalAlignment(JLabel.CENTER);
-			_label.setVerticalAlignment(JLabel.CENTER);
+			_label.setHorizontalAlignment(SwingConstants.CENTER);
+			_label.setVerticalAlignment(SwingConstants.CENTER);
 
 			_listModel = new DefaultListModel();
 			_list = ListFacade.createList();
@@ -924,7 +931,7 @@ public abstract class QuickSearch<E> {
 			setLayout(new BorderLayout());
 			setBackground(_backgroundColor);
 			setOpaque(true);
-			setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+			setBorder(BorderFactory.createLineBorder(JBColor.GRAY, 1));
 
 			add(_label, BorderLayout.NORTH);
 			add(scrollPane, BorderLayout.CENTER);

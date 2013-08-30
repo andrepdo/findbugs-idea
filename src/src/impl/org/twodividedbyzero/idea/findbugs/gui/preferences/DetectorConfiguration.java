@@ -18,6 +18,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
+import com.intellij.ui.JBColor;
 import edu.umd.cs.findbugs.BugPattern;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.I18N;
@@ -478,8 +479,8 @@ public class DetectorConfiguration implements ConfigurationPage {
 
 	private static class ColorRenderer extends JLabel implements TableCellRenderer {
 
-		private static final Color BG_COLOR = new Color(226, 225, 225);
-		private static final Color FG_COLOR = new Color(125, 124, 124);
+		private static final Color BG_COLOR = new JBColor(new Color(226, 225, 225), new Color(200, 199, 199));
+		private static final Color FG_COLOR = new JBColor(new Color(125, 124, 124), new Color(104, 103, 103));
 
 		private final BugPatternTableModel _model;
 		private final FindBugsPreferences _preferences;

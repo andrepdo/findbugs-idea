@@ -29,6 +29,7 @@ import com.intellij.psi.PsiAnonymousClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.ui.JBColor;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.Detector;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +48,6 @@ import org.twodividedbyzero.idea.findbugs.intentions.SuppressReportBugIntentionA
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
@@ -134,10 +134,10 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 				if (psiElement instanceof PsiAnonymousClass) {
 					final PsiElement firstChild = psiElement.getFirstChild();
 					annotation = annotationHolder.createWarningAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(matchingDescriptors));
-					annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, Color.RED.brighter(), Color.WHITE, EffectType.BOXED, Font.PLAIN));
+					annotation.setEnforcedTextAttributes(new TextAttributes(JBColor.BLACK, JBColor.RED.brighter(), JBColor.WHITE, EffectType.BOXED, Font.PLAIN));
 				} else {
 					annotation = annotationHolder.createWarningAnnotation(textRange, getAnnotationText(matchingDescriptors));
-					annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, null, Color.RED, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
+					annotation.setEnforcedTextAttributes(new TextAttributes(JBColor.BLACK, null, JBColor.RED, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 				}
 
 				annotation.registerFix(new SuppressReportBugIntentionAction(problemDescriptor), textRange);
@@ -156,7 +156,7 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 					annotation = annotationHolder.createWarningAnnotation(textRange, getAnnotationText(matchingDescriptors));
 				}
 
-				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, null, Color.YELLOW.darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
+				annotation.setEnforcedTextAttributes(new TextAttributes(JBColor.BLACK, null, JBColor.YELLOW.darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 
 				annotation.registerFix(new SuppressReportBugIntentionAction(problemDescriptor), textRange);
 				annotation.registerFix(new SuppressReportBugForClassIntentionAction(problemDescriptor), textRange);
@@ -174,7 +174,7 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 					annotation = annotationHolder.createWarningAnnotation(textRange, getAnnotationText(matchingDescriptors));
 				}
 
-				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, null, Color.GRAY, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
+				annotation.setEnforcedTextAttributes(new TextAttributes(JBColor.BLACK, null, JBColor.GRAY, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 
 				annotation.registerFix(new SuppressReportBugIntentionAction(problemDescriptor), textRange);
 				annotation.registerFix(new SuppressReportBugForClassIntentionAction(problemDescriptor), textRange);
@@ -191,7 +191,7 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 					annotation = annotationHolder.createInfoAnnotation(textRange, getAnnotationText(matchingDescriptors));
 				}
 
-				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, null, Color.GREEN, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
+				annotation.setEnforcedTextAttributes(new TextAttributes(JBColor.BLACK, null, JBColor.GREEN, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 
 				annotation.registerFix(new SuppressReportBugIntentionAction(problemDescriptor), textRange);
 				annotation.registerFix(new SuppressReportBugForClassIntentionAction(problemDescriptor), textRange);
@@ -203,12 +203,12 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 				if (problemElement instanceof PsiAnonymousClass) {
 					final PsiElement firstChild = psiElement.getFirstChild();
 					annotation = annotationHolder.createWarningAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(matchingDescriptors));
-					annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, Color.WHITE, Color.MAGENTA.brighter(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
+					annotation.setEnforcedTextAttributes(new TextAttributes(JBColor.BLACK, JBColor.WHITE, JBColor.MAGENTA.brighter(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 				} else {
 					annotation = annotationHolder.createWarningAnnotation(textRange, getAnnotationText(matchingDescriptors));
 				}
 
-				annotation.setEnforcedTextAttributes(new TextAttributes(Color.BLACK, null, Color.MAGENTA.darker().darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
+				annotation.setEnforcedTextAttributes(new TextAttributes(JBColor.BLACK, null, JBColor.MAGENTA.darker().darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 
 				annotation.registerFix(new SuppressReportBugIntentionAction(problemDescriptor), textRange);
 				annotation.registerFix(new SuppressReportBugForClassIntentionAction(problemDescriptor), textRange);

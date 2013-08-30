@@ -21,6 +21,7 @@ package org.twodividedbyzero.idea.findbugs.common;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.QuickFix;
+import com.intellij.lang.annotation.ProblemGroup;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -39,7 +40,7 @@ import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
  * @version $Revision$
  * @since 0.0.1
  */
-public class ExtendedProblemDescriptor implements ProblemDescriptor {
+public class ExtendedProblemDescriptor implements ProblemDescriptor, ProblemGroup {
 
 
 	private final PsiFile _psiFile;
@@ -94,17 +95,21 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor {
 
 
 	public void setTextAttributes(final TextAttributesKey key) {
-		//TODO: implement
 	}
 
 
 	@Nullable
-	public String getProblemGroup() {
-		return "FindBugs-IDEA";
+	public ProblemGroup getProblemGroup() {
+		return this;
 	}
 
 
-	public void setProblemGroup(@Nullable final String s) {
+	public void setProblemGroup(@Nullable final ProblemGroup problemgroup) {
+	}
+
+
+	public String getProblemName() {
+		return "FindBugs-IDEA";
 	}
 
 

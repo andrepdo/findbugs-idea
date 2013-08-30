@@ -276,7 +276,7 @@ public class ConfigurationPanel extends JPanel {
 	private JSlider getEffortSlider() {
 		if (_effortSlider == null) {
 			_effortSlider = new JSlider(JSlider.HORIZONTAL, 10, 30, 20);
-			_effortSlider.setBackground(GuiResources.HIGHLIGHT_COLOR);
+			_effortSlider.setBackground(GuiResources.HIGHLIGHT_COLOR_DARKER);
 			_effortSlider.setMajorTickSpacing(10);
 			_effortSlider.setPaintTicks(true);
 			_effortSlider.setSnapToTicks(true);
@@ -416,7 +416,7 @@ public class ConfigurationPanel extends JPanel {
 	private Component getShowAdvancedConfigsButton() {
 		if (_showAdvancedConfigsButton == null) {
 			_showAdvancedConfigsButton = new JToggleButton("Advanced Settings");
-			_showAdvancedConfigsButton.setBackground(GuiResources.HIGHLIGHT_COLOR);
+			_showAdvancedConfigsButton.setBackground(GuiResources.HIGHLIGHT_COLOR_DARKER);
 			_showAdvancedConfigsButton.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
 					if(_showAdvancedConfigsButton.isSelected()) {
@@ -487,8 +487,8 @@ public class ConfigurationPanel extends JPanel {
 							firstAdvancedPage = configPage.getComponent();
 						}
 						_tabbedPane.insertTab(configPage.getTitle(), null, configPage.getComponent(), configPage.getTitle(), i);
-						_tabbedPane.setBackgroundAt(i, GuiResources.HIGHLIGHT_COLOR);
-						_tabbedPane.setForegroundAt(i, GuiResources.HIGHLIGHT_COLOR_DARKER);
+						_tabbedPane.setBackgroundAt(i, GuiResources.HIGHLIGHT_COLOR_DARKER);
+						_tabbedPane.setForegroundAt(i, GuiResources.HIGHLIGHT_COLOR);
 					} else {
 						_tabbedPane.remove(configPage.getComponent());
 					}
@@ -498,8 +498,8 @@ public class ConfigurationPanel extends JPanel {
 							firstAdvancedPage = configPage.getComponent();
 						}
 						_tabbedPane.insertTab(configPage.getTitle(), null, configPage.getComponent(), configPage.getTitle(), i);
-						_tabbedPane.setBackgroundAt(i, GuiResources.HIGHLIGHT_COLOR);
-						_tabbedPane.setForegroundAt(i, GuiResources.HIGHLIGHT_COLOR_DARKER);
+						_tabbedPane.setBackgroundAt(i, GuiResources.HIGHLIGHT_COLOR_DARKER);
+						_tabbedPane.setForegroundAt(i, GuiResources.HIGHLIGHT_COLOR);
 					} else {
 						_tabbedPane.remove(configPage.getComponent());
 					}
@@ -533,6 +533,7 @@ public class ConfigurationPanel extends JPanel {
 		} catch (IOException ex) {
 			LOGGER.error(ex);
 			final String msg = ex.getLocalizedMessage();
+			//noinspection DialogTitleCapitalization
 			Messages.showErrorDialog(this, msg != null && msg.length() > 0 ? msg : ex.toString(), "Export failed");
 		}
 	}
@@ -565,6 +566,7 @@ public class ConfigurationPanel extends JPanel {
 		} catch (Exception ex) {
 			LOGGER.warn(ex);
 			final String msg = ex.getLocalizedMessage();
+			//noinspection DialogTitleCapitalization
 			Messages.showErrorDialog(this, msg != null && msg.length() > 0 ? msg : ex.toString(), "Import failed");
 			return;
 		}

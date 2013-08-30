@@ -5,7 +5,6 @@ import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-//import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
@@ -23,6 +22,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
+
+//import com.intellij.openapi.ui.ValidationInfo;
 
 /**
  * $Date$
@@ -45,6 +46,7 @@ final class ImportPluginsDialog extends DialogWrapper {
 		_validPlugins = filterPlugins(prefs, invalidPlugins);
 		_invalidPlugins = invalidPlugins;
 		_invalidPluginPanes = new ArrayList<PluginPathPane>(invalidPlugins.size());
+		//noinspection DialogTitleCapitalization
 		setTitle("Import plugins");
 		init();
 	}

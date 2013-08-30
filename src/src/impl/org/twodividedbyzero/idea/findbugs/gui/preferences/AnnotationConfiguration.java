@@ -21,8 +21,10 @@ package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
 import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.ui.ColorChooser;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.UIBundle;
 import info.clearthought.layout.TableLayout;
+import info.clearthought.layout.TableLayoutConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.gui.common.ListFacade;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -98,8 +100,8 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			final double border = 5;
 			final double rowsGap = 5;
 			final double colsGap = 10;
-			final double[][] size = {{border, TableLayout.FILL, border}, // Columns
-									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
+			final double[][] size = {{border, TableLayoutConstants.FILL, border}, // Columns
+									 {border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 
 			final Container mainPanel = new JPanel(tbl);
@@ -162,8 +164,8 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 			final double border = 5;
 			final double colsGap = 10;
-			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, border}, // Columns
-									 {border, TableLayout.PREFERRED, border}};// Rows
+			final double[][] size = {{border, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.PREFERRED, border}, // Columns
+									 {border, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_annotationPathPanel = new JPanel(tbl);
 			_annotationPathPanel.setBorder(BorderFactory.createTitledBorder("FindBugs Annotation class (@SuppressWarnings). e.g. edu.umd.cs.findbugs.annotations.SuppressWarnings"));
@@ -172,8 +174,8 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 
 			final double rowsGap = 5;
-			final double[][] bPanelSize = {{border, TableLayout.PREFERRED}, // Columns
-										   {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
+			final double[][] bPanelSize = {{border, TableLayoutConstants.PREFERRED}, // Columns
+										   {border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tableLayout = new TableLayout(bPanelSize);
 
 			final Container buttonPanel = new JPanel(tableLayout);
@@ -226,15 +228,15 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			final double border = 5;
 			final double colsGap = 10;
 			final double rowsGap = 15;
-			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, border}, // Columns
-									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
+			final double[][] size = {{border, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.PREFERRED, border}, // Columns
+									 {border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_markUpPanel = new JPanel(tbl) {
 				@Override
 				public void paint(final Graphics g) {
 					super.paint(g);
 					final Graphics2D graphics = (Graphics2D) g.create();
-					graphics.setColor(GuiResources.HIGHLIGHT_COLOR);
+					graphics.setColor(GuiResources.HIGHLIGHT_COLOR_DARKER);
 					GuiUtil.configureGraphics(graphics);
 					graphics.setFont(getFont().deriveFont(Font.BOLD, 33f));
 					graphics.rotate(.3);
@@ -261,8 +263,8 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			final double border = 5;
 			final double colsGap = 10;
 			final double rowsGap = 5;
-			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, border}, // Columns
-									 {border, TableLayout.PREFERRED, 10, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
+			final double[][] size = {{border, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.PREFERRED, border}, // Columns
+									 {border, TableLayoutConstants.PREFERRED, 10, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_typeSettingsPanel = new JPanel(tbl);
 			_typeSettingsPanel.setBorder(BorderFactory.createTitledBorder("Annotation type settings"));
@@ -386,8 +388,8 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			final double border = 5;
 			final double colsGap = 10;
 			final double rowsGap = 5;
-			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.FILL,  border}, // Columns
-									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
+			final double[][] size = {{border, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.FILL,  border}, // Columns
+									 {border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			setLayout(tbl);
 
@@ -511,7 +513,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			_size = new Dimension(size, size);
 			_isSelectable = isSelectable;
 			_color = color;
-			setBorder(BorderFactory.createLineBorder(Color.GRAY));
+			setBorder(BorderFactory.createLineBorder(JBColor.GRAY));
 
 			updateToolTip();
 			addMouseListener(new MouseAdapter() {

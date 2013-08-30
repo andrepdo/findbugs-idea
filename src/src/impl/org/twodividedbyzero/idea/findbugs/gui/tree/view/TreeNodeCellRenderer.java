@@ -18,7 +18,9 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.tree.view;
 
+import com.intellij.ui.JBColor;
 import info.clearthought.layout.TableLayout;
+import info.clearthought.layout.TableLayoutConstants;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceGroupNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.RootNode;
@@ -81,14 +83,14 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer/*, 
 		setBackgroundNonSelectionColor(UIManager.getColor("Tree.textBackground"));
 		setBorderSelectionColor(UIManager.getColor("Tree.selectionBorderColor"));
 		final Object value = UIManager.get("Tree.drawsFocusBorderAroundIcon");
-		setHitsForegroundColor(Color.GRAY);
+		setHitsForegroundColor(JBColor.GRAY);
 		_drawsFocusBorderAroundIcon = value != null && (Boolean) value;
 
 		final double border = 0;
 		final double rowsGap = 0;
 		final double colsGap = _hGap;
-		final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, border}, // Columns
-								 {border, TableLayout.PREFERRED, border}};// Rows
+		final double[][] size = {{border, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.PREFERRED, border}, // Columns
+								 {border, TableLayoutConstants.PREFERRED, border}};// Rows
 		final LayoutManager tbl = new TableLayout(size);
 		setLayout(tbl);
 
@@ -99,11 +101,11 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer/*, 
 		_title.setFont(getFont());
 
 		_hits = new ValueLabel();
-		_hits.setForeground(Color.GRAY);
+		_hits.setForeground(getHitsForegroundColor());
 		_hits.setFont(getFont());
 
 		_link = new ValueLabel();
-		_link.setForeground(Color.GRAY);
+		_link.setForeground(getHitsForegroundColor());
 		_link.setFont(getFont());
 
 		add(_icon, "1, 1, 1, 1");
@@ -124,7 +126,7 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer/*, 
 	}
 
 
-	Color getHitsForegroundColor() {
+	final Color getHitsForegroundColor() {
 		return _hitsForegroundColor;
 	}
 
@@ -322,10 +324,10 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer/*, 
 			} else if (imageOffset == -1) {
 				imageOffset = getIconLabelStart();
 			}
-			g2d.setColor(Color.BLACK);
+			g2d.setColor(getBorderSelectionColor());
 			g2d.drawRect(imageOffset, 0, getWidth() - 1 - imageOffset, getHeight() - 1);
 		} else if (_selected) {
-			g2d.setColor(Color.BLACK);
+			g2d.setColor(getBorderSelectionColor());
 			g2d.drawRect(imageOffset, 0, getWidth() - 1 - imageOffset, getHeight() - 1);
 		}
 		// call paintChildren and not paint so we don't

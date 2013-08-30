@@ -18,7 +18,8 @@
  */
 package org.twodividedbyzero.idea.findbugs.resources;
 
-import com.intellij.openapi.editor.colors.EditorColorsManager;
+import com.intellij.ui.JBColor;
+import org.jdesktop.swingx.color.ColorUtil;
 
 import javax.swing.Icon;
 import javax.swing.text.html.StyleSheet;
@@ -46,10 +47,10 @@ public class GuiResources {
 	public static final Icon CLOSE_EDITOR_ICON = ResourcesLoader.loadIcon("close.png");
 	public static final Icon CLOSE_EDITOR_HOVER_ICON = ResourcesLoader.loadIcon("closeHovered.png");
 
-	public static final Color HIGH_PRIORITY_COLOR = Color.RED;
-	public static final Color MIDDLE_PRIORITY_COLOR = Color.YELLOW;
-	public static final Color LOW_PRIORITY_COLOR = Color.GREEN;
-	public static final Color EXP_PRIORITY_COLOR = Color.BLACK;
+	public static final Color HIGH_PRIORITY_COLOR = JBColor.RED;
+	public static final Color MIDDLE_PRIORITY_COLOR = JBColor.YELLOW;
+	public static final Color LOW_PRIORITY_COLOR = JBColor.GREEN;
+	public static final Color EXP_PRIORITY_COLOR = JBColor.BLACK;
 
 	public static final Icon PRIORITY_HIGH_ICON = ResourcesLoader.loadIcon("priority/bug_high.png");
 	public static final Icon PRIORITY_NORMAL_ICON = ResourcesLoader.loadIcon("priority/bug_normal.png");
@@ -100,51 +101,48 @@ public class GuiResources {
 	 * --------------------------------------------------------------------------------------------------
 	 * Tree icons
 	 */
-	public static final Icon TREENODE_OPEN_ICON = ResourcesLoader.loadIcon("nodes/TreeOpen.png");
-	public static final Icon TREENODE_CLOSED_ICON = ResourcesLoader.loadIcon("nodes/TreeClosed.png");
+	public static final Icon TREENODE_OPEN_ICON = ResourcesLoader.findIcon("/nodes/TreeOpen.png");
+	public static final Icon TREENODE_CLOSED_ICON = ResourcesLoader.findIcon("/nodes/TreeClosed.png");
 
 
 	/**
 	 * --------------------------------------------------------------------------------------------------
 	 * Navigation icons
 	 */
-	public static final Icon NAVIGATION_MOVEUP_ICON = ResourcesLoader.loadIcon("actions/moveUp.png");
-	public static final Icon NAVIGATION_MOVEDOWN_ICON = ResourcesLoader.loadIcon("actions/moveDown.png");
+	public static final Icon NAVIGATION_MOVEUP_ICON = ResourcesLoader.loadIcon("/actions/moveUp.png");
+	public static final Icon NAVIGATION_MOVEDOWN_ICON = ResourcesLoader.loadIcon("/actions/moveDown.png");
 
 	public static final StyleSheet EDITORPANE_STYLESHEET;
 	static {
+
+		final String black = ColorUtil.toHexString(JBColor.black);
+		final String gray = ColorUtil.toHexString(JBColor.gray);
+		final String blue = ColorUtil.toHexString(JBColor.blue);
+		final String green = ColorUtil.toHexString(JBColor.green);
+		final String yellow = ColorUtil.toHexString(JBColor.yellow);
+		final String red = ColorUtil.toHexString(JBColor.red);
+		final String cremeWhite = ColorUtil.toHexString(new JBColor(new Color(0x005555), JBColor.green));
+
 		EDITORPANE_STYLESHEET = new StyleSheet();
 		EDITORPANE_STYLESHEET.addRule("body {font-size: 12pt}");
 		EDITORPANE_STYLESHEET.addRule("code {font-family: courier; font-size: 12pt}");
-		EDITORPANE_STYLESHEET.addRule("pre {color: gray; font-family: courier; font-size: 12pt}");
-		EDITORPANE_STYLESHEET.addRule("a {color: blue; font-decoration: underline}");
+		EDITORPANE_STYLESHEET.addRule("pre {color: " + gray + "; font-family: courier; font-size: 12pt}");
+		EDITORPANE_STYLESHEET.addRule("a {color: " + blue + "; font-decoration: underline}");
 		EDITORPANE_STYLESHEET.addRule("li {margin-left: 10px; list-style-type: none}");
-		EDITORPANE_STYLESHEET.addRule("#Low {background-color: green; width: 15px; height: 15px;}");
-		EDITORPANE_STYLESHEET.addRule("#Medium {background-color: yellow; width: 15px; height: 15px;}");
-		EDITORPANE_STYLESHEET.addRule("#High {background-color: red; width: 15px; height: 15px;}");
-		EDITORPANE_STYLESHEET.addRule("#Exp {background-color: black; width: 15px; height: 15px;}");
-		if (!isDarcula()) {
-			EDITORPANE_STYLESHEET.addRule("H1 {color: #005555;  font-size: 120%; font-weight: bold;}");
-			EDITORPANE_STYLESHEET.addRule("H1 a {color: #005555;  font-size: 120%; font-weight: bold;}");
-			EDITORPANE_STYLESHEET.addRule("H2, .fakeH2 {color: #005555;  font-size: 12pt; font-weight: bold;}");
-			EDITORPANE_STYLESHEET.addRule("H3 {color: #005555;  font-size: 12pt; font-weight: bold;}");
-		} else {
-			EDITORPANE_STYLESHEET.addRule("H1 {color: #E8E8E8;  font-size: 120%; font-weight: bold;}");
-			EDITORPANE_STYLESHEET.addRule("H1 a {color: #E8E8E8;  font-size: 120%; font-weight: bold;}");
-			EDITORPANE_STYLESHEET.addRule("H2, .fakeH2 {color: #E8E8E8;  font-size: 12pt; font-weight: bold;}");
-			EDITORPANE_STYLESHEET.addRule("H3 {color: #E8E8E8;  font-size: 12pt; font-weight: bold;}");
-		}
+		EDITORPANE_STYLESHEET.addRule("#Low {background-color: " + green + "; width: 15px; height: 15px;}");
+		EDITORPANE_STYLESHEET.addRule("#Medium {background-color: "+ yellow + "; width: 15px; height: 15px;}");
+		EDITORPANE_STYLESHEET.addRule("#High {background-color: " + red + "; width: 15px; height: 15px;}");
+		EDITORPANE_STYLESHEET.addRule("#Exp {background-color: " + black + "; width: 15px; height: 15px;}");
+		EDITORPANE_STYLESHEET.addRule("H1 {color: " + cremeWhite + ";  font-size: 120%; font-weight: bold;}");
+		EDITORPANE_STYLESHEET.addRule("H1 a {color: " + cremeWhite + ";  font-size: 120%; font-weight: bold;}");
+		EDITORPANE_STYLESHEET.addRule("H2, .fakeH2 {color: " + cremeWhite + ";  font-size: 12pt; font-weight: bold;}");
+		EDITORPANE_STYLESHEET.addRule("H3 {color: " + cremeWhite + ";  font-size: 12pt; font-weight: bold;}");
 	}
 
 
-	public static final Color HIGHLIGHT_COLOR = new Color(219, 219, 137);
-	public static final Color HIGHLIGHT_COLOR_DARKER = new Color(135, 135, 69, 254);
-	public static final Color HIGHLIGHT_COLOR_LIGHTER = isDarcula() ? new Color(100, 100, 100) : new Color(255, 255, 204);
-
-
-	private static boolean isDarcula() {
-		return "Darcula".equals(EditorColorsManager.getInstance().getGlobalScheme().getName());
-	}
+	public static final Color HIGHLIGHT_COLOR = new JBColor(new Color(219, 219, 137), new Color(189, 189, 120));
+	public static final Color HIGHLIGHT_COLOR_DARKER = new JBColor(new Color(135, 135, 69, 254), new Color(112, 112, 56, 254));
+	public static final Color HIGHLIGHT_COLOR_LIGHTER = new JBColor(new Color(255, 255, 204), new Color(86, 86, 43, 254));
 
 
 	private GuiResources() {

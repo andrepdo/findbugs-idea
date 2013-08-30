@@ -36,6 +36,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.ui.JBColor;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.ProjectStats;
@@ -57,7 +58,6 @@ import javax.swing.JScrollPane;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.util.Arrays;
@@ -259,7 +259,7 @@ public class BugTreePanel extends JPanel {
 		}
 
 		if(marker != null) {
-			editor.getMarkupModel().addRangeHighlighter(marker.getStartOffset(), marker.getEndOffset(), HighlighterLayer.FIRST - 1, new TextAttributes(null, null, Color.RED, EffectType.BOXED, Font.BOLD), HighlighterTargetArea.EXACT_RANGE);
+			editor.getMarkupModel().addRangeHighlighter(marker.getStartOffset(), marker.getEndOffset(), HighlighterLayer.FIRST - 1, new TextAttributes(null, null, JBColor.RED, EffectType.BOXED, Font.BOLD), HighlighterTargetArea.EXACT_RANGE);
 		}
 
 		return editor;
