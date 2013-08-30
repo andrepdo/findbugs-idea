@@ -1,0 +1,10 @@
+all
+assemble
+build
+clean
+compile.all
+compile.api
+compile.dev
+compile.impl
+init
+mktargetdirs

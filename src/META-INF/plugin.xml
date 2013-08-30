@@ -193,7 +193,7 @@
     <vendor logo="/org/twodividedbyzero/idea/findbugs/resources/icons/fb-idea-logo_16x16.png"
             email="see@http://findbugs-idea.googlecode.com" url="http://findbugs-idea.googlecode.com">Andre Pfeiler
     </vendor>
-    <idea-version since-build="10781"/>
+    <idea-version since-build="@IDEA_SINCE_BUILD@" until-build="@IDEA_UNTIL_BUILD@"/>
     <!-- until-build="10762" min="8.0"-->
     <!--<helpset file="your-help.jar" path="path-to-helpset.hs"/>-->
     <resource-bundle>org.twodividedbyzero.idea.findbugs.resources.i18n.Messages</resource-bundle>

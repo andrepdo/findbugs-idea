@@ -1,6 +1,6 @@
 FindBugs-IDEA
 
-Copyright 2008 2009 Andre Pfeiler <andrepdo@dev.java.net>
+Copyright 2008 2009 2010 2011 2012 2013 Andre Pfeiler <andrepdo@dev.java.net>
 
 FindBugs for IntelliJ IDEA
 Provides static byte code analysis to look for bugs in Java code from within IntelliJ IDEA.
@@ -31,14 +31,3 @@ FindBugs is free software; see the License tab for details.
 
 Gui Resource Icons Copyright:
 Most Icons are taken from FindBugs and IntelliJ IDEA with slightly modifications.
-
-
-BUILD
-------
-adapt build.properties - path to idea.home should be something like idea.home=/home/andrep/Apps/dev/idea-8.1-jdk15 to be idea 8 and jdk 1.5 compatible
-execute '. setenv.sh'
-run 'ant assemble-all'
-
-DEBUGGING FindBugs
--------------------
--Dfindbugs.debug.PluginLoader=true
