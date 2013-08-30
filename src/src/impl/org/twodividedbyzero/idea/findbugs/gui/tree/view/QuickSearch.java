@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.gui.common.AbstractBar;
 import org.twodividedbyzero.idea.findbugs.gui.common.ListFacade;
+import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.gui.common.ToolBarButton;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
@@ -915,7 +916,7 @@ public abstract class QuickSearch<E> {
 			});
 
 			//updatePopupBounds();
-			final JScrollPane scrollPane = new JScrollPane();
+			final JScrollPane scrollPane = ScrollPaneFacade.createScrollPane();
 			scrollPane.getViewport().setView(_list);
 			scrollPane.setBorder(null);
 			scrollPane.setForeground(_foregroundColor);
