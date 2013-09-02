@@ -32,6 +32,7 @@ import com.intellij.openapi.vfs.VirtualFileWrapper;
 import com.intellij.ui.FilterComponent;
 import com.intellij.util.xmlb.XmlSerializer;
 import info.clearthought.layout.TableLayout;
+import org.jdesktop.swingx.color.ColorUtil;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
@@ -416,7 +417,7 @@ public class ConfigurationPanel extends JPanel {
 
 	private Component getShowAdvancedConfigsButton() {
 		if (_showAdvancedConfigsButton == null) {
-			_showAdvancedConfigsButton = new JCheckBox("Advanced Settings");
+			_showAdvancedConfigsButton = new JCheckBox("Advanced");
 			_showAdvancedConfigsButton.setBackground(GuiResources.HIGHLIGHT_COLOR_DARKER);
 			_showAdvancedConfigsButton.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
@@ -477,6 +478,8 @@ public class ConfigurationPanel extends JPanel {
 			_mainPanel.repaint();
 		}
 
+		final String fontColorHex = ColorUtil.toHexString(GuiResources.HIGHLIGHT_COLOR_DARKER);
+
 		final List<ConfigurationPage> configPages = getConfigPages();
 		Component firstAdvancedPage = null;
 		for (int i = 0, configPagesSize = configPages.size(); i < configPagesSize; i++) {
@@ -487,9 +490,8 @@ public class ConfigurationPanel extends JPanel {
 						if (firstAdvancedPage == null) {
 							firstAdvancedPage = configPage.getComponent();
 						}
-						_tabbedPane.insertTab(configPage.getTitle(), null, configPage.getComponent(), configPage.getTitle(), i);
-						_tabbedPane.setBackgroundAt(i, GuiResources.HIGHLIGHT_COLOR_DARKER);
-						_tabbedPane.setForegroundAt(i, GuiResources.HIGHLIGHT_COLOR);
+						_tabbedPane.insertTab("<html><b><font color='" + fontColorHex + "</font>" + configPage.getTitle(), null, configPage.getComponent(), configPage.getTitle(), i);
+						_tabbedPane.setForegroundAt(i, GuiResources.HIGHLIGHT_COLOR_DARKER);
 					} else {
 						_tabbedPane.remove(configPage.getComponent());
 					}
@@ -498,9 +500,8 @@ public class ConfigurationPanel extends JPanel {
 						if (firstAdvancedPage == null) {
 							firstAdvancedPage = configPage.getComponent();
 						}
-						_tabbedPane.insertTab(configPage.getTitle(), null, configPage.getComponent(), configPage.getTitle(), i);
-						_tabbedPane.setBackgroundAt(i, GuiResources.HIGHLIGHT_COLOR_DARKER);
-						_tabbedPane.setForegroundAt(i, GuiResources.HIGHLIGHT_COLOR);
+						_tabbedPane.insertTab("<html><b><font color='" + fontColorHex + "'</font>" + configPage.getTitle(), null, configPage.getComponent(), configPage.getTitle(), i);
+						_tabbedPane.setForegroundAt(i, GuiResources.HIGHLIGHT_COLOR_DARKER);
 					} else {
 						_tabbedPane.remove(configPage.getComponent());
 					}
