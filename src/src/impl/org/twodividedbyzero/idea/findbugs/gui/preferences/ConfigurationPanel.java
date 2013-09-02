@@ -490,7 +490,7 @@ public class ConfigurationPanel extends JPanel {
 						if (firstAdvancedPage == null) {
 							firstAdvancedPage = configPage.getComponent();
 						}
-						_tabbedPane.insertTab("<html><b><font color='" + fontColorHex + "</font>" + configPage.getTitle(), null, configPage.getComponent(), configPage.getTitle(), i);
+						_tabbedPane.insertTab("<html><b><font color='" + fontColorHex + "'>" + configPage.getTitle(), null, configPage.getComponent(), configPage.getTitle(), i);
 						_tabbedPane.setForegroundAt(i, GuiResources.HIGHLIGHT_COLOR_DARKER);
 					} else {
 						_tabbedPane.remove(configPage.getComponent());
@@ -500,7 +500,7 @@ public class ConfigurationPanel extends JPanel {
 						if (firstAdvancedPage == null) {
 							firstAdvancedPage = configPage.getComponent();
 						}
-						_tabbedPane.insertTab("<html><b><font color='" + fontColorHex + "'</font>" + configPage.getTitle(), null, configPage.getComponent(), configPage.getTitle(), i);
+						_tabbedPane.insertTab("<html><b><font color='" + fontColorHex + "'>" + configPage.getTitle(), null, configPage.getComponent(), configPage.getTitle(), i);
 						_tabbedPane.setForegroundAt(i, GuiResources.HIGHLIGHT_COLOR_DARKER);
 					} else {
 						_tabbedPane.remove(configPage.getComponent());
