@@ -1,5 +1,6 @@
 ### BUILD (for build versions/numbers @see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges) ###
 ------------------------------------------------------------------------------------------------------------------------
+* adapt VersionManager major, minor, build, branch, revision
 * this should be done automatically (adapt VersionManager and plugins.xml <change-notes> since-build="" until-build="")
 
 * adapt build.properties - path to idea.home should be something like idea.home=/home/andrep/Apps/dev/idea-8.1-jdk15 to be idea 8 and jdk 1.5 compatible

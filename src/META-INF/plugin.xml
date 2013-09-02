@@ -87,6 +87,14 @@
     </description>
     <change-notes>
         <![CDATA[<html>
+         <h3>0.9.98.234</h3>
+        <ul>
+            <li>mainly UI fixes for the dark side of idea</li>
+            <li>some release management stuff</li>
+            <li>thanks to Reto Merz for contributing lot of fixes, enhancements and compatibility issues fixes</li>
+            <li>apply patch Issue 29 (settings panel) contributed by simon@billingsley.me.uk</li>
+            <li>apply patch  Issue 38  IntelliJ FileChooser (dark theme osx) contributed by</li>
+        </ul>
         <h3>0.9.98</h3>
         <ul>
             <li>thanks to Reto Merz for contributing lot of fixes, enhancements and compatibility issues fixes</li>
