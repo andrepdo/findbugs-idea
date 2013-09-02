@@ -35,6 +35,7 @@ import info.clearthought.layout.TableLayout;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
@@ -137,7 +138,7 @@ public class ConfigurationPanel extends JPanel {
 
 
 	private void initGui() {
-		add( getMainPanel(), BorderLayout.CENTER );
+		add( ScrollPaneFacade.createScrollPane(getMainPanel()), BorderLayout.CENTER );
 	}
 
 
@@ -415,7 +416,7 @@ public class ConfigurationPanel extends JPanel {
 
 	private Component getShowAdvancedConfigsButton() {
 		if (_showAdvancedConfigsButton == null) {
-			_showAdvancedConfigsButton = new JToggleButton("Advanced Settings");
+			_showAdvancedConfigsButton = new JCheckBox("Advanced Settings");
 			_showAdvancedConfigsButton.setBackground(GuiResources.HIGHLIGHT_COLOR_DARKER);
 			_showAdvancedConfigsButton.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {

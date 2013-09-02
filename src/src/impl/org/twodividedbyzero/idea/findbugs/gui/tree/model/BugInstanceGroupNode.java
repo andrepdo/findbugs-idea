@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -331,7 +332,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 					return GuiResources.GROUP_BY_PRIORITY_EXP_ICON;
 				}
 			case BugRank:
-				final String rankString = BugRankCategory.getRank(getBugInstance().getBugRank()).toString();
+				final String rankString = BugRankCategory.getRank(getBugInstance().getBugRank()).toString().toUpperCase(Locale.ENGLISH);
 				if (GuiResources.GROUP_BY_RANK_ICONS.containsKey(rankString)) {
 					return GuiResources.GROUP_BY_RANK_ICONS.get(rankString);
 				} else {

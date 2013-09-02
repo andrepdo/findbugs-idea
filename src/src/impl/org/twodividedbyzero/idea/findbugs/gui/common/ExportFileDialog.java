@@ -19,13 +19,17 @@
 
 package org.twodividedbyzero.idea.findbugs.gui.common;
 
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.ui.DialogBuilder;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VfsUtilCore;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.DocumentAdapter;
 import info.clearthought.layout.TableLayout;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -164,16 +168,20 @@ public class ExportFileDialog extends JPanel {
 	private class MyFileChooserActionListener implements ActionListener {
 
 		public void actionPerformed(final ActionEvent e) {
-			final JFileChooser fc = new JFileChooser();
-			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			final Component parent = SwingUtilities.getRoot(_path);
-			fc.showDialog(parent, "Select");
-			_selectedFile = fc.getSelectedFile();
-			if (_selectedFile != null && _selectedFile.isDirectory()) {
-				final String newLocation = _selectedFile.getPath();
-				_path.setText(newLocation);
-				_dialogBuilder.setOkActionEnabled(true);
-
+      final FileChooserDescriptor descriptor = new FilterFileChooserDescriptor(
+          "Select",
+          "Select an export directory");
+      final VirtualFile toSelect = LocalFileSystem.getInstance().findFileByPath(_path.getText());
+      final Component parent = SwingUtilities.getRoot(_path);
+      final VirtualFile chosen = FileChooser.chooseFile(descriptor, parent, null, toSelect);
+      if (chosen != null) {
+        final File selectedFile = VfsUtilCore.virtualToIoFile(chosen);
+        if (selectedFile.isDirectory() && selectedFile.canWrite()) {
+          _selectedFile = selectedFile;
+				  final String newLocation = _selectedFile.getPath();
+				  _path.setText(newLocation);
+				  _dialogBuilder.setOkActionEnabled(true);
+        }
 			}
 		}
 	}

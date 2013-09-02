@@ -19,10 +19,16 @@
 
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.ui.MessageType;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VfsUtilCore;
+import com.intellij.openapi.vfs.VirtualFile;
 import info.clearthought.layout.TableLayout;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
+import org.twodividedbyzero.idea.findbugs.gui.common.FilterFileChooserDescriptor;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import javax.swing.AbstractButton;
@@ -30,7 +36,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -296,17 +301,20 @@ public class ImportExportConfiguration implements ConfigurationPage {
 	private class FileChooserActionListener implements ActionListener {
 
 		public void actionPerformed(final ActionEvent e) {
-			final JFileChooser fc = new JFileChooser();
-			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			fc.showDialog(_parent, "Select");
-			fc.setCurrentDirectory(new File(getExportDirTextField().getText()));
-			final File selectedFile = fc.getSelectedFile();
-			if (selectedFile != null && selectedFile.isDirectory() && selectedFile.canWrite()) {
-				final String newLocation = selectedFile.getPath();
-				getExportDirTextField().setText(newLocation);
-			} else {
-				showToolWindowNotifier("Invalid directory.", MessageType.ERROR);
-			}
+      final FileChooserDescriptor descriptor = new FilterFileChooserDescriptor(
+          "Select",
+          "Select an export directory");
+      final VirtualFile toSelect = LocalFileSystem.getInstance().findFileByPath(getExportDirTextField().getText());
+      final VirtualFile chosen = FileChooser.chooseFile(descriptor, _parent, _parent.getProject(), toSelect);
+      if (chosen != null) {
+        final File selectedFile = VfsUtilCore.virtualToIoFile(chosen);
+        if (selectedFile.isDirectory() && selectedFile.canWrite()) {
+          final String newLocation = selectedFile.getPath();
+          getExportDirTextField().setText(newLocation);
+        } else {
+          showToolWindowNotifier("Invalid directory.", MessageType.ERROR);
+        }
+      }
 		}
 	}
 }

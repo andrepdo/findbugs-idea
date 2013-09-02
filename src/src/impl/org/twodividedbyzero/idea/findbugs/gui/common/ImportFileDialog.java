@@ -19,13 +19,17 @@
 
 package org.twodividedbyzero.idea.findbugs.gui.common;
 
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VfsUtilCore;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.DocumentAdapter;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -146,28 +150,30 @@ public class ImportFileDialog extends JPanel {
 	private class MyFileChooserActionListener implements ActionListener {
 
 		public void actionPerformed(final ActionEvent e) {
-			final JFileChooser fc = new JFileChooser(_importDir);
-			fc.setFileFilter(new FileFilter() {
-				@Override
-				public boolean accept(final File f) {
-					return f.isDirectory() || "xml".equals(FileUtil.getExtension(f.getAbsolutePath()));
-				}
+      final FileChooserDescriptor descriptor = new FilterFileChooserDescriptor(
+          "Select",
+          "Select a file to import",
+          new FileFilter() {
+            @Override
+            public boolean accept(final File f) {
+              return f.isDirectory() || "xml".equals(FileUtil.getExtension(f.getAbsolutePath()));
+            }
 
+            @Override
+            public String getDescription() {
+              return "*.xml";
+            }
+          });
 
-				@Override
-				public String getDescription() {
-					return "*.xml";
-				}
-			});
-			final Component parent = SwingUtilities.getRoot(_importFile);
-			fc.showDialog(parent, "Select");
-			_selectedFile = fc.getSelectedFile();
-			if (_selectedFile != null && _selectedFile.isFile() && "xml".equals(FileUtil.getExtension(_selectedFile.getAbsolutePath()))) {
-				final String newLocation = _selectedFile.getPath();
-				_importFile.setText(newLocation);
-				_dialogBuilder.setOkActionEnabled(true);
-
-			}
+      final Component parent = SwingUtilities.getRoot(_importFile);
+      final VirtualFile toSelect = LocalFileSystem.getInstance().findFileByPath(_importDir);
+      final VirtualFile chosen = FileChooser.chooseFile(descriptor, parent, null, toSelect);
+      if (chosen != null) {
+        _selectedFile = VfsUtilCore.virtualToIoFile(chosen);
+        final String newLocation = _selectedFile.getPath();
+        _importFile.setText(newLocation);
+        _dialogBuilder.setOkActionEnabled(true);
+      }
 		}
 	}
 }

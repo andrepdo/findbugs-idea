@@ -1,0 +1,49 @@
+Index: src/impl/org/twodividedbyzero/idea/findbugs/resources/GuiResources.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/resources/GuiResources.java	(revision 233)
++++ src/impl/org/twodividedbyzero/idea/findbugs/resources/GuiResources.java	(revision )
+@@ -141,7 +141,7 @@
+ 
+ 
+ 	public static final Color HIGHLIGHT_COLOR = new JBColor(new Color(219, 219, 137), new Color(189, 189, 120));
+-	public static final Color HIGHLIGHT_COLOR_DARKER = new JBColor(new Color(135, 135, 69, 254), new Color(112, 112, 56, 254));
++	public static final Color HIGHLIGHT_COLOR_DARKER = new JBColor(new Color(135, 135, 69, 254), new Color(45, 48, 50, 254));
+ 	public static final Color HIGHLIGHT_COLOR_LIGHTER = new JBColor(new Color(255, 255, 204), new Color(86, 86, 43, 254));
+ 
+ 
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ConfigurationPanel.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ConfigurationPanel.java	(revision 233)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ConfigurationPanel.java	(revision )
+@@ -35,6 +35,7 @@
+ import org.jdom.Document;
+ import org.jdom.Element;
+ import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
++import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
+ import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
+ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+ import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
+@@ -137,7 +138,7 @@
+ 
+ 
+ 	private void initGui() {
+-		add( getMainPanel(), BorderLayout.CENTER );
++		add( ScrollPaneFacade.createScrollPane(getMainPanel()), BorderLayout.CENTER );
+ 	}
+ 
+ 
+@@ -415,7 +416,7 @@
+ 
+ 	private Component getShowAdvancedConfigsButton() {
+ 		if (_showAdvancedConfigsButton == null) {
+-			_showAdvancedConfigsButton = new JToggleButton("Advanced Settings");
++			_showAdvancedConfigsButton = new JCheckBox("Advanced Settings");
+ 			_showAdvancedConfigsButton.setBackground(GuiResources.HIGHLIGHT_COLOR_DARKER);
+ 			_showAdvancedConfigsButton.addActionListener(new ActionListener() {
+ 				public void actionPerformed(final ActionEvent e) {

@@ -1,0 +1,339 @@
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/BrowseAction.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/BrowseAction.java	(revision 233)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/BrowseAction.java	(revision )
+@@ -18,13 +18,18 @@
+  */
+ package org.twodividedbyzero.idea.findbugs.gui.preferences;
+ 
++import com.intellij.openapi.fileChooser.FileChooser;
++import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+ import com.intellij.openapi.project.Project;
++import com.intellij.openapi.vfs.LocalFileSystem;
++import com.intellij.openapi.vfs.VfsUtilCore;
++import com.intellij.openapi.vfs.VirtualFile;
+ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
++import org.twodividedbyzero.idea.findbugs.gui.common.FilterFileChooserDescriptor;
+ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+ 
+ import javax.swing.AbstractAction;
+ import javax.swing.Action;
+-import javax.swing.JFileChooser;
+ import javax.swing.JList;
+ import javax.swing.filechooser.FileFilter;
+ import java.awt.event.ActionEvent;
+@@ -70,16 +75,19 @@
+ 
+ 
+ 	public void actionPerformed(final ActionEvent e) {
+-		final JFileChooser fileChooser = new JFileChooser(_lastDir);
+-		fileChooser.setFileFilter(_fileFilter);
++    final FileChooserDescriptor descriptor = new FilterFileChooserDescriptor(
++        (String)getValue(Action.NAME),
++        (String)getValue(Action.SHORT_DESCRIPTION),
++        _fileFilter);
+ 
+-		final int result = fileChooser.showOpenDialog(_parent);
+-		if (result == JFileChooser.APPROVE_OPTION) {
+-			final File selectedFile = fileChooser.getSelectedFile();
++    final VirtualFile toSelect = LocalFileSystem.getInstance().findFileByPath(_lastDir);
++    final VirtualFile chosen = FileChooser.chooseFile(descriptor, _parent, _parent.getProject(), toSelect);
++    if (chosen != null) {
++      final File selectedFile = VfsUtilCore.virtualToIoFile(chosen);
+-			//noinspection AssignmentToStaticFieldFromInstanceMethod
+-			_lastDir = selectedFile.getPath();
+-			_callback.addSelection(selectedFile);
+-		}
++      //noinspection AssignmentToStaticFieldFromInstanceMethod
++      _lastDir = selectedFile.getPath();
++      _callback.addSelection(selectedFile);
++    }
+ 	}
+ 
+ 
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ImportExportConfiguration.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ImportExportConfiguration.java	(revision 233)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/preferences/ImportExportConfiguration.java	(revision )
+@@ -19,10 +19,16 @@
+ 
+ package org.twodividedbyzero.idea.findbugs.gui.preferences;
+ 
++import com.intellij.openapi.fileChooser.FileChooser;
++import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+ import com.intellij.openapi.ui.MessageType;
++import com.intellij.openapi.vfs.LocalFileSystem;
++import com.intellij.openapi.vfs.VfsUtilCore;
++import com.intellij.openapi.vfs.VirtualFile;
+ import info.clearthought.layout.TableLayout;
+ import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
+ import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
++import org.twodividedbyzero.idea.findbugs.gui.common.FilterFileChooserDescriptor;
+ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+ 
+ import javax.swing.AbstractButton;
+@@ -30,7 +36,6 @@
+ import javax.swing.JButton;
+ import javax.swing.JCheckBox;
+ import javax.swing.JComponent;
+-import javax.swing.JFileChooser;
+ import javax.swing.JLabel;
+ import javax.swing.JPanel;
+ import javax.swing.JTextField;
+@@ -296,17 +301,20 @@
+ 	private class FileChooserActionListener implements ActionListener {
+ 
+ 		public void actionPerformed(final ActionEvent e) {
+-			final JFileChooser fc = new JFileChooser();
+-			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+-			fc.showDialog(_parent, "Select");
+-			fc.setCurrentDirectory(new File(getExportDirTextField().getText()));
+-			final File selectedFile = fc.getSelectedFile();
+-			if (selectedFile != null && selectedFile.isDirectory() && selectedFile.canWrite()) {
++      final FileChooserDescriptor descriptor = new FilterFileChooserDescriptor(
++          "Select",
++          "Select an export directory");
++      final VirtualFile toSelect = LocalFileSystem.getInstance().findFileByPath(getExportDirTextField().getText());
++      final VirtualFile chosen = FileChooser.chooseFile(descriptor, _parent, _parent.getProject(), toSelect);
++      if (chosen != null) {
++        final File selectedFile = VfsUtilCore.virtualToIoFile(chosen);
++        if (selectedFile.isDirectory() && selectedFile.canWrite()) {
+-				final String newLocation = selectedFile.getPath();
+-				getExportDirTextField().setText(newLocation);
+-			} else {
+-				showToolWindowNotifier("Invalid directory.", MessageType.ERROR);
++          final String newLocation = selectedFile.getPath();
++          getExportDirTextField().setText(newLocation);
++        } else {
++          showToolWindowNotifier("Invalid directory.", MessageType.ERROR);
++        }
+-			}
++      }
+ 		}
+ 	}
+-}
+\ No newline at end of file
++}
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/common/FilterFileChooserDescriptor.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/common/FilterFileChooserDescriptor.java	(revision )
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/common/FilterFileChooserDescriptor.java	(revision )
+@@ -0,0 +1,72 @@
++package org.twodividedbyzero.idea.findbugs.gui.common;
++
++import com.intellij.openapi.fileChooser.FileChooserDescriptor;
++import com.intellij.openapi.vfs.VfsUtilCore;
++import com.intellij.openapi.vfs.VirtualFile;
++
++import javax.swing.filechooser.FileFilter;
++import java.io.File;
++
++/**
++ * Custom FileChooser Descriptor that allows the specification of a file filter.
++ */
++public class FilterFileChooserDescriptor extends FileChooserDescriptor {
++  private final FileFilter _fileFilter;
++
++  /**
++   * Construct a file chooser descriptor for the given file filter.
++   *
++   * @param title       the dialog title.
++   * @param description the dialog description.
++   * @param filter      the file filter.
++   */
++  public FilterFileChooserDescriptor(final String title, final String description, final FileFilter filter) {
++    // select a single file, not jar contents
++    super(true, false, true, true, false, false);
++    setTitle(title);
++    setDescription(description);
++    _fileFilter = filter;
++  }
++
++  /**
++   * Construct a file chooser descriptor for directories only.
++   *
++   * @param title the dialog title.
++   * @param description the dialog description.
++   */
++  public FilterFileChooserDescriptor(final String title, final String description) {
++    // select a single file, not jar contents
++    super(false, true, false, true, false, false);
++    setTitle(title);
++    setDescription(description);
++    _fileFilter = new DirectoryFileFilter();
++  }
++
++  @Override
++  public boolean isFileSelectable(final VirtualFile file) {
++    return _fileFilter.accept(VfsUtilCore.virtualToIoFile(file));
++  }
++
++  @Override
++  public boolean isFileVisible(final VirtualFile file, boolean showHiddenFiles) {
++    return file.isDirectory() || _fileFilter.accept(VfsUtilCore.virtualToIoFile(file));
++  }
++
++  /**
++   * File filter that only accepts directories.
++   */
++  private static class DirectoryFileFilter extends FileFilter {
++    public DirectoryFileFilter() {
++    }
++
++    @Override
++    public boolean accept(final File file) {
++      return file.isDirectory();
++    }
++
++    @Override
++    public String getDescription() {
++      return "directories-only";
++    }
++  }
++}
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ImportFileDialog.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ImportFileDialog.java	(revision 233)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ImportFileDialog.java	(revision )
+@@ -19,13 +19,17 @@
+ 
+ package org.twodividedbyzero.idea.findbugs.gui.common;
+ 
++import com.intellij.openapi.fileChooser.FileChooser;
++import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+ import com.intellij.openapi.ui.DialogBuilder;
+ import com.intellij.openapi.util.io.FileUtil;
++import com.intellij.openapi.vfs.LocalFileSystem;
++import com.intellij.openapi.vfs.VfsUtilCore;
++import com.intellij.openapi.vfs.VirtualFile;
+ import com.intellij.ui.DocumentAdapter;
+ 
+ import javax.swing.AbstractButton;
+ import javax.swing.JButton;
+-import javax.swing.JFileChooser;
+ import javax.swing.JLabel;
+ import javax.swing.JPanel;
+ import javax.swing.JTextField;
+@@ -146,28 +150,30 @@
+ 	private class MyFileChooserActionListener implements ActionListener {
+ 
+ 		public void actionPerformed(final ActionEvent e) {
+-			final JFileChooser fc = new JFileChooser(_importDir);
+-			fc.setFileFilter(new FileFilter() {
++      final FileChooserDescriptor descriptor = new FilterFileChooserDescriptor(
++          "Select",
++          "Select a file to import",
++          new FileFilter() {
+-				@Override
+-				public boolean accept(final File f) {
+-					return f.isDirectory() || "xml".equals(FileUtil.getExtension(f.getAbsolutePath()));
+-				}
++            @Override
++            public boolean accept(final File f) {
++              return f.isDirectory() || "xml".equals(FileUtil.getExtension(f.getAbsolutePath()));
++            }
+ 
+-
+-				@Override
+-				public String getDescription() {
+-					return "*.xml";
+-				}
+-			});
++            @Override
++            public String getDescription() {
++              return "*.xml";
++            }
++          });
++
+-			final Component parent = SwingUtilities.getRoot(_importFile);
++      final Component parent = SwingUtilities.getRoot(_importFile);
+-			fc.showDialog(parent, "Select");
+-			_selectedFile = fc.getSelectedFile();
+-			if (_selectedFile != null && _selectedFile.isFile() && "xml".equals(FileUtil.getExtension(_selectedFile.getAbsolutePath()))) {
++      final VirtualFile toSelect = LocalFileSystem.getInstance().findFileByPath(_importDir);
++      final VirtualFile chosen = FileChooser.chooseFile(descriptor, parent, null, toSelect);
++      if (chosen != null) {
++        _selectedFile = VfsUtilCore.virtualToIoFile(chosen);
+-				final String newLocation = _selectedFile.getPath();
+-				_importFile.setText(newLocation);
+-				_dialogBuilder.setOkActionEnabled(true);
++        final String newLocation = _selectedFile.getPath();
++        _importFile.setText(newLocation);
++        _dialogBuilder.setOkActionEnabled(true);
+-
+-			}
++      }
+ 		}
+ 	}
+-}
+\ No newline at end of file
++}
+Index: src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ExportFileDialog.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ExportFileDialog.java	(revision 233)
++++ src/impl/org/twodividedbyzero/idea/findbugs/gui/common/ExportFileDialog.java	(revision )
+@@ -19,13 +19,17 @@
+ 
+ package org.twodividedbyzero.idea.findbugs.gui.common;
+ 
++import com.intellij.openapi.fileChooser.FileChooser;
++import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+ import com.intellij.openapi.ui.DialogBuilder;
++import com.intellij.openapi.vfs.LocalFileSystem;
++import com.intellij.openapi.vfs.VfsUtilCore;
++import com.intellij.openapi.vfs.VirtualFile;
+ import com.intellij.ui.DocumentAdapter;
+ import info.clearthought.layout.TableLayout;
+ 
+ import javax.swing.ButtonGroup;
+ import javax.swing.JButton;
+-import javax.swing.JFileChooser;
+ import javax.swing.JLabel;
+ import javax.swing.JPanel;
+ import javax.swing.JRadioButton;
+@@ -164,16 +168,20 @@
+ 	private class MyFileChooserActionListener implements ActionListener {
+ 
+ 		public void actionPerformed(final ActionEvent e) {
+-			final JFileChooser fc = new JFileChooser();
+-			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
++      final FileChooserDescriptor descriptor = new FilterFileChooserDescriptor(
++          "Select",
++          "Select an export directory");
++      final VirtualFile toSelect = LocalFileSystem.getInstance().findFileByPath(_path.getText());
+-			final Component parent = SwingUtilities.getRoot(_path);
++      final Component parent = SwingUtilities.getRoot(_path);
+-			fc.showDialog(parent, "Select");
+-			_selectedFile = fc.getSelectedFile();
+-			if (_selectedFile != null && _selectedFile.isDirectory()) {
++      final VirtualFile chosen = FileChooser.chooseFile(descriptor, parent, null, toSelect);
++      if (chosen != null) {
++        final File selectedFile = VfsUtilCore.virtualToIoFile(chosen);
++        if (selectedFile.isDirectory() && selectedFile.canWrite()) {
++          _selectedFile = selectedFile;
+-				final String newLocation = _selectedFile.getPath();
+-				_path.setText(newLocation);
+-				_dialogBuilder.setOkActionEnabled(true);
++				  final String newLocation = _selectedFile.getPath();
++				  _path.setText(newLocation);
++				  _dialogBuilder.setOkActionEnabled(true);
+-
++        }
+ 			}
+ 		}
+ 	}

@@ -18,13 +18,18 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VfsUtilCore;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.gui.common.FilterFileChooserDescriptor;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.filechooser.FileFilter;
 import java.awt.event.ActionEvent;
@@ -70,16 +75,19 @@ public final class BrowseAction extends AbstractAction {
 
 
 	public void actionPerformed(final ActionEvent e) {
-		final JFileChooser fileChooser = new JFileChooser(_lastDir);
-		fileChooser.setFileFilter(_fileFilter);
+    final FileChooserDescriptor descriptor = new FilterFileChooserDescriptor(
+        (String)getValue(Action.NAME),
+        (String)getValue(Action.SHORT_DESCRIPTION),
+        _fileFilter);
 
-		final int result = fileChooser.showOpenDialog(_parent);
-		if (result == JFileChooser.APPROVE_OPTION) {
-			final File selectedFile = fileChooser.getSelectedFile();
-			//noinspection AssignmentToStaticFieldFromInstanceMethod
-			_lastDir = selectedFile.getPath();
-			_callback.addSelection(selectedFile);
-		}
+    final VirtualFile toSelect = LocalFileSystem.getInstance().findFileByPath(_lastDir);
+    final VirtualFile chosen = FileChooser.chooseFile(descriptor, _parent, _parent.getProject(), toSelect);
+    if (chosen != null) {
+      final File selectedFile = VfsUtilCore.virtualToIoFile(chosen);
+      //noinspection AssignmentToStaticFieldFromInstanceMethod
+      _lastDir = selectedFile.getPath();
+      _callback.addSelection(selectedFile);
+    }
 	}
 
 
