@@ -95,7 +95,9 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 
 		if (_problemCache.containsKey(psiFile)) {
 			final List<ExtendedProblemDescriptor> matchingDescriptors = new ArrayList<ExtendedProblemDescriptor>();
-			final Iterable<ExtendedProblemDescriptor> descriptors = new ArrayList<ExtendedProblemDescriptor>(_problemCache.get(psiFile));
+			final List<ExtendedProblemDescriptor> problemDescriptors = _problemCache.get(psiFile);
+
+			final Iterable<ExtendedProblemDescriptor> descriptors = new ArrayList<ExtendedProblemDescriptor>(problemDescriptors);
 			for (final ExtendedProblemDescriptor problemDescriptor : descriptors) {
 
 				final PsiElement problemPsiElement = problemDescriptor.getPsiElement();
