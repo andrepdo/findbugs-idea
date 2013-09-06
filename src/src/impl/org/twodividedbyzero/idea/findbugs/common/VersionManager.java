@@ -36,10 +36,10 @@ public class VersionManager {
 
 	private static final long _major = 0;
 	private static final long _minor = 9;
-	private static final long _build = 98;
+	private static final long _build = 99;
 
 	private static final String _branch = "trunk";
-	private static final long _revision = 238;
+	private static final long _revision = 241;
 
 
 	private static final String NAME = FindBugsPluginConstants.PLUGIN_NAME;
@@ -71,17 +71,16 @@ public class VersionManager {
 			}
 		}
 		REVISION = parsedRevision;
-		MAJOR_MINOR_BUILD_REVISION = MAJOR_MINOR_BUILD + (REVISION == -1 ? '.' + _revision : '.' + REVISION);
-		//noinspection StringEqualsEmptyString
-		FULL_VERSION_INTERNAL = NAME + ' ' + MAJOR_MINOR_BUILD_REVISION + ("".equals(_branch) ? "" : '-' + _branch);
+		MAJOR_MINOR_BUILD_REVISION = MAJOR_MINOR_BUILD + (REVISION == -1 ? "." + _revision : "." + REVISION);
+		//noinspection StringEqualsEmptyString,SingleCharacterStringConcatenation
+		FULL_VERSION_INTERNAL = NAME + ' ' + MAJOR_MINOR_BUILD_REVISION + ("".equals(_branch) ? "" : "-" + _branch);
 	}
 
 
 	/** e.g. "0.9.21".
 	 * @return*/
 	private static String getVersion() {
-		//noinspection SizeReplaceableByIsEmpty
-		return MAJOR_MINOR_BUILD + (_branch.length() == 0 ? "" : '-' + _branch);
+		return MAJOR_MINOR_BUILD;
 	}
 
 
@@ -138,7 +137,7 @@ public class VersionManager {
 			FileWriter writer = null;
 			try {
 				writer = new FileWriter(file);
-				writer.write(getVersionWithRevision());
+				writer.write(getVersion());
 				writer.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
