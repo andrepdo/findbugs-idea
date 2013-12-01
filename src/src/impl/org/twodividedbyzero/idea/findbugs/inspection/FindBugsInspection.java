@@ -233,18 +233,12 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 			public void run() {
 
 				try {
-					final PsiElement element = IdeaUtilImpl.getElementAtLine(psiFile, lines[0] - 1);
-					if (element != null) {
-						//QuickFixFactory.getInstance().
-						//final AddAnnotationFix fix1 = new AddAnnotationFix("org.twodividedbyzero.idea.findbugs.common.annotations.SuppressWarnings");
-						//fix.applyFix(I);
-						//final SurroundWithTagFix surroundWithTagFix = new SurroundWithTagFix(element, element, element, "qwertz");
-						final SuppressWarningFix fix = new SuppressWarningFix("org.twodividedbyzero.idea.findbugs.common.annotations.SuppressWarnings", BugInstanceUtil.getBugType(bugInstance));
-						//problemDescriptor[0] = getManager().createProblemDescriptor(element, description.toString(), ProblemHighlightType.GENERIC_ERROR_OR_WARNING, null, surroundWithTagFix, fix);
-						problemDescriptor[0] = getManager(element).createProblemDescriptor(element, description.toString(), ProblemHighlightType.GENERIC_ERROR_OR_WARNING, null, fix);
-					} else {
-						problemDescriptor[0] = getManager(psiFile).createProblemDescriptor(psiFile, description.toString(), ProblemHighlightType.GENERIC_ERROR_OR_WARNING, null);
+					PsiElement element = IdeaUtilImpl.getElementAtLine(psiFile, lines[0] - 1);
+					if (element == null) {
+						element = psiFile;
 					}
+					final SuppressWarningFix fix = new SuppressWarningFix("org.twodividedbyzero.idea.findbugs.common.annotations.SuppressWarnings", BugInstanceUtil.getBugType(bugInstance)); // LATER: use SurroundWithTagFix ?
+					problemDescriptor[0] = getManager(element).createProblemDescriptor(element, description.toString(), true, ProblemHighlightType.GENERIC_ERROR_OR_WARNING, true, fix);
 				} catch (final ProcessCanceledException ignore) {
 				}
 			}

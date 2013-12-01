@@ -557,7 +557,7 @@ public class ConfigurationPanel extends JPanel {
 		descriptor.setDescription( "Please select the configuration file (usually named findbugs.xml) to import." );
 		descriptor.setTitle( "Import Configuration" );
 
-		final VirtualFile [] files = FileChooser.chooseFiles(this, descriptor);
+		final VirtualFile [] files = FileChooser.chooseFiles(descriptor, this, getProject(), null);
 		if (files.length != 1) {
 			return;
 		}

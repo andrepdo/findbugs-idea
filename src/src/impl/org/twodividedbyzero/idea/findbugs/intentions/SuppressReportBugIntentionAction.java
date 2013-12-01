@@ -18,7 +18,6 @@
  */
 package org.twodividedbyzero.idea.findbugs.intentions;
 
-import com.intellij.codeInsight.CodeInsightUtilBase;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.codeInspection.InspectionsBundle;
 import com.intellij.codeInspection.SuppressIntentionAction;
@@ -50,6 +49,7 @@ import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
+import org.twodividedbyzero.idea.findbugs.common.util.FileModificationServiceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
@@ -158,7 +158,7 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 		IntentionHintComponent.showIntentionHint(project, element.getContainingFile(), editor, intentionsInfo, true);*/
 		final PsiDocCommentOwner container = getContainer(element);
 		assert container != null;
-		if (!CodeInsightUtilBase.preparePsiElementForWrite(container)) {
+		if (!FileModificationServiceUtil.preparePsiElementForWrite(container)) {
 			return;
 		}
 		@SuppressWarnings({"ConstantConditions"})

@@ -110,8 +110,8 @@ public class GuiResources {
 	 * --------------------------------------------------------------------------------------------------
 	 * Navigation icons
 	 */
-	public static final Icon NAVIGATION_MOVEUP_ICON = ResourcesLoader.loadIcon("/actions/moveUp.png");
-	public static final Icon NAVIGATION_MOVEDOWN_ICON = ResourcesLoader.loadIcon("/actions/moveDown.png");
+	public static final Icon NAVIGATION_MOVEUP_ICON = ResourcesLoader.findIcon("/actions/moveUp.png");
+	public static final Icon NAVIGATION_MOVEDOWN_ICON = ResourcesLoader.findIcon("/actions/moveDown.png");
 
 	public static final StyleSheet EDITORPANE_STYLESHEET;
 	static {
