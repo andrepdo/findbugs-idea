@@ -5,6 +5,7 @@ import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
@@ -22,8 +23,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
-
-//import com.intellij.openapi.ui.ValidationInfo;
 
 /**
  * $Date$
@@ -93,7 +92,7 @@ final class ImportPluginsDialog extends DialogWrapper {
 	}
 
 
-	/* @Override comment out because can not cross compile (ValidationInfo is a nested class)
+	@Override
 	protected ValidationInfo doValidate() {
 		ValidationInfo info;
 		for (PluginPathPane plugin : _invalidPluginPanes) {
@@ -103,7 +102,7 @@ final class ImportPluginsDialog extends DialogWrapper {
 			}
 		}
 		return null;
-	} */
+	}
 
 
 	private static FileChooserDescriptor createJarChooserDescriptor() {
@@ -165,7 +164,7 @@ final class ImportPluginsDialog extends DialogWrapper {
 		}
 
 
-		/* ValidationInfo doValidate() { see ImportPluginsDialog#doValidate
+		ValidationInfo doValidate() {
 			if (isImport()) {
 				final String path = getPath();
 				if (null != path) {
@@ -178,7 +177,7 @@ final class ImportPluginsDialog extends DialogWrapper {
 				}
 			}
 			return null;
-		} */
+		}
 
 
 	}
