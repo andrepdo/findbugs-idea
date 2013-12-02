@@ -421,7 +421,7 @@ public final class IdeaUtilImpl {
 
 
 	@NotNull
-	private static String getPackage(@NotNull final PsiElement psiElement) {
+	public static String getPackage(@NotNull final PsiElement psiElement) {
 		return ((PsiClassOwner) psiElement.getContainingFile()).getPackageName();
 	}
 

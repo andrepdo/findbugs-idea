@@ -372,6 +372,12 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	}
 
 
+	public void configureOutputFiles(@NotNull final Iterable<String> paths) {
+		// set class files
+		_findBugsProject.configureOutputFiles(paths);
+	}
+
+
 	void registerEventListener() {
 		EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(_project.getName()), this);
 	}

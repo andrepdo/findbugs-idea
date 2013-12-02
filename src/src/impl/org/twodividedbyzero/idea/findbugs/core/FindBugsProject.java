@@ -22,11 +22,16 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import edu.umd.cs.findbugs.Project;
+import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.collectors.RecurseClassCollector;
 import org.twodividedbyzero.idea.findbugs.collectors.RecurseFileCollector;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -39,8 +44,7 @@ import java.io.File;
 public class FindBugsProject extends Project {
 
 	private static final Logger LOGGER = Logger.getInstance(FindBugsProject.class.getName());
-	private VirtualFile[] _outputFiles;
-	private static final VirtualFile[] EMPTY_VIRTUAL_FILES_ARRAY = new VirtualFile[]{};
+	private List<String> _outputFiles;
 	//private RecurseCollectorTask _collectorTask;
 
 
@@ -89,7 +93,7 @@ public class FindBugsProject extends Project {
 
 	public void configureOutputFiles(final com.intellij.openapi.project.Project project, final VirtualFile[] selectedSourceFiles) {
 		//final com.intellij.openapi.project.Project project = IdeaUtilImpl.getProject(dataContext);
-		_outputFiles = selectedSourceFiles.clone();
+		_outputFiles = asPathList(selectedSourceFiles);
 
 		RecurseClassCollector classCollector = null;
 		for (final VirtualFile file : selectedSourceFiles) {
@@ -111,7 +115,7 @@ public class FindBugsProject extends Project {
 		//final com.intellij.openapi.project.Project project = IdeaUtilImpl.getProject(dataContext);
 		final VirtualFile vFile = IdeaUtilImpl.getVirtualFile(selectedPsiClass);
 		if (vFile != null) {
-			_outputFiles = new VirtualFile[] {vFile};
+			_outputFiles = Arrays.asList(vFile.getPath());
 
 			final RecurseClassCollector classCollector = new RecurseClassCollector(this, project);
 			//classCollector.setVirtualFile(file);
@@ -126,19 +130,39 @@ public class FindBugsProject extends Project {
 	public void configureOutputFiles(final VirtualFile selectedPackage, final com.intellij.openapi.project.Project project) {
 		final VirtualFile path = IdeaUtilImpl.getCompilerOutputPath(selectedPackage, project);
 		assert path != null;
-		_outputFiles = new VirtualFile[] {path};
+		_outputFiles = Arrays.asList(path.getPath());
 		RecurseFileCollector.addFiles(this, new File(selectedPackage.getPath()));
 	}
 
 
 	public void configureOutputFiles(final String path) {
-		_outputFiles = new VirtualFile[] {IdeaUtilImpl.findFileByPath(path)};
+		_outputFiles = Arrays.asList(IdeaUtilImpl.findFileByPath(path).getPath());
 		RecurseFileCollector.addFiles(this, new File(path));
 	}
 
 
-	public VirtualFile[] getConfiguredOutputFiles() {
-		return _outputFiles != null ? _outputFiles.clone() : EMPTY_VIRTUAL_FILES_ARRAY;
+	public void configureOutputFiles(@NotNull final Iterable<String> paths) {
+		_outputFiles = new ArrayList<String>();
+		for (String path : paths) {
+			_outputFiles.add(path);
+			addFile(path);
+		}
+	}
+
+
+	@NotNull
+	public List<String> getConfiguredOutputFiles() {
+		return _outputFiles != null ? new ArrayList<String>(_outputFiles) : Collections.<String>emptyList();
+	}
+
+
+	@NotNull
+	private static List<String> asPathList(@NotNull final VirtualFile[] files) {
+		final List<String> ret = new ArrayList<String>(files.length);
+		for (VirtualFile file : files) {
+			ret.add(file.getPath());
+		}
+		return ret;
 	}
 
 

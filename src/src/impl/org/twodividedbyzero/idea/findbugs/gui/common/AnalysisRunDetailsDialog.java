@@ -21,7 +21,6 @@ package org.twodividedbyzero.idea.findbugs.gui.common;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogBuilder;
-import com.intellij.openapi.vfs.VirtualFile;
 import edu.umd.cs.findbugs.ProjectStats;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
@@ -67,7 +66,7 @@ public class AnalysisRunDetailsDialog implements Serializable {
 
 		final List<String> fileList = bugsProject.getFileList();
 		final List<String> auxClasspathEntries = bugsProject.getAuxClasspathEntryList();
-		final VirtualFile[] configuredOutputFiles = bugsProject.getConfiguredOutputFiles();
+		final List<String> configuredOutputFiles = bugsProject.getConfiguredOutputFiles();
 		//bugsProject.get
 
 		final StringBuilder html = new StringBuilder();
@@ -75,12 +74,12 @@ public class AnalysisRunDetailsDialog implements Serializable {
 		html.append("<p><h2>").append(VersionManager.getName()).append(": <b>found ").append(bugCount).append(" bugs in ").append(numAnalysedClasses).append(numAnalysedClasses > 1 ? " classes" : " class").append("</b>").append("</h2></p>");
 		html.append("<p>").append("<font size='10px'>using ").append(VersionManager.getFullVersion()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font>").append("</p>");
 
-		if (configuredOutputFiles.length > 0) {
-			html.append("<p><h3>Configured Output Files/Paths - the analysis entry point").append(" <font color='gray'>(").append(configuredOutputFiles.length).append(")</h3></p>");
+		if (!configuredOutputFiles.isEmpty()) {
+			html.append("<p><h3>Configured Output Files/Paths - the analysis entry point").append(" <font color='gray'>(").append(configuredOutputFiles.size()).append(")</h3></p>");
 			html.append("<ul>");
-			for (final VirtualFile file : configuredOutputFiles) {
+			for (final String file : configuredOutputFiles) {
 				html.append("<li>");
-				html.append(file.getPath());
+				html.append(file);
 				html.append("</li>");
 			}
 			html.append("</ul>");

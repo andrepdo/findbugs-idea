@@ -328,6 +328,16 @@
                 <add-to-group group-id="FindBugs.AnalyzeMenu" anchor="last"/>
             </action>
 
+            <action id="FindBugs.AnalyseScope"
+                    class="org.twodividedbyzero.idea.findbugs.actions.AnalyzeScopeFiles"
+                    text="Analyze Scope Files"
+                    description="Run FindBugs analysis on files of the specified scope."
+                    icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeScope.png">
+
+                <add-to-group group-id="FindBugs.EditorPopup" anchor="last"/>
+                <add-to-group group-id="FindBugs.ProjectViewPopupMenu" anchor="last"/>
+            </action>
+
             <action id="FindBugs.DefaultChangeListAction"
                     class="org.twodividedbyzero.idea.findbugs.actions.AnalyzeAllModifiedFiles"
                     text="Analyze All Modified Files"
