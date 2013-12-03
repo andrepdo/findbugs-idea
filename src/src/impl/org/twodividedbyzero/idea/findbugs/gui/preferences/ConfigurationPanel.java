@@ -25,6 +25,7 @@ import com.intellij.openapi.fileChooser.FileChooserFactory;
 import com.intellij.openapi.fileChooser.FileSaverDescriptor;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -35,6 +36,7 @@ import info.clearthought.layout.TableLayout;
 import org.jdesktop.swingx.color.ColorUtil;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
@@ -82,6 +84,7 @@ import java.util.List;
 public class ConfigurationPanel extends JPanel {
 
 	private static final Logger LOGGER = Logger.getInstance(ConfigurationPanel.class.getName());
+	private static final String PERSISTENCE_ROOT_NAME = "findbugs";
 
 	private final FindBugsPlugin _plugin;
 	private JCheckBox _compileBeforeAnalyseChkb;
@@ -528,15 +531,14 @@ public class ConfigurationPanel extends JPanel {
 				new FileSaverDescriptor("Export FindBugs Preferences to File...", "", "xml"), this).save( null, null );
 		if (wrapper == null) return;
 		final Element el= XmlSerializer.serialize(prefs);
-		el.setName("findbugs"); // rename "PersistencePreferencesBean"
+		el.setName(PERSISTENCE_ROOT_NAME); // rename "PersistencePreferencesBean"
 		final Document document = new Document(el);
 		try {
 			JDOMUtil.writeDocument(document, wrapper.getFile(), "\n");
 		} catch (IOException ex) {
 			LOGGER.error(ex);
 			final String msg = ex.getLocalizedMessage();
-			//noinspection DialogTitleCapitalization
-			Messages.showErrorDialog(this, msg != null && msg.length() > 0 ? msg : ex.toString(), "Export failed");
+			Messages.showErrorDialog(this, msg != null && msg.length() > 0 ? msg : ex.toString(), "Export Failed");
 		}
 	}
 
@@ -565,11 +567,13 @@ public class ConfigurationPanel extends JPanel {
 		try {
 			final Document document = JDOMUtil.loadDocument(files[0].getInputStream());
 			prefs = XmlSerializer.deserialize(document, PersistencePreferencesBean.class);
+			if (!validatePreferences(document, prefs)) {
+				return;
+			}
 		} catch (Exception ex) {
 			LOGGER.warn(ex);
 			final String msg = ex.getLocalizedMessage();
-			//noinspection DialogTitleCapitalization
-			Messages.showErrorDialog(this, msg != null && msg.length() > 0 ? msg : ex.toString(), "Import failed");
+			Messages.showErrorDialog(this, msg != null && msg.length() > 0 ? msg : ex.toString(), "Import Failed");
 			return;
 		}
 		_pluginConfig.importPreferences( getProject(), prefs, new PluginConfiguration.ImportCallback() {
@@ -581,6 +585,24 @@ public class ConfigurationPanel extends JPanel {
 				}
 			}
 		} );
+	}
+
+
+	private boolean validatePreferences(final Document document, @Nullable PersistencePreferencesBean prefs) {
+		if (!PERSISTENCE_ROOT_NAME.equals(document.getRootElement().getName())) {
+			Messages.showErrorDialog(this, "The file format is invalid.", "Invalid File");
+			return false;
+		}
+		if (prefs == null) {
+			Messages.showErrorDialog(this, "The configuration is invalid.", "Invalid Configuration");
+			return false;
+		} else if (prefs.isEmpty()) {
+			final int answer = Messages.showYesNoDialog(this, "The configuration is empty. Do you want to proceed?", "Empty Configuration", Messages.getQuestionIcon());
+			if (answer != DialogWrapper.OK_EXIT_CODE) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 
