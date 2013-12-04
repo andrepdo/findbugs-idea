@@ -518,7 +518,11 @@ public final class IdeaUtilImpl {
 
 
 	@NotNull
-	public static VirtualFile[] getProjectClasspath(final Module module) {
+	public static VirtualFile[] getProjectClasspath(@Nullable final Module module) {
+		//noinspection ConstantConditions
+		if (module == null) {
+			return EMPTY_VIRTUAL_FILE;
+		}
 		final VirtualFile[] files;
 		try {
 			final List<VirtualFile> found = new LinkedList<VirtualFile>();
@@ -970,6 +974,17 @@ public final class IdeaUtilImpl {
 
 	public static boolean isIdea11() {
 		return "11".equals(getIdeaMajorVersion());
+	}
+
+
+	public static boolean isIdea13() {
+		return "13".equals(getIdeaMajorVersion());
+	}
+
+
+	public static boolean isVersionSmallerThanIdea13() {
+		//noinspection MagicNumber
+		return Integer.valueOf(getIdeaMajorVersion()) < 13;
 	}
 
 

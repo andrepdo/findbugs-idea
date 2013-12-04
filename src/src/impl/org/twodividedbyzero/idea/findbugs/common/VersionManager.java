@@ -39,7 +39,7 @@ public class VersionManager {
 	private static final long _build = 99;
 
 	private static final String _branch = "trunk";
-	private static final long _revision = 241;
+	private static final long _revision = 249;
 
 
 	private static final String NAME = FindBugsPluginConstants.PLUGIN_NAME;

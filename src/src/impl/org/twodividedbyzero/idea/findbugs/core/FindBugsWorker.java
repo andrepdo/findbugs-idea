@@ -21,8 +21,6 @@ package org.twodividedbyzero.idea.findbugs.core;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.openapi.compiler.CompileContext;
 import com.intellij.openapi.compiler.CompileStatusNotification;
-import com.intellij.openapi.compiler.CompileTask;
-import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -37,7 +35,6 @@ import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import edu.umd.cs.findbugs.config.UserPreferences;
 import org.dom4j.DocumentException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper.OperationAdapter;
 import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
@@ -83,7 +80,6 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	protected final com.intellij.openapi.project.Project _project;
 	protected UserPreferences _userPrefs;
 	protected BugReporter _bugReporter;
-	private CompilerManager _compilerManager;
 	private final boolean _startInBackground;
 	private Module _module;
 	protected SortedBugCollection _bugCollection;
@@ -214,29 +210,16 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	}
 
 
-	public void compile(@NotNull final VirtualFile virtualFile, @NotNull final Project project, final CompileTask afterTask) {
-		compile(new VirtualFile[] {virtualFile}, project, afterTask);
-	}
-
-
-	public void compile(final VirtualFile[] virtualFiles, final Project project, @Nullable final CompileTask afterTask) {
+	public void compile(final VirtualFile[] virtualFiles, final Project project) {
 		//TODO: use make() with CompilerScope
+		//noinspection AnonymousInnerClass
 		EventDispatchThreadHelper.invokeAndWait(new OperationAdapter() {
 			public void run() {
-				if (afterTask != null) {
-					addCompileAfterTask(project, afterTask);
-				}
-				new CompileManagerFacade(project).compile(virtualFiles, afterTask != null ? null : FindBugsWorker.this, afterTask, false);
+				new CompileManagerFacade(project).compile(virtualFiles, null);
 			}
 		});
 	}
 
-
-	private static void addCompileAfterTask(@NotNull final Project project, @NotNull final CompileTask afterTask) {
-		final CompilerManager compilerManager = CompilerManager.getInstance(project);
-		//compilerManager.make();
-		compilerManager.addAfterTask(afterTask);
-	}
 
 
 	public void finished(final boolean aborted, final int errors, final int warnings, final CompileContext compileContext) {

@@ -53,14 +53,8 @@ public class FindBugsInspector extends FindBugsWorker implements CompileTask {
 	}
 
 
-	/**
-	 * If using {@link org.twodividedbyzero.idea.findbugs.core.FindBugsWorker#compile(com.intellij.openapi.vfs.VirtualFile, com.intellij.openapi.project.Project, com.intellij.openapi.compiler.CompileTask)}
-	 * there's no need to call  before or after.  will be invoked as compile after task {@link #execute(com.intellij.openapi.compiler.CompileContext)}.
-	 *
-	 * @return true on success otherwise false
-	 */
 	@Override
-	public boolean work(String text) {
+	public boolean work(final String text) {
 		try {
 			_inspection.registerEventListener(getProject());
 			final IFindBugsEngine engine = createFindBugsEngine();

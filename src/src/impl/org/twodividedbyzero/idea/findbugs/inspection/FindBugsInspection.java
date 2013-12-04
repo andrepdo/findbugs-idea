@@ -25,6 +25,7 @@ import com.intellij.codeInspection.LocalInspectionToolSession;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
+import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -162,7 +163,13 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 
 
 	@Override
-	public void inspectionFinished(final LocalInspectionToolSession session) {
+	public void inspectionFinished(@NotNull final LocalInspectionToolSession session) {
+		LOGGER.debug("Inspection finished...");
+	}
+
+
+	@Override
+	public void inspectionFinished(@NotNull final LocalInspectionToolSession session, @NotNull final ProblemsHolder problemsHolder) {
 		LOGGER.debug("Inspection finished...");
 	}
 
@@ -268,10 +275,6 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 
 	private void initWorker(@SuppressWarnings("TypeMayBeWeakened") final PsiFile psiFile) {
 		final com.intellij.openapi.project.Project project = IdeaUtilImpl.getProject(psiFile);
-
-		/*final CompilerManager compilerManager = CompilerManager.getInstance(project);
-		compilerManager.compile(new VirtualFile[] {psiFile.getVirtualFile()}, null, true);*/
-		//IdeaUtilImpl.activateToolWindow(IdeaUtilImpl.getPluginInterface(project).getInternalToolWindowId(), dataContext);
 		final FindBugsInspector worker = new FindBugsInspector(project, this);
 
 		// set aux classpath
@@ -281,15 +284,16 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 
 		// set source dirs
 		final VirtualFile selectedSourceFiles = IdeaUtilImpl.getVirtualFile(psiFile);
+		if (selectedSourceFiles == null) {
+			return;
+		}
 		worker.configureSourceDirectories(selectedSourceFiles);
 
 		// set class files
 		worker.configureOutputFiles(new VirtualFile[] {selectedSourceFiles});
-		//FindBugsWorker.addCompileAfterTask(project, worker);
-		//worker.compile(new VirtualFile[] {selectedSourceFiles}, project, worker);
 
 		if (selectedSourceFiles.getTimeStamp() > System.currentTimeMillis() - 30000) {
-			worker.compile(new VirtualFile[] {selectedSourceFiles}, project, null);
+			worker.compile(new VirtualFile[] {selectedSourceFiles}, project);
 		}
 
 		worker.work("Running FindBugs inspection...");
