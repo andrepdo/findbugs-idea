@@ -23,6 +23,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiClassOwner;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
@@ -79,7 +80,7 @@ public class RecurseClassCollector {
 		final PsiFile psiFile = PsiManager.getInstance(_project).findFile(virtualFile);
 
 		if (psiFile instanceof PsiJavaFile) {
-			final PsiJavaFile psiJavaFile = (PsiJavaFile) psiFile;
+			final PsiClassOwner psiJavaFile = (PsiJavaFile) psiFile;
 			final PsiClass[] psiClasses = psiJavaFile.getClasses();
 
 			for (final PsiClass psiClass : psiClasses) {

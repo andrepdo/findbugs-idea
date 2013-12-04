@@ -400,6 +400,9 @@ public final class IdeaUtilImpl {
 	@Nullable
 	public static VirtualFile getCompilerOutputPath(@NotNull final VirtualFile virtualFile, @NotNull final Project project) {
 		final Module module = findModuleForFile(virtualFile, project);
+		if (module == null) {
+			return null;
+		}
 		final CompilerModuleExtension compilerModuleExtension = CompilerModuleExtension.getInstance(module);
 		if (compilerModuleExtension != null) {
 			return compilerModuleExtension.getCompilerOutputPath();
