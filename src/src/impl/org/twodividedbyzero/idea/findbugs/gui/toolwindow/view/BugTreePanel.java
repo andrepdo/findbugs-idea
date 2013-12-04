@@ -248,7 +248,9 @@ public class BugTreePanel extends JPanel {
 				element = psiElement;
 			}
 		} else {
-			element = IdeaUtilImpl.getElementAtLine(psiFile, lineStart);
+			if (psiFile != null) {
+				element = IdeaUtilImpl.getElementAtLine(psiFile, lineStart);
+			}
 		}
 
 		RangeMarker marker = null;

@@ -887,13 +887,19 @@ public final class IdeaUtilImpl {
 
 	@Nullable
 	public static PsiElement getElementAtLine(@NotNull final PsiFile file, final int line) {
+		//noinspection ConstantConditions
+		if (file == null) {
+			return null;
+		}
 		final Document document = PsiDocumentManager.getInstance(file.getProject()).getDocument(file);
 		PsiElement element = null;
 		try {
-			final int offset = document.getLineStartOffset(line);
-			element = file.getViewProvider().findElementAt(offset);
-			if (document.getLineNumber(element.getTextOffset()) != line) {
-				element = element.getNextSibling();
+			if (document != null) {
+				final int offset = document.getLineStartOffset(line);
+				element = file.getViewProvider().findElementAt(offset);
+				if (document.getLineNumber(element.getTextOffset()) != line) {
+					element = element.getNextSibling();
+				}
 			}
 		} catch (@NotNull final IndexOutOfBoundsException ignore) {
 		}
