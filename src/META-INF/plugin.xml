@@ -87,7 +87,15 @@
     </description>
     <change-notes>
         <![CDATA[<html>
-         <h3>0.9.99</h3>
+        <h3>0.9.991</h3>
+        <ul>
+            <li>Issue 29: annotation color: do not change foreground and background - make only use of effect color and effect type (dark color theme problems)</li>
+            <li>Issue 41: compilemanager fixed (after hook idea 12) </li>
+            <li>some cleanups</li>
+            <li> Issue 47: New "Analyze Scope" action</li>
+            <li>IDEA 13 RC3 (133.162) compatibility (builds/works with 129.713 too) </li>
+        </ul>
+        <h3>0.9.99</h3>
         <ul>
             <li>mainly and many UI fixes/adaptations for the dark side of idea</li>
             <li>some release management stuff</li>
