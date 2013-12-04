@@ -19,10 +19,12 @@
 package org.twodividedbyzero.idea.findbugs.common.util;
 
 import com.intellij.ide.plugins.PluginManager;
+import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.compiler.CompilerPaths;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.SelectionModel;
@@ -34,7 +36,7 @@ import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.CompilerProjectExtension;
@@ -52,7 +54,7 @@ import com.intellij.openapi.vcs.changes.ChangeList;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vcs.changes.ContentRevision;
 import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -72,7 +74,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiPackage;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.util.PsiUtil;
+import com.intellij.psi.util.PsiUtilCore;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.collectors.RecurseClassCollector;
@@ -105,6 +107,8 @@ import java.util.Set;
  */
 @SuppressWarnings({"HardcodedFileSeparator"})
 public final class IdeaUtilImpl {
+
+	private static final Logger LOGGER = Logger.getInstance(IdeaUtilImpl.class.getName());
 
 	@NotNull
 	private static final VirtualFile[] EMPTY_VIRTUAL_FILE = new VirtualFile[0];
@@ -285,7 +289,7 @@ public final class IdeaUtilImpl {
 
 	@Nullable
 	public static VirtualFile getVirtualFile(final PsiElement element) {
-		return PsiUtil.getVirtualFile(element);
+		return PsiUtilCore.getVirtualFile(element);
 	}
 
 
@@ -384,8 +388,6 @@ public final class IdeaUtilImpl {
 	@Nullable
 	public static VirtualFile getCompilerOutputPath(@NotNull final DataContext dataContext) {
 		final Module module = getModule(dataContext);
-
-		// TODO: facade
 		final CompilerModuleExtension compilerModuleExtension = CompilerModuleExtension.getInstance(module);
 		if (compilerModuleExtension != null) {
 			return compilerModuleExtension.getCompilerOutputPath();
@@ -398,8 +400,6 @@ public final class IdeaUtilImpl {
 	@Nullable
 	public static VirtualFile getCompilerOutputPath(@NotNull final VirtualFile virtualFile, @NotNull final Project project) {
 		final Module module = findModuleForFile(virtualFile, project);
-
-		// TODO: facade
 		final CompilerModuleExtension compilerModuleExtension = CompilerModuleExtension.getInstance(module);
 		if (compilerModuleExtension != null) {
 			return compilerModuleExtension.getCompilerOutputPath();
@@ -485,7 +485,7 @@ public final class IdeaUtilImpl {
 		final String packageName = DirectoryIndex.getInstance(project).getPackageName(packagePath);
 		if (packageName != null && !packageName.isEmpty()) {
 			final String [] path = packageName.split("\\.");
-			for (String p : path) {
+			for (final String p : path) {
 				parentPath.add(FindBugsPluginConstants.FILE_SEPARATOR + p);
 			}
 		}
@@ -532,7 +532,7 @@ public final class IdeaUtilImpl {
 				Collections.addAll(found, entry.getFiles(OrderRootType.CLASSES));
 			}
 			files = found.toArray(new VirtualFile[found.size()]);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new FindBugsPluginException("ModuleRootManager must not be null. may be the current class is not a project/module class. check your project/module outpath configuration.", e);
 		}
 		return files;
@@ -582,7 +582,7 @@ public final class IdeaUtilImpl {
 		try {
 			OrderRootType.class.getField("COMPILATION_CLASSES");
 			return true;
-		} catch (NoSuchFieldException e) {
+		} catch (final NoSuchFieldException e) {
 			return false;
 		}
 	}
@@ -590,7 +590,12 @@ public final class IdeaUtilImpl {
 
 	@Nullable
 	public static Module findModuleForFile(@NotNull final VirtualFile virtualFile, @NotNull final Project project) {
-		return ModuleUtil.findModuleForFile(virtualFile, project);
+		//noinspection ConstantConditions
+		if (virtualFile == null || project == null) {
+			LOGGER.debug("Expected not null arguments. virtualFile=" + virtualFile + " project=" + project);
+			return null;
+		}
+		return ModuleUtilCore.findModuleForFile(virtualFile, project);
 	}
 
 	/*public static VirtualFile[] getModuleClasspath(final DataContext dataContext) {
@@ -633,7 +638,7 @@ public final class IdeaUtilImpl {
 		final VirtualFile selectedFile = getSelectedFile(dataContext);
 		Module module = null;
 		if (selectedFile != null) {
-			module = ModuleUtil.findModuleForFile(selectedFile, project);
+			module = ModuleUtilCore.findModuleForFile(selectedFile, project);
 		}
 
 		if (module == null) {
@@ -674,7 +679,7 @@ public final class IdeaUtilImpl {
 				virtualFiles.add(outputDirectory);
 			}
 			for (final VirtualFile virtualFile : virtualFiles) {
-				final File file = VfsUtil.virtualToIoFile(virtualFile);
+				final File file = VfsUtilCore.virtualToIoFile(virtualFile);
 				resolvedFiles.add(file.getAbsoluteFile());
 			}
 		}
@@ -756,6 +761,7 @@ public final class IdeaUtilImpl {
 	 * @param dataContext The IntelliJ DataContext (can usually be obtained from the action-event).
 	 * @return The current PsiMethod or null if not found.
 	 */
+	@SuppressWarnings("UnusedDeclaration")
 	@Nullable
 	public static PsiMethod getCurrentMethod(@NotNull final DataContext dataContext) {
 		return findMethod(getCurrentElement(dataContext));
@@ -792,6 +798,7 @@ public final class IdeaUtilImpl {
 	private static PsiClass findClass(final PsiElement element) {
 		final PsiClass psiClass = element instanceof PsiClass ? (PsiClass) element : PsiTreeUtil.getParentOfType(element, PsiClass.class);
 		if (psiClass instanceof PsiAnonymousClass) {
+			//noinspection TailRecursion
 			return findClass(psiClass.getParent());
 		}
 		return psiClass;
@@ -808,6 +815,7 @@ public final class IdeaUtilImpl {
 	private static PsiField findField(final PsiElement element) {
 		final PsiField psiField = element instanceof PsiField ? (PsiField) element : PsiTreeUtil.getParentOfType(element, PsiField.class);
 		if (psiField != null && psiField.getContainingClass() instanceof PsiAnonymousClass) {
+			//noinspection TailRecursion
 			return findField(psiField.getParent());
 		}
 		return psiField;
@@ -824,18 +832,21 @@ public final class IdeaUtilImpl {
 	private static PsiMethod findMethod(final PsiElement element) {
 		final PsiMethod method = element instanceof PsiMethod ? (PsiMethod) element : PsiTreeUtil.getParentOfType(element, PsiMethod.class);
 		if (method != null && method.getContainingClass() instanceof PsiAnonymousClass) {
+			//noinspection TailRecursion
 			return findMethod(method.getParent());
 		}
 		return method;
 	}
 
 
+	@SuppressWarnings("UnusedDeclaration")
 	@Nullable
 	public static VirtualFile findFileByIoFile(final File file) {
 		return LocalFileSystem.getInstance().findFileByIoFile(file);
 	}
 
 
+	@SuppressWarnings("StaticMethodOnlyUsedInOneClass")
 	@Nullable
 	public static VirtualFile findFileByPath(@NotNull final String path) {
 		return LocalFileSystem.getInstance().findFileByPath(path.replace(File.separatorChar, '/'));
@@ -867,7 +878,7 @@ public final class IdeaUtilImpl {
 		final PsiClass[] classes = JavaPsiFacade.getInstance(project).findClasses(dottedFqClassName, searchScope);
 		if (classes.length > 0) {
 			if (classes.length > 1) {
-				for (PsiClass c : classes) {
+				for (final PsiClass c : classes) {
 					if (!(c instanceof PsiCompiledElement)) { // prefer non compiled
 						return c;
 					}
@@ -881,7 +892,7 @@ public final class IdeaUtilImpl {
 
 	@Nullable
 	public static Module findModuleForPsiElement(@NotNull final PsiElement element, final Project project) {
-		return ModuleUtil.findModuleForPsiElement(element);
+		return ModuleUtilCore.findModuleForPsiElement(element);
 	}
 
 
@@ -897,8 +908,10 @@ public final class IdeaUtilImpl {
 			if (document != null) {
 				final int offset = document.getLineStartOffset(line);
 				element = file.getViewProvider().findElementAt(offset);
-				if (document.getLineNumber(element.getTextOffset()) != line) {
-					element = element.getNextSibling();
+				if (element != null) {
+					if (document.getLineNumber(element.getTextOffset()) != line) {
+						element = element.getNextSibling();
+					}
 				}
 			}
 		} catch (@NotNull final IndexOutOfBoundsException ignore) {
@@ -908,9 +921,10 @@ public final class IdeaUtilImpl {
 	}
 
 
+	@SuppressWarnings("UnusedDeclaration")
 	@Nullable
 	public static String getPluginId() {
-		final PluginId pluginId = PluginManager.getPluginByClassName(FindBugsPluginImpl.class.getName());
+		final PluginId pluginId = PluginManagerCore.getPluginByClassName(FindBugsPluginImpl.class.getName());
 		if (pluginId != null) {
 			return pluginId.getIdString();
 		}
@@ -968,32 +982,6 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static boolean isIdea9() {
-		return "9".equals(getIdeaMajorVersion());
-	}
-
-
-	public static boolean isIdea10() {
-		return "10".equals(getIdeaMajorVersion());
-	}
-
-
-	public static boolean isIdea11() {
-		return "11".equals(getIdeaMajorVersion());
-	}
-
-
-	public static boolean isIdea13() {
-		return "13".equals(getIdeaMajorVersion());
-	}
-
-
-	public static boolean isVersionSmallerThanIdea13() {
-		//noinspection MagicNumber
-		return Integer.valueOf(getIdeaMajorVersion()) < 13;
-	}
-
-
 	public static boolean isVersionGreaterThanIdea9() {
 		return Integer.valueOf(getIdeaMajorVersion()) > 9;
 	}
@@ -1006,6 +994,7 @@ public final class IdeaUtilImpl {
 	}
 
 
+	@SuppressWarnings("UnusedDeclaration")
 	@Nullable
 	public static Document getDocument(@NotNull final Project project, @NotNull final ExtendedProblemDescriptor issue) {
 		final PsiFile psiFile = getPsiFile(project, issue);

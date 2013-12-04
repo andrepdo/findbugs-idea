@@ -145,6 +145,10 @@ public class AnalyzePackageFiles extends BaseAction implements EventListener<Bug
 		if (selectedSourceFiles != null && selectedSourceFiles.length > 0) {
 			for (final VirtualFile virtualFile : selectedSourceFiles) {
 				final Module moduleOfFile = IdeaUtilImpl.findModuleForFile(virtualFile, project);
+				if (moduleOfFile == null) {
+					return;
+				}
+
 
 				if (virtualFile.isDirectory()) {
 					if (!virtualFile.getPath().endsWith(moduleOfFile.getName())) {

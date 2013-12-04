@@ -49,7 +49,6 @@ import java.util.Set;
 @SuppressWarnings({"MethodMayBeStatic"})
 public abstract class BaseAction extends AnAction {
 
-	/** Logger for this class. */
 	private static final Logger LOGGER = Logger.getInstance(BaseAction.class.getName());
 
 	private final Set<String> _registeredProjects = new HashSet<String>();
