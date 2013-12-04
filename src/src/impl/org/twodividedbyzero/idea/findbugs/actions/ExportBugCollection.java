@@ -199,18 +199,18 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 
 						showToolWindowNotifier(project, "Exported bug collection to " + exportDir + '.', MessageType.INFO);
 						if((!finalExportXml || finalExportBoth) && preferences.getBooleanProperty(FindBugsPreferences.EXPORT_OPEN_BROWSER, true)) {
-							BrowserUtil.launchBrowser(new File(exportDirAndFilenameWithoutSuffix).getAbsolutePath());
+							BrowserUtil.launchBrowser(new File(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_HTML_SUFFIX).getAbsolutePath());
 						}
 					}
-				} catch (IOException e1) {
+				} catch (final IOException e1) {
 					final String message = "Export failed";
 					showToolWindowNotifier(project, message, MessageType.ERROR);
 					LOGGER.error(message, e1);
-				} catch (TransformerConfigurationException e1) {
+				} catch (final TransformerConfigurationException e1) {
 					final String message = "Transform to html failed due to configuration problems.";
 					showToolWindowNotifier(project, message, MessageType.ERROR);
 					LOGGER.error(message, e1);
-				} catch (TransformerException e1) {
+				} catch (final TransformerException e1) {
 					final String message = "Transformation to exportXml failed.";
 					showToolWindowNotifier(project, message, MessageType.ERROR);
 					LOGGER.error(message, e1);
@@ -221,7 +221,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 					if (writer != null) {
 						try {
 							writer.close();
-						} catch (IOException ignored) {
+						} catch (final IOException ignored) {
 						}
 					}
 					Thread.currentThread().interrupt();
@@ -296,12 +296,12 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 		try {
 			final URL url = new URL(stylesheet);
 			return url.openStream();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOGGER.info("xls read failed.", e);
 		}
 		try {
 			return new BufferedInputStream(new FileInputStream(stylesheet));
-		} catch (Exception ignored) {
+		} catch (final Exception ignored) {
 		}
 		final InputStream xslInputStream = HTMLBugReporter.class.getResourceAsStream("/" + stylesheet);
 		if (xslInputStream == null) {
@@ -342,7 +342,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
 			presentation.setVisible(true);
 
-		} catch (Throwable e) {
+		} catch (final Throwable e) {
 			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);// NON-NLS
 			if (processed != null) {
 				LOGGER.error("Action update failed", processed);
