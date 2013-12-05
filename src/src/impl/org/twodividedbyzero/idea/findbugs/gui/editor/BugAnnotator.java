@@ -159,7 +159,7 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 				}
 
 				// todo: use color from annotation configuration
-				annotation.setEnforcedTextAttributes(new TextAttributes(null, null, JBColor.YELLOW, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
+				annotation.setEnforcedTextAttributes(new TextAttributes(null, null, JBColor.YELLOW.darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 
 				annotation.registerFix(new SuppressReportBugIntentionAction(problemDescriptor), textRange);
 				annotation.registerFix(new SuppressReportBugForClassIntentionAction(problemDescriptor), textRange);
