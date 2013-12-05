@@ -45,7 +45,8 @@ public class VersionManager {
 	private static final long _build = 991;
 
 	private static final String _branch = "trunk";
-	private static final long _revision = 256;
+	private static final String rev = "$Revision$";
+	private static final long _revision = Long.parseLong(rev.substring(11, rev.lastIndexOf(' ')));
 
 
 	private static final String NAME = FindBugsPluginConstants.PLUGIN_NAME;
