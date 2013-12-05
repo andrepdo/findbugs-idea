@@ -30,6 +30,8 @@ import java.nio.charset.Charset;
 /**
  * $Date$
  *
+ * $Id$
+ *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
  * @version $Revision$
  * @since 0.0.1
@@ -151,7 +153,7 @@ public class VersionManager {
 			}
 
 		}
-		System.out.println("$Id");
+		System.out.println("$Id$");
 		System.out.println(getVersion());
 		System.out.println(getFullVersion());
 		System.out.println(getVersionWithRevision());
