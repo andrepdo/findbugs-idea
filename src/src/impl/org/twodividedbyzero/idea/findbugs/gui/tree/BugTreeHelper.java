@@ -88,12 +88,16 @@ public class BugTreeHelper {
 				return node.getPsiFile();
 			} else {
 				final PsiClass psiClass = IdeaUtilImpl.findJavaPsiClass(_project, node.getSourcePath());
-				LOGGER.debug("BugTreeHelper#getSeletedElement(" + _project + ", " + node.getSourcePath() + ")");
+				LOGGER.debug("BugTreeHelper#getSeletedElement(" + _project + ", " + node.getSourcePath() + ')');
 				if (psiClass != null) {
-					LOGGER.debug("Found: psiClass (" + psiClass.getName() + ")");
+					LOGGER.debug("Found: psiClass (" + psiClass.getName() + ')');
 					psiElement = IdeaUtilImpl.getPsiFile(psiClass);
-					LOGGER.debug("BugTreeHelper - IdeaUtilImpl.getPsiFile(psiClass) - found - psiElement: [" + psiElement.getText() + "]");
-					node.setPsiFile((PsiFile) psiElement);
+					if (psiElement != null) {
+						LOGGER.debug("BugTreeHelper - IdeaUtilImpl.getPsiFile(psiClass) - found - psiElement: [" + psiElement.getText() + ']');
+						node.setPsiFile((PsiFile) psiElement);
+					} else {
+						LOGGER.debug("BugTreeHelper - IdeaUtilImpl.getPsiFile(psiClass) - found - psiClass: [" + psiClass + ']');
+					}
 				}
 			}
 		}
@@ -125,12 +129,16 @@ public class BugTreeHelper {
 					return node.getPsiFile();
 				} else {
 					final PsiClass psiClass = IdeaUtilImpl.findJavaPsiClass(_project, node.getSourcePath());
-					LOGGER.debug("BugTreeHelper#getSelectedFile(" + _project + ", " + node.getSourcePath() + ")");
+					LOGGER.debug("BugTreeHelper#getSelectedFile(" + _project + ", " + node.getSourcePath() + ')');
 					if (psiClass != null) {
-						LOGGER.debug("Found: psiClass (" + psiClass.getName() + ")");
+						LOGGER.debug("Found: psiClass (" + psiClass.getName() + ')');
 						final PsiFile psiFile = IdeaUtilImpl.getPsiFile(psiClass);
-						LOGGER.debug("BugTreeHelper - IdeaUtilImpl.getPsiFile(psiClass) - found - psiFile: " + psiFile.getName());
-						node.setPsiFile(psiFile);
+						if (psiFile != null) {
+							LOGGER.debug("BugTreeHelper - IdeaUtilImpl.getPsiFile(psiClass) - found - psiFile: " + psiFile.getName());
+							node.setPsiFile(psiFile);
+						} else {
+							LOGGER.debug("BugTreeHelper - IdeaUtilImpl.getPsiFile(psiClass) - NOT found - psiClass: " + psiClass);
+						}
 						return psiFile;
 					} else {
 						return null;
@@ -213,8 +221,9 @@ public class BugTreeHelper {
 
 
 	// todo: fix me
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"BC_UNCONFIRMED_CAST_OF_RETURN_VALUE"})
 	@Nullable
-	private BugInstanceNode getPreviousBugInstanceLeafNode(final AbstractTreeNode<VisitableTreeNode> node) {
+	private BugInstanceNode getPreviousBugInstanceLeafNode(@SuppressWarnings("TypeMayBeWeakened") final AbstractTreeNode<VisitableTreeNode> node) {
 		if (node instanceof BugInstanceNode) {
 			return (BugInstanceNode) node;
 		}
@@ -222,12 +231,15 @@ public class BugTreeHelper {
 			return null;
 		}
 
+		@SuppressWarnings("unchecked")
 		final List<VisitableTreeNode> childList = (List<VisitableTreeNode>) node.getParent().getChildsList();
 		Collections.reverse(childList);
 		for (final VisitableTreeNode childNode : childList) {
-			if (childNode instanceof BugInstanceNode && childList != node) {
+			//noinspection ObjectEquality
+			if (childNode instanceof BugInstanceNode && childNode != node) {
 				return  (BugInstanceNode) childNode;
 			} else if (childNode instanceof BugInstanceGroupNode) {
+				//noinspection TailRecursion,unchecked
 				return getPreviousBugInstanceLeafNode((AbstractTreeNode<VisitableTreeNode>) childNode);
 			}
 		}

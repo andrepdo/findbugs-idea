@@ -115,7 +115,7 @@ class PreviewPanel {
 		final JComponent editorComponent = editor.getComponent();
 		_delegate.add(editorComponent, BorderLayout.CENTER);
 		_delegate.add(_labelPanel, BorderLayout.NORTH);
-		_label.setText(psiFile.getName() + ":");
+		_label.setText(psiFile.getName() + ':');
 
 		_delegate.revalidate();
 		_delegate.repaint();

@@ -74,6 +74,7 @@ public final class BrowseAction extends AbstractAction {
 	}
 
 
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"})
 	public void actionPerformed(final ActionEvent e) {
     final FileChooserDescriptor descriptor = new FilterFileChooserDescriptor(
         (String)getValue(Action.NAME),

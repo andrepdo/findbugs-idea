@@ -137,7 +137,7 @@ public class SuppressWarningFix /*extends SuppressIntentionAction*/ implements L
 				negation.getOperand().replace(result);
 				result.replace(negation);
 			}*/
-		} catch (IncorrectOperationException e) {
+		} catch (final IncorrectOperationException e) {
 			LOGGER.error(e);
 		}
 	}

@@ -74,7 +74,7 @@ public class CheckThreadViolationRepaintManager extends RepaintManager {
 
 	static {
 		FALSE_POSITIVE = new HashSet<StackTraceElement>();
-		final StackTraceElement[] ignore_these = new StackTraceElement[] {new StackTraceElement("javax.swing.JLabel", "setText", null, -1)};
+		final StackTraceElement[] ignore_these = {new StackTraceElement("javax.swing.JLabel", "setText", null, -1)};
 		FALSE_POSITIVE.addAll(Arrays.asList(ignore_these));
 	}
 

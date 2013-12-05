@@ -57,7 +57,7 @@ final class FileUtil {
 				in.close();
 			}
 			return new String(fBuffer, "UTF-8");
-		} catch (IOException ex) {
+		} catch (final IOException ex) {
 			throw new IOException("could not read configuration file '" + file.getPath() + "': " + ex.getMessage());
 		} finally {
 			if (in != null) {

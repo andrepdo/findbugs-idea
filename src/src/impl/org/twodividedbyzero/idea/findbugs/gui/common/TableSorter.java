@@ -40,6 +40,7 @@ import java.awt.event.MouseListener;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -97,7 +98,7 @@ import java.util.Map;
  * @author Parwinder Sekhon
  * @version 2.0 02/27/04
  */
-@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
+@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED", "SE_BAD_FIELD", "SE_BAD_FIELD"})
 public class TableSorter extends AbstractTableModel {
 
 	private static final long serialVersionUID = 0L;
@@ -115,9 +116,9 @@ public class TableSorter extends AbstractTableModel {
 	private transient Row[] _viewToModel;
 	private int[] _modelToView;
 	private JTableHeader _tableHeader;
-	private transient MouseListener _mouseListener;
-	private transient TableModelListener _tableModelListener;
-	private final List<JTableHeader> _registredTableHeaders = new ArrayList<JTableHeader>();
+	private final transient MouseListener _mouseListener;
+	private final transient TableModelListener _tableModelListener;
+	private final Collection<JTableHeader> _registredTableHeaders = new ArrayList<JTableHeader>();
 	private final Map<Class<?>, Comparator<?>> _columnComparators = new HashMap<Class<?>, Comparator<?>>();
 	private final List<Directive> _sortingColumns = new ArrayList<Directive>();
 	private boolean _disableNotSorted;
@@ -475,11 +476,8 @@ public class TableSorter extends AbstractTableModel {
 
 			final Row row = (Row) o;
 
-			if (_modelIndex != row._modelIndex) {
-				return false;
-			}
+			return _modelIndex == row._modelIndex;
 
-			return true;
 		}
 
 
@@ -536,10 +534,10 @@ public class TableSorter extends AbstractTableModel {
 			// Something has happened to the data that may have invalidated the row order.
 			clearSortingState();
 			fireTableDataChanged();
-			return;
 		}
 	}
 
+	@SuppressWarnings({"AssignmentToMethodParameter", "AssignmentReplaceableWithOperatorAssignment"})
 	private class MouseHandler extends MouseAdapter {
 
 		@Override
@@ -563,6 +561,7 @@ public class TableSorter extends AbstractTableModel {
 		}
 
 
+		@SuppressWarnings("TailRecursion")
 		private int getNextStatus(int actStatus, final boolean isShiftDown) {
 			// Cycle the sorting states through {NOT_SORTED, ASCENDING, DESCENDING} or
 			// {NOT_SORTED, DESCENDING, ASCENDING} depending on whether shift is pressed.
@@ -597,6 +596,7 @@ public class TableSorter extends AbstractTableModel {
 			final int dx = _size / 2 * (int) Math.pow(0.8, _priority);
 			final int dy = _descending ? dx : -dx;
 			// Align icon (roughly) with font baseline.
+			//noinspection AssignmentToMethodParameter
 			y = y + 5 * _size / 6 + (_descending ? -dy : 0);
 			final int shift = _descending ? 1 : -1;
 			g.translate(x, y);

@@ -59,6 +59,7 @@ import java.util.Map.Entry;
  * @version $Revision$
  * @since 0.9.9
  */
+@SuppressWarnings("RedundantInterfaceDeclaration")
 @State(
 		name = FindBugsPluginConstants.PLUGIN_ID,
 		storages = {@Storage(id = "other", file = "$MODULE_FILE$")
@@ -217,6 +218,7 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 
 	public PersistencePreferencesBean getState() {
 		final PersistencePreferencesBean preferencesBean = new PersistencePreferencesBean();
+		//noinspection ForLoopWithMissingComponent
 		for (final Enumeration<?> confNames = _preferences.propertyNames(); confNames.hasMoreElements();) {
 			final String elementName = (String) confNames.nextElement();
 			preferencesBean.getBasePreferences().put(elementName, _preferences.getProperty(elementName));

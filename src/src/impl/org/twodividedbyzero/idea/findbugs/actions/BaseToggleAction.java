@@ -92,11 +92,9 @@ public abstract class BaseToggleAction extends ToggleAction {
 			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
 			presentation.setVisible(true);
 
-		} catch (Throwable e) {
+		} catch (final Throwable e) {
 			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
-			if (processed != null) {
-				LOGGER.error("Action update failed", processed);
-			}
+			LOGGER.error("Action update failed", processed);
 		}
 	}
 

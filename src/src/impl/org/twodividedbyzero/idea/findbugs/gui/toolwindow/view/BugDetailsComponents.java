@@ -71,10 +71,10 @@ import java.net.URL;
 
 
 /**
- * $Date: 2010-10-10 16:30:08 +0200 (Sun, 10 Oct 2010) $
+ * $Date$
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision: 107 $
+ * @version $Revision$
  * @since 0.0.1
  */
 public class BugDetailsComponents /*extends JPanel*/ {
@@ -338,12 +338,13 @@ public class BugDetailsComponents /*extends JPanel*/ {
 				BrowserUtil.launchBrowser(url.toExternalForm());
 				_explanationPane.setPage(url);
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOGGER.debug(e);
 		}
 	}
 
 
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@SuppressWarnings({"HardCodedStringLiteral"})
 	public void setBugsDetails(final BugInstanceNode bugInstanceNode, final TreePath treePath) {
 		_currentTreePath = treePath;
@@ -360,6 +361,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		final SortedBugCollection bc = _lastBugCollection;
 		if (bc != null) {
 			final Cloud cloud = bc.getCloud();
+			//noinspection ConstantConditions
 			if (cloud != null) {
 				final int reviewers = cloud.getReviewers(bugInstance).size();
 				if (reviewers > 0) {
@@ -504,7 +506,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 		try {
 			_explanationPane.setToolTipText(edu.umd.cs.findbugs.L10N.getLocalString("tooltip.longer_description", "This gives a longer description of the detected bug pattern"));
 			_explanationPane.read(reader, "html bug description");
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			_explanationPane.setText("Could not find bug description: " + e.getMessage());
 			LOGGER.warn(e.getMessage(), e);
 		} finally {

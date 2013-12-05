@@ -119,9 +119,9 @@ public class ToolBarButton extends ToggleableButton {
 		setIconSize(_buttonBackground.getIconWidth(), _buttonBackground.getIconHeight());
 
 		super.setIcon(null);
-		super.setRolloverIcon(ResourcesLoader.loadIcon("actions/button-empty_hover.png"));
-		super.setRolloverSelectedIcon(ResourcesLoader.loadIcon("actions/button-empty_hover.png"));
-		super.setPressedIcon(ResourcesLoader.loadIcon("actions/button-empty_pressed.png"));
+		setRolloverIcon(ResourcesLoader.loadIcon("actions/button-empty_hover.png"));
+		setRolloverSelectedIcon(ResourcesLoader.loadIcon("actions/button-empty_hover.png"));
+		setPressedIcon(ResourcesLoader.loadIcon("actions/button-empty_pressed.png"));
 		setBorder(null);
 		setMargin(null);
 
@@ -215,10 +215,10 @@ public class ToolBarButton extends ToggleableButton {
 	private static class ButtonIcon implements Icon {
 
 		private static final float DISABLED_OPACITY = 0.5f;
-		private Icon[] _icons;
-		private int _maxWidth;
-		private int _maxHeight;
-		private boolean _disabledOpacity;
+		private final Icon[] _icons;
+		private final int _maxWidth;
+		private final int _maxHeight;
+		private final boolean _disabledOpacity;
 
 
 		private ButtonIcon(final Dimension dimension, final Icon... icons) {

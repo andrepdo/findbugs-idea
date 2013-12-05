@@ -37,7 +37,7 @@ import java.io.OutputStream;
  */
 public class IOHandler extends InputStream {
 
-	private InputStream _delegate;
+	private final InputStream _delegate;
 	private String _name;
 	private int _bufferSize = 8096;
 	private OutputStream _outputStream;
@@ -141,7 +141,7 @@ public class IOHandler extends InputStream {
 	public void closeQuietly() {
 		try {
 			close();
-		} catch (IOException ignore) {
+		} catch (final IOException ignore) {
 			// ignore
 		}
 	}
@@ -174,7 +174,7 @@ public class IOHandler extends InputStream {
 	void closeInput() {
 		try {
 			close();
-		} catch (IOException ignore) {
+		} catch (final IOException ignore) {
 		}
 	}
 
@@ -182,7 +182,7 @@ public class IOHandler extends InputStream {
 	void closeOutput() {
 		try {
 			_outputStream.close();
-		} catch (IOException ignore) {
+		} catch (final IOException ignore) {
 		}
 	}
 

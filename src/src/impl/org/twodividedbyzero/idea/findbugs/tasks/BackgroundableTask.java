@@ -93,7 +93,7 @@ public abstract class BackgroundableTask extends Backgroundable {
 		if (progressIndicator != null) {
 			progressIndicator.setText(text);
 
-			if ("".equals(text2) || text2 != null) {
+			if (text2 != null && text2.isEmpty() || text2 != null) {
 				progressIndicator.setText(text2);
 			}
 		}

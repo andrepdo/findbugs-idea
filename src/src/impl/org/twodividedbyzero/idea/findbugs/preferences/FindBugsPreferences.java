@@ -57,6 +57,7 @@ public class FindBugsPreferences extends Properties {
 	private static final long serialVersionUID = 3L;
 
 	private static final Logger LOGGER = Logger.getInstance(FindBugsPreferences.class.getName());
+	@SuppressWarnings("StaticVariableMayNotBeInitialized")
 	private static DetectorFactoryCollection _detectorFactoryCollection;
 
 	//public static final String DEFAULT_CONFIG = "";
@@ -173,7 +174,8 @@ public class FindBugsPreferences extends Properties {
 	public Map<String, String> getDefinedProperties() {
 		final Map<String, String> values = new HashMap<String, String>();
 
-		for (final Enumeration<?> properties = propertyNames(); properties.hasMoreElements(); ) {
+		final Enumeration<?> properties = propertyNames();
+		while (properties.hasMoreElements()) {
 			final String propertyName = (String) properties.nextElement();
 			if (propertyName.startsWith(PROPERTIES_PREFIX)) {
 				final String configPropertyName = propertyName.substring(PROPERTIES_PREFIX.length());
@@ -190,6 +192,7 @@ public class FindBugsPreferences extends Properties {
 
 	public void setDefaults(final FindBugsPreferences properties) {
 		clear();
+		//noinspection ForLoopWithMissingComponent
 		for (final Enumeration<?> confNames = properties.propertyNames(); confNames.hasMoreElements(); ) {
 			final String elementName = (String) confNames.nextElement();
 			final String value = properties.getProperty(elementName);
@@ -229,6 +232,7 @@ public class FindBugsPreferences extends Properties {
 	public void clearDefinedProperies() {
 		final Collection<String> propertiesToRemove = new ArrayList<String>();
 
+		//noinspection ForLoopWithMissingComponent
 		for (final Enumeration<?> properties = propertyNames(); properties.hasMoreElements(); ) {
 			final String propertyName = (String) properties.nextElement();
 			if (propertyName.startsWith(PROPERTIES_PREFIX)) {
@@ -258,8 +262,9 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public void setProperty(final String propertyName, final List<String> value) {
+	public void setProperty(final String propertyName, final Iterable<String> value) {
 		if (value == null) {
+			//noinspection ConstantConditions
 			setProperty(propertyName, (String) null);
 			return;
 		}
@@ -267,7 +272,7 @@ public class FindBugsPreferences extends Properties {
 		final StringBuilder valueString = new StringBuilder();
 		for (final String part : value) {
 			if (valueString.length() > 0) {
-				valueString.append(";");
+				valueString.append(';');
 			}
 			valueString.append(part);
 		}
@@ -343,13 +348,13 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public static void loadPlugins(final List<String> pluginUrls) {
+	public static void loadPlugins(final Iterable<String> pluginUrls) {
 		for (final String pluginUrl : pluginUrls) {
 			try {
 				final Plugin plugin = Plugin.loadCustomPlugin(new URL(pluginUrl), null);
 				plugin.setGloballyEnabled(false);
-			} catch (Exception e) {
-				e.printStackTrace();
+			} catch (final Exception e) {
+				LOGGER.warn("Could not load custom findbugs plugins!", e);
 			}
 		}
 	}
@@ -376,7 +381,7 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public void setPlugins(final List<String> plugins) {
+	public void setPlugins(final Iterable<String> plugins) {
 		_plugins.clear();
 		_plugins = checkPlugins(plugins);
 	}
@@ -384,13 +389,14 @@ public class FindBugsPreferences extends Properties {
 
 	public static List<String> collectInvalidPlugins(final Iterable<String> plugins) {
 		final List<String> invalid = new ArrayList<String>();
-		for (String plugin : plugins) {
+		for (final String plugin : plugins) {
 			try {
 				final File file = getPluginAsFile(plugin);
 				if (!checkPlugin(file)) {
 					invalid.add(plugin);
 				}
-			} catch (MalformedURLException e) {
+			} catch (final MalformedURLException e) {
+				LOGGER.debug("invalid plugin.", e);
 				invalid.add(plugin);
 			}
 		}
@@ -408,7 +414,7 @@ public class FindBugsPreferences extends Properties {
 				} else {
 					LOGGER.warn("Plugin '" + plugin + "' not loaded. Archive '" + file + "' does not exists.");
 				}
-			} catch (MalformedURLException e) {
+			} catch (final MalformedURLException e) {
 				LOGGER.warn("Plugin '" + plugin + "' not loaded. Archive '" + plugin + "' is malformed.", e);
 			}
 		}
@@ -417,17 +423,17 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public static boolean checkPlugin(File plugin) {
+	public static boolean checkPlugin(final File plugin) {
 		return plugin.exists() && plugin.canRead();
 	}
 
 
-	public static String getPluginAsString(File plugin) throws MalformedURLException {
+	public static String getPluginAsString(final File plugin) throws MalformedURLException {
 		return plugin.toURI().toURL().toExternalForm();
 	}
 
 
-	public static File getPluginAsFile(String plugin) throws MalformedURLException {
+	public static File getPluginAsFile(final String plugin) throws MalformedURLException {
 		return new File(new URL(plugin).getFile());
 	}
 
@@ -438,7 +444,7 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public List<String> getIncludeFilters() {
+	public Collection<String> getIncludeFilters() {
 		//noinspection ReturnOfCollectionOrArrayField
 		return _includeFilters;
 	}
@@ -455,7 +461,7 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public List<String> getExcludeFilters() {
+	public Collection<String> getExcludeFilters() {
 		//noinspection ReturnOfCollectionOrArrayField
 		return _excludeFilters;
 	}
@@ -472,7 +478,7 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public List<String> getExcludeBaselineBugs() {
+	public Collection<String> getExcludeBaselineBugs() {
 		//noinspection ReturnOfCollectionOrArrayField
 		return _excludeBaselineBugs;
 	}
@@ -489,7 +495,7 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public List<String> getPlugins() {
+	public Collection<String> getPlugins() {
 		//noinspection ReturnOfCollectionOrArrayField
 		return _plugins;
 	}
@@ -583,7 +589,7 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public List<String> getEnabledModuleConfigs() {
+	public Collection<String> getEnabledModuleConfigs() {
 		//noinspection ReturnOfCollectionOrArrayField
 		return _enabledModuleConfigs;
 	}
@@ -671,7 +677,7 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public static FindBugsPreferences createEmpty(final List<String> pluginList) {
+	public static FindBugsPreferences createEmpty(final Iterable<String> pluginList) {
 		loadPlugins(pluginList);
 		final UserPreferences userPrefs = UserPreferences.createDefaultUserPreferences();
 		final ProjectFilterSettings filterSettings = userPrefs.getFilterSettings();
@@ -770,12 +776,12 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public List<String> getDisabledPlugins() {
+	public Collection<String> getDisabledPlugins() {
 		return _disabledPlugins;
 	}
 
 
-	public List<String> getEnabledPlugins() {
+	public Collection<String> getEnabledPlugins() {
 		return _enabledPlugins;
 	}
 

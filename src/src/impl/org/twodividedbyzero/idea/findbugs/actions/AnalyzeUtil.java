@@ -27,7 +27,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileSystemItem;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 
@@ -52,18 +52,18 @@ public final class AnalyzeUtil {
 
 		try {
 			_key = getStaticDataKey(Class.forName("com.intellij.analysis.AnalysisScopeUtil"));
-		} catch (ClassNotFoundException e) { // ignore e;
-		} catch (NoSuchFieldException e) { // ignore e;
-		} catch (IllegalAccessException e) {
+		} catch (final ClassNotFoundException ignored) { // ignore e;
+		} catch (final NoSuchFieldException ignored) { // ignore e;
+		} catch (final IllegalAccessException e) {
 			throw new Error(e); // we are expecting a public field
 		}
 
 		if (_key == null) {
 			try {
 				_key = getStaticDataKey(AnalysisScope.class);
-			} catch (NoSuchFieldException e) {
+			} catch (final NoSuchFieldException e) {
 				throw new Error(e);
-			} catch (IllegalAccessException e) {
+			} catch (final IllegalAccessException e) {
 				throw new Error(e); // we are expecting a public field
 			}
 		}
@@ -78,12 +78,10 @@ public final class AnalyzeUtil {
 
 	@SuppressWarnings("unchecked")
 	@Nullable
-	private static DataKey<AnalysisScope> getStaticDataKey(@Nullable Class clazz) throws NoSuchFieldException, IllegalAccessException {
+	private static DataKey<AnalysisScope> getStaticDataKey(@Nullable final Class<?> clazz) throws NoSuchFieldException, IllegalAccessException {
 		if (clazz != null) {
 			final Field key = clazz.getDeclaredField("KEY");
-			if (key != null) {
-				return (DataKey<AnalysisScope>)key.get(null);
-			}
+			return (DataKey<AnalysisScope>)key.get(null);
 		}
 		return null;
 	}
@@ -93,8 +91,9 @@ public final class AnalyzeUtil {
 	 * Copy from \ideaIC-129.354\plugins\ByteCodeViewer\src\com\intellij\byteCodeViewer\ByteCodeViewerManager#getByteCode(PsiElement)
 	 * (first unused part "detect module" removed)
 	 */
+	@SuppressWarnings("HardcodedFileSeparator")
 	@Nullable
-	public static String getOutputClassFilePathForJavaFile(PsiFile psiFile, Project project) {
+	public static String getOutputClassFilePathForJavaFile(final PsiFileSystemItem psiFile, final Project project) {
 		try {
 			final Module module = IdeaUtilImpl.findModuleForPsiElement(psiFile, project);
 			final VirtualFile virtualFile = psiFile.getVirtualFile();
@@ -129,7 +128,7 @@ public final class AnalyzeUtil {
 				LOGGER.warn("Unexpected file type:" + virtualFile);
 				return null;
 			}
-			classPath += "/" + packageName.replace('.', '/') + "/" + className + ".class";
+			classPath += '/' + packageName.replace('.', '/') + '/' + className + ".class";
 
 			final File classFile = new File(classPath);
 			if (!classFile.exists()) {
@@ -138,7 +137,7 @@ public final class AnalyzeUtil {
 			}
 			return classFile.getCanonicalPath();
 		}
-		catch (Exception e1) {
+		catch (final Exception e1) {
 			LOGGER.error(e1);
 		}
 		return null;

@@ -26,6 +26,7 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementFactory;
 import com.intellij.util.IncorrectOperationException;
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 
@@ -55,7 +56,7 @@ public class SurroundWithTagFix implements LocalQuickFix {
 
 	@NotNull
 	public String getName() {
-		return "Surround with '" + _tagName + "'";
+		return "Surround with '" + _tagName + '\'';
 	}
 
 
@@ -68,9 +69,11 @@ public class SurroundWithTagFix implements LocalQuickFix {
 
 				try {
 					final StringBuilder builder = new StringBuilder(_parent.getTextRange().getLength());
+					//noinspection ForLoopWithMissingComponent
 					for (PsiElement next = _firstChild; ; next = next.getNextSibling()) {
 						assert next != null;
 						builder.append(next.getText());
+						//noinspection ObjectEquality
 						if (next == _lastChild) {
 							break;
 						}
@@ -78,7 +81,7 @@ public class SurroundWithTagFix implements LocalQuickFix {
 					/*final XmlTag tag = elfactory.createTagFromText("<" + tagName + ">" + builder.toString() + "</" + tagName + ">");
 					parent.addAfter(tag, lastChild);
 					parent.deleteChildRange(firstChild, lastChild);*/
-				} catch (IncorrectOperationException e) {
+				} catch (final IncorrectOperationException e) {
 					throw new IllegalStateException(e);
 				}
 			}
@@ -86,6 +89,7 @@ public class SurroundWithTagFix implements LocalQuickFix {
 	}
 
 
+	@SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@NotNull
 	public String getFamilyName() {
 		return FindBugsPluginConstants.PLUGIN_ID;

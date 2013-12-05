@@ -233,7 +233,7 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 		for (//noinspection LocalCanBeFinal
 				int i = 0, problemDescriptorsSize = problemDescriptors.size(); i < problemDescriptorsSize; i++) {
 			final ExtendedProblemDescriptor problemDescriptor = problemDescriptors.get(i);
-			buffer.append(ResourcesLoader.getString("findbugs.name")).append(": ").append(StringUtil.html2text(BugInstanceUtil.getBugPatternShortDescription(problemDescriptor.getBugInstance()))).append("\n");
+			buffer.append(ResourcesLoader.getString("findbugs.name")).append(": ").append(StringUtil.html2text(BugInstanceUtil.getBugPatternShortDescription(problemDescriptor.getBugInstance()))).append('\n');
 			buffer.append(StringUtil.html2text(BugInstanceUtil.getDetailText(problemDescriptor.getBugInstance())));
 			if (i < problemDescriptors.size() - 1) {
 				//noinspection HardcodedLineSeparator

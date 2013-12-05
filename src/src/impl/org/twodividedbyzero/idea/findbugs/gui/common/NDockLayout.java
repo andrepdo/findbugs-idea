@@ -39,6 +39,7 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Collection;
 
 
 public class NDockLayout extends BorderLayout {
@@ -154,6 +155,7 @@ public class NDockLayout extends BorderLayout {
 	 * @return Returns the ideal width for a vertically oriented toolbar and the ideal height for a horizontally oriented tollbar.
 	 */
 	private static Dimension getPreferredDimension(final Iterable<Component> components) {
+		@SuppressWarnings("MultipleVariablesInDeclaration")
 		int w = 0, h = 0;
 
 		for (final Component comp : components) {
@@ -283,7 +285,7 @@ public class NDockLayout extends BorderLayout {
 								jtb.add(separ, i);
 							}
 						}
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						throw new AWTError(e.getMessage());
 					}
 				}
@@ -295,7 +297,7 @@ public class NDockLayout extends BorderLayout {
 	public boolean containsImbeddedComp(final Component component) {
 		for (final Object curImbeddedTBR : _embeddedComponents) {
 			//noinspection unchecked
-			if (((ArrayList<Component>) curImbeddedTBR).contains(component)) {
+			if (((Collection<Component>) curImbeddedTBR).contains(component)) {
 				return true;
 			}
 		}
@@ -314,7 +316,7 @@ public class NDockLayout extends BorderLayout {
 	 */
 	public boolean containsEmbeddedComp(final Component component, final int inx) {
 		//noinspection unchecked
-		return inx > 0 && inx < 5 && ((ArrayList<Component>) _embeddedComponents[inx + 1]).contains(component);
+		return inx > 0 && inx < 5 && ((Collection<Component>) _embeddedComponents[inx + 1]).contains(component);
 	}
 
 }

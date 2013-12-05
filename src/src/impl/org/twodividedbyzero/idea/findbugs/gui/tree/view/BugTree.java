@@ -78,9 +78,9 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 	private final BugTreePanel _bugTreePanel;
 	private transient TreeMouseListener _treeMouseListener;
 	private transient TreeSelectionListener _treeSelectionListener;
-	private final Project _project;
+	private final transient Project _project;
 	private transient BugTreeHelper _treeHelper;
-	private KeyAdapter _treeKeyAdapter;
+	private transient KeyAdapter _treeKeyAdapter;
 	private transient ScrollToSourceHandler _scrollToSourceHandler;
 	private final transient TreeOccurenceNavigator _occurenceNavigator;
 
@@ -308,7 +308,7 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 
 
 	/** Listen for clicks and scroll to the error's source as necessary. */
-	protected class TreeMouseListener extends MouseAdapter {
+	private class TreeMouseListener extends MouseAdapter {
 
 		@Override
 		public void mouseClicked(final MouseEvent e) {
@@ -357,7 +357,7 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 
 
 	/** Listen for tree selection events and scroll to the error's source as necessary. */
-	protected class TreeSelectionListener implements javax.swing.event.TreeSelectionListener {
+	private class TreeSelectionListener implements javax.swing.event.TreeSelectionListener {
 
 		public void valueChanged(final TreeSelectionEvent e) {
 			final TreePath path = e.getPath();

@@ -172,8 +172,9 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 				addSuppressAnnotation(project, editor, container, modifierList, getID(container));
 			}
 		} else {
-			PsiDocComment docComment = container.getDocComment();
+			final PsiDocComment docComment = container.getDocComment();
 			final PsiManager manager = PsiManager.getInstance(project);
+			//noinspection IfStatementWithIdenticalBranches
 			if (docComment == null) {
 				/*final String commentText = "*//** @" + SUPPRESS_INSPECTIONS_TAG_NAME + ' ' + getID(container) + "*//*";
 				docComment = JavaPsiFacade.getInstance(manager.getProject()).getElementFactory().createDocCommentFromText(commentText, null);
@@ -216,6 +217,7 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 	}
 
 
+	@SuppressWarnings("HardcodedLineSeparator")
 	public void addSuppressAnnotation(final Project project, final Editor editor, final PsiElement container, final PsiModifierList modifierList, final String id) throws IncorrectOperationException {
 		PsiAnnotation annotation = modifierList.findAnnotation(_suppressWarningsClassName);
 		if (annotation != null) {
@@ -223,19 +225,19 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 				final PsiNameValuePair[] attributes = annotation.getParameterList().getAttributes();
 				if (attributes.length == 1) {
 					final String suppressedWarnings = attributes[0].getText();
-					final PsiAnnotation newAnnotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + _suppressWarningsClassName + "({" + suppressedWarnings + ", \"" + id + "\"})\n", container);
+					final PsiAnnotation newAnnotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + _suppressWarningsClassName + "({" + suppressedWarnings + ", \"" + id + "\"})\r\n", container);
 					annotation.replace(newAnnotation);
 				}
 			} else {
 				final int curlyBraceIndex = annotation.getText().lastIndexOf('}');
 				if (curlyBraceIndex > 0) {
-					annotation.replace(JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText(annotation.getText().substring(0, curlyBraceIndex) + ", \"" + id + "\"})\n", container));
+					annotation.replace(JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText(annotation.getText().substring(0, curlyBraceIndex) + ", \"" + id + "\"})\r\n", container));
 				} else if (!ApplicationManager.getApplication().isUnitTestMode() && editor != null) {
 					Messages.showErrorDialog(editor.getComponent(), InspectionsBundle.message("suppress.inspection.annotation.syntax.error", annotation.getText()));
 				}
 			}
 		} else {
-			annotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + _suppressWarningsClassName + "({\"" + id + "\"})\n", container);
+			annotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + _suppressWarningsClassName + "({\"" + id + "\"})\r\n", container);
 			modifierList.addBefore(annotation, modifierList.getFirstChild());
 			JavaCodeStyleManager.getInstance(project).shortenClassReferences(modifierList);
 

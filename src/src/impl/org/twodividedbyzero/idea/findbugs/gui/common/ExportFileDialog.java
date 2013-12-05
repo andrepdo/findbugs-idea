@@ -50,11 +50,11 @@ import java.io.File;
 
 
 /**
- * $Date: 2010-10-10 16:30:08 +0200 (Sun, 10 Oct 2010) $
+ * $Date$
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
  * @author Keith Lea <keithl@gmail.com>
- * @version $Revision: 107 $
+ * @version $Revision$
  * @since 0.9.96
  */
 @edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
@@ -112,7 +112,7 @@ public class ExportFileDialog extends JPanel {
 		dialogBuilder.setCenterPanel(this);
 
 		_path.getDocument().addDocumentListener(new MyDocumentAdapter());
-		if (_path.getText().length() > 0) {
+		if (!_path.getText().isEmpty()) {
 			_selectedFile = new File(_path.getText());
 		}
 		_path.addHierarchyListener(new HierarchyListener() {
@@ -148,8 +148,8 @@ public class ExportFileDialog extends JPanel {
 
 	private boolean validateDirectory(final Document doc) {
 		try {
-			return _selectedFile != null && _selectedFile.isDirectory() && _selectedFile.canWrite() || doc.getText(0, doc.getLength()).trim().length() > 0;
-		} catch (BadLocationException ignore) {
+			return _selectedFile != null && _selectedFile.isDirectory() && _selectedFile.canWrite() || !doc.getText(0, doc.getLength()).trim().isEmpty();
+		} catch (final BadLocationException ignore) {
 			return false;
 		}
 	}

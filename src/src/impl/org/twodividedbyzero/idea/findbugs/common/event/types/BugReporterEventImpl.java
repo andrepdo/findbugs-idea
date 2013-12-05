@@ -39,15 +39,15 @@ public class BugReporterEventImpl extends EventImpl implements BugReporterEvent 
 
 	private static final long serialVersionUID = 0L;
 
-	private Operation _operation;
-	private BugInstance _bugInstance;
-	private Integer _bugCount;
+	private final Operation _operation;
+	private final BugInstance _bugInstance;
+	private final Integer _bugCount;
 
 
-	private transient BugCollection _bugCollection;
-	private transient ProjectStats _projectStats;
-	private String _projectName;
-	private FindBugsProject _findBugsProject;
+	private final transient BugCollection _bugCollection;
+	private final transient ProjectStats _projectStats;
+	private final String _projectName;
+	private final FindBugsProject _findBugsProject;
 
 
 	public BugReporterEventImpl(@NotNull final Operation operation, @NotNull final String projectName) {

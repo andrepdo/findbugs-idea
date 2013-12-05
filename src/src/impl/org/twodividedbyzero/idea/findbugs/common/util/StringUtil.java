@@ -42,7 +42,7 @@ public class StringUtil {
 			result.append(calctext.substring(0, maxWidth)).append('\n');
 			calctext = calctext.substring(maxWidth, calctext.length());
 		}
-		if (calctext.length() > 0) {
+		if (!calctext.isEmpty()) {
 			result.append(calctext);
 		}
 
@@ -55,7 +55,7 @@ public class StringUtil {
 	}
 
 
-	public static String html2text(String html) {
+	public static String html2text(final String html) {
 		return Jsoup.parse(html).text();
 	}
 

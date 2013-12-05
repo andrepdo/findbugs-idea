@@ -293,7 +293,7 @@ public class ImportExportConfiguration implements ConfigurationPage {
 	}
 
 
-	public void filter(String filter) {
+	public void filter(final String filter) {
 		// TODO support search
 	}
 

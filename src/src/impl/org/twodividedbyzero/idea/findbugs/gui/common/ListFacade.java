@@ -52,15 +52,15 @@ public final class ListFacade {
 				final Class<?> clazz = Class.forName("com.intellij.ui.components.JBList");
 				final Constructor<?> constructor = clazz.getConstructor(ListModel.class);
 				return (JList) constructor.newInstance(dataModel);
-			} catch (ClassNotFoundException e) {
+			} catch (final ClassNotFoundException e) {
 				LOGGER.error(e);
-			} catch (NoSuchMethodException e) {
+			} catch (final NoSuchMethodException e) {
 				LOGGER.error(e);
-			} catch (InvocationTargetException e) {
+			} catch (final InvocationTargetException e) {
 				LOGGER.error(e.getTargetException());
-			} catch (InstantiationException e) {
+			} catch (final InstantiationException e) {
 				LOGGER.error(e);
-			} catch (IllegalAccessException e) {
+			} catch (final IllegalAccessException e) {
 				LOGGER.error(e);
 			}
 		}
@@ -76,15 +76,15 @@ public final class ListFacade {
 				final Constructor<?> constructor = clazz.getConstructor(Object[].class);
 				final Object[] passed = {listData};
 				return (JList) constructor.newInstance(passed);
-			} catch (ClassNotFoundException e) {
+			} catch (final ClassNotFoundException e) {
 				LOGGER.error(e);
-			} catch (NoSuchMethodException e) {
+			} catch (final NoSuchMethodException e) {
 				LOGGER.error(e);
-			} catch (InvocationTargetException e) {
+			} catch (final InvocationTargetException e) {
 				LOGGER.error(e.getTargetException());
-			} catch (InstantiationException e) {
+			} catch (final InstantiationException e) {
 				LOGGER.error(e);
-			} catch (IllegalAccessException e) {
+			} catch (final IllegalAccessException e) {
 				LOGGER.error(e);
 			}
 		}
@@ -99,15 +99,15 @@ public final class ListFacade {
 				final Class<?> clazz = Class.forName("com.intellij.ui.components.JBList");
 				final Constructor<?> constructor = clazz.getConstructor();
 				return (JList) constructor.newInstance();
-			} catch (ClassNotFoundException e) {
+			} catch (final ClassNotFoundException e) {
 				LOGGER.error(e);
-			} catch (NoSuchMethodException e) {
+			} catch (final NoSuchMethodException e) {
 				LOGGER.error(e);
-			} catch (InvocationTargetException e) {
+			} catch (final InvocationTargetException e) {
 				LOGGER.error(e.getTargetException());
-			} catch (InstantiationException e) {
+			} catch (final InstantiationException e) {
 				LOGGER.error(e);
-			} catch (IllegalAccessException e) {
+			} catch (final IllegalAccessException e) {
 				LOGGER.error(e);
 			}
 		}

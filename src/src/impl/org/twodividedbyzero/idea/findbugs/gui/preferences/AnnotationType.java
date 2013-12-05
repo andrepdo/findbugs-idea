@@ -56,8 +56,7 @@ public enum AnnotationType {
 	public static final String EFFECT_TYPE = "effectType";
 	public static final String FONT = "font";
 
-	@SuppressWarnings("PublicStaticArrayField")
-	public static String[] PROP_ORDER = new String[5];
+	private static final String[] PROP_ORDER = new String[5];
 
 
 	static {
@@ -175,7 +174,8 @@ public enum AnnotationType {
 		for (final Entry<String, String> entry : entries) {
 			final Map<String, String> properties = new HashMap<String, String>();
 			final String[] split = entry.getValue().split(";");
-			for (int i = 0, splitLength = split.length; i < splitLength; i++) {
+			final int splitLength = split.length;
+			for (int i = 0; i < splitLength; i++) {
 				final String s = split[i];
 				//noinspection SizeReplaceableByIsEmpty
 				if (s.length() > 0) {

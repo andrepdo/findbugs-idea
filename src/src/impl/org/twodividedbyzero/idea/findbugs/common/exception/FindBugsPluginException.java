@@ -18,6 +18,9 @@
  */
 package org.twodividedbyzero.idea.findbugs.common.exception;
 
+import org.jetbrains.annotations.Nullable;
+
+
 /**
  * $Date$
  *
@@ -35,7 +38,7 @@ public class FindBugsPluginException extends RuntimeException {
 	}
 
 
-	public FindBugsPluginException(final String message, final Throwable cause) {
+	public FindBugsPluginException(final String message, @Nullable final Throwable cause) {
 		super(message, cause);
 	}
 

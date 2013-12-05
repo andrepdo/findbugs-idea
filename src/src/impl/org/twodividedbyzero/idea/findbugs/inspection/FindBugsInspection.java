@@ -37,9 +37,11 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileSystemItem;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.FieldAnnotation;
 import edu.umd.cs.findbugs.MethodAnnotation;
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -91,6 +93,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
+	@SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@Override
 	@Nls
 	@NotNull
@@ -99,6 +102,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
+	@SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@Override
 	@Nls
 	@NotNull
@@ -220,15 +224,15 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 
 		if (fieldAnnotation != null) {
 			description.append("Field: ");
-			description.append(BugInstanceUtil.getFieldName(bugInstance)).append(" ");
+			description.append(BugInstanceUtil.getFieldName(bugInstance)).append(' ');
 		}
 
 		if (methodAnnotation != null) {
 			description.append("\r\nMethod: ");
 			if ("<init>".equals(BugInstanceUtil.getMethodName(bugInstance))) {
-				description.append(BugInstanceUtil.getJavaSourceMethodName(bugInstance)).append("<init>").append(BugInstanceUtil.getFullMethod(bugInstance)).append(" ");
+				description.append(BugInstanceUtil.getJavaSourceMethodName(bugInstance)).append("<init>").append(BugInstanceUtil.getFullMethod(bugInstance)).append(' ');
 			} else {
-				description.append(methodAnnotation.getMethodName()).append(BugInstanceUtil.getFullMethod(bugInstance)).append(" ");
+				description.append(methodAnnotation.getMethodName()).append(BugInstanceUtil.getFullMethod(bugInstance)).append(' ');
 			}
 		}
 		if (lines[0] > -1) {
@@ -273,7 +277,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
-	private void initWorker(@SuppressWarnings("TypeMayBeWeakened") final PsiFile psiFile) {
+	private void initWorker(@SuppressWarnings("TypeMayBeWeakened") final PsiFileSystemItem psiFile) {
 		final com.intellij.openapi.project.Project project = IdeaUtilImpl.getProject(psiFile);
 		final FindBugsInspector worker = new FindBugsInspector(project, this);
 
@@ -292,6 +296,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 		// set class files
 		worker.configureOutputFiles(new VirtualFile[] {selectedSourceFiles});
 
+		//noinspection MagicNumber
 		if (selectedSourceFiles.getTimeStamp() > System.currentTimeMillis() - 30000) {
 			worker.compile(new VirtualFile[] {selectedSourceFiles}, project);
 		}
@@ -311,8 +316,10 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 				break;
 			case NEW_BUG_INSTANCE:
 				final BugInstance bugInstance = event.getBugInstance();
-				final ProblemDescriptor problemDescriptor = createProblemDescriptor(bugInstance);
-				_problems.add(problemDescriptor);
+				if (bugInstance != null) {
+					final ProblemDescriptor problemDescriptor = createProblemDescriptor(bugInstance);
+					_problems.add(problemDescriptor);
+				}
 				break;
 			default:
 		}
@@ -334,6 +341,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
+	@SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@NotNull
 	@Override
 	public HighlightDisplayLevel getDefaultLevel() {

@@ -70,7 +70,7 @@ public class AnalyzeModuleFiles extends BaseAction implements EventListener<BugR
 		final Presentation presentation = e.getPresentation();
 
 		// check a project is loaded
-		if (isProjectLoaded(project, presentation)) {
+		if (isProjectNotLoaded(project, presentation)) {
 			Messages.showWarningDialog("Project not loaded.", "FindBugs");
 			return;
 		}
@@ -96,14 +96,14 @@ public class AnalyzeModuleFiles extends BaseAction implements EventListener<BugR
 			//final Module module = IdeaUtilImpl.getModule(_dataContext);
 
 			// check a project is loaded
-			if (isProjectLoaded(project, presentation)) {
+			if (isProjectNotLoaded(project, presentation)) {
 				return;
 			}
 
 			isPluginAccessible(project);
 
 			// check if tool window is registered
-			final ToolWindow toolWindow = isToolWindowRegistred(project);
+			final ToolWindow toolWindow = isToolWindowRegistered(project);
 			if (toolWindow == null) {
 				presentation.setEnabled(false);
 				presentation.setVisible(false);
@@ -115,16 +115,14 @@ public class AnalyzeModuleFiles extends BaseAction implements EventListener<BugR
 
 			// enable ?
 			if (!_running) {
-				_enabled = project != null && project.isInitialized() && project.isInitialized();
+				_enabled = project != null && project.isInitialized() && project.isOpen();
 			}
 			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
 			presentation.setVisible(true);
 
-		} catch (Throwable e) {
+		} catch (final Throwable e) {
 			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
-			if (processed != null) {
-				LOGGER.error("Action update failed", processed);
-			}
+			LOGGER.error("Action update failed", processed);
 		}
 	}
 

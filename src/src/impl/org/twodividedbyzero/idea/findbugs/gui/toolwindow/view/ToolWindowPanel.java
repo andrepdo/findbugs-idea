@@ -63,6 +63,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -279,6 +280,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 				_bugTreePanel.updateRootNode(event.getProjectStats());
 				break;
 			case ANALYSIS_ABORTED:
+				//noinspection ConstantConditions
 				_bugTreePanel.setBugCollection(event.getBugCollection());
 				EventDispatchThreadHelper.invokeLater(new Runnable() {
 					public void run() {
@@ -289,14 +291,18 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 				break;
 			case ANALYSIS_FINISHED:
 				final BugCollection bugCollection = event.getBugCollection();
-				_bugTreePanel.setBugCollection(bugCollection);
-				final ProjectStats projectStats = bugCollection.getProjectStats();
-				_bugTreePanel.updateRootNode(projectStats);
+				final AtomicReference<ProjectStats> projectStats = new AtomicReference<ProjectStats>();
+				if (bugCollection != null) {
+					_bugTreePanel.setBugCollection(bugCollection);
+					projectStats.set(bugCollection.getProjectStats());
+					_bugTreePanel.updateRootNode(projectStats.get());
+				}
 
 				EventDispatchThreadHelper.invokeLater(new Runnable() {
 					public void run() {
 						_bugTreePanel.getBugTree().validate();
-						final int numAnalysedClasses = projectStats.getNumClasses();
+						final ProjectStats stats = projectStats.get();
+						final int numAnalysedClasses = stats != null ? stats.getNumClasses() : 0;
 
 						final StringBuilder message = new StringBuilder()
 								.append(VersionManager.getName())

@@ -840,7 +840,7 @@ public class MultiSplitLayout implements LayoutManager {
 	 * @return the Dividers that overlap r
 	 * @throws IllegalArgumentException if the Rectangle is null
 	 */
-	public List<Divider> dividersThatOverlap(final Rectangle r) {
+	public Iterable<Divider> dividersThatOverlap(final Rectangle r) {
 		if (r == null) {
 			throw new IllegalArgumentException("null Rectangle");
 		}
@@ -1216,7 +1216,7 @@ public class MultiSplitLayout implements LayoutManager {
 				throwParseException(st, "invalid name");
 			}
 		} else {
-			throwParseException(st, "unrecognized attribute \"" + name + "\"");
+			throwParseException(st, "unrecognized attribute \"" + name + '"');
 		}
 	}
 
@@ -1274,7 +1274,7 @@ public class MultiSplitLayout implements LayoutManager {
 					addSplitChild(parent, split);
 					parseSplit(st, split);
 				} else {
-					throwParseException(st, "unrecognized node type '" + nodeType + "'");
+					throwParseException(st, "unrecognized node type '" + nodeType + '\'');
 				}
 			}
 		}
@@ -1287,13 +1287,13 @@ public class MultiSplitLayout implements LayoutManager {
 			final Split root = new Split();
 			parseSplit(st, root);
 			return root.getChildren().get(0);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			//noinspection UseOfSystemOutOrSystemErr
 			System.err.println(e);
 		} finally {
 			try {
 				r.close();
-			} catch (IOException ignore) {
+			} catch (final IOException ignore) {
 			}
 		}
 		return null;

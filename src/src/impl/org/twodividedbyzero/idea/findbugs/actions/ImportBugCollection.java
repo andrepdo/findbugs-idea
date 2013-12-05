@@ -61,10 +61,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
- * $Date: 2010-10-10 16:30:08 +0200 (Sun, 10 Oct 2010) $
+ * $Date$
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision: 107 $
+ * @version $Revision$
  * @since 0.9.96
  */
 @SuppressWarnings({"HardCodedStringLiteral"})
@@ -102,7 +102,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 		final Presentation presentation = e.getPresentation();
 
 		// check a project is loaded
-		if (isProjectLoaded(project, presentation)) {
+		if (isProjectNotLoaded(project, presentation)) {
 			Messages.showWarningDialog("Project not loaded.", "FindBugs");
 			return;
 		}
@@ -122,7 +122,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 			return;
 		}
 		final String fileToImport = importFileDialog.getText();
-		if (fileToImport == null || fileToImport.trim().length() == 0) {
+		if (fileToImport == null || fileToImport.trim().isEmpty()) {
 			return;
 		}
 
@@ -183,13 +183,13 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 					_importBugCollection.setDoNotUseCloud(false);
 					_importBugCollection.setTimestamp(System.currentTimeMillis());
 					_importBugCollection.reinitializeCloud();
-				} catch (IOException e1) {
+				} catch (final IOException e1) {
 					EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_ABORTED, project.getName()));
 					final String message = "Import failed";
 					showToolWindowNotifier(project, message, MessageType.ERROR);
 					LOGGER.error(message, e1);
 
-				} catch (DocumentException e1) {
+				} catch (final DocumentException e1) {
 					EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_ABORTED, project.getName()));
 					final String message = "Import failed";
 					showToolWindowNotifier(project, message, MessageType.ERROR);
@@ -237,14 +237,14 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 			final Presentation presentation = event.getPresentation();
 
 			// check a project is loaded
-			if (isProjectLoaded(project, presentation)) {
+			if (isProjectNotLoaded(project, presentation)) {
 				return;
 			}
 
 			isPluginAccessible(project);
 
 			// check if tool window is registered
-			final ToolWindow toolWindow = isToolWindowRegistred(project);
+			final ToolWindow toolWindow = isToolWindowRegistered(project);
 			if (toolWindow == null) {
 				presentation.setEnabled(false);
 				presentation.setVisible(false);
@@ -261,11 +261,9 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
 			presentation.setVisible(true);
 
-		} catch (Throwable e) {
+		} catch (final Throwable e) {
 			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
-			if (processed != null) {
-				LOGGER.error("Action update failed", processed);
-			}
+			LOGGER.error("Action update failed", processed);
 		}
 	}
 

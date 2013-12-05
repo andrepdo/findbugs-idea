@@ -18,9 +18,13 @@
  */
 package org.twodividedbyzero.idea.findbugs.common;
 
+import org.twodividedbyzero.idea.findbugs.common.util.IoUtil;
+
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 
 
 /**
@@ -39,7 +43,7 @@ public class VersionManager {
 	private static final long _build = 991;
 
 	private static final String _branch = "trunk";
-	private static final long _revision = 250;
+	private static final long _revision = 256;
 
 
 	private static final String NAME = FindBugsPluginConstants.PLUGIN_NAME;
@@ -134,24 +138,20 @@ public class VersionManager {
 		if (args.length == 1) {
 			final File file = new File(args[0]);
 			System.out.println("version string file: " + args[0]);
-			FileWriter writer = null;
+			OutputStreamWriter writer = null;
 			try {
-				writer = new FileWriter(file);
+				//noinspection IOResourceOpenedButNotSafelyClosed
+				writer = new OutputStreamWriter(new FileOutputStream(file), Charset.forName("UTF-8").newEncoder());
 				writer.write(getVersion());
 				writer.flush();
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 			} finally {
-				try {
-					if (writer != null) {
-						writer.close();
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				IoUtil.safeClose(writer);
 			}
 
 		}
+		System.out.println("$Id");
 		System.out.println(getVersion());
 		System.out.println(getFullVersion());
 		System.out.println(getVersionWithRevision());

@@ -323,7 +323,7 @@ public abstract class QuickSearch<E> {
 				if (componentLocation.y < 0) {
 					componentLocation.y = 0;
 				}
-			} catch (IllegalComponentStateException ignore) {
+			} catch (final IllegalComponentStateException ignore) {
 				return null;
 			}
 
@@ -466,7 +466,7 @@ public abstract class QuickSearch<E> {
 	public int findNextOccurence(final String text) {
 		final int count = getElementCount();
 		if (count == 0) {
-			return text.length() > 0 ? -1 : 0;
+			return !text.isEmpty() ? -1 : 0;
 		}
 
 		for (int i = getCursor() + 1; i < count; i++) {
@@ -483,7 +483,7 @@ public abstract class QuickSearch<E> {
 	public int findPreviousOccurence(final String text) {
 		final int count = getElementCount();
 		if (count == 0) {
-			return text.length() > 0 ? -1 : 0;
+			return !text.isEmpty() ? -1 : 0;
 		}
 
 		for (int i = getCursor() - 1; i >= 0; i--) {
@@ -498,7 +498,7 @@ public abstract class QuickSearch<E> {
 
 
 	protected boolean compare(final E element, final String searchText) {
-		if (searchText == null || searchText.trim().length() == 0) {
+		if (searchText == null || searchText.trim().isEmpty()) {
 			return true;
 		}
 
@@ -509,19 +509,19 @@ public abstract class QuickSearch<E> {
 
 		try {
 			//_pattern = Pattern.compile(isFromStart() ? "^" + s : s, isCaseSensitive() ? 0 : Pattern.CASE_INSENSITIVE);
-			Pattern pattern = Pattern.compile("^" + searchText + "^", 0);
+			Pattern pattern = Pattern.compile('^' + searchText + '^', 0);
 			boolean found = pattern.matcher(text).find();
 			if (found) {
 				return found;
 			}
 
-			pattern = Pattern.compile("^" + searchText, 0);
+			pattern = Pattern.compile('^' + searchText, 0);
 			found = pattern.matcher(text).find();
 			if (found) {
 				return found;
 			}
 
-			pattern = Pattern.compile("^" + searchText, Pattern.CASE_INSENSITIVE);
+			pattern = Pattern.compile('^' + searchText, Pattern.CASE_INSENSITIVE);
 			found = pattern.matcher(text).find();
 			if (found) {
 				return found;
@@ -530,7 +530,7 @@ public abstract class QuickSearch<E> {
 			pattern = Pattern.compile(searchText, Pattern.CASE_INSENSITIVE);
 			found = pattern.matcher(text).find();
 			return found;
-		} catch (PatternSyntaxException ignore) {
+		} catch (final PatternSyntaxException ignore) {
 			return false;
 		}
 	}
@@ -647,7 +647,7 @@ public abstract class QuickSearch<E> {
 
 				void doFind() {
 					final String text = _searchField.getText().trim();
-					if (text.length() != 0) {
+					if (!text.isEmpty()) {
 						final int found = find(text);
 						if (found == -1) {
 							_noMatchForeground = getNoMatchForeground();
@@ -723,7 +723,7 @@ public abstract class QuickSearch<E> {
 					_popup.setSize(size);
 					_popup.setPreferredSize(size);
 					_popup.validate();
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					LOGGER.debug(e);
 				}
 			}
@@ -736,7 +736,7 @@ public abstract class QuickSearch<E> {
 			if (e.isConsumed()) {
 				final String text = getSearchText();
 
-				if (text.length() == 0) {
+				if (text.isEmpty()) {
 					return;
 				}
 
@@ -1064,7 +1064,7 @@ public abstract class QuickSearch<E> {
 				if (componentLocation.y < 0) {
 					componentLocation.y = 2;
 				}
-			} catch (IllegalComponentStateException ignore) {
+			} catch (final IllegalComponentStateException ignore) {
 				return null;
 			}
 

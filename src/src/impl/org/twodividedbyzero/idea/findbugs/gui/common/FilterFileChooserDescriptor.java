@@ -48,7 +48,7 @@ public class FilterFileChooserDescriptor extends FileChooserDescriptor {
   }
 
   @Override
-  public boolean isFileVisible(final VirtualFile file, boolean showHiddenFiles) {
+  public boolean isFileVisible(final VirtualFile file, final boolean showHiddenFiles) {
     return file.isDirectory() || _fileFilter.accept(VfsUtilCore.virtualToIoFile(file));
   }
 

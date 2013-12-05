@@ -35,11 +35,11 @@ import java.awt.Insets;
  */
 public class CustomLineBorder implements Border {
 
-	private Color _lineColor;
-	private int _top;
-	private int _left;
-	private int _bottom;
-	private int _right;
+	private final Color _lineColor;
+	private final int _top;
+	private final int _left;
+	private final int _bottom;
+	private final int _right;
 
 
 	public CustomLineBorder(final int top, final int left, final int bottom, final int right) {

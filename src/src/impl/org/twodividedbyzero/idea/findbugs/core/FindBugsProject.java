@@ -136,14 +136,19 @@ public class FindBugsProject extends Project {
 
 
 	public void configureOutputFiles(final String path) {
-		_outputFiles = Arrays.asList(IdeaUtilImpl.findFileByPath(path).getPath());
+		final VirtualFile fileByPath = IdeaUtilImpl.findFileByPath(path);
+		if (fileByPath != null) {
+			_outputFiles = Arrays.asList(fileByPath.getPath());
+		} else {
+			LOGGER.error("Could not configure outputFiles! path=" + path);
+		}
 		RecurseFileCollector.addFiles(this, new File(path));
 	}
 
 
 	public void configureOutputFiles(@NotNull final Iterable<String> paths) {
 		_outputFiles = new ArrayList<String>();
-		for (String path : paths) {
+		for (final String path : paths) {
 			_outputFiles.add(path);
 			addFile(path);
 		}
@@ -159,7 +164,7 @@ public class FindBugsProject extends Project {
 	@NotNull
 	private static List<String> asPathList(@NotNull final VirtualFile[] files) {
 		final List<String> ret = new ArrayList<String>(files.length);
-		for (VirtualFile file : files) {
+		for (final VirtualFile file : files) {
 			ret.add(file.getPath());
 		}
 		return ret;

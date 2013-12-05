@@ -431,7 +431,7 @@ public class MultiSplitPane extends JPanel {
 	}
 
 
-	protected class AccessibleMultiSplitPane extends AccessibleJPanel {
+	private class AccessibleMultiSplitPane extends AccessibleJPanel {
 
 		private static final long serialVersionUID = 0L;
 

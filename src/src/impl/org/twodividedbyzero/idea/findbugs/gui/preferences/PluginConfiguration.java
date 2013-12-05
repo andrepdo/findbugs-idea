@@ -19,6 +19,7 @@
 
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.JBColor;
@@ -78,6 +79,8 @@ import java.util.List;
 @SuppressWarnings({"AnonymousInnerClass", "HardcodedLineSeparator"})
 public class PluginConfiguration implements ConfigurationPage {
 
+	private static final Logger LOGGER = Logger.getInstance(PluginConfiguration.class.getName());
+
 	private static final Color PLUGIN_DESCRIPTION_BG_COLOR = UIManager.getColor("Tree.textBackground");
 
 	private final FindBugsPreferences _preferences;
@@ -125,13 +128,13 @@ public class PluginConfiguration implements ConfigurationPage {
 		}
 		_pluginComponentPanel.removeAll();
 		final Project currentProject = getCurrentFbProject();
+		if (currentProject == null) {
+			LOGGER.warn("Expected not null findbugs project!");
+			return;
+		}
 		JPanel pluginComponent = null;
 		for (final Plugin plugin : Plugin.getAllPlugins()) {
 			plugin.setGloballyEnabled(true);
-			if (plugin.isCorePlugin()) {
-				//continue;
-			}
-
 			final PluginComponent pluginPanel = new PluginComponent(currentProject, plugin, _preferences);
 			pluginComponent = pluginPanel.getComponent();
 			_pluginComponentPanel.add(pluginComponent);
@@ -178,14 +181,15 @@ public class PluginConfiguration implements ConfigurationPage {
 				public void addSelection(final File selectedFile) {
 					try {
 						Plugin.loadCustomPlugin(selectedFile, getCurrentFbProject());
+						//noinspection NestedTryStatement
 						try {
 							_preferences.addPlugin(FindBugsPreferences.getPluginAsString(selectedFile));
 							showRestartHint(_parent);
-						} catch (MalformedURLException e) {
+						} catch (final MalformedURLException e) {
 							Messages.showErrorDialog(e.getMessage(), e.getClass().getSimpleName());
 						}
 						updatePreferences();
-					} catch (Throwable e) {
+					} catch (final Throwable e) {
 						//noinspection DialogTitleCapitalization
 						Messages.showErrorDialog(_parent, "Error loading " + selectedFile.getPath() + ":\n\n" + e.getClass().getSimpleName() + ": " + e.getMessage(), "Error loading plugin");
 					}
@@ -201,7 +205,7 @@ public class PluginConfiguration implements ConfigurationPage {
 	}
 
 
-	static void showRestartHint(Component parent) {
+	static void showRestartHint(final Component parent) {
 		Messages.showInfoMessage(parent, "Restart Intellij IDEA to load custom findbugs plugins.", "Intellij Needs to Be Restarted");
 	}
 
@@ -240,12 +244,12 @@ public class PluginConfiguration implements ConfigurationPage {
 	}
 
 
-	public void filter(String filter) {
+	public void filter(final String filter) {
 		// TODO support search
 	}
 
 
-	public void importPreferences(com.intellij.openapi.project.Project project, PersistencePreferencesBean prefs, ImportCallback callback) {
+	public void importPreferences(final com.intellij.openapi.project.Project project, final PersistencePreferencesBean prefs, final ImportCallback callback) {
 		final List<String> invalid = FindBugsPreferences.collectInvalidPlugins(prefs.getPlugins());
 		if (invalid.isEmpty()) {
 			callback.validated(prefs);
@@ -255,7 +259,7 @@ public class PluginConfiguration implements ConfigurationPage {
 	}
 
 
-	private void showImportDialog(com.intellij.openapi.project.Project project, PersistencePreferencesBean prefs, ImportCallback callback, List<String> invalidPlugins) {
+	private void showImportDialog(final com.intellij.openapi.project.Project project, final PersistencePreferencesBean prefs, final ImportCallback callback, final List<String> invalidPlugins) {
 		final ImportPluginsDialog dialog = new ImportPluginsDialog(project, prefs, invalidPlugins);
 		dialog.setModal(true);
 		dialog.pack();
@@ -334,7 +338,7 @@ public class PluginConfiguration implements ConfigurationPage {
 				html.append(longText);
 				html.append("</p>");
 
-				if (website != null && website.length() > 0) {
+				if (website != null && !website.isEmpty()) {
 					html.append("<br><p>");
 					html.append("<font style='font-weight: bold; color:gray; font-size: 8px'>Website: ").append(website).append("</font>");
 					html.append("</p>");
@@ -411,7 +415,7 @@ public class PluginConfiguration implements ConfigurationPage {
 	}
 
 
-	public static interface ImportCallback {
+	public interface ImportCallback {
 		void validated(PersistencePreferencesBean prefs);
 	}
 }

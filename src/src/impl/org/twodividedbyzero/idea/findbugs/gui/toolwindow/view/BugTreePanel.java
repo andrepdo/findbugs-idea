@@ -76,7 +76,7 @@ import java.util.Map;
 @SuppressWarnings({"AnonymousInnerClass"})
 public class BugTreePanel extends JPanel {
 
-	private final Project _project;
+	private final transient Project _project;
 
 	private boolean _scrollToSource;
 	private final BugTree _bugTree;
@@ -337,7 +337,7 @@ public class BugTreePanel extends JPanel {
 	}
 
 
-	public SortedBugCollection getBugCollection() {
+	public BugCollection getBugCollection() {
 		return _bugCollection;
 	}
 

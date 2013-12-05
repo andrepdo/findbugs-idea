@@ -72,14 +72,14 @@ public class StopAction extends BaseAction implements EventListener<BugReporterE
 			final Project project = DataKeys.PROJECT.getData(dataContext);
 			final Presentation presentation = event.getPresentation();
 
-			if (isProjectLoaded(project, presentation)) {
+			if (isProjectNotLoaded(project, presentation)) {
 				return;
 			}
 
 			isPluginAccessible(project);
 
 			// check if tool window is registered
-			final ToolWindow toolWindow = isToolWindowRegistred(project);
+			final ToolWindow toolWindow = isToolWindowRegistered(project);
 			if (toolWindow == null) {
 				presentation.setEnabled(false);
 				presentation.setVisible(false);
@@ -93,11 +93,9 @@ public class StopAction extends BaseAction implements EventListener<BugReporterE
 			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
 			presentation.setVisible(true);
 
-		} catch (Throwable e) {
+		} catch (final Throwable e) {
 			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
-			if (processed != null) {
-				LOGGER.error("Action update failed", processed);
-			}
+			LOGGER.error("Action update failed", processed);
 		}
 	}
 

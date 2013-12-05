@@ -62,6 +62,7 @@ public final class ResourcesLoader {
 	public static ResourceBundle getResourceBundle() {
 		LOGGER.info("Loading locale properties for '" + Locale.getDefault() + ')');
 
+		//noinspection StaticVariableUsedBeforeInitialization
 		if (_bundle != null) {
 			return _bundle;
 		}
@@ -69,7 +70,7 @@ public final class ResourcesLoader {
 		//noinspection UnusedCatchParameter
 		try {
 			_bundle = ResourceBundle.getBundle(LOCALE_RESOURCES_PKG, Locale.getDefault());
-		} catch (MissingResourceException e) {
+		} catch (final MissingResourceException e) {
 			throw new MissingResourceException("Missing Resource bundle: " + Locale.getDefault() + ' ', LOCALE_RESOURCES_PKG, "");
 		}
 
@@ -82,7 +83,7 @@ public final class ResourcesLoader {
 		//noinspection UnusedCatchParameter
 		try {
 			_bundle = ResourceBundle.getBundle(localeResourceFolder, Locale.getDefault());
-		} catch (MissingResourceException e) {
+		} catch (final MissingResourceException e) {
 			throw new MissingResourceException("Missing Resource bundle: " + Locale.getDefault() + ' ', localeResourceFolder, "");
 		}
 
@@ -93,22 +94,20 @@ public final class ResourcesLoader {
 	@SuppressWarnings({"UnusedCatchParameter"})
 	public static String getString(final String key) {
 		try {
+			//noinspection StaticVariableUsedBeforeInitialization
 			if (_bundle == null) {
 				getResourceBundle();
 			}
 			return _bundle.getString(key);
-		} catch (MissingResourceException e) {
+		} catch (final MissingResourceException e) {
 			throw new MissingResourceException("Missing Resource: " + Locale.getDefault() + " - key: " + key + "  - resources: " + LOCALE_RESOURCES_PKG, LOCALE_RESOURCES_PKG, key);
-		} catch (NullPointerException e) {
-			throw new NullPointerException("No bundle set: use ResourcesLoader.getResourceBundle().getString(...)");
 		}
-
 	}
 
 
 	private static InputStream getResourceStream(final String iconResourcePkg, final String filename) {
 		String iconResourcePkg1 = iconResourcePkg;
-		if (iconResourcePkg1.length() > 0 && iconResourcePkg1.charAt(0) == '/') {
+		if (!iconResourcePkg1.isEmpty() && iconResourcePkg1.charAt(0) == '/') {
 			iconResourcePkg1 = iconResourcePkg1.replaceFirst("/", "");
 		}
 
@@ -167,7 +166,7 @@ public final class ResourcesLoader {
 				int c = 0;
 				try {
 					c = is.read();
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					LOGGER.error("InputStream read failure!", e);
 				}
 				if (c == -1) {
@@ -179,7 +178,7 @@ public final class ResourcesLoader {
 
 			try {
 				is.close();
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				LOGGER.error("Couldn't close InputStream.", e);
 			}
 			ret = sb.toString();
@@ -238,7 +237,7 @@ public final class ResourcesLoader {
 				int len = 0;
 				try {
 					len = is.read(tmBuf);
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					LOGGER.error("InputStream read failure!", e);
 				}
 
@@ -256,7 +255,7 @@ public final class ResourcesLoader {
 			addIfAbsent(pkgName, filename, ret);
 			try {
 				is.close();
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				LOGGER.error("Couldn't close InputStream.", e);
 			}
 		}
@@ -310,7 +309,7 @@ public final class ResourcesLoader {
 				int len = 0;
 				try {
 					len = is.read(tmpBuffer);
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					LOGGER.error("InputStream read failure!", e);
 				}
 
@@ -328,7 +327,7 @@ public final class ResourcesLoader {
 			addIfAbsent(pkgName, filename, ret);
 			try {
 				is.close();
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				LOGGER.error("Couldn't close InputStream.", e);
 			}
 		}

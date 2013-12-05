@@ -29,6 +29,7 @@ import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vcs.changes.ChangeList;
 import com.intellij.openapi.vcs.changes.ChangeListAdapter;
+import com.intellij.openapi.vcs.changes.ChangeListListener;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
@@ -78,7 +79,7 @@ public class AnalyzeChangelistFiles extends BaseAction implements EventListener<
 		final Presentation presentation = e.getPresentation();
 
 		// check a project is loaded
-		if (isProjectLoaded(project, presentation)) {
+		if (isProjectNotLoaded(project, presentation)) {
 			Messages.showWarningDialog("Project not loaded.", "FindBugs");
 			return;
 		}
@@ -102,14 +103,14 @@ public class AnalyzeChangelistFiles extends BaseAction implements EventListener<
 			final Presentation presentation = event.getPresentation();
 
 			// check a project is loaded
-			if (isProjectLoaded(_project, presentation)) {
+			if (isProjectNotLoaded(_project, presentation)) {
 				return;
 			}
 
 			isPluginAccessible(_project);
 
 			// check if tool window is registered
-			final ToolWindow toolWindow = isToolWindowRegistred(_project);
+			final ToolWindow toolWindow = isToolWindowRegistered(_project);
 			if (toolWindow == null) {
 				presentation.setEnabled(false);
 				presentation.setVisible(false);
@@ -121,7 +122,7 @@ public class AnalyzeChangelistFiles extends BaseAction implements EventListener<
 
 			// enable ?
 			final List<VirtualFile> modifiedFiles = IdeaUtilImpl.getAllModifiedFiles(_dataContext);
-			if (!_running && modifiedFiles != null && !modifiedFiles.isEmpty()) {
+			if (!_running && !modifiedFiles.isEmpty()) {
 				for (final VirtualFile virtualFile : modifiedFiles) {
 					if (IdeaUtilImpl.isValidFileType(virtualFile.getFileType())) {
 						_enabled = true;
@@ -137,11 +138,9 @@ public class AnalyzeChangelistFiles extends BaseAction implements EventListener<
 			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
 			presentation.setVisible(true);
 
-		} catch (Throwable e) {
+		} catch (final Throwable e) {
 			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
-			if (processed != null) {
-				LOGGER.error("Action update failed", processed);
-			}
+			LOGGER.error("Action update failed", processed);
 		}
 	}
 
@@ -164,14 +163,12 @@ public class AnalyzeChangelistFiles extends BaseAction implements EventListener<
 		//final VirtualFile[] files1 = IdeaUtilImpl.getSelectedFiles(_dataContext);
 		final ChangeList changeList = getActiveChangeList();
 		final Collection<VirtualFile> modifiedFiles = IdeaUtilImpl.getModifiedFilesByList(changeList, _dataContext);
-		if (modifiedFiles != null) {
-			final VirtualFile[] selectedSourceFiles = modifiedFiles.toArray(new VirtualFile[modifiedFiles.size()]);
-			worker.configureSourceDirectories(selectedSourceFiles);
+		final VirtualFile[] selectedSourceFiles = modifiedFiles.toArray(new VirtualFile[modifiedFiles.size()]);
+		worker.configureSourceDirectories(selectedSourceFiles);
 
-			// set class files
-			worker.configureOutputFiles(selectedSourceFiles);
-			worker.work("Running FindBugs analysis for changelist '" + changeList.getName() + "'...");
-		}
+		// set class files
+		worker.configureOutputFiles(selectedSourceFiles);
+		worker.work("Running FindBugs analysis for changelist '" + changeList.getName() + "'...");
 	}
 
 
@@ -184,7 +181,7 @@ public class AnalyzeChangelistFiles extends BaseAction implements EventListener<
 	}
 
 
-	public ChangeListAdapter getChangelistAdapter() {
+	public ChangeListListener getChangelistAdapter() {
 		if(_changelistAdapter == null) {
 			_changelistAdapter =  new MyChangeListAdapter();
 		}

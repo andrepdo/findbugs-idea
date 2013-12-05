@@ -1,5 +1,6 @@
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
@@ -22,6 +23,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -33,16 +35,19 @@ import java.util.List;
  */
 final class ImportPluginsDialog extends DialogWrapper {
 
+	private static final Logger LOGGER = Logger.getInstance(ImportPluginsDialog.class.getName());
+
 	private final Project _project;
 	private final List<String> _validPlugins;
 	private final List<String> _invalidPlugins;
 	private final List<PluginPathPane> _invalidPluginPanes;
 
 
-	ImportPluginsDialog(Project project, PersistencePreferencesBean prefs, List<String> invalidPlugins) {
+	ImportPluginsDialog(final Project project, final PersistencePreferencesBean prefs, final List<String> invalidPlugins) {
 		super(project, true);
 		_project = project;
 		_validPlugins = filterPlugins(prefs, invalidPlugins);
+		//noinspection AssignmentToCollectionOrArrayFieldFromParameter
 		_invalidPlugins = invalidPlugins;
 		_invalidPluginPanes = new ArrayList<PluginPathPane>(invalidPlugins.size());
 		//noinspection DialogTitleCapitalization
@@ -51,9 +56,9 @@ final class ImportPluginsDialog extends DialogWrapper {
 	}
 
 
-	private static List<String> filterPlugins(PersistencePreferencesBean prefs, List<String> excludePlugins) {
+	private static List<String> filterPlugins(final PersistencePreferencesBean prefs, final Collection<String> excludePlugins) {
 		final List<String> result = new ArrayList<String>();
-		for (String plugin : prefs.getPlugins()) {
+		for (final String plugin : prefs.getPlugins()) {
 			if (!excludePlugins.contains(plugin)) {
 				result.add(plugin);
 			}
@@ -67,7 +72,7 @@ final class ImportPluginsDialog extends DialogWrapper {
 		final JPanel main = new JPanel();
 		main.setPreferredSize(new Dimension(400, 0));
 		main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
-		for (String plugin : _invalidPlugins) {
+		for (final String plugin : _invalidPlugins) {
 			final PluginPathPane pane = new PluginPathPane(_project, plugin);
 			_invalidPluginPanes.add(pane);
 			main.add(pane);
@@ -76,14 +81,14 @@ final class ImportPluginsDialog extends DialogWrapper {
 	}
 
 
-	List<String> getPlugins() {
+	Collection<String> getPlugins() {
 		final List<String> plugins = new ArrayList<String>();
 		plugins.addAll(_validPlugins);
-		for (PluginPathPane plugin : _invalidPluginPanes) {
+		for (final PluginPathPane plugin : _invalidPluginPanes) {
 			if (plugin.isImport()) {
 				try {
 					plugins.add(FindBugsPreferences.getPluginAsString(plugin.getPlugin()));
-				} catch (MalformedURLException e) {
+				} catch (final MalformedURLException e) {
 					throw new RuntimeException(e);
 				}
 			}
@@ -95,7 +100,7 @@ final class ImportPluginsDialog extends DialogWrapper {
 	@Override
 	protected ValidationInfo doValidate() {
 		ValidationInfo info;
-		for (PluginPathPane plugin : _invalidPluginPanes) {
+		for (final PluginPathPane plugin : _invalidPluginPanes) {
 			info = plugin.doValidate();
 			if (info != null) {
 				return info;
@@ -108,13 +113,13 @@ final class ImportPluginsDialog extends DialogWrapper {
 	private static FileChooserDescriptor createJarChooserDescriptor() {
 		return new FileChooserDescriptor(true, false, true, false, true, false) {
 			@Override
-			public boolean isFileVisible(VirtualFile file, boolean showHiddenFiles) {
+			public boolean isFileVisible(final VirtualFile file, final boolean showHiddenFiles) {
 				return super.isFileVisible(file, showHiddenFiles) &&
 						(file.isDirectory() || "jar".equals(file.getExtension()) || file.getFileType() == StdFileTypes.ARCHIVE);
 			}
 
 			@Override
-			public boolean isFileSelectable(VirtualFile file) {
+			public boolean isFileSelectable(final VirtualFile file) {
 				return file.getFileType() == StdFileTypes.ARCHIVE;
 			}
 		};
@@ -127,11 +132,11 @@ final class ImportPluginsDialog extends DialogWrapper {
 		private final TextFieldWithBrowseButton _pathTextField;
 
 
-		PluginPathPane(Project project, String plugin) {
+		PluginPathPane(final Project project, final String plugin) {
 			super(new BorderLayout());
 			_importCheckbox = new JCheckBox("Import");
 			_importCheckbox.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					_pathTextField.setEnabled(isImport());
 				}
 			});
@@ -139,7 +144,8 @@ final class ImportPluginsDialog extends DialogWrapper {
 			_pathTextField.setEnabled(false);
 			try {
 				_pathTextField.setText(FindBugsPreferences.getPluginAsFile(plugin).getPath());
-			} catch (MalformedURLException e) {
+			} catch (final MalformedURLException e) {
+				LOGGER.debug("invalid plugin=" + plugin, e);
 				_pathTextField.setText(plugin);
 			}
 			_pathTextField.addBrowseFolderListener("Choose plugin", "Please select the plugin archive.", project, createJarChooserDescriptor());

@@ -71,7 +71,6 @@ public class RotatedJLabel extends JLabel {
    * values.
    */
   public RotatedJLabel() {
-    super();
   }
 
   /**
@@ -153,7 +152,7 @@ public class RotatedJLabel extends JLabel {
    *          The new direction.
    */
   public void setDirection(final Direction direction) {
-    this._direction = direction;
+	  _direction = direction;
   }
 
   /*

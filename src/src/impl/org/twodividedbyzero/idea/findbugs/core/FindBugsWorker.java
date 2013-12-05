@@ -23,6 +23,7 @@ import com.intellij.openapi.compiler.CompileContext;
 import com.intellij.openapi.compiler.CompileStatusNotification;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
@@ -184,7 +185,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	}*/
 
 
-	public boolean work(String text) {
+	public boolean work(final String text) {
 		try {
 			registerEventListener();
 			final IFindBugsEngine engine = createFindBugsEngine();
@@ -199,7 +200,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 			//new File(virtualFile.getPath()) # method compileOutputFile(virtualfiles)
 			//_compilerManager.compile(_findBugsProject.getOutputFiles(), null, true);
 			return true;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOGGER.error("FindBugs analysis failed.", e);
 			unregisterEventListener();
 			return false;
@@ -267,7 +268,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 		for (final Entry<String, Boolean> excludeFileName : excludeFilterFiles.entrySet()) {
 			try {
 				engine.addFilter(IdeaUtilImpl.replace$PROJECT_DIR$(_project, excludeFileName.getKey()), false);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				LOGGER.error("ExcludeFilter configuration failed.", e);
 			}
 		}
@@ -275,7 +276,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 		for (final Entry<String, Boolean> includeFileName : includeFilterFiles.entrySet()) {
 			try {
 				engine.addFilter(IdeaUtilImpl.replace$PROJECT_DIR$(_project, includeFileName.getKey()), true);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				LOGGER.error("IncludeFilter configuration failed.", e);
 			}
 		}
@@ -283,9 +284,9 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 		for (final Entry<String, Boolean> excludeBugFile : excludeBugFiles.entrySet()) {
 			try {
 				engine.excludeBaselineBugs(IdeaUtilImpl.replace$PROJECT_DIR$(_project, excludeBugFile.getKey()));
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				LOGGER.error("ExcludeBaseLineBug files configuration failed.", e);
-			} catch (DocumentException e) {
+			} catch (final DocumentException e) {
 				LOGGER.error("ExcludeBaseLineBug files configuration failed.", e);
 			}
 		}
@@ -376,7 +377,10 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 			case ANALYSIS_STARTED:
 				break;
 			case ANALYSIS_ABORTED:
-				_bugReporter.getFindBugsTask().getProgressIndicator().cancel();
+				final ProgressIndicator progressIndicator = _bugReporter.getFindBugsTask().getProgressIndicator();
+				if (progressIndicator != null) {
+					progressIndicator.cancel();
+				}
 				unregisterEventListener();
 				break;
 			case ANALYSIS_FINISHED:

@@ -52,7 +52,7 @@ public class BugPatternTableModel extends AbstractTableModel {
 
 	private final Object _guardedLock = new Object();
 	private final transient List<DetectorFactory> _entries;
-	private final List<DetectorFactory> _filtered = new ArrayList<DetectorFactory>();
+	private final transient Collection<DetectorFactory> _filtered = new ArrayList<DetectorFactory>();
 	private final FindBugsPreferences _preferences;
 
 
@@ -297,16 +297,16 @@ public class BugPatternTableModel extends AbstractTableModel {
 	}
 
 
-	public void filter(String filter) {
+	public void filter(final String filter) {
 		final SearchableOptionsRegistrar optionsRegistrar = SearchableOptionsRegistrar.getInstance();
 		final Set<String> search = optionsRegistrar.getProcessedWords(filter);
 
 		final ArrayList<DetectorFactory> accept = new ArrayList<DetectorFactory>();
 
-		final List<DetectorFactory> toProcess = new ArrayList<DetectorFactory>(_entries);
+		final Collection<DetectorFactory> toProcess = new ArrayList<DetectorFactory>(_entries);
 		toProcess.addAll(_filtered);
 		_filtered.clear();
-		for (DetectorFactory detector : toProcess) {
+		for (final DetectorFactory detector : toProcess) {
 			if (isAccepted(filter, search, detector)) {
 				accept.add(detector);
 			} else {
@@ -319,7 +319,7 @@ public class BugPatternTableModel extends AbstractTableModel {
 	}
 
 
-	private static boolean isAccepted(String filter, Set<String> search, DetectorFactory detector) {
+	private static boolean isAccepted(final String filter, final Set<String> search, final DetectorFactory detector) {
 		if (StringUtil.isEmpty(filter)) return true;
 		if (isAccepted(search, filter, detector.getShortName())) {
 			return true;
@@ -328,7 +328,7 @@ public class BugPatternTableModel extends AbstractTableModel {
 			return true;
 		}
 		final Set<BugPattern> patterns = detector.getReportedBugPatterns();
-		for (BugPattern pattern : patterns) {
+		for (final BugPattern pattern : patterns) {
 			if (isAccepted(search, filter, pattern.getType())) {
 				return true;
 			}

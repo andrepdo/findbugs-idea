@@ -92,15 +92,15 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 	 *
 	 * @param project the project whose classes are being analyzed for bugs
 	 */
-	public BugReporter(final Project project, SortedBugCollection bugCollection, final FindBugsProject findBugsProject) {
+	public BugReporter(final Project project, final SortedBugCollection bugCollection, final FindBugsProject findBugsProject) {
 		this(project, false, bugCollection, findBugsProject);
 	}
 
 
-	public BugReporter(final Project project, final boolean isInspectionRun, SortedBugCollection bugCollection, final FindBugsProject findBugsProject) {
+	public BugReporter(final Project project, final boolean isInspectionRun, final SortedBugCollection bugCollection, final FindBugsProject findBugsProject) {
 		//this.monitor = monitor;
 		_project = project;
-        FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(project);
+        final FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(project);
         _preferences = pluginComponent.getPreferences();
 		_isInspectionRun = isInspectionRun;
 		_bugCollection = bugCollection;
@@ -199,7 +199,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 
 		try {
 			Thread.sleep(500);
-		} catch (InterruptedException ignore) {
+		} catch (final InterruptedException ignore) {
 			Thread.interrupted();
 		}
 		//monitor.done();
@@ -259,11 +259,11 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 
 		// Update progress monitor
 		if (_pass <= 0) {
-			message = "Prescanning... (found " + _filteredBugCount + ", checking " + className + ")";
+			message = "Prescanning... (found " + _filteredBugCount + ", checking " + className + ')';
 			_findBugsTask.setIndicatorText(message);
 			LOGGER.debug(message);
 		} else {
-			message = "Checking... (found " + _filteredBugCount + ", checking " + className + ")";
+			message = "Checking... (found " + _filteredBugCount + ", checking " + className + ')';
 			_findBugsTask.setIndicatorText(message);
 			LOGGER.debug(message);
 		}
@@ -376,7 +376,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 				final int work = _pass == 0 ? 1 : 2;
 
 				//EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.NEW_BUG_INSTANCE, null, _filteredBugCount, getProjectStats()));
-				_findBugsTask.setIndicatorText2(_currentStageName + " " + count + "/" + goal + (ANALYZING_CLASSES_i18N.equals(_currentStageName) ? " (pass #" + work + "/2)" : ""));
+				_findBugsTask.setIndicatorText2(_currentStageName + ' ' + count + '/' + goal + (ANALYZING_CLASSES_i18N.equals(_currentStageName) ? " (pass #" + work + "/2)" : ""));
 				//countValueLabel.setText(count + "/" + goal);
 				//progressBar.setValue(count);
 				//_findBugsTask.getProgressIndicator().setFraction(100/(double) count);

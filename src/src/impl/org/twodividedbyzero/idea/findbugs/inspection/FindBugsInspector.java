@@ -63,7 +63,7 @@ public class FindBugsInspector extends FindBugsWorker implements CompileTask {
 			_bugReporter.setFindBugsTask(findBugsTask);
 			findBugsTask.runFindBugs(engine);
 			return true;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOGGER.debug("FindBugs inpsection failed.", e);
 			_inspection.unregisterEventListner();
 			return false;

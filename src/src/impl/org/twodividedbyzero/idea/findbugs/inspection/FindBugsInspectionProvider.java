@@ -56,6 +56,9 @@ public class FindBugsInspectionProvider implements InspectionToolProvider, Appli
 
 	public void initComponent() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
+		if (plugin == null) {
+			return;
+		}
 		final File jar = new File(plugin.getPath(), FindBugsPluginConstants.FINDBUGS_WEBCLOUD_CLIENT_JAR);
 		if (jar.exists() && jar.canRead()) {
 			System.setProperty(FindBugsPluginConstants.FINDBUGS_APP_ENGINE_PROPERTY_NAME, jar.toURI().toString());

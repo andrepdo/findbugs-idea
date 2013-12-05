@@ -51,7 +51,7 @@ public class ScrollToSourceHandler extends com.intellij.ui.AutoScrollToSourceHan
 
 
 	public void scollToSelectionSource() {
-		super.onMouseClicked(_panel.getBugTree());
+		onMouseClicked(_panel.getBugTree());
 	}
 
 	// todo: call super.install(JTree tree)

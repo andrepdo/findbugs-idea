@@ -43,6 +43,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LayoutManager;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 
 
 /**
@@ -55,7 +56,7 @@ import java.awt.RenderingHints;
 @SuppressWarnings({"HardCodedStringLiteral"})
 public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer/*, TreeCellEditor*/ {
 
-	private static final BasicStroke _stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1, new float[] {1, 1}, 0);
+	private static final Stroke _stroke = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1, new float[] {1, 1}, 0);
 
 	private boolean _selected;
 	private boolean _hasFocus;
@@ -342,7 +343,7 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer/*, 
 		final Dimension size = _icon.getPreferredSize();
 		size.width += _title.getPreferredSize().width;
 		size.width += _hits.getPreferredSize().width;
-		if (_link.getText().length() > 0) {
+		if (!_link.getText().isEmpty()) {
 			size.width += 50; //_link
 		}
 		size.width += _hGap; // BorderLayout hGap

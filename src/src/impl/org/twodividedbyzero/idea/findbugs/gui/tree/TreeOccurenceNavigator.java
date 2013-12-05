@@ -27,6 +27,7 @@ import org.twodividedbyzero.idea.findbugs.gui.tree.model.RootNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.VisitableTreeNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.BugTree;
 
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 
@@ -61,10 +62,10 @@ public final class TreeOccurenceNavigator implements OccurenceNavigator {
 		if (nodedescriptor instanceof BugInstanceNode) {
 			return _tree.getRowCount() != _tree.getRowForPath(treepath) + 1;
 		} else if (nodedescriptor instanceof BugInstanceGroupNode) {
-			final BugInstanceGroupNode node = (BugInstanceGroupNode) nodedescriptor;
+			final TreeNode node = (BugInstanceGroupNode) nodedescriptor;
 			return node.getChildCount() > 0;
 		} else if (nodedescriptor instanceof RootNode) {
-			final RootNode node = (RootNode) nodedescriptor;
+			final TreeNode node = (RootNode) nodedescriptor;
 			return node.getChildCount() > 0;
 		}
 		return false;

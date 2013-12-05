@@ -74,7 +74,7 @@ import java.beans.PropertyChangeListener;
  * @author Andre Pfeiler - made some tiny modification on positioning the buffered image rect
  */
 @edu.umd.cs.findbugs.annotations.SuppressWarnings({"RI_REDUNDANT_INTERFACES"})
-@SuppressWarnings({"AssignmentToNull"})
+@SuppressWarnings({"AssignmentToNull", "RedundantInterfaceDeclaration"})
 public final class ViewTooltips extends MouseAdapter implements MouseMotionListener {
 
 	/** The default instance, reference counted */
@@ -476,6 +476,7 @@ public final class ViewTooltips extends MouseAdapter implements MouseMotionListe
 	 * produce clones of itself that display subrectangles of that cell
 	 * renderer.
 	 */
+	@SuppressWarnings("SimplifiableConditionalExpression")
 	private static final class ImgComp extends JComponent {
 
 		private transient BufferedImage img;

@@ -29,6 +29,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
@@ -61,14 +62,14 @@ public abstract class BaseAction extends AnAction {
 			final Project project = DataKeys.PROJECT.getData(dataContext);
 			final Presentation presentation = event.getPresentation();
 
-			if (isProjectLoaded(project, presentation)) {
+			if (isProjectNotLoaded(project, presentation)) {
 				return;
 			}
 
 			isPluginAccessible(project);
 
 			// check if tool window is registered
-			final ToolWindow toolWindow = isToolWindowRegistred(project);
+			final ToolWindow toolWindow = isToolWindowRegistered(project);
 			if (toolWindow == null) {
 				presentation.setEnabled(false);
 				presentation.setVisible(false);
@@ -80,16 +81,14 @@ public abstract class BaseAction extends AnAction {
 			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
 			presentation.setVisible(true);
 
-		} catch (Throwable e) {
+		} catch (final Throwable e) {
 			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
-			if (processed != null) {
-				LOGGER.error("Action update failed", processed);
-			}
+			LOGGER.error("Action update failed", processed);
 		}
 	}
 
 
-	protected ToolWindow isToolWindowRegistred(final Project project) {
+	protected ToolWindow isToolWindowRegistered(final Project project) {
 		return ToolWindowManager.getInstance(project).getToolWindow(getPluginInterface(project).getInternalToolWindowId());
 	}
 
@@ -103,7 +102,7 @@ public abstract class BaseAction extends AnAction {
 	}
 
 
-	protected boolean isProjectLoaded(final Project project, final Presentation presentation) {
+	protected boolean isProjectNotLoaded(@Nullable final Project project, final Presentation presentation) {
 		// check a project is loaded
 		if (project == null) {
 			presentation.setEnabled(false);

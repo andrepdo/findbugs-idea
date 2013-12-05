@@ -477,6 +477,7 @@ public class GraphicsUtilities {
 		}
 
 		if (pixels == null) {
+			//noinspection AssignmentToMethodParameter
 			pixels = new int[w * h];
 		} else if (pixels.length < w * h) {
 			throw new IllegalArgumentException("pixels array must have a length" + " >= w*h");

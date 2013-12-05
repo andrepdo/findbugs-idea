@@ -26,6 +26,7 @@ import com.intellij.openapi.fileChooser.FileSaverDescriptor;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -38,6 +39,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -71,6 +73,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -86,7 +89,7 @@ public class ConfigurationPanel extends JPanel {
 	private static final Logger LOGGER = Logger.getInstance(ConfigurationPanel.class.getName());
 	private static final String PERSISTENCE_ROOT_NAME = "findbugs";
 
-	private final FindBugsPlugin _plugin;
+	private final transient FindBugsPlugin _plugin;
 	private JCheckBox _compileBeforeAnalyseChkb;
 	private JCheckBox _analyzeAfterCompileChkb;
 	private JCheckBox _runInBackgroundChkb;
@@ -106,7 +109,7 @@ public class ConfigurationPanel extends JPanel {
 	private transient PluginConfiguration _pluginConfig;
 	private transient ImportExportConfiguration _importExportConfig;
 	private transient AnnotationConfiguration _annotationConfig;
-	private List<ConfigurationPage> _configPagesRegistry;
+	private transient List<ConfigurationPage> _configPagesRegistry;
 	private JToggleButton _showAdvancedConfigsButton;
 	private JButton _exportButton;
 	private JButton _importButton;
@@ -330,9 +333,7 @@ public class ConfigurationPanel extends JPanel {
 			final List<ConfigurationPage> configPages = getConfigPages();
 			for (final ConfigurationPage configPage : configPages) {
 				if (!configPage.isAdvancedConfig()) {
-					if (!_plugin.isModuleComponent()) {
-						_tabbedPane.addTab(configPage.getTitle(), configPage.getComponent());
-					} else if (configPage.showInModulePreferences()) {
+					if (!_plugin.isModuleComponent() || configPage.showInModulePreferences()) {
 						_tabbedPane.addTab(configPage.getTitle(), configPage.getComponent());
 					}
 				}
@@ -365,7 +366,7 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
-	ReportConfiguration getReporterConfig() {
+	ConfigurationPage getReporterConfig() {
 		if (_reporterConfig == null) {
 			_reporterConfig = new ReportConfiguration(this, getPreferences());
 		}
@@ -373,7 +374,7 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
-	FilterConfiguration getFilterConfig() {
+	ConfigurationPage getFilterConfig() {
 		if (_filterConfig == null) {
 			_filterConfig = new FilterConfiguration(this, getPreferences());
 		}
@@ -381,7 +382,7 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
-	PluginConfiguration getPluginConfig() {
+	ConfigurationPage getPluginConfig() {
 		if (_pluginConfig == null) {
 			_pluginConfig = new PluginConfiguration(this, getPreferences());
 		}
@@ -389,7 +390,7 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
-	ImportExportConfiguration getImportExportConfig() {
+	ConfigurationPage getImportExportConfig() {
 		if (_importExportConfig == null) {
 			_importExportConfig = new ImportExportConfiguration(this, getPreferences());
 		}
@@ -397,7 +398,7 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
-	AnnotationConfiguration getAnnotationConfig() {
+	ConfigurationPage getAnnotationConfig() {
 		if (_annotationConfig == null) {
 			_annotationConfig = new AnnotationConfiguration(this, getPreferences());
 		}
@@ -485,7 +486,8 @@ public class ConfigurationPanel extends JPanel {
 
 		final List<ConfigurationPage> configPages = getConfigPages();
 		Component firstAdvancedPage = null;
-		for (int i = 0, configPagesSize = configPages.size(); i < configPagesSize; i++) {
+		final int configPagesSize = configPages.size();
+		for (int i = 0; i < configPagesSize; i++) {
 			final ConfigurationPage configPage = configPages.get(i);
 			if (configPage.isAdvancedConfig()) {
 				if (!_plugin.isModuleComponent()) {
@@ -535,24 +537,26 @@ public class ConfigurationPanel extends JPanel {
 		final Document document = new Document(el);
 		try {
 			JDOMUtil.writeDocument(document, wrapper.getFile(), "\n");
-		} catch (IOException ex) {
+		} catch (final IOException ex) {
 			LOGGER.error(ex);
 			final String msg = ex.getLocalizedMessage();
-			Messages.showErrorDialog(this, msg != null && msg.length() > 0 ? msg : ex.toString(), "Export Failed");
+			Messages.showErrorDialog(this, msg != null && !msg.isEmpty() ? msg : ex.toString(), "Export Failed");
 		}
 	}
 
 
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON", "REC_CATCH_EXCEPTION"})
 	private void importPreferences() {
+		@SuppressWarnings("AnonymousInnerClassMayBeStatic")
 		final FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, true, false, true, false) {
 			@Override
-			public boolean isFileVisible(VirtualFile file, boolean showHiddenFiles) {
+			public boolean isFileVisible(final VirtualFile file, final boolean showHiddenFiles) {
 				return super.isFileVisible(file, showHiddenFiles) &&
 						(file.isDirectory() || "xml".equals(file.getExtension()) || file.getFileType() == StdFileTypes.ARCHIVE);
 			}
 
 			@Override
-			public boolean isFileSelectable(VirtualFile file) {
+			public boolean isFileSelectable(final VirtualFile file) {
 				return file.getFileType() == StdFileTypes.XML;
 			}
 		};
@@ -570,14 +574,14 @@ public class ConfigurationPanel extends JPanel {
 			if (!validatePreferences(document, prefs)) {
 				return;
 			}
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			LOGGER.warn(ex);
 			final String msg = ex.getLocalizedMessage();
-			Messages.showErrorDialog(this, msg != null && msg.length() > 0 ? msg : ex.toString(), "Import Failed");
+			FindBugsPluginImpl.showToolWindowNotifier(getProject(), "Import failed! " + (msg != null && !msg.isEmpty() ? msg : ex.toString()), MessageType.WARNING);
 			return;
 		}
 		_pluginConfig.importPreferences( getProject(), prefs, new PluginConfiguration.ImportCallback() {
-			public void validated( PersistencePreferencesBean prefs ) {
+			public void validated( final PersistencePreferencesBean prefs ) {
 				_plugin.loadState( prefs );
 				updatePreferences();
 				if ( !prefs.getPlugins().isEmpty() ) {
@@ -588,7 +592,7 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
-	private boolean validatePreferences(final Document document, @Nullable PersistencePreferencesBean prefs) {
+	private boolean validatePreferences(final Document document, @Nullable final PersistencePreferencesBean prefs) {
 		if (!PERSISTENCE_ROOT_NAME.equals(document.getRootElement().getName())) {
 			Messages.showErrorDialog(this, "The file format is invalid.", "Invalid File");
 			return false;
@@ -616,7 +620,7 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
-	public void setFilter(String filter) {
+	public void setFilter(final String filter) {
 		_myFilter.setSelectedItem(filter);
 	}
 
@@ -631,8 +635,8 @@ public class ConfigurationPanel extends JPanel {
 			if (!_showAdvancedConfigsButton.isSelected()) {
 				showAdvancedConfigs(true);
 			}
-			final String filter = getFilter().toLowerCase();
-			for (ConfigurationPage page : _configPagesRegistry) {
+			final String filter = getFilter().toLowerCase(Locale.ENGLISH);
+			for (final ConfigurationPage page : _configPagesRegistry) {
 				page.filter(filter);
 			}
 		}

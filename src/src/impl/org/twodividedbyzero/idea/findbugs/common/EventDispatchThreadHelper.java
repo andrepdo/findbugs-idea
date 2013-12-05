@@ -116,10 +116,10 @@ public final class EventDispatchThreadHelper {
 				public void run() {
 					try {
 						runnable.run();
-					} catch (RuntimeException e) {
+					} catch (final RuntimeException e) {
 						CallerStack.initCallerStack(e, caller);
 						throw e;
-					} catch (Error e) {
+					} catch (final Error e) {
 						CallerStack.initCallerStack(e, caller);
 						throw e;
 					}
@@ -135,9 +135,9 @@ public final class EventDispatchThreadHelper {
 
 	public interface Operation extends Runnable {
 
-		public void onFailure(Throwable failure);
+		void onFailure(Throwable failure);
 
-		public void onSuccess();
+		void onSuccess();
 
 	}
 

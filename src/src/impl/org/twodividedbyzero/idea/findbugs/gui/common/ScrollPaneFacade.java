@@ -53,15 +53,15 @@ public final class ScrollPaneFacade implements ScrollPaneConstants {
 				final Class<?> clazz = Class.forName("com.intellij.ui.components.JBScrollPane");
 				final Constructor<?> constructor = clazz.getConstructor(Component.class, int.class, int.class);
 				return (JScrollPane) constructor.newInstance(view, vsbPolicy, hsbPolicy);
-			} catch (ClassNotFoundException e) {
+			} catch (final ClassNotFoundException e) {
 				LOGGER.error(e);
-			} catch (NoSuchMethodException e) {
+			} catch (final NoSuchMethodException e) {
 				LOGGER.error(e);
-			} catch (InvocationTargetException e) {
+			} catch (final InvocationTargetException e) {
 				LOGGER.error(e.getTargetException());
-			} catch (InstantiationException e) {
+			} catch (final InstantiationException e) {
 				LOGGER.error(e);
-			} catch (IllegalAccessException e) {
+			} catch (final IllegalAccessException e) {
 				LOGGER.error(e);
 			}
 		}

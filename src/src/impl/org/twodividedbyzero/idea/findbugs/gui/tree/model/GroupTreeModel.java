@@ -177,7 +177,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 
 		addGroupIfAbsent(Arrays.toString(BugInstanceUtil.getGroupPath(member, depth, _groupBy)), depth, groupNode);
 
-		((RootNode) _root).addChild(groupNode);
+		((AbstractTreeNode<VisitableTreeNode>) _root).addChild(groupNode);
 		nodeStructureChanged(_root);
 
 		startSubGroup(depth + 1, member, member);
@@ -282,7 +282,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 		_bugCount.set(0);
 		_groups.clear();
 		_problems.clear();
-		((RootNode) _root).removeAllChilds();
+		((AbstractTreeNode<VisitableTreeNode>) _root).removeAllChilds();
 		nodeStructureChanged(_root);
 		reload();
 

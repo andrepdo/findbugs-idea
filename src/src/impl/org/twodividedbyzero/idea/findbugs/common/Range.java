@@ -46,7 +46,7 @@ public final class Range<T extends Comparable<T>> {
 	 *             if lower bound is greater than upper bound
 	 */
 	public Range(final T lowerBound, final T upperBound) throws IllegalArgumentException {
-		if (lowerBound != null && upperBound != null && lowerBound.compareTo(upperBound) == 1)
+		if (lowerBound != null && upperBound != null && lowerBound.compareTo(upperBound) > 0)
 			throw new IllegalArgumentException("lowerBound is greater than upperBound");
 
 		_lowerBound = lowerBound;
@@ -65,17 +65,12 @@ public final class Range<T extends Comparable<T>> {
 	 * @throws IllegalArgumentException
 	 *             if the specified object is <code>null</code>.
 	 */
-	public final boolean contains(final T object) throws IllegalArgumentException {
+	public final boolean contains(final Comparable object) throws IllegalArgumentException {
 		if (object == null)
 			throw new IllegalArgumentException("object is null");
 
-		if (_lowerBound != null && object.compareTo(_lowerBound) == -1)
-			return false;
+		return !(_lowerBound != null && object.compareTo(_lowerBound) < 0) && !(_upperBound != null && object.compareTo(_upperBound) > 0 && object.compareTo(_upperBound) < 2);
 
-		if (_upperBound != null && object.compareTo(_upperBound) == 1)
-			return false;
-
-		return true;
 	}
 
 	@Override
@@ -105,10 +100,8 @@ public final class Range<T extends Comparable<T>> {
 		if (a == null && b == null)
 			return true;
 
-		if (a != null && b != null)
-			return a.equals(b);
+		return a != null && b != null && a.equals(b);
 
-		return false;
 	}
 
 	@Override

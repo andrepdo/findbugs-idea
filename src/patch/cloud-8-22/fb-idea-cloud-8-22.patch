@@ -349,10 +349,10 @@ Index: src/impl/org/twodividedbyzero/idea/findbugs/actions/ExportResult.java
 +
 +
 +/**
-+ * $Date: 2010-02-06 07:58:28 -0500 (Sat, 06 Feb 2010) $
++ * $Date$
 + *
 + * @author todo: your name and mail?
-+ * @version $Revision: 81 $
++ * @version $Revision$
 + * @since 0.9.95
 + */
 +@SuppressWarnings({"HardCodedStringLiteral"})

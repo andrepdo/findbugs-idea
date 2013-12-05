@@ -329,21 +329,23 @@ public class DetectorConfiguration implements ConfigurationPage {
 	}*/
 
 
+	@SuppressWarnings("HardcodedLineSeparator")
 	private static String getDetailedText(final DetectorFactory factory) {
 		if (factory == null) {
 			return "";
 		}
 		final StringBuilder sb = new StringBuilder(factory.getFullName());
-		sb.append("\n");
+		sb.append('\n');
 		sb.append(getDescriptionWithoutHtml(factory));
 		sb.append("\n\nReported patterns:\n");
 		final Collection<BugPattern> patterns = factory.getReportedBugPatterns();
-		for (Iterator<BugPattern> iter = patterns.iterator(); iter.hasNext();) {
+		//noinspection ForLoopWithMissingComponent
+		for (final Iterator<BugPattern> iter = patterns.iterator(); iter.hasNext();) {
 			final BugPattern pattern = iter.next();
-			sb.append(pattern.getType()).append(" ").append(" (").append(pattern.getAbbrev()).append(", ").append(pattern.getCategory()).append("):").append("  ");
+			sb.append(pattern.getType()).append(' ').append(" (").append(pattern.getAbbrev()).append(", ").append(pattern.getCategory()).append("):").append("  ");
 			sb.append(pattern.getShortDescription());
 			if (iter.hasNext()) {
-				sb.append("\n");
+				sb.append('\n');
 			}
 		}
 		if (patterns.isEmpty()) {
@@ -405,7 +407,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 		if (!categories.isEmpty()) {
 			final StringBuilder sb = new StringBuilder();
 			for (final String string : categories) {
-				sb.append(I18N.instance().getBugCategoryDescription(string)).append("|");
+				sb.append(I18N.instance().getBugCategoryDescription(string)).append('|');
 			}
 			category = sb.toString();
 		} else {
@@ -437,11 +439,12 @@ public class DetectorConfiguration implements ConfigurationPage {
 			final String abbr = pattern.getAbbrev();
 			abbrs.add(abbr);
 		}
-		for (Iterator<String> iter = abbrs.iterator(); iter.hasNext();) {
+		//noinspection ForLoopWithMissingComponent
+		for (final Iterator<String> iter = abbrs.iterator(); iter.hasNext();) {
 			final String element = iter.next();
 			sb.append(element);
 			if (iter.hasNext()) {
-				sb.append("|");
+				sb.append('|');
 			}
 		}
 		return sb.toString();
@@ -472,7 +475,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 	}
 
 
-	public void filter(String filter) {
+	public void filter(final String filter) {
 		_bugPatternModel.filter(filter);
 	}
 

@@ -32,11 +32,12 @@ import java.util.List;
  * @version $Revision$
  * @since 0.9.90-dev
  */
+@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
 public class BugCategoryTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 0L;
 
-	private final List<BugCategory> _entries;
+	private final transient List<BugCategory> _entries;
 
 
 	public BugCategoryTableModel() {
@@ -117,7 +118,7 @@ public class BugCategoryTableModel extends AbstractTableModel {
 	}
 
 
-	public List<BugCategory> getCheckedEntries() {
+	public Collection<BugCategory> getCheckedEntries() {
 		final List<BugCategory> result = new ArrayList<BugCategory>();
 		for (final BugCategory entry : _entries) {
 			final boolean selected = entry.isEnabled();

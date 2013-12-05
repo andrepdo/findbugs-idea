@@ -42,12 +42,12 @@ public class PluginGuiCallback extends AbstractSwingGuiCallback {
     private Cloud _cloud;
 
     private final CloudListener _cloudListener = new CloudListener() {
-        public void issueUpdated(BugInstance bug) {
+        public void issueUpdated(final BugInstance bug) {
             _plugin.getToolWindowPanel().getBugDetailsComponents().issueUpdated(bug);
         }
 
         public void statusUpdated() {
-			StatusBar sb = WindowManager.getInstance().getStatusBar(_plugin.getProject());
+			final StatusBar sb = WindowManager.getInstance().getStatusBar(_plugin.getProject());
 			if (sb != null && _cloud != null)
 				sb.setInfo(_cloud.getStatusMsg());
         }
@@ -61,7 +61,7 @@ public class PluginGuiCallback extends AbstractSwingGuiCallback {
                     try {
                         final CountDownLatch latch = new CountDownLatch(1);
                         task.addListener(new CloudTaskListener() {
-                            public void taskStatusUpdated(String statusLine, double percentCompleted) {
+                            public void taskStatusUpdated(final String statusLine, final double percentCompleted) {
                                 progressIndicator.setText(statusLine);
                                 progressIndicator.setFraction(percentCompleted / 100.0);
                             }
@@ -70,14 +70,14 @@ public class PluginGuiCallback extends AbstractSwingGuiCallback {
                                 latch.countDown();
                             }
 
-                            public void taskFailed(String message) {
+                            public void taskFailed(final String message) {
                                 progressIndicator.setText(message);
                                 latch.countDown();
                             }
                         });
                         if (!task.isFinished())
                             latch.await();
-                    } catch (InterruptedException e) {
+                    } catch (final InterruptedException e) {
                         throw new IllegalStateException(e);
                     }
                 }
@@ -90,20 +90,20 @@ public class PluginGuiCallback extends AbstractSwingGuiCallback {
         }
     };
 
-    public PluginGuiCallback(FindBugsPlugin plugin) {
+    public PluginGuiCallback(final FindBugsPlugin plugin) {
         super(plugin.getToolWindowPanel());
 		_plugin = plugin;
     }
 
-    public void setErrorMessage(String errorMsg) {
+    public void setErrorMessage(final String errorMsg) {
     }
 
-    public void registerCloud(final edu.umd.cs.findbugs.Project project, BugCollection collection, final Cloud cloud) {
+    public void registerCloud(final edu.umd.cs.findbugs.Project project, final BugCollection collection, final Cloud cloud) {
 		_cloud = cloud;
         cloud.addListener(_cloudListener);
     }
 
-    public void unregisterCloud(edu.umd.cs.findbugs.Project project, BugCollection collection, Cloud cloud) {
+    public void unregisterCloud(final edu.umd.cs.findbugs.Project project, final BugCollection collection, final Cloud cloud) {
         //noinspection ObjectEquality
         if (cloud == _cloud) {
             //noinspection AssignmentToNull

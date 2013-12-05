@@ -32,6 +32,7 @@ import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
+import javax.swing.JLabel;
 import java.awt.Graphics;
 import java.util.List;
 
@@ -64,7 +65,7 @@ public class CloudCommentsPaneIntellij extends CloudCommentsPane {
 
 
 	protected void setSignInOutText(final String buttonText) {
-		((LinkLabel) signInOutLink).setText(buttonText);
+		((JLabel) signInOutLink).setText(buttonText);
 	}
 
 
@@ -77,14 +78,14 @@ public class CloudCommentsPaneIntellij extends CloudCommentsPane {
 					}
 				}, null);*/
 		cancelLink = new LinkLabel();
-		((LinkLabel) cancelLink).setText("cancel");
+		((JLabel) cancelLink).setText("cancel");
 		((LinkLabel) cancelLink).setListener(new LinkListener() {
 			public void linkSelected(final LinkLabel linkLabel, final Object o) {
 				cancelClicked();
 			}
 		}, null);
 		signInOutLink = new LinkLabel();
-		((LinkLabel) signInOutLink).setText("sign in");
+		((JLabel) signInOutLink).setText("sign in");
 		((LinkLabel) signInOutLink).setListener(new LinkListener() {
 			public void linkSelected(final LinkLabel linkLabel, final Object o) {
 				signInOrOutClicked();
@@ -129,7 +130,7 @@ public class CloudCommentsPaneIntellij extends CloudCommentsPane {
 	}
 
 
-	protected boolean isDisabled(CloudPlugin plugin) {
+	protected boolean isDisabled(final CloudPlugin plugin) {
 		final FindBugsPlugin findBugsPlugin = _toolWindowPanel.getProject().getComponent(FindBugsPlugin.class);
 		final FindBugsPreferences prefs = findBugsPlugin.getPreferences();
 		return prefs.isPluginDisabled(plugin.getFindbugsPluginId());

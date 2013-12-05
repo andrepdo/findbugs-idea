@@ -27,10 +27,10 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * $Date: 2010-10-11 23:47:29 +0200 (Mon, 11 Oct 2010) $
+ * $Date$
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision: 112 $
+ * @version $Revision$
  * @since 0.9.96
  */
 public final class LookUp {
@@ -72,8 +72,10 @@ public final class LookUp {
 
 	public static <T> void unregister(final T instance) {
 		if (instance != null) {
+			//noinspection ForLoopWithMissingComponent
 			for (final Iterator<Object> it = _instances.iterator(); it.hasNext(); ) {
 				final Object o = it.next();
+				//noinspection ObjectEquality
 				if (o == instance) {
 					it.remove();
 				}

@@ -53,7 +53,7 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	private ProblemDescriptor _problem;
 	private String _description;
 	private BugInstance _bugInstance;
-	private List<VisitableTreeNode> _childs;
+	private final List<VisitableTreeNode> _childs;
 	private final Project _project;
 
 	private static final Icon _expandedIcon = new MaskIcon(ResourcesLoader.findIcon("/nodes/class.png", BugInstanceNode.class), JBColor.BLACK);
@@ -134,7 +134,7 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 
 
 	public void setSimpleName(final String simpleName) {
-		if (simpleName == null || simpleName.trim().length() == 0) {
+		if (simpleName == null || simpleName.trim().isEmpty()) {
 			throw new IllegalArgumentException("simpleName may not be null/empty");
 		}
 		_simpleName = simpleName;

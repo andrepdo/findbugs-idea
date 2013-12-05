@@ -88,9 +88,9 @@ public class EventManagerImpl implements EventManager {
 		for (final MulticastEventFilter multicastEventFilter : multicastEventFilters) {
 			if (multicastEventFilter.getEventFilter().acceptEvent(event)) {
 				multicastEventFilter.getEventListener().onEvent(event);
-				LOGGER.debug("fireEvent: " + event.toString() + " Listener{" + multicastEventFilter.getEventListener().toString() + "}");
+				LOGGER.debug("fireEvent: " + event.toString() + " Listener{" + multicastEventFilter.getEventListener().toString() + '}');
 			} else {
-				LOGGER.debug("No listeners accepted eventType [" + event.getType() + "] registered. Event was: [" + event.toString() + "]");
+				LOGGER.debug("No listeners accepted eventType [" + event.getType() + "] registered. Event was: [" + event.toString() + ']');
 			}
 		}
 	}
@@ -127,15 +127,16 @@ public class EventManagerImpl implements EventManager {
 		if (!hasListener(eventFilter, listener)) {
 			_eventFilters.get(eventFilter.getEventType()).add(new MulticastEventFilter(eventFilter, listener));
 			fireEvent(new EventManagerEventImpl(EventManagerEvent.Operation.LISTENER_ADDED));
-			LOGGER.debug("Registered listener [" + listener + "] for EventFilter was: [" + eventFilter + "]");
+			LOGGER.debug("Registered listener [" + listener + "] for EventFilter was: [" + eventFilter + ']');
 		} else {
-			LOGGER.debug("Listener already registered [" + listener + "] for EventType [" + eventFilter.getEventType() + "] and project [" + eventFilter.getProjectName() + "]");
+			LOGGER.debug("Listener already registered [" + listener + "] for EventType [" + eventFilter.getEventType() + "] and project [" + eventFilter.getProjectName() + ']');
 		}
 	}
 
 
 	public void removeEventListener(@NotNull final EventListener<?> listener) {
 		for (final Collection<MulticastEventFilter> multicastEventFilters : _eventFilters.values()) {
+			//noinspection ForLoopWithMissingComponent
 			for (final Iterator<MulticastEventFilter> filterIterator = multicastEventFilters.iterator(); filterIterator.hasNext();) {
 				final MulticastEventFilter multicastEventFilter = filterIterator.next();
 
@@ -152,6 +153,7 @@ public class EventManagerImpl implements EventManager {
 	public void removeEventListener(@NotNull final Project project) {
 
 		for (final Collection<MulticastEventFilter> multicastEventFilters : _eventFilters.values()) {
+			//noinspection ForLoopWithMissingComponent
 			for (final Iterator<MulticastEventFilter> filterIterator = multicastEventFilters.iterator(); filterIterator.hasNext();) {
 				final MulticastEventFilter multicastEventFilter = filterIterator.next();
 

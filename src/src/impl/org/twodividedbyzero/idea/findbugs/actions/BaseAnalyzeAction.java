@@ -49,6 +49,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiRecursiveElementVisitor;
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
@@ -56,8 +57,8 @@ import javax.annotation.Nullable;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -72,8 +73,8 @@ public abstract class BaseAnalyzeAction extends BaseAction {
 
 
   @Override
-  public void actionPerformed(AnActionEvent e) {
-    DataContext dataContext = e.getDataContext();
+  public void actionPerformed(final AnActionEvent e) {
+    final DataContext dataContext = e.getDataContext();
     final Project project = e.getData(PlatformDataKeys.PROJECT);
     final Module module = e.getData(LangDataKeys.MODULE);
     if (project == null) {
@@ -82,8 +83,8 @@ public abstract class BaseAnalyzeAction extends BaseAction {
     AnalysisScope scope = getInspectionScope(dataContext);
     final boolean rememberScope = e.getPlace().equals(ActionPlaces.MAIN_MENU);
     final AnalysisUIOptions uiOptions = AnalysisUIOptions.getInstance(project);
-    PsiElement element = LangDataKeys.PSI_ELEMENT.getData(dataContext);
-    BaseAnalysisActionDialog dlg = new BaseAnalysisActionDialog(AnalysisScopeBundle.message("specify.analysis.scope", "FindBugs Analyze"),
+    final PsiElement element = LangDataKeys.PSI_ELEMENT.getData(dataContext);
+    final BaseAnalysisActionDialog dlg = new BaseAnalysisActionDialog(AnalysisScopeBundle.message("specify.analysis.scope", "FindBugs Analyze"),
             AnalysisScopeBundle.message("analysis.scope.title", "Analyze"),
             project,
             scope,
@@ -100,7 +101,8 @@ public abstract class BaseAnalyzeAction extends BaseAction {
         HelpManager.getInstance().invokeHelp(getHelpTopic());
       }
 
-      @NotNull
+      @SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+	  @NotNull
       @Override
       protected Action[] createActions() {
         return new Action[]{getOKAction(), getCancelAction(), getHelpAction()};
@@ -136,13 +138,15 @@ public abstract class BaseAnalyzeAction extends BaseAction {
   protected abstract void analyze(@NotNull Project project, AnalysisScope scope);
 
 
-  protected final Iterable<String> findClasses(@NotNull final Project project, AnalysisScope scope) {
-	final List<String> ret = new ArrayList<String>(256);
+  @edu.umd.cs.findbugs.annotations.SuppressWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON"})
+  protected final Iterable<String> findClasses(@NotNull final Project project, final AnalysisScope scope) {
+	final Collection<String> ret = new ArrayList<String>(256);
     final PsiManager psiManager = PsiManager.getInstance(project);
     psiManager.startBatchFilesProcessingMode();
     //final ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex(); TODO remove
     try {
-      scope.accept(new PsiRecursiveElementVisitor() {
+		//noinspection AnonymousInnerClass
+		scope.accept(new PsiRecursiveElementVisitor() {
 		FileType fileType;
 		String path;
         @Override public void visitFile(final PsiFile file) {
@@ -168,19 +172,19 @@ public abstract class BaseAnalyzeAction extends BaseAction {
 
 
   @Nullable
-  private AnalysisScope getInspectionScope(@NotNull DataContext dataContext) {
+  private AnalysisScope getInspectionScope(@NotNull final DataContext dataContext) {
     if (PlatformDataKeys.PROJECT.getData(dataContext) == null) return null;
 
-    AnalysisScope scope = getInspectionScopeImpl(dataContext);
+    final AnalysisScope scope = getInspectionScopeImpl(dataContext);
 
     return scope != null && scope.getScopeType() != AnalysisScope.INVALID ? scope : null;
   }
 
 
   @Nullable
-  private AnalysisScope getInspectionScopeImpl(@NotNull DataContext dataContext) {
+  private AnalysisScope getInspectionScopeImpl(@NotNull final DataContext dataContext) {
     //Possible scopes: file, directory, package, project, module.
-    Project projectContext = PlatformDataKeys.PROJECT_CONTEXT.getData(dataContext);
+    final Project projectContext = PlatformDataKeys.PROJECT_CONTEXT.getData(dataContext);
     if (projectContext != null) {
       return new AnalysisScope(projectContext);
     }
@@ -190,12 +194,12 @@ public abstract class BaseAnalyzeAction extends BaseAction {
       return analysisScope;
     }
 
-    Module moduleContext = LangDataKeys.MODULE_CONTEXT.getData(dataContext);
+    final Module moduleContext = LangDataKeys.MODULE_CONTEXT.getData(dataContext);
     if (moduleContext != null) {
       return new AnalysisScope(moduleContext);
     }
 
-    Module [] modulesArray = LangDataKeys.MODULE_CONTEXT_ARRAY.getData(dataContext);
+    final Module [] modulesArray = LangDataKeys.MODULE_CONTEXT_ARRAY.getData(dataContext);
     if (modulesArray != null) {
       return new AnalysisScope(modulesArray);
     }
@@ -205,7 +209,7 @@ public abstract class BaseAnalyzeAction extends BaseAction {
       if (file != null && file.isValid() && file.getFileType() instanceof ArchiveFileType && acceptNonProjectDirectories()) {
         final VirtualFile jarRoot = JarFileSystem.getInstance().getJarRootForLocalFile(file);
         if (jarRoot != null) {
-          PsiDirectory psiDirectory = psiFile.getManager().findDirectory(jarRoot);
+          final PsiDirectory psiDirectory = psiFile.getManager().findDirectory(jarRoot);
           if (psiDirectory != null) {
             return new AnalysisScope(psiDirectory);
           }
@@ -214,17 +218,17 @@ public abstract class BaseAnalyzeAction extends BaseAction {
       return new AnalysisScope(psiFile);
     }
 
-    VirtualFile[] virtualFiles = PlatformDataKeys.VIRTUAL_FILE_ARRAY.getData(dataContext);
-    Project project = PlatformDataKeys.PROJECT.getData(dataContext);
+    final VirtualFile[] virtualFiles = PlatformDataKeys.VIRTUAL_FILE_ARRAY.getData(dataContext);
+    final Project project = PlatformDataKeys.PROJECT.getData(dataContext);
     if (virtualFiles != null && project != null) { //analyze on selection
-      ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
+      final ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
       if (virtualFiles.length == 1) {
-        PsiDirectory psiDirectory = PsiManager.getInstance(project).findDirectory(virtualFiles[0]);
+        final PsiDirectory psiDirectory = PsiManager.getInstance(project).findDirectory(virtualFiles[0]);
         if (psiDirectory != null && (acceptNonProjectDirectories() || psiDirectory.getManager().isInProject(psiDirectory))) {
           return new AnalysisScope(psiDirectory);
         }
       }
-      Set<VirtualFile> files = new HashSet<VirtualFile>();
+      final Set<VirtualFile> files = new HashSet<VirtualFile>();
       for (VirtualFile vFile : virtualFiles) {
         if (fileIndex.isInContent(vFile)) {
           if (vFile instanceof VirtualFileWindow) {
@@ -246,15 +250,15 @@ public abstract class BaseAnalyzeAction extends BaseAction {
 
 
   @Nullable
-  protected JComponent getAdditionalActionSettings(Project project, BaseAnalysisActionDialog dialog){
+  protected JComponent getAdditionalActionSettings(final Project project, final BaseAnalysisActionDialog dialog){
     return null;
   }
 
 
-  private static void collectFilesUnder(@NotNull VirtualFile vFile, @NotNull final Set<VirtualFile> files) {
+  private static void collectFilesUnder(@NotNull final VirtualFile vFile, @NotNull final Collection<VirtualFile> files) {
     VfsUtilCore.visitChildrenRecursively(vFile, new VirtualFileVisitor() {
       @Override
-      public boolean visitFile(@NotNull VirtualFile file) {
+      public boolean visitFile(@NotNull final VirtualFile file) {
         if (!file.isDirectory()) {
           files.add(file);
         }

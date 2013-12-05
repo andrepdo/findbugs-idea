@@ -33,20 +33,20 @@ public final class FileModificationServiceUtil {
 					_preparePsiElementForWrite = fileModificationService.getDeclaredMethod("preparePsiElementForWrite", PsiElement.class);
 				}
 			}
-		} catch (ClassNotFoundException e) { // ignore e;
-		} catch (NoSuchMethodException e) { // ignore e;
+		} catch (final ClassNotFoundException ignored) { // ignore e;
+		} catch (final NoSuchMethodException ignored) { // ignore e;
 		}
 
 		// or CodeInsightUtilBase ?
 		if (_preparePsiElementForWrite == null) {
 			try {
-				final Class codeInsightUtilBase = Class.forName("com.intellij.codeInsight.CodeInsightUtilBase");
+				final Class<?> codeInsightUtilBase = Class.forName("com.intellij.codeInsight.CodeInsightUtilBase");
 				if (codeInsightUtilBase != null) {
 					_getInstance = null;
 					_preparePsiElementForWrite = codeInsightUtilBase.getDeclaredMethod("preparePsiElementForWrite", PsiElement.class);
 				}
-			} catch (ClassNotFoundException e) { // ignore e;
-			} catch (NoSuchMethodException e) { // ignore e;
+			} catch (final ClassNotFoundException ignored) { // ignore e;
+			} catch (final NoSuchMethodException ignored) { // ignore e;
 			}
 		}
 
@@ -58,16 +58,16 @@ public final class FileModificationServiceUtil {
 		preparePsiElementForWrite = _preparePsiElementForWrite;
 	}
 
-	public static boolean preparePsiElementForWrite(@org.jetbrains.annotations.Nullable PsiElement element) {
+	public static boolean preparePsiElementForWrite(@org.jetbrains.annotations.Nullable final PsiElement element) {
 		try {
 			Object instance = null;
 			if (getInstance != null) {
 				instance = getInstance.invoke(null);
 			}
 			return (Boolean)preparePsiElementForWrite.invoke(instance, element);
-		} catch (IllegalAccessException e) {
+		} catch (final IllegalAccessException e) {
 			throw new Error(e);
-		} catch ( InvocationTargetException e ) {
+		} catch ( final InvocationTargetException e ) {
 			throw new Error(e);
 		}
 	}

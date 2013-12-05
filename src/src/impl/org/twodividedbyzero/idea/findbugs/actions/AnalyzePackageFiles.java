@@ -69,7 +69,7 @@ public class AnalyzePackageFiles extends BaseAction implements EventListener<Bug
 		final Presentation presentation = e.getPresentation();
 
 		// check a project is loaded
-		if (isProjectLoaded(project, presentation)) {
+		if (isProjectNotLoaded(project, presentation)) {
 			Messages.showWarningDialog("Project not loaded.", "FindBugs");
 			return;
 		}
@@ -93,14 +93,14 @@ public class AnalyzePackageFiles extends BaseAction implements EventListener<Bug
 			final Presentation presentation = event.getPresentation();
 
 			// check a project is loaded
-			if (isProjectLoaded(project, presentation)) {
+			if (isProjectNotLoaded(project, presentation)) {
 				return;
 			}
 
 			isPluginAccessible(project);
 
 			// check if tool window is registered
-			final ToolWindow toolWindow = isToolWindowRegistred(project);
+			final ToolWindow toolWindow = isToolWindowRegistered(project);
 			if (toolWindow == null) {
 				presentation.setEnabled(false);
 				presentation.setVisible(false);
@@ -119,11 +119,9 @@ public class AnalyzePackageFiles extends BaseAction implements EventListener<Bug
 			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
 			presentation.setVisible(true);
 
-		} catch (Throwable e) {
+		} catch (final Throwable e) {
 			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
-			if (processed != null) {
-				LOGGER.error("Action update failed", processed);
-			}
+			LOGGER.error("Action update failed", processed);
 		}
 	}
 

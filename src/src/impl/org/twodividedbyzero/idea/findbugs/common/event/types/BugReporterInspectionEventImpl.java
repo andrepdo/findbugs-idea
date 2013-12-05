@@ -42,12 +42,12 @@ public class BugReporterInspectionEventImpl extends EventImpl implements BugRepo
 
 	private static final String _toolWindowId = FindBugsPluginConstants.TOOL_WINDOW_ID; // todo: set on instance creation
 
-	private Operation _operation;
-	private BugInstance _bugInstance;
-	private Integer _bugCount;
-	private transient BugCollection _bugCollection;
-	private transient ProjectStats _projectStats;
-	private String _projectName;
+	private final Operation _operation;
+	private final BugInstance _bugInstance;
+	private final Integer _bugCount;
+	private final transient BugCollection _bugCollection;
+	private final transient ProjectStats _projectStats;
+	private final String _projectName;
 	private final FindBugsProject _findBugsProject;
 
 

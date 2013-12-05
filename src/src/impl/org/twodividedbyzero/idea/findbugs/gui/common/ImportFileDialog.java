@@ -51,11 +51,11 @@ import java.io.File;
 
 
 /**
- * $Date: 2010-10-10 16:30:08 +0200 (Sun, 10 Oct 2010) $
+ * $Date$
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
  * @author Keith Lea <keithl@gmail.com>
- * @version $Revision: 107 $
+ * @version $Revision$
  * @since 0.9.96
  */
 @edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
@@ -104,7 +104,7 @@ public class ImportFileDialog extends JPanel {
 		dialogBuilder.setCenterPanel(this);
 
 		_importFile.getDocument().addDocumentListener(new MyDocumentAdapter());
-		if (_importFile.getText().length() > 0) {
+		if (!_importFile.getText().isEmpty()) {
 			_selectedFile = new File(_importFile.getText());
 		}
 		_importFile.addHierarchyListener(new HierarchyListener() {
@@ -130,8 +130,8 @@ public class ImportFileDialog extends JPanel {
 
 	private boolean validateFile(final Document doc) {
 		try {
-			return _selectedFile != null && _selectedFile.isFile() && _selectedFile.canRead() && "xml".equals(FileUtil.getExtension(_selectedFile.getAbsolutePath())) && doc.getText(0, doc.getLength()).trim().length() > 0;
-		} catch (BadLocationException ignore) {
+			return _selectedFile != null && _selectedFile.isFile() && _selectedFile.canRead() && "xml".equals(FileUtil.getExtension(_selectedFile.getAbsolutePath())) && !doc.getText(0, doc.getLength()).trim().isEmpty();
+		} catch (final BadLocationException ignore) {
 			return false;
 		}
 	}

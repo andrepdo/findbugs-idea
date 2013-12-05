@@ -37,6 +37,7 @@ import edu.umd.cs.findbugs.HTMLBugReporter;
 import org.dom4j.Document;
 import org.dom4j.io.DocumentSource;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
@@ -45,6 +46,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventF
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.common.util.IoUtil;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.ExportFileDialog;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -61,10 +63,13 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -73,11 +78,11 @@ import java.util.regex.Pattern;
 
 
 /**
- * $Date: 2010-10-10 16:30:08 +0200 (Sun, 10 Oct 2010) $
+ * $Date$
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
  * @author Keith Lea <keithl@gmail.com>
- * @version $Revision: 107 $
+ * @version $Revision$
  * @since 0.9.95
  */
 @SuppressWarnings({"HardCodedStringLiteral"})
@@ -120,7 +125,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 		final Presentation presentation = e.getPresentation();
 
 		// check a project is loaded
-		if (isProjectLoaded(project, presentation)) {
+		if (isProjectNotLoaded(project, presentation)) {
 			Messages.showWarningDialog("Project not loaded.", "FindBugs");  // NON-NLS
 			return;
 		}
@@ -131,7 +136,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 		boolean exportHtml = preferences.getBooleanProperty(FindBugsPreferences.EXPORT_AS_HTML, true);
 		boolean exportBoth = exportXml && preferences.getBooleanProperty(FindBugsPreferences.EXPORT_AS_HTML, true);
 
-		if (exportDir.length() == 0 || !exportXml && !exportBoth && !exportHtml) {
+		if (exportDir.isEmpty() || !exportXml && !exportBoth && !exportHtml) {
 
 			//Ask the user for a export directory
 			final DialogBuilder dialogBuilder = new DialogBuilder(project);
@@ -144,12 +149,12 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 				return;
 			}
 			final String path = exportDialog.getText();
-			if (path == null || path.trim().length() == 0) {
+			if (path == null || path.trim().isEmpty()) {
 				return;
 			}
 
 			exportXml = exportDialog.isXml() != exportXml ? exportDialog.isXml() : exportXml;
-			exportHtml = !exportDialog.isXml() != exportHtml ? !exportDialog.isXml() : exportHtml;
+			exportHtml = exportDialog.isXml() == exportHtml ? !exportDialog.isXml() : exportHtml;
 			exportBoth = exportDialog.isBoth() != exportBoth ? exportDialog.isBoth() : exportBoth;
 			exportDir = path.trim();
 		}
@@ -174,7 +179,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 			public void run(@NotNull final ProgressIndicator indicator) {
 				indicator.setText2(finalExportDir + File.separatorChar + fileName);
 				setProgressIndicator(indicator);
-				FileWriter writer = null;
+				Writer writer = null;
 				try {
 					createDirIfAbsent(project, finalExportDir);
 					String exportDir = finalExportDir;
@@ -218,12 +223,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 					showToolWindowNotifier(project, e.getMessage(), MessageType.ERROR);
 					LOGGER.error(e.getMessage(), e);
 				} finally {
-					if (writer != null) {
-						try {
-							writer.close();
-						} catch (final IOException ignored) {
-						}
-					}
+					IoUtil.safeClose(writer);
 					Thread.currentThread().interrupt();
 				}
 			}
@@ -250,7 +250,8 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 	}
 
 
-	private FileWriter exportHtml(final String fileName) throws IOException, TransformerException {
+	@Nullable
+	private Writer exportHtml(final String fileName) throws IOException, TransformerException {
 		final Document document = _bugCollection.toDocument();
 		final Source xsl = new StreamSource(getStylesheetStream(FINDBUGS_PLAIN_XSL));
 		xsl.setSystemId(FINDBUGS_PLAIN_XSL);
@@ -262,12 +263,12 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 		final Source source = new DocumentSource(document);
 
 		// Write result to output stream
-		final FileWriter writer = new FileWriter(fileName);
+		final OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(fileName), Charset.forName("UTF-8").newEncoder());
 		final Result result = new StreamResult(writer);
-
 		// Do the transformation
 		transformer.transform(source, result);
 		return writer;
+
 	}
 
 
@@ -303,7 +304,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 			return new BufferedInputStream(new FileInputStream(stylesheet));
 		} catch (final Exception ignored) {
 		}
-		final InputStream xslInputStream = HTMLBugReporter.class.getResourceAsStream("/" + stylesheet);
+		final InputStream xslInputStream = HTMLBugReporter.class.getResourceAsStream('/' + stylesheet);
 		if (xslInputStream == null) {
 			throw new IOException("Could not load HTML generation stylesheet " + stylesheet);
 		}
@@ -318,14 +319,14 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 			final Presentation presentation = event.getPresentation();
 
 			// check a project is loaded
-			if (isProjectLoaded(project, presentation)) {
+			if (isProjectNotLoaded(project, presentation)) {
 				return;
 			}
 
 			isPluginAccessible(project);
 
 			// check if tool window is registered
-			final ToolWindow toolWindow = isToolWindowRegistred(project);
+			final ToolWindow toolWindow = isToolWindowRegistered(project);
 			if (toolWindow == null) {
 				presentation.setEnabled(false);
 				presentation.setVisible(false);
@@ -343,10 +344,8 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 			presentation.setVisible(true);
 
 		} catch (final Throwable e) {
-			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);// NON-NLS
-			if (processed != null) {
-				LOGGER.error("Action update failed", processed);
-			}
+			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
+			LOGGER.error("Action update failed", processed);
 		}
 	}
 

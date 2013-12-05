@@ -68,7 +68,7 @@ public class AnalyzeProjectFiles extends BaseAction implements EventListener<Bug
 		final Presentation presentation = e.getPresentation();
 
 		// check a project is loaded
-		if (isProjectLoaded(project, presentation)) {
+		if (isProjectNotLoaded(project, presentation)) {
 			Messages.showWarningDialog("Project not loaded.", "FindBugs");
 			return;
 		}
@@ -83,6 +83,7 @@ public class AnalyzeProjectFiles extends BaseAction implements EventListener<Bug
 	}
 
 
+	@SuppressWarnings("ConstantConditions")
 	@Override
 	public void update(final AnActionEvent event) {
 		try {
@@ -92,14 +93,14 @@ public class AnalyzeProjectFiles extends BaseAction implements EventListener<Bug
 			final Presentation presentation = event.getPresentation();
 
 			// check a project is loaded
-			if (isProjectLoaded(project, presentation)) {
+			if (isProjectNotLoaded(project, presentation)) {
 				return;
 			}
 
 			isPluginAccessible(project);
 
 			// check if tool window is registered
-			final ToolWindow toolWindow = isToolWindowRegistred(project);
+			final ToolWindow toolWindow = isToolWindowRegistered(project);
 			if (toolWindow == null) {
 				presentation.setEnabled(false);
 				presentation.setVisible(false);
@@ -111,20 +112,20 @@ public class AnalyzeProjectFiles extends BaseAction implements EventListener<Bug
 
 			// enable ?
 			if (!_running) {
-				_enabled = project != null && project.isInitialized() && project.isInitialized();
+				_enabled = project != null && project.isInitialized() && project.isOpen();
 			}
 			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
 			presentation.setVisible(true);
 
-		} catch (Throwable e) {
+		} catch (final Throwable e) {
 			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
-			if (processed != null) {
-				LOGGER.error("Action update failed", processed);
-			}
+			LOGGER.error("Action update failed", processed);
 		}
 	}
 
 
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"}) // action is not enabled
+	@SuppressWarnings("ConstantConditions")
 	private void initWorker() {
 		final com.intellij.openapi.project.Project project = IdeaUtilImpl.getProject(_dataContext);
 

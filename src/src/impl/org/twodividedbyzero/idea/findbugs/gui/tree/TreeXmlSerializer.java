@@ -36,6 +36,7 @@ import java.io.IOException;
  * @version $Revision$
  * @since 0.9.29-dev
  */
+@SuppressWarnings("CallToPrintStackTrace")
 class TreeXmlSerializer {
 
 	public static void write(final DefaultTreeModel model, final String filename) {
@@ -48,7 +49,7 @@ class TreeXmlSerializer {
 			stream = new BufferedOutputStream(fileOutputStream);
 			encoder = new XMLEncoder(stream);
 			encoder.writeObject(model);
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
 		} finally {
 			try {
@@ -58,7 +59,7 @@ class TreeXmlSerializer {
 				if (stream != null) {
 					stream.close();
 				}
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 			if (encoder != null) {
@@ -78,13 +79,13 @@ class TreeXmlSerializer {
 			final FileInputStream fis = new FileInputStream(filename);
 			stream = new BufferedInputStream(fis);
 			decoder = new XMLDecoder(stream);
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
 		} finally {
 			try {
 				assert stream != null;
 				stream.close();
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}
@@ -92,7 +93,7 @@ class TreeXmlSerializer {
 		DefaultTreeModel model = null;
 		try {
 			model = (DefaultTreeModel) decoder.readObject();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
 			decoder.close();

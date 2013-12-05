@@ -201,6 +201,7 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 	private static class TooltipProvider implements Function<PsiElement, String> {
 
 		private final List<ExtendedProblemDescriptor> _problemDescriptors;
+		@SuppressWarnings("HardcodedLineSeparator")
 		private static final Pattern PATTERN = Pattern.compile("\n");
 
 
@@ -220,7 +221,8 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 			buffer.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
 			buffer.append("<HTML><HEAD><TITLE>");
 
-			for (int i = 0, problemDescriptorsSize = problemDescriptors.size(); i < problemDescriptorsSize; i++) {
+			final int problemDescriptorsSize = problemDescriptors.size();
+			for (int i = 0;i < problemDescriptorsSize; i++) {
 				final ExtendedProblemDescriptor problemDescriptor = problemDescriptors.get(i);
 				buffer.append("");
 				buffer.append("</TITLE></HEAD><BODY><H3>");
@@ -240,11 +242,7 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 
 		@Override
 		public String toString() {
-			final StringBuilder sb = new StringBuilder();
-			sb.append("TooltipProvider");
-			sb.append("{_problemDescriptor=").append(_problemDescriptors);
-			sb.append('}');
-			return sb.toString();
+			return "TooltipProvider" + "{_problemDescriptor=" + _problemDescriptors + '}';
 		}
 	}
 

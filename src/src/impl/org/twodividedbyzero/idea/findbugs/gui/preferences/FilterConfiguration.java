@@ -35,6 +35,7 @@ import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -132,7 +133,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			_includePanel = new JPanel(tbl);
 			_includePanel.setBorder(BorderFactory.createTitledBorder("Include filter files"));
 
-			final DefaultListModel model = new DefaultListModel();
+			final ListModel model = new DefaultListModel();
 
 			_includeList = ListFacade.createList(model);
 			_includeList.setVisibleRowCount(7);
@@ -197,7 +198,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			_excludePanel = new JPanel(tbl);
 			_excludePanel.setBorder(BorderFactory.createTitledBorder("Exclude filter files"));
 
-			final DefaultListModel model = new DefaultListModel();
+			final ListModel model = new DefaultListModel();
 
 			_excludeList = ListFacade.createList(model);
 			_excludeList.setVisibleRowCount(7);
@@ -262,7 +263,7 @@ public class FilterConfiguration implements ConfigurationPage {
 			_baselinePanel = new JPanel(tbl);
 			_baselinePanel.setBorder(BorderFactory.createTitledBorder("Exclude baseline bugs"));
 
-			final DefaultListModel model = new DefaultListModel();
+			final ListModel model = new DefaultListModel();
 
 			_baselineList = ListFacade.createList(model);
 			_baselineList.setVisibleRowCount(7);
@@ -367,7 +368,7 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	public void filter(String filter) {
+	public void filter(final String filter) {
 		// TODO support search
 	}
 

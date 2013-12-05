@@ -1,7 +1,6 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-    xmlns:lxslt="http://xml.apache.org/xslt"
-    xmlns:redirect="org.apache.xalan.lib.Redirect"
-    extension-element-prefixes="redirect">
+                xmlns:redirect="org.apache.xalan.lib.Redirect"
+                extension-element-prefixes="redirect">
 
 <!--
    Licensed to the Apache Software Foundation (ASF) under one or more

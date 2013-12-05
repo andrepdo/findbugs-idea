@@ -78,6 +78,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -119,6 +120,9 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 	static {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
+		if (plugin == null) {
+			throw new IllegalStateException(FindBugsPluginConstants.PLUGIN_NAME + " could not be instantiated! PluginManager returned null!");
+		}
 		FindBugs.setHome(plugin.getPath().toURI().toString());
 
 		// todo: extract plugins to /home/findbugs-idea/... ???
@@ -149,21 +153,25 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 				LOGGER.info(VersionManager.getFullVersion() + " Plugin loaded with no project.");
 			}
 
-		} catch (Throwable t) {
+		} catch (final Throwable t) {
 			LOGGER.error("Project initialisation failed.", t);
 		}
 
 	}
 
 
+	@SuppressWarnings({"NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"})
 	public void initComponent() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
+		//noinspection ConstantConditions
 		LOGGER.debug("initComponent: " + plugin.getName() + " project="  + getProject());
 	}
 
 
+	@SuppressWarnings({"NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"})
 	public void disposeComponent() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
+		//noinspection ConstantConditions
 		LOGGER.debug("disposeComponent: " + plugin.getName() + " project="  + getProject());
 	}
 
@@ -174,8 +182,10 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
+	@SuppressWarnings({"NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"})
 	public void projectOpened() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
+		//noinspection ConstantConditions
 		LOGGER.debug("project is opened: " + plugin.getName() + " project="  + getProject());
 		initToolWindow();
 		setActionGroupsIcon();
@@ -185,8 +195,10 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
+	@SuppressWarnings({"NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"})
 	public void projectClosed() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
+		//noinspection ConstantConditions
 		LOGGER.debug("project is being closed: " + plugin.getName() + " project="  + getProject());
 		EventManagerImpl.getInstance().removeEventListener(_project);
 		final AnalyzeChangelistFiles action = (AnalyzeChangelistFiles) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTIVE_CHANGELIST_ACTION);
@@ -312,7 +324,8 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	 * @param error   the exception.
 	 * @return any exception to be passed upwards.
 	 */
-	@SuppressWarnings({"ThrowableInstanceNeverThrown"})
+	@SuppressWarnings({"ThrowableInstanceNeverThrown", "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+	@NotNull
 	public static FindBugsPluginException processError(final String message, @Nullable final Throwable error) {
 		Throwable root = error;
 
@@ -487,6 +500,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 			_preferences = getDefaultPreferences();
 		}
 
+		//noinspection ForLoopWithMissingComponent
 		for (final Enumeration<?> confNames = _preferences.propertyNames(); confNames.hasMoreElements();) {
 			final String elementName = (String) confNames.nextElement();
 			preferencesBean.getBasePreferences().put(elementName, _preferences.getProperty(elementName));
@@ -513,6 +527,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
+	@SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@NotNull
 	public String getId() {
 		return FindBugsPluginConstants.PLUGIN_ID;
@@ -541,7 +556,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 				if (factory != null) {
 					addToSearchIndex(registrar, factory.getShortName()); // eg: FindFieldSelfAssignment
 					final Set<BugPattern> patterns = factory.getReportedBugPatterns();
-					for (BugPattern pattern : patterns) {
+					for (final BugPattern pattern : patterns) {
 						addToSearchIndex(registrar, pattern.getType()); // eg: SA_FIELD_SELF_ASSIGNMENT
 					}
 				}
@@ -550,9 +565,9 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
-	private void addToSearchIndex(SearchableOptionsRegistrar registrar, String option) {
+	private void addToSearchIndex(final SearchableOptionsRegistrar registrar, final String option) {
 		registrar.addOption(
-				option.toLowerCase(), // should be lowercase
+				option.toLowerCase(Locale.ENGLISH), // should be lowercase
 				null, // path
 				null, // hit
 				FindBugsPluginConstants.PLUGIN_ID,

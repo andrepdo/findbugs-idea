@@ -54,6 +54,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.LayoutManager;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
@@ -358,7 +359,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 	}
 
 
-	public void filter(String filter) {
+	public void filter(final String filter) {
 		// TODO support search
 	}
 
@@ -390,7 +391,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			final double rowsGap = 5;
 			final double[][] size = {{border, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.FILL,  border}, // Columns
 									 {border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
-			final TableLayout tbl = new TableLayout(size);
+			final LayoutManager tbl = new TableLayout(size);
 			setLayout(tbl);
 
 			final JPanel fontPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -610,7 +611,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			buffer.append(_color.getBlue());
 
 			if (_isSelectable) {
-				buffer.append(" (").append(UIBundle.message("color.panel.right.click.to.customize.tooltip.suffix")).append(")");
+				buffer.append(" (").append(UIBundle.message("color.panel.right.click.to.customize.tooltip.suffix")).append(')');
 			}
 			setToolTipText(buffer.toString());
 		}

@@ -50,7 +50,7 @@ public class FindBugsTask extends BackgroundableTask {
 	private final edu.umd.cs.findbugs.Project _findBugsProject;
 
 
-	public FindBugsTask(@Nullable final Project project, SortedBugCollection bugCollection, @NotNull final String title, final boolean canBeCancelled, final IFindBugsEngine engine, final boolean startInBackground) {
+	public FindBugsTask(@Nullable final Project project, final SortedBugCollection bugCollection, @NotNull final String title, final boolean canBeCancelled, final IFindBugsEngine engine, final boolean startInBackground) {
 		super(project, title, canBeCancelled);
         _bugCollection = bugCollection;
         setCancelText("Cancel");  // NON-NLS
@@ -103,12 +103,12 @@ public class FindBugsTask extends BackgroundableTask {
 			//CommandProcessor.getInstance().executeCommand();
 			findBugs.execute();
 
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			//LOGGER.error("FindBugsWorker interrupted.", e);
 			//noinspection ThrowableResultOfMethodCallIgnored
 			FindBugsPluginImpl.processError("FindBugsWorker interrupted.", e);
 			Thread.currentThread().interrupt();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			LOGGER.error("Error performing FindBugs analysis", e);
 			//noinspection ThrowableResultOfMethodCallIgnored
 			FindBugsPluginImpl.processError("Error performing FindBugs analysis", e);

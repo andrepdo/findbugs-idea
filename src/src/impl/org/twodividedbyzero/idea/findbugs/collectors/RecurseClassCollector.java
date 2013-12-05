@@ -50,11 +50,11 @@ public class RecurseClassCollector {
 
 	private static final Logger LOGGER = Logger.getInstance(RecurseClassCollector.class.getName());
 
-	private FindBugsProject _findBugsProject;
-	private Project _project;
-	private Map<String, PsiElement> _classes; // TODO: collect all classes url's and addFile later
+	private final FindBugsProject _findBugsProject;
+	private final Project _project;
+	private final Map<String, PsiElement> _classes; // TODO: collect all classes url's and addFile later
 	public static final String CLASS_FILE_SUFFIX = ".class";
-	private boolean _collectAndAdd;
+	private final boolean _collectAndAdd;
 	private static final String ANONYMOUSE_CLASS_DELIMITER = "$";
 
 
@@ -121,7 +121,7 @@ public class RecurseClassCollector {
 		final PsiFile psiFile = PsiManager.getInstance(_project).findFile(virtualFile);
 
 		if (psiFile instanceof PsiJavaFile) {
-			final PsiJavaFile psiJavaFile = (PsiJavaFile) psiFile;
+			final PsiClassOwner psiJavaFile = (PsiJavaFile) psiFile;
 			final PsiClass[] psiClasses = psiJavaFile.getClasses();
 
 			for (final PsiClass psiClass : psiClasses) {

@@ -515,7 +515,6 @@ public final class IdeaUtilImpl {
 	@NotNull
 	public static VirtualFile[] getProjectClasspath(@NotNull final DataContext dataContext) {
 		final Module module = getModule(dataContext);
-
 		return getProjectClasspath(module);
 	}
 
@@ -585,12 +584,13 @@ public final class IdeaUtilImpl {
 		try {
 			OrderRootType.class.getField("COMPILATION_CLASSES");
 			return true;
-		} catch (final NoSuchFieldException e) {
+		} catch (final NoSuchFieldException ignore) {
 			return false;
 		}
 	}
 
 
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@Nullable
 	public static Module findModuleForFile(@NotNull final VirtualFile virtualFile, @NotNull final Project project) {
 		//noinspection ConstantConditions
@@ -899,6 +899,7 @@ public final class IdeaUtilImpl {
 	}
 
 
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@Nullable
 	public static PsiElement getElementAtLine(@NotNull final PsiFile file, final int line) {
 		//noinspection ConstantConditions
