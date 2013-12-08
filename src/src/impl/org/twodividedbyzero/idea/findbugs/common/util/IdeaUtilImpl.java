@@ -19,7 +19,6 @@
 package org.twodividedbyzero.idea.findbugs.common.util;
 
 import com.intellij.ide.plugins.PluginManager;
-import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.application.ApplicationInfo;
@@ -928,7 +927,7 @@ public final class IdeaUtilImpl {
 	@SuppressWarnings("UnusedDeclaration")
 	@Nullable
 	public static String getPluginId() {
-		final PluginId pluginId = PluginManagerCore.getPluginByClassName(FindBugsPluginImpl.class.getName());
+		final PluginId pluginId = PluginManager.getPluginByClassName(FindBugsPluginImpl.class.getName()); // use PluginManager here for IDEA 12.1.x compatibility (PluginManagerCore extension was introduced with 13.x)
 		if (pluginId != null) {
 			return pluginId.getIdString();
 		}
