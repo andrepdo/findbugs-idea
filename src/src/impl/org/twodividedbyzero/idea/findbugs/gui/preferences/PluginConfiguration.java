@@ -128,10 +128,6 @@ public class PluginConfiguration implements ConfigurationPage {
 		}
 		_pluginComponentPanel.removeAll();
 		final Project currentProject = getCurrentFbProject();
-		if (currentProject == null) {
-			LOGGER.warn("Expected not null findbugs project!");
-			return;
-		}
 		JPanel pluginComponent = null;
 		for (final Plugin plugin : Plugin.getAllPlugins()) {
 			plugin.setGloballyEnabled(true);
@@ -281,7 +277,7 @@ public class PluginConfiguration implements ConfigurationPage {
 		private static final Border SELECTION_BORDER = BorderFactory.createLineBorder(GuiResources.HIGHLIGHT_COLOR_DARKER);
 
 
-		private PluginComponent(final Project currentProject, final Plugin plugin, final FindBugsPreferences preferences) {
+		private PluginComponent(@Nullable final Project currentProject, final Plugin plugin, final FindBugsPreferences preferences) {
 			_plugin = plugin;
 			_currentProject = currentProject;
 			_preferences = preferences;
@@ -305,7 +301,7 @@ public class PluginConfiguration implements ConfigurationPage {
 				}
 
 				final String pluginUrl = _plugin.getPluginLoader().getURL().toExternalForm();
-				final boolean enabled = isEnabled(_currentProject, _plugin);
+				final boolean enabled = isEnabled(getCurrentFbProject(), _plugin);
 				final AbstractButton checkbox = new JCheckBox();
 				checkbox.setEnabled(enabled);
 				checkbox.setBackground(PLUGIN_DESCRIPTION_BG_COLOR);
@@ -355,7 +351,13 @@ public class PluginConfiguration implements ConfigurationPage {
 		}
 
 
-		static boolean isEnabled(final Project project, final Plugin plugin) {
+		@Nullable
+		private Project getCurrentFbProject() {
+			return _currentProject;
+		}
+
+
+		static boolean isEnabled(@Nullable final Project project, final Plugin plugin) {
 			if (plugin.isCorePlugin()) {
 				return false;
 			}
