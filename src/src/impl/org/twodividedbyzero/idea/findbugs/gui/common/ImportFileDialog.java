@@ -22,7 +22,7 @@ package org.twodividedbyzero.idea.findbugs.gui.common;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.ui.DialogBuilder;
-import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -130,7 +130,11 @@ public class ImportFileDialog extends JPanel {
 
 	private boolean validateFile(final Document doc) {
 		try {
-			return _selectedFile != null && _selectedFile.isFile() && _selectedFile.canRead() && "xml".equals(FileUtil.getExtension(_selectedFile.getAbsolutePath())) && !doc.getText(0, doc.getLength()).trim().isEmpty();
+			return _selectedFile != null &&
+					_selectedFile.isFile() &&
+					_selectedFile.canRead() &&
+					"xml".equalsIgnoreCase(FileUtilRt.getExtension(_selectedFile.getAbsolutePath())) &&
+					!doc.getText(0, doc.getLength()).trim().isEmpty();
 		} catch (final BadLocationException ignore) {
 			return false;
 		}
@@ -156,7 +160,7 @@ public class ImportFileDialog extends JPanel {
           new FileFilter() {
             @Override
             public boolean accept(final File f) {
-              return f.isDirectory() || "xml".equals(FileUtil.getExtension(f.getAbsolutePath()));
+              return f.isDirectory() || "xml".equalsIgnoreCase(FileUtilRt.getExtension(f.getAbsolutePath()));
             }
 
             @Override

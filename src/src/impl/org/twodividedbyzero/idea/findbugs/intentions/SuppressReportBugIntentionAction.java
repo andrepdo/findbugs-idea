@@ -22,7 +22,7 @@ import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.codeInspection.InspectionsBundle;
 import com.intellij.codeInspection.SuppressIntentionAction;
 import com.intellij.codeInspection.SuppressManager;
-import com.intellij.lang.StdLanguages;
+import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
@@ -121,7 +121,7 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 			// for PsiDirectory
 			return null;
 		}
-		if (!containingFile.getLanguage().isKindOf(StdLanguages.JAVA) || context instanceof PsiFile) {
+		if (!containingFile.getLanguage().isKindOf(JavaLanguage.INSTANCE) || context instanceof PsiFile) {
 			return null;
 		}
 		PsiElement container = context;

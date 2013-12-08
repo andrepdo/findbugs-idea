@@ -167,12 +167,6 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 
 
 	@Override
-	public void inspectionFinished(@NotNull final LocalInspectionToolSession session) {
-		LOGGER.debug("Inspection finished...");
-	}
-
-
-	@Override
 	public void inspectionFinished(@NotNull final LocalInspectionToolSession session, @NotNull final ProblemsHolder problemsHolder) {
 		LOGGER.debug("Inspection finished...");
 	}
