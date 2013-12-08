@@ -18,6 +18,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.common.util;
 
+import org.jetbrains.annotations.Nullable;
 import org.jsoup.Jsoup;
 
 
@@ -59,4 +60,8 @@ public class StringUtil {
 		return Jsoup.parse(html).text();
 	}
 
+
+	public static boolean isEmpty(@Nullable final String s) {
+		return null == s || s.trim().isEmpty();
+	}
 }

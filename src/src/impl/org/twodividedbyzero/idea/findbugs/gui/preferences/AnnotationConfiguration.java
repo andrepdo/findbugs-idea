@@ -153,7 +153,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 
 	private void clearModels() {
-		getAnnotationPathField().setText("");
+		getAnnotationPathField().setText("", false);
 		//getModel(getPluginList()).clear();
 	}
 

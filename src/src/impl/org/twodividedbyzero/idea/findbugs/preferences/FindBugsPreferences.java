@@ -26,6 +26,7 @@ import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import edu.umd.cs.findbugs.config.UserPreferences;
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.common.util.StringUtil;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.AnnotationType;
 
 import java.io.File;
@@ -829,8 +830,8 @@ public class FindBugsPreferences extends Properties {
 
 
 	public void setAnnotationSuppressWarningsClass(final String annotationSuppressWarningsClass) {
-		_annotationSuppressWarningsClass = annotationSuppressWarningsClass == null ? DEFAULT_ANNOTATION_CLASS_NAME : annotationSuppressWarningsClass;
-		setProperty(ANNOTATION_SUPPRESS_WARNING_CLASS, annotationSuppressWarningsClass);
+		_annotationSuppressWarningsClass = StringUtil.isEmpty(annotationSuppressWarningsClass) ? DEFAULT_ANNOTATION_CLASS_NAME : annotationSuppressWarningsClass;
+		setProperty(ANNOTATION_SUPPRESS_WARNING_CLASS, _annotationSuppressWarningsClass);
 	}
 
 
