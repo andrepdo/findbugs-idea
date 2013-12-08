@@ -490,6 +490,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 			_preferences.clear();
 			_preferences = FindBugsPreferences.createDefault();
 		}
+		_preferences.setModified(false); // make sure not modified at the end of loading
 		buildSearchIndexIfNecessary();
 	}
 

@@ -39,6 +39,8 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.gui.common.AaComboBox;
+import org.twodividedbyzero.idea.findbugs.gui.common.AaSlider;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
@@ -48,10 +50,8 @@ import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -66,8 +66,6 @@ import java.awt.FlowLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -96,7 +94,7 @@ public class ConfigurationPanel extends JPanel {
 	private JCheckBox _toolwindowToFront;
 
 
-	private JComboBox _effortLevelCombobox;
+	private AaComboBox<AnalysisEffort> _effortLevelCombobox;
 	private JPanel _mainPanel;
 	private JCheckBox _detectorThresholdChkb;
 	private JPanel _effortPanel;
@@ -104,7 +102,7 @@ public class ConfigurationPanel extends JPanel {
 	private transient DetectorConfiguration _detectorConfig;
 	private transient ReportConfiguration _reporterConfig;
 	private JButton _restoreDefaultsButton;
-	private JSlider _effortSlider;
+	private AaSlider _effortSlider;
 	private transient FilterConfiguration _filterConfig;
 	private transient PluginConfiguration _pluginConfig;
 	private transient ImportExportConfiguration _importExportConfig;
@@ -197,11 +195,11 @@ public class ConfigurationPanel extends JPanel {
 
 
 	private void updatePreferences() {
-		getEffortSlider().setValue(AnalysisEffort.valueOfLevel(getPreferences().getProperty(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL, AnalysisEffort.DEFAULT.getEffortLevel())).getValue());
+		getEffortSlider().setValue(AnalysisEffort.valueOfLevel(getPreferences().getProperty(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL, AnalysisEffort.DEFAULT.getEffortLevel())).getValue(), false);
 		getRunInBgCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND, false));
 		getAnalyzeAfterCompileCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.ANALYZE_AFTER_COMPILE, false));
 		getToolwindowToFrontCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT, true));
-		getEffortLevelCombobox().setSelectedItem(AnalysisEffort.valueOfLevel(getPreferences().getProperty(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL, AnalysisEffort.DEFAULT.getEffortLevel())));
+		getEffortLevelComboBox().setSelectedItem(AnalysisEffort.valueOfLevel(getPreferences().getProperty(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL, AnalysisEffort.DEFAULT.getEffortLevel())), false);
 		//((FindBugsPluginImpl) _plugin).setPreferences(FindBugsPreferences.createDefaultPreferences());
 		getReporterConfig().updatePreferences();
 		getDetectorConfig().updatePreferences();
@@ -223,9 +221,9 @@ public class ConfigurationPanel extends JPanel {
 		if (_runInBackgroundChkb == null) {
 			_runInBackgroundChkb = new JCheckBox("Run analysis in background");
 			_runInBackgroundChkb.setFocusable(false);
-			_runInBackgroundChkb.addItemListener(new ItemListener() {
-				public void itemStateChanged(final ItemEvent e) {
-					getPreferences().setProperty(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND, e.getStateChange() == ItemEvent.SELECTED);
+			_runInBackgroundChkb.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					getPreferences().setProperty(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND, _runInBackgroundChkb.isSelected());
 				}
 			});
 		}
@@ -237,11 +235,11 @@ public class ConfigurationPanel extends JPanel {
 		if (_analyzeAfterCompileChkb == null) {
 			_analyzeAfterCompileChkb = new JCheckBox("Analyze affected files after compile");
 			_analyzeAfterCompileChkb.setFocusable( false );
-			_analyzeAfterCompileChkb.addItemListener( new ItemListener() {
-				public void itemStateChanged( final ItemEvent e ) {
-					getPreferences().setProperty( FindBugsPreferences.ANALYZE_AFTER_COMPILE, e.getStateChange() == ItemEvent.SELECTED );
+			_analyzeAfterCompileChkb.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					getPreferences().setProperty(FindBugsPreferences.ANALYZE_AFTER_COMPILE, _analyzeAfterCompileChkb.isSelected());
 				}
-			} );
+			});
 		}
 		return _analyzeAfterCompileChkb;
 	}
@@ -251,9 +249,9 @@ public class ConfigurationPanel extends JPanel {
 		if (_toolwindowToFront == null) {
 			_toolwindowToFront = new JCheckBox("Activate toolwindow on run");
 			_toolwindowToFront.setFocusable(false);
-			_toolwindowToFront.addItemListener(new ItemListener() {
-				public void itemStateChanged(final ItemEvent e) {
-					getPreferences().setProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT, e.getStateChange() == ItemEvent.SELECTED);
+			_toolwindowToFront.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					getPreferences().setProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT, _toolwindowToFront.isSelected());
 				}
 			});
 		}
@@ -281,9 +279,9 @@ public class ConfigurationPanel extends JPanel {
 
 
 	@SuppressWarnings({"UseOfObsoleteCollectionType"})
-	private JSlider getEffortSlider() {
+	private AaSlider getEffortSlider() {
 		if (_effortSlider == null) {
-			_effortSlider = new JSlider(JSlider.HORIZONTAL, 10, 30, 20);
+			_effortSlider = new AaSlider(JSlider.HORIZONTAL, 10, 30, 20);
 			_effortSlider.setBackground(GuiResources.HIGHLIGHT_COLOR_DARKER);
 			_effortSlider.setMajorTickSpacing(10);
 			_effortSlider.setPaintTicks(true);
@@ -298,7 +296,7 @@ public class ConfigurationPanel extends JPanel {
 			_effortSlider.setLabelTable(labelTable);
 			_effortSlider.setPaintLabels(true);
 
-			_effortSlider.addChangeListener(new ChangeListener() {
+			_effortSlider.addValueChangeListener(new ChangeListener() {
 				public void stateChanged(final ChangeEvent e) {
 					final JSlider source = (JSlider) e.getSource();
 					if (!source.getValueIsAdjusting()) {
@@ -313,12 +311,12 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
-	private JComboBox getEffortLevelCombobox() {
+	private AaComboBox<AnalysisEffort> getEffortLevelComboBox() {
 		if (_effortLevelCombobox == null) {
-			_effortLevelCombobox = new JComboBox(new DefaultComboBoxModel(AnalysisEffort.values()));
-			_effortLevelCombobox.addItemListener(new ItemListener() {
-				public void itemStateChanged(final ItemEvent e) {
-					getPreferences().setProperty(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL, ((AnalysisEffort) e.getItem()).getEffortLevel());
+			_effortLevelCombobox = new AaComboBox<AnalysisEffort>(AnalysisEffort.values());
+			_effortLevelCombobox.addSelectionChangeListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					getPreferences().setProperty(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL, ((AnalysisEffort)_effortLevelCombobox.getSelectedItem()).getEffortLevel());
 				}
 			});
 		}

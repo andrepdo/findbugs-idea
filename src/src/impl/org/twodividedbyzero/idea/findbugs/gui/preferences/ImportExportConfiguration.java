@@ -28,6 +28,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import info.clearthought.layout.TableLayout;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
+import org.twodividedbyzero.idea.findbugs.gui.common.AaTextField;
 import org.twodividedbyzero.idea.findbugs.gui.common.FilterFileChooserDescriptor;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
@@ -38,16 +39,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.File;
 
 
@@ -67,8 +63,8 @@ public class ImportExportConfiguration implements ConfigurationPage {
 	private JPanel _mainPanel;
 
 	private JPanel _exportDirPanel;
-	private JTextField _exportDirTextField;
-	private JCheckBox _exportDirFormaCheckbox;
+	private AaTextField _exportDirTextField;
+	private JCheckBox _exportDirFormatCheckbox;
 
 	private JPanel _fileFormatPanel;
 	private JCheckBox _writeXmlCheckbox;
@@ -180,19 +176,10 @@ public class ImportExportConfiguration implements ConfigurationPage {
 
 	private JTextComponent getExportDirTextField() {
 		if (_exportDirTextField == null) {
-			_exportDirTextField = new JTextField(30);
+			_exportDirTextField = new AaTextField(30);
 			_exportDirTextField.setText(_currentExportDir);
-			_exportDirTextField.getDocument().addDocumentListener(new DocumentListener() {
-				public void insertUpdate(final DocumentEvent e) {
-					_preferences.setProperty(FindBugsPreferences.EXPORT_BASE_DIR, _exportDirTextField.getText());
-				}
-
-
-				public void removeUpdate(final DocumentEvent e) {
-				}
-
-
-				public void changedUpdate(final DocumentEvent e) {
+			_exportDirTextField.addTextChangeListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
 					_preferences.setProperty(FindBugsPreferences.EXPORT_BASE_DIR, _exportDirTextField.getText());
 				}
 			});
@@ -202,15 +189,15 @@ public class ImportExportConfiguration implements ConfigurationPage {
 
 
 	private AbstractButton getExportDirFormatCheckbox() {
-		if (_exportDirFormaCheckbox == null) {
-			_exportDirFormaCheckbox = new JCheckBox();
-			_exportDirFormaCheckbox.addItemListener(new ItemListener() {
-				public void itemStateChanged(final ItemEvent e) {
-					_preferences.setProperty(FindBugsPreferences.EXPORT_CREATE_ARCHIVE_DIR, e.getStateChange() == ItemEvent.SELECTED);
+		if (_exportDirFormatCheckbox == null) {
+			_exportDirFormatCheckbox = new JCheckBox();
+			_exportDirFormatCheckbox.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					_preferences.setProperty(FindBugsPreferences.EXPORT_CREATE_ARCHIVE_DIR, _exportDirFormatCheckbox.isSelected());
 				}
 			});
 		}
-		return _exportDirFormaCheckbox;
+		return _exportDirFormatCheckbox;
 	}
 
 
@@ -257,9 +244,9 @@ public class ImportExportConfiguration implements ConfigurationPage {
 	private AbstractButton getWriteXmlCheckbox() {
 		if (_writeXmlCheckbox == null) {
 			_writeXmlCheckbox = new JCheckBox();
-			_writeXmlCheckbox.addItemListener(new ItemListener() {
-				public void itemStateChanged(final ItemEvent e) {
-					_preferences.setProperty(FindBugsPreferences.EXPORT_AS_XML, e.getStateChange() == ItemEvent.SELECTED);
+			_writeXmlCheckbox.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					_preferences.setProperty(FindBugsPreferences.EXPORT_AS_XML, _writeXmlCheckbox.isSelected());
 				}
 			});
 		}
@@ -270,9 +257,9 @@ public class ImportExportConfiguration implements ConfigurationPage {
 	private AbstractButton getWriteHtmlCheckbox() {
 		if (_writeHtmlCheckbox == null) {
 			_writeHtmlCheckbox = new JCheckBox();
-			_writeHtmlCheckbox.addItemListener(new ItemListener() {
-				public void itemStateChanged(final ItemEvent e) {
-					_preferences.setProperty(FindBugsPreferences.EXPORT_AS_HTML, e.getStateChange() == ItemEvent.SELECTED);
+			_writeHtmlCheckbox.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					_preferences.setProperty(FindBugsPreferences.EXPORT_AS_HTML, _writeHtmlCheckbox.isSelected());
 				}
 			});
 		}
@@ -283,9 +270,9 @@ public class ImportExportConfiguration implements ConfigurationPage {
 	private AbstractButton getOpenBrowserCheckbox() {
 		if (_openBrowserCheckbox == null) {
 			_openBrowserCheckbox = new JCheckBox();
-			_openBrowserCheckbox.addItemListener(new ItemListener() {
-				public void itemStateChanged(final ItemEvent e) {
-					_preferences.setProperty(FindBugsPreferences.EXPORT_OPEN_BROWSER, e.getStateChange() == ItemEvent.SELECTED);
+			_openBrowserCheckbox.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					_preferences.setProperty(FindBugsPreferences.EXPORT_OPEN_BROWSER, _openBrowserCheckbox.isSelected());
 				}
 			});
 		}

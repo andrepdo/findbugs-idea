@@ -26,6 +26,8 @@ import com.intellij.ui.UIBundle;
 import info.clearthought.layout.TableLayout;
 import info.clearthought.layout.TableLayoutConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
+import org.twodividedbyzero.idea.findbugs.gui.common.AaComboBox;
+import org.twodividedbyzero.idea.findbugs.gui.common.AaTextField;
 import org.twodividedbyzero.idea.findbugs.gui.common.ListFacade;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
@@ -33,16 +35,12 @@ import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.AlphaComposite;
@@ -55,8 +53,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LayoutManager;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Map;
@@ -80,7 +78,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 	private final ConfigurationPanel _parent;
 	private Component _component;
 	private JPanel _mainPanel;
-	private JTextField _annotationPathField;
+	private AaTextField _annotationPathField;
 	private JCheckBox _enableGutterIcon;
 	private JCheckBox _enableTextRangeMarkUp;
 	private JPanel _annotationPathPanel;
@@ -125,11 +123,11 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 	private void syncModels() {
 		final String annotationSuppressWarningName = _preferences.getProperty(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS);
-		getAnnotationPathField().setText(annotationSuppressWarningName);
+		getAnnotationPathField().setText(annotationSuppressWarningName, false);
 
 		getGutterIconCheckbox().setSelected(_preferences.getBooleanProperty(FindBugsPreferences.ANNOTATION_GUTTER_ICON_ENABLED, true));
 		if (_preferences.getBooleanProperty(FindBugsPreferences.ANNOTATION_TEXT_RAGE_MARKUP_ENABLED, true)) {
-			getTextRangeMarkupCheckbox().doClick();
+			getTextRangeMarkupCheckbox().setSelected(true);
 		} else {
 			getAnnotationTypePanel().setEnabled(false);
 			getAnnotationTypeList().setEnabled(false);
@@ -200,22 +198,12 @@ public class AnnotationConfiguration implements ConfigurationPage {
 	}
 
 
-	private JTextField getAnnotationPathField() {
+	private AaTextField getAnnotationPathField() {
 		if (_annotationPathField == null) {
-			_annotationPathField = new JTextField(30);
+			_annotationPathField = new AaTextField(30);
 			_annotationPathField.setEditable(true);
-			_annotationPathField.getDocument().addDocumentListener(new DocumentListener() {
-				public void insertUpdate(final DocumentEvent e) {
-					_preferences.setAnnotationSuppressWarningsClass(_annotationPathField.getText());
-				}
-
-
-				public void removeUpdate(final DocumentEvent e) {
-					_preferences.setAnnotationSuppressWarningsClass(_annotationPathField.getText());
-				}
-
-
-				public void changedUpdate(final DocumentEvent e) {
+			_annotationPathField.addTextChangeListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
 					_preferences.setAnnotationSuppressWarningsClass(_annotationPathField.getText());
 				}
 			});
@@ -297,9 +285,9 @@ public class AnnotationConfiguration implements ConfigurationPage {
 	private JCheckBox getTextRangeMarkupCheckbox() {
 		if (_enableTextRangeMarkUp == null) {
 			_enableTextRangeMarkUp = new JCheckBox("Enable editor TextRange markup & Suppress bug pattern feature");
-			_enableTextRangeMarkUp.addItemListener(new ItemListener() {
-				public void itemStateChanged(final ItemEvent e) {
-					final boolean selected = e.getStateChange() == ItemEvent.SELECTED;
+			_enableTextRangeMarkUp.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					final boolean selected = _enableTextRangeMarkUp.isSelected();
 					getAnnotationTypePanel().setEnabled(selected);
 					getAnnotationTypeList().setEnabled(selected);
 					_preferences.setAnnotationTextRangeMarkupEnabled(selected);
@@ -313,10 +301,9 @@ public class AnnotationConfiguration implements ConfigurationPage {
 	private JCheckBox getGutterIconCheckbox() {
 		if (_enableGutterIcon == null) {
 			_enableGutterIcon = new JCheckBox("Enable editor GutterIcon markup");
-			_enableGutterIcon.addItemListener(new ItemListener() {
-				public void itemStateChanged(final ItemEvent e) {
-					final boolean selected = e.getStateChange() == ItemEvent.SELECTED;
-					_preferences.setAnnotationGutterIconEnabled(selected);
+			_enableGutterIcon.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					_preferences.setAnnotationGutterIconEnabled(_enableGutterIcon.isSelected());
 				}
 			});
 		}
@@ -374,7 +361,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 		private ColorBox _foreground;
 		private ColorBox _background;
 		private ColorBox _effectTypeColor;
-		private JComboBox _typeComboBox;
+		private AaComboBox _typeComboBox;
 		private AnnotationType _annotationType;
 
 
@@ -396,24 +383,24 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 			final JPanel fontPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 			_plainBox = new JCheckBox("plain");
-			_plainBox.addItemListener(new ItemListener() {
-				public void itemStateChanged(final ItemEvent e) {
+			_plainBox.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
 					//TODO: implement
 				}
 			});
 			fontPanel.add(_plainBox);
 
 			_italicBox = new JCheckBox("italic");
-			_italicBox.addItemListener(new ItemListener() {
-				public void itemStateChanged(final ItemEvent e) {
+			_italicBox.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
 					//TODO: implement
 				}
 			});
 			fontPanel.add(_italicBox);
 
 			_boldBox = new JCheckBox("bold");
-			_boldBox.addItemListener(new ItemListener() {
-				public void itemStateChanged(final ItemEvent e) {
+			_boldBox.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
 					//TODO: implement
 				}
 			});
@@ -436,9 +423,9 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 
 			final JPanel effectPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-			_typeComboBox = new JComboBox(EffectType.values());
-			_typeComboBox.addItemListener(new ItemListener() {
-				public void itemStateChanged(final ItemEvent e) {
+			_typeComboBox = new AaComboBox<EffectType>(EffectType.values());
+			_typeComboBox.addSelectionChangeListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
 					//TODO: implement
 				}
 			});

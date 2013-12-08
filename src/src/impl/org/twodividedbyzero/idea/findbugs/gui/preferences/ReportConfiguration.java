@@ -21,13 +21,13 @@ package org.twodividedbyzero.idea.findbugs.gui.preferences;
 import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import info.clearthought.layout.TableLayout;
+import org.twodividedbyzero.idea.findbugs.gui.common.AaComboBox;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.gui.common.TableFacade;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.model.BugCategoryTableModel;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import javax.swing.BorderFactory;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -37,8 +37,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -54,7 +54,7 @@ public class ReportConfiguration implements ConfigurationPage {
 
 	public static final String DEFAULT_PRIORITY = ProjectFilterSettings.MEDIUM_PRIORITY;
 
-	private JComboBox _priorityBox;
+	private AaComboBox<String> _priorityBox;
 	private JTable _categoryTable;
 	private Component _component;
 
@@ -82,7 +82,7 @@ public class ReportConfiguration implements ConfigurationPage {
 			final JPanel mainPanel = new JPanel(tbl);
 			mainPanel.add(new JLabel("Minimum confidence to report"), "1, 1, 1, 1");
 			final JPanel comp = new JPanel(new FlowLayout(FlowLayout.LEFT));
-			comp.add(getPriorityCombobox());
+			comp.add(getPriorityComboBox());
 			mainPanel.add(comp, "3, 1, 3, 1");
 
 			final JPanel categoryPanel = new JPanel();
@@ -98,21 +98,21 @@ public class ReportConfiguration implements ConfigurationPage {
 
 
 	public void updatePreferences() {
-		getPriorityCombobox().setSelectedItem(_preferences.getProperty(FindBugsPreferences.MIN_PRIORITY_TO_REPORT));
+		getPriorityComboBox().setSelectedItem(_preferences.getProperty(FindBugsPreferences.MIN_PRIORITY_TO_REPORT), false);
 		getModel().clear();
 		syncTableModel(getModel());
 	}
 
 
-	private JComboBox getPriorityCombobox() {
+	private AaComboBox getPriorityComboBox() {
 		if (_priorityBox == null) {
-			_priorityBox = new JComboBox();
+			_priorityBox = new AaComboBox<String>();
 			_priorityBox.addItem(ProjectFilterSettings.HIGH_PRIORITY);
 			_priorityBox.addItem(ProjectFilterSettings.MEDIUM_PRIORITY);
 			_priorityBox.addItem(ProjectFilterSettings.LOW_PRIORITY);
-			_priorityBox.addItemListener(new ItemListener() {
-				public void itemStateChanged(final ItemEvent e) {
-					_preferences.setProperty(FindBugsPreferences.MIN_PRIORITY_TO_REPORT, (String) e.getItem());
+			_priorityBox.addSelectionChangeListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					_preferences.setProperty(FindBugsPreferences.MIN_PRIORITY_TO_REPORT, (String)_priorityBox.getSelectedItem());
 				}
 			});
 		}
@@ -191,7 +191,7 @@ public class ReportConfiguration implements ConfigurationPage {
 
 	public void setEnabled(final boolean enabled) {
 		getBugCategoriesTable().setEnabled(enabled);
-		getPriorityCombobox().setEnabled(enabled);
+		getPriorityComboBox().setEnabled(enabled);
 	}
 
 

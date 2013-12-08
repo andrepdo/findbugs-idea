@@ -30,8 +30,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 
 /**
@@ -81,9 +81,9 @@ public class ModuleConfigurationPanel extends JPanel {
 		if (_checkBox == null) {
 			_checkBox = new JCheckBox("Override FindBugs-IDEA project settings");
 			_checkBox.setFocusable(false);
-			_checkBox.addItemListener(new ItemListener() {
-				public void itemStateChanged(final ItemEvent e) {
-					final boolean enabled = e.getStateChange() == ItemEvent.SELECTED;
+			_checkBox.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					final boolean enabled = _checkBox.isSelected();
 					getConfigPanel().setEnabled(enabled);
 					final Module module = _plugin.getModule();
 					if (module != null) {

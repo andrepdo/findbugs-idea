@@ -54,6 +54,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.ItemEvent;
@@ -170,9 +172,9 @@ public class DetectorConfiguration implements ConfigurationPage {
 	private AbstractButton getHiddenCheckBox() {
 		if (_hiddenCheckbox == null) {
 			_hiddenCheckbox = new JCheckBox("show hidden detector");
-			_hiddenCheckbox.addItemListener(new ItemListener() {
-				public void itemStateChanged(final ItemEvent e) {
-					_preferences.setProperty(FindBugsPreferences.SHOW_HIDDEN_DETECTORS, e.getStateChange() == ItemEvent.SELECTED);
+			_hiddenCheckbox.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					_preferences.setProperty(FindBugsPreferences.SHOW_HIDDEN_DETECTORS, _hiddenCheckbox.isSelected());
 					getModel().clear();
 					populateAvailableRulesTable();
 				}
