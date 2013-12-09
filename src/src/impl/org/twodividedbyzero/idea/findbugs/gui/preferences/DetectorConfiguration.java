@@ -204,7 +204,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 
 			_detectorsTable = TableFacade.createStripeTable(_tableSorter);
 
-			final TableCellRenderer colorRenderer = new ColorRenderer(getModel(), _preferences);
+			final TableCellRenderer colorRenderer = new ColorRenderer(_bugPatternModel, _tableSorter, _preferences);
 			_detectorsTable.setDefaultRenderer(String.class, colorRenderer);
 
 			_bugPatternModel.addTableModelListener(new TableModelListener() {
@@ -488,11 +488,13 @@ public class DetectorConfiguration implements ConfigurationPage {
 		private static final Color FG_COLOR = new JBColor(new Color(125, 124, 124), new Color(104, 103, 103));
 
 		private final BugPatternTableModel _model;
+		private final TableSorter _tableSorter;
 		private final FindBugsPreferences _preferences;
 
 
-		private ColorRenderer(final BugPatternTableModel model, final FindBugsPreferences preferences) {
+		private ColorRenderer(final BugPatternTableModel model, final TableSorter tableSorter, final FindBugsPreferences preferences) {
 			_model = model;
+			_tableSorter = tableSorter;
 			//noinspection AssignmentToCollectionOrArrayFieldFromParameter
 			_preferences = preferences;
 			setOpaque(true);
@@ -500,7 +502,8 @@ public class DetectorConfiguration implements ConfigurationPage {
 
 
 		public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
-			final DetectorFactory factory = _model.getEntries().get(row);
+			final int modelIndex = _tableSorter.modelIndex(row);
+			final DetectorFactory factory = _model.getEntries().get(modelIndex);
 			if (value != null) {
 				setText(value.toString());
 			}
