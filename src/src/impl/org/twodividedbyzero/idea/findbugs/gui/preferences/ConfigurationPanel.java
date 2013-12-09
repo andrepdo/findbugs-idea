@@ -98,6 +98,7 @@ public class ConfigurationPanel extends JPanel {
 	private JPanel _mainPanel;
 	private JCheckBox _detectorThresholdChkb;
 	private JPanel _effortPanel;
+	private JLabel _effortLabel;
 	private JTabbedPane _tabbedPane;
 	private transient DetectorConfiguration _detectorConfig;
 	private transient ReportConfiguration _reporterConfig;
@@ -270,11 +271,19 @@ public class ConfigurationPanel extends JPanel {
 			final LayoutManager tbl = new TableLayout(size);
 
 			_effortPanel = new JPanel(tbl);
-			_effortPanel.add(new JLabel("Analysis effort"), "1, 1, 1, 1");
+			_effortPanel.add(getEffortLabel(), "1, 1, 1, 1");
 			_effortPanel.setBorder(null);
 			_effortPanel.add( getEffortSlider(), "3, 1, 3, 1, l, t" );
 		}
 		return _effortPanel;
+	}
+
+
+	private JLabel getEffortLabel() {
+		if (_effortLabel == null) {
+			_effortLabel = new JLabel("Analysis effort");
+		}
+		return _effortLabel;
 	}
 
 
@@ -611,10 +620,22 @@ public class ConfigurationPanel extends JPanel {
 	@Override
 	public void setEnabled(final boolean enabled) {
 		super.setEnabled(enabled);
+		// do not call setEnabled() here for:
+		//     - getTabbedPane() and getShowAdvancedConfigsButton() -> allow browsing all read only settings
+		//     - getExportButton() -> allow export
+		//     - getMyFilter() -> allow filter/search
+		getMainPanel().setEnabled(enabled);
+		getAnalyzeAfterCompileCheckbox().setEnabled(enabled);
+		getRunInBgCheckbox().setEnabled(enabled);
+		getToolwindowToFrontCheckbox().setEnabled(enabled);
 		final List<ConfigurationPage> configPages = getConfigPages();
 		for (final ConfigurationPage configPage : configPages) {
 			configPage.setEnabled(enabled);
 		}
+		getImportButton().setEnabled(enabled);
+		getRestoreDefaultsButton().setEnabled(enabled);
+		getEffortLabel().setEnabled(enabled);
+		getEffortSlider().setEnabled(enabled);
 	}
 
 

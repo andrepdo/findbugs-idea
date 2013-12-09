@@ -54,7 +54,9 @@ public class ReportConfiguration implements ConfigurationPage {
 
 	public static final String DEFAULT_PRIORITY = ProjectFilterSettings.MEDIUM_PRIORITY;
 
+	private JLabel _priorityLabel;
 	private AaComboBox<String> _priorityBox;
+	private JPanel _categoryPanel;
 	private JTable _categoryTable;
 	private Component _component;
 
@@ -80,16 +82,11 @@ public class ReportConfiguration implements ConfigurationPage {
 			final TableLayout tbl = new TableLayout(size);
 
 			final JPanel mainPanel = new JPanel(tbl);
-			mainPanel.add(new JLabel("Minimum confidence to report"), "1, 1, 1, 1");
+			mainPanel.add(getPriorityLabel(), "1, 1, 1, 1");
 			final JPanel comp = new JPanel(new FlowLayout(FlowLayout.LEFT));
 			comp.add(getPriorityComboBox());
 			mainPanel.add(comp, "3, 1, 3, 1");
-
-			final JPanel categoryPanel = new JPanel();
-			categoryPanel.setBorder(BorderFactory.createTitledBorder("Reported (visible) bug categories"));
-			categoryPanel.add(ScrollPaneFacade.createScrollPane(getBugCategoriesTable(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
-
-			mainPanel.add(categoryPanel, "1, 3, 3, 3");
+			mainPanel.add(getCategoryPanel(), "1, 3, 3, 3");
 
 			_component = mainPanel;
 		}
@@ -101,6 +98,14 @@ public class ReportConfiguration implements ConfigurationPage {
 		getPriorityComboBox().setSelectedItem(_preferences.getProperty(FindBugsPreferences.MIN_PRIORITY_TO_REPORT), false);
 		getModel().clear();
 		syncTableModel(getModel());
+	}
+
+
+	private JLabel getPriorityLabel() {
+		if (_priorityLabel == null) {
+			_priorityLabel = new JLabel("Minimum confidence to report");
+		}
+		return _priorityLabel;
 	}
 
 
@@ -117,6 +122,16 @@ public class ReportConfiguration implements ConfigurationPage {
 			});
 		}
 		return _priorityBox;
+	}
+
+
+	private JPanel getCategoryPanel() {
+		if (_categoryPanel == null) {
+			_categoryPanel = new JPanel();
+			_categoryPanel.setBorder(BorderFactory.createTitledBorder("Reported (visible) bug categories"));
+			_categoryPanel.add(ScrollPaneFacade.createScrollPane(getBugCategoriesTable(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+		}
+		return _categoryPanel;
 	}
 
 
@@ -190,8 +205,10 @@ public class ReportConfiguration implements ConfigurationPage {
 
 
 	public void setEnabled(final boolean enabled) {
-		getBugCategoriesTable().setEnabled(enabled);
+		getPriorityLabel().setEnabled(enabled);
 		getPriorityComboBox().setEnabled(enabled);
+		getCategoryPanel().setEnabled(enabled);
+		getBugCategoriesTable().setEnabled(enabled);
 	}
 
 

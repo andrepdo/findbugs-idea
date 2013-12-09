@@ -347,9 +347,13 @@ public class FilterConfiguration implements ConfigurationPage {
 
 
 	public void setEnabled(final boolean enabled) {
-		getBaselineList().setEnabled(enabled);
-		getExcludeList().setEnabled(enabled);
+		getIncludePanel().setEnabled(enabled);
 		getIncludeList().setEnabled(enabled);
+		getExcludePanel().setEnabled(enabled);
+		getExcludeList().setEnabled(enabled);
+		getBaseLinePanel().setEnabled(enabled);
+		getBaselineList().setEnabled(enabled);
+		// TODO set state for add- and remove-button
 	}
 
 
