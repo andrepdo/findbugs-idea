@@ -62,8 +62,12 @@ public class HelpAction extends BaseAction {
 		HTML_BODY.append("Email: ").append(Version.SUPPORT_EMAIL);
 		HTML_BODY.append("</p>");
 		HTML_BODY.append("<p><br/>");
-		HTML_BODY.append("The name FindBugs™ and the FindBugs logo are trademarked by The University of Maryland.");
+		HTML_BODY.append("The name FindBugs&trade; and the FindBugs logo are trademarked by The University of Maryland.");
 		HTML_BODY.append("</p>");
+		HTML_BODY.append("<p>");
+		HTML_BODY.append("<font size='10px' color='#666666'>").append(VersionManager.getFullVersionInternal()).append("</font>");
+		HTML_BODY.append("</p>");
+
 
 	}
 

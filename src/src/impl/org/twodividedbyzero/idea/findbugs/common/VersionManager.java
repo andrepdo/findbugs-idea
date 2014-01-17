@@ -38,7 +38,6 @@ import java.nio.charset.Charset;
  */
 @SuppressWarnings({"HardCodedStringLiteral", "UseOfSystemOutOrSystemErr", "StringConcatenation", "CallToPrintStackTrace", "CallToPrintStackTrace"})
 public class VersionManager {
-	// todo: gather latest svn revision
 
 	private static final long _major = 0;
 	private static final long _minor = 9;
@@ -55,11 +54,12 @@ public class VersionManager {
 
 	private static final String DOWNLOAD_WEBSITE = "http://plugins.intellij.net/plugin/?id=3847";
 
-	private static final String SUPPORT_EMAIL = "andrepdo@dev.java.net";
+	private static final String SUPPORT_EMAIL = "andre.pfeiler@gmail.com";
 
 	private static final long REVISION;
 
 	private static final String FULL_VERSION_INTERNAL;
+	private static final String FULL_VERSION;
 
 	private static final String MAJOR_MINOR_BUILD = _major + "." + _minor + '.' + _build;
 
@@ -81,6 +81,7 @@ public class VersionManager {
 		MAJOR_MINOR_BUILD_REVISION = MAJOR_MINOR_BUILD + (REVISION == -1 ? "." + _revision : "." + REVISION);
 		//noinspection StringEqualsEmptyString,SingleCharacterStringConcatenation
 		FULL_VERSION_INTERNAL = NAME + ' ' + MAJOR_MINOR_BUILD_REVISION + ("".equals(_branch) ? "" : "-" + _branch);
+		FULL_VERSION = NAME + ' ' + MAJOR_MINOR_BUILD;
 	}
 
 
@@ -106,8 +107,13 @@ public class VersionManager {
 	/* e.g. "FindBugs-IDEA 0.9.21.26427". */
 
 
-	public static String getFullVersion() {
+	public static String getFullVersionInternal() {
 		return FULL_VERSION_INTERNAL;
+	}
+
+
+	public static String getFullVersion() {
+		return FULL_VERSION;
 	}
 
 
@@ -156,7 +162,7 @@ public class VersionManager {
 		}
 		System.out.println("$Id$");
 		System.out.println(getVersion());
-		System.out.println(getFullVersion());
+		System.out.println(getFullVersionInternal());
 		System.out.println(getVersionWithRevision());
 	}
 }

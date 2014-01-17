@@ -72,7 +72,7 @@ public class AnalysisRunDetailsDialog implements Serializable {
 		final StringBuilder html = new StringBuilder();
 		html.append("<html><body>");
 		html.append("<p><h2>").append(VersionManager.getName()).append(": <b>found ").append(bugCount).append(" bugs in ").append(numAnalysedClasses).append(numAnalysedClasses > 1 ? " classes" : " class").append("</b>").append("</h2></p>");
-		html.append("<p>").append("<font size='10px'>using ").append(VersionManager.getFullVersion()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font>").append("</p>");
+		html.append("<p>").append("<font size='10px'>using ").append(VersionManager.getFullVersionInternal()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font>").append("</p>");
 
 		if (!configuredOutputFiles.isEmpty()) {
 			html.append("<p><h3>Configured Output Files/Paths - the analysis entry point").append(" <font color='gray'>(").append(configuredOutputFiles.size()).append(")</h3></p>");

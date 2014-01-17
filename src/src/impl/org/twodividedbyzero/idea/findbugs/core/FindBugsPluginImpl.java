@@ -147,10 +147,10 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 		try {
 			if (project != null) {
-				LOGGER.info(VersionManager.getFullVersion() + " Plugin loaded with project base dir: " + IdeaUtilImpl.getProjectPath(project));
+				LOGGER.info(VersionManager.getFullVersionInternal() + " Plugin loaded with project base dir: " + IdeaUtilImpl.getProjectPath(project));
 				LOGGER.info("using Findbugs version " + FindBugsUtil.getFindBugsFullVersion());
 			} else {
-				LOGGER.info(VersionManager.getFullVersion() + " Plugin loaded with no project.");
+				LOGGER.info(VersionManager.getFullVersionInternal() + " Plugin loaded with no project.");
 			}
 
 		} catch (final Throwable t) {
