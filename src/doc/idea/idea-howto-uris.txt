@@ -1,0 +1,5 @@
+http://confluence.jetbrains.com/display/IDEADEV/Testing+IntelliJ+IDEA+Plugins
+
+http://confluence.jetbrains.com/display/IntelliJIDEA/Writing+Tests+for+Plugins
+
+http://confluence.jetbrains.com/display/IDEADEV/PluginDevelopment
