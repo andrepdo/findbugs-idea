@@ -513,10 +513,10 @@
         <inspection_tool class="AbstractClassExtendsConcreteClass" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="AbstractMethodWithMissingImplementations" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="AccessToNonThreadSafeStaticFieldFromInstance" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="nonThreadSafeTypes" value="java.text.DateFormat,java.util.Calendar" />
           <option name="nonThreadSafeClasses">
             <value />
           </option>
+          <option name="nonThreadSafeTypes" value="java.text.DateFormat,java.util.Calendar" />
         </inspection_tool>
         <inspection_tool class="AccessToStaticFieldLockedOnInstance" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="AnonymousInnerClass" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -961,10 +961,10 @@
         <inspection_tool class="UseOfSunClasses" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UtilityClassWithPublicConstructor" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="UtilityClassWithoutPrivateConstructor" enabled="true" level="WARNING" enabled_by_default="true">
-          <option name="ignoreClassesWithOnlyMain" value="false" />
           <option name="ignorableAnnotations">
             <value />
           </option>
+          <option name="ignoreClassesWithOnlyMain" value="false" />
         </inspection_tool>
         <inspection_tool class="VolatileArrayField" enabled="true" level="WARNING" enabled_by_default="true" />
         <inspection_tool class="VolatileLongOrDoubleField" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -1131,7 +1131,7 @@
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="IDEA IU-95.429 (1)" project-jdk-type="IDEA JDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="IDEA IU-129.1359" project-jdk-type="IDEA JDK">
     <output url="file://$PROJECT_DIR$/trunk/target/impl" />
   </component>
   <component name="RegexUtilComponent" text="1900-01-01 2007/08/13 1900.01.01 1900 01 01 1900-01.01 1900 13 01 1900 02 31" flags="0" regex="(19|20)\d\d([- /.])(0[1-9]|1[012])\2(0[1-9]|[12][0-9]|3[01])" mode="0" />

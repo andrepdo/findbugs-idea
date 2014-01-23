@@ -21,13 +21,13 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/../../findbugs-2.0.1-rc2/src/tools" />
-          <root url="file://$MODULE_DIR$/../../findbugs-2.0.1-rc2/src/antTask" />
-          <root url="file://$MODULE_DIR$/../../findbugs-2.0.1-rc2/src/java" />
-          <root url="file://$MODULE_DIR$/../../findbugs-2.0.1-rc2/src/gui" />
-          <root url="file://$MODULE_DIR$/../../findbugs-2.0.1-rc2/src/obsolete" />
-          <root url="file://$MODULE_DIR$/../../findbugs-2.0.1-rc2/src/infonodeJava" />
-          <root url="file://$MODULE_DIR$/../../findbugs-2.0.1-rc2/src/junit" />
+          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.2/src/gui" />
+          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.2/src/java" />
+          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.2/src/junit" />
+          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.2/src/tools" />
+          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.2/src/antTask" />
+          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.2/src/obsolete" />
+          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.2/src/infonodeJava" />
         </SOURCES>
         <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
       </library>
