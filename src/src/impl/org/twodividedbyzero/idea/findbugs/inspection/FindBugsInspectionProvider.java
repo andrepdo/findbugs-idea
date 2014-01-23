@@ -42,11 +42,14 @@ public class FindBugsInspectionProvider implements InspectionToolProvider, Appli
 	private static final Logger LOGGER = Logger.getInstance(FindBugsInspectionProvider.class.getName());
 
 
+	@Override
 	public Class<?>[] getInspectionClasses() {
 		return new Class[] {FindBugsInspection.class};
 	}
 
 
+	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+	@Override
 	@NonNls
 	@NotNull
 	public String getComponentName() {
@@ -54,6 +57,7 @@ public class FindBugsInspectionProvider implements InspectionToolProvider, Appli
 	}
 
 
+	@Override
 	public void initComponent() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
 		if (plugin == null) {
@@ -63,12 +67,13 @@ public class FindBugsInspectionProvider implements InspectionToolProvider, Appli
 		if (jar.exists() && jar.canRead()) {
 			System.setProperty(FindBugsPluginConstants.FINDBUGS_APP_ENGINE_PROPERTY_NAME, jar.toURI().toString());
 		} else {
-			LOGGER.info(FindBugsPluginConstants.FINDBUGS_APP_ENGINE_PROPERTY_NAME + " jar not found." + jar.toURI().toString());
+			LOGGER.info(FindBugsPluginConstants.FINDBUGS_APP_ENGINE_PROPERTY_NAME + " jar not found." + jar.toURI());
 		}
 
 	}
 
 
+	@Override
 	public void disposeComponent() {
 		// no action required
 	}

@@ -30,7 +30,7 @@ import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -93,6 +93,12 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
+	@Override
+	public boolean isEnabledByDefault() {
+		return false;
+	}
+
+
 	@SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@Override
 	@Nls
@@ -126,6 +132,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
+	@SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@Nls
 	@Override
 	@NotNull
@@ -160,6 +167,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 
 
 	// do not remove to be idea < 10.5.1 compatible
+	@java.lang.SuppressWarnings("MethodMayBeStatic")
 	@SuppressWarnings( {"MethodMayBeStatic", "UnusedDeclaration", "UnusedDeclaration"})
 	public void inspectionStarted(final LocalInspectionToolSession session) {
 		LOGGER.debug("Inspection started...");
@@ -198,10 +206,11 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	/**
 	 * See {@link InspectionManager#createProblemDescriptor(PsiElement, String, LocalQuickFix, ProblemHighlightType) } for method descriptions.
 	 *
-	 * @param psiFile
-	 * @param bugInstance
+	 * @param psiFile the psi file
+	 * @param bugInstance a fb Bug pattern container
 	 * @return the created ProblemDescriptor
 	 */
+	@java.lang.SuppressWarnings("HardcodedLineSeparator")
 	@SuppressWarnings({"HardcodedLineSeparator"})
 	private static ProblemDescriptor createProblemDescriptor(final PsiFile psiFile, final BugInstance bugInstance) {
 		final int[] lines = BugInstanceUtil.getSourceLines(bugInstance);
@@ -216,6 +225,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 
 		description.append(BugInstanceUtil.getDetailText(bugInstance));
 
+		//noinspection VariableNotUsedInsideIf
 		if (fieldAnnotation != null) {
 			description.append("Field: ");
 			description.append(BugInstanceUtil.getFieldName(bugInstance)).append(' ');
@@ -235,6 +245,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 
 		final ProblemDescriptor[] problemDescriptor = new ProblemDescriptor[1];
 		ApplicationManager.getApplication().runReadAction(new Runnable() {
+			@Override
 			public void run() {
 
 				try {
@@ -263,7 +274,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	/**
 	 * See {@link InspectionManager#createProblemDescriptor(PsiElement, String, LocalQuickFix, ProblemHighlightType) } for method descriptions.
 	 *
-	 * @param bugInstance
+	 * @param bugInstance a fb Bug pattern container
 	 * @return the created ProblemDescriptor
 	 */
 	ProblemDescriptor createProblemDescriptor(final BugInstance bugInstance) {
@@ -276,7 +287,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 		final FindBugsInspector worker = new FindBugsInspector(project, this);
 
 		// set aux classpath
-		final Module module = ModuleUtil.findModuleForFile(psiFile.getVirtualFile(), project);
+		final Module module = ModuleUtilCore.findModuleForFile(psiFile.getVirtualFile(), project);
 		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(module);
 		worker.configureAuxClasspathEntries(files);
 
@@ -299,6 +310,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
+	@Override
 	public void onEvent(@NotNull final BugReporterInspectionEvent event) {
 		switch (event.getOperation()) {
 			case ANALYSIS_STARTED:
@@ -306,7 +318,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 				break;
 			case ANALYSIS_ABORTED:
 			case ANALYSIS_FINISHED:
-				unregisterEventListner();
+				unregisterEventListener();
 				break;
 			case NEW_BUG_INSTANCE:
 				final BugInstance bugInstance = event.getBugInstance();
@@ -329,7 +341,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
-	public void unregisterEventListner() {
+	public void unregisterEventListener() {
 		EventManagerImpl.getInstance().removeEventListener(this);
 		_isListener = false;
 	}

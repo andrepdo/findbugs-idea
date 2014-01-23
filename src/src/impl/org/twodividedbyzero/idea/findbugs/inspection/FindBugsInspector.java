@@ -58,20 +58,23 @@ public class FindBugsInspector extends FindBugsWorker implements CompileTask {
 		try {
 			_inspection.registerEventListener(getProject());
 			final IFindBugsEngine engine = createFindBugsEngine();
-			// Create FindBugsTask
 			final FindBugsTask findBugsTask = new FindBugsTask(_project, _bugCollection, "Running FindBugs inspection...", true, engine, true);
 			_bugReporter.setFindBugsTask(findBugsTask);
 			findBugsTask.runFindBugs(engine);
 			return true;
 		} catch (final Exception e) {
-			LOGGER.debug("FindBugs inpsection failed.", e);
-			_inspection.unregisterEventListner();
+			LOGGER.debug("FindBugs inspection failed.", e);
 			return false;
+		} finally {
+			_inspection.unregisterEventListener();
+			//noinspection AssignmentToNull
+			_inspection = null;
 		}
 
 	}
 
 
+	@Override
 	public boolean execute(final CompileContext context) {
 		/*ApplicationManager.getApplication().runReadAction(new Runnable() {
 			public void run() {

@@ -48,9 +48,8 @@ public class FindBugsInspectionPanel extends JPanel {
 	}
 
 
-	void initialize() {
+	final void initialize() {
 		final ResourceBundle i18n = ResourcesLoader.getResourceBundle();
-
 
 		// fake a multi-line label with a text area
 		_descriptionLabel.setText(i18n.getString("findbugs.inspection.description.config"));
@@ -61,9 +60,7 @@ public class FindBugsInspectionPanel extends JPanel {
 		_descriptionLabel.setOpaque(false);
 		_descriptionLabel.setDisabledTextColor(_descriptionLabel.getForeground());
 
-		final GridBagConstraints descLabelConstraints = new GridBagConstraints(0, 0, 3, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(4, 4, 4, 4), 0, 0);
+		final GridBagConstraints descLabelConstraints = new GridBagConstraints(0, 0, 3, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.BOTH, new Insets(4, 4, 4, 4), 0, 0);
 		add(_descriptionLabel, descLabelConstraints);
-
-
 	}
 }

@@ -189,8 +189,6 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 		try {
 			registerEventListener();
 			final IFindBugsEngine engine = createFindBugsEngine();
-
-			// Create FindBugsTask
 			final FindBugsTask findBugsTask = new FindBugsTask(_project, _bugCollection, text, true, engine, _startInBackground);
 			_bugReporter.setFindBugsTask(findBugsTask);
 			queue(findBugsTask);
@@ -202,11 +200,10 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 			return true;
 		} catch (final Exception e) {
 			LOGGER.error("FindBugs analysis failed.", e);
-			unregisterEventListener();
 			return false;
-		}/* finally {
-			//unregisterEventListner();
-		}*/
+		} finally {
+			unregisterEventListener();
+		}
 
 	}
 
@@ -215,6 +212,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 		//TODO: use make() with CompilerScope
 		//noinspection AnonymousInnerClass
 		EventDispatchThreadHelper.invokeAndWait(new OperationAdapter() {
+			@Override
 			public void run() {
 				new CompileManagerFacade(project).compile(virtualFiles, null);
 			}
@@ -223,6 +221,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 
 
 
+	@Override
 	public void finished(final boolean aborted, final int errors, final int warnings, final CompileContext compileContext) {
 		if (!aborted && errors == 0) {
 			DaemonCodeAnalyzer.getInstance(_project).restart();
@@ -295,6 +294,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 
 	private static void queue(final FindBugsTask findBugsTask) {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				findBugsTask.queue();
 			}
@@ -372,6 +372,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	}
 
 
+	@Override
 	public void onEvent(@NotNull final BugReporterEvent event) {
 		switch (event.getOperation()) {
 			case ANALYSIS_STARTED:
