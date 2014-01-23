@@ -16,15 +16,9 @@
     </list>
     <list id="bf5cba07-ac91-4ec3-9547-e5e2cd6d9df6" name="compatiblity issues" comment="* compatiblity issue (use facade)" />
     <list id="1344aa48-df1a-4c81-9d6a-cd86f3a702f3" name="release" comment="* release-management stuff" />
-    <list default="true" id="e6fa75ea-1643-4c8c-ab0b-8a41df2f8be8" name="Bugfixing-01" comment="* Issue 29: annotation color: use yellow.darker">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/pfeiler.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FindBugs-IDEA.iml" afterPath="$PROJECT_DIR$/FindBugs-IDEA.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FindBugs-IDEA.ipr" afterPath="$PROJECT_DIR$/FindBugs-IDEA.ipr" />
+    <list default="true" id="e6fa75ea-1643-4c8c-ab0b-8a41df2f8be8" name="Bugfixing-01" comment="* generic idea: project setup/settings">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FindBugs-IDEA.iws" afterPath="$PROJECT_DIR$/FindBugs-IDEA.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/MyDefaultProfile.xml" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/MyDefaultProfile.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.number" afterPath="$PROJECT_DIR$/build.number" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="$USER_HOME$/.griffon/" />
@@ -1186,7 +1180,7 @@
       <workItem from="1389958962646" duration="1050000" />
       <workItem from="1390469638950" duration="2629000" />
       <workItem from="1390472332983" duration="244000" />
-      <workItem from="1390472783223" duration="786000" />
+      <workItem from="1390472783223" duration="836000" />
     </task>
     <task id="LOCAL-00004" summary="* findbugs-2.0.1 support&#10;* annotate, suppress findbugs patterns&#10;* idea 11 compatibility">
       <created>1349283234174</created>
@@ -1338,11 +1332,15 @@
       <created>1389960008102</created>
       <updated>1389960008102</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary="* generic idea: project setup/settings">
+      <created>1390473610127</created>
+      <updated>1390473610127</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="42310000" />
+    <option name="totallyTimeSpent" value="42360000" />
   </component>
   <component name="TodoView" selected-index="1">
     <todo-panel id="selected-file">
@@ -1523,7 +1521,6 @@
     <option name="PERFORM_COMMIT_IN_BACKGROUND" value="false" />
     <option name="CHECK_LOCALLY_CHANGED_CONFLICTS_IN_BACKGROUND" value="true" />
     <confirmRemoveEmptyChangelist value="1" />
-    <MESSAGE value="fb-idea-cloud-8-22-working" />
     <MESSAGE value="fb-idea-cloud-8-22-working patch and jars" />
     <MESSAGE value="* findbugs-2.0.1 support&#10;* annotate, suppress findbugs patterns&#10;* idea 11 compatibility" />
     <MESSAGE value="* remove some deprated openapi usages&#10;* fix  Issue#9 - &#9;Access is allowed from event dispatch thread only.&#10;** remove deprated api use of getDataContext" />
@@ -1548,7 +1545,8 @@
     <MESSAGE value="* add automatic revision detection/setting&#10;" />
     <MESSAGE value="* some howto write plugin tests uri's&#10;" />
     <MESSAGE value="* release-management stuff" />
-    <option name="LAST_COMMIT_MESSAGE" value="* release-management stuff" />
+    <MESSAGE value="* generic idea: project setup/settings" />
+    <option name="LAST_COMMIT_MESSAGE" value="* generic idea: project setup/settings" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
