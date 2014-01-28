@@ -32,6 +32,7 @@ import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.application.Result;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.StdFileTypes;
@@ -71,6 +72,7 @@ import java.util.Set;
  */
 public abstract class BaseAnalyzeAction extends BaseAction {
 
+	private static final Logger LOGGER = Logger.getInstance(BaseAction.class.getName());
 
   @Override
   public void actionPerformed(final AnActionEvent e) {
@@ -143,26 +145,40 @@ public abstract class BaseAnalyzeAction extends BaseAction {
 	final Collection<String> ret = new ArrayList<String>(256);
     final PsiManager psiManager = PsiManager.getInstance(project);
     psiManager.startBatchFilesProcessingMode();
-    //final ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex(); TODO remove
     try {
 		//noinspection AnonymousInnerClass
 		scope.accept(new PsiRecursiveElementVisitor() {
 		FileType fileType;
 		String path;
+		VirtualFile virtualFile;
         @Override public void visitFile(final PsiFile file) {
 			fileType = file.getFileType();
 			if (StdFileTypes.JAVA.equals(fileType)) {
 				path = AnalyzeUtil.getOutputClassFilePathForJavaFile(file, project);
 				if (path != null) {
-					if (!ret.contains(path)) {
-						ret.add(path);
-					} // LATER: check why visitFile is called multiple times for the same PsiFile ?
+					addPath(path);
+				} else {
+					LOGGER.warn("No output class path found for PsiFile: " + file);
 				}
-				ret.add(path);
 			} else if (StdFileTypes.CLASS.equals(fileType)) {
-				ret.add(file.getVirtualFile().getPath());
+				virtualFile = file.getVirtualFile();
+				if (virtualFile != null) {
+					path = virtualFile.getPath();
+					if (path != null) {
+						addPath(path);
+					} else {
+						LOGGER.warn("No path for VirtualFile: " + virtualFile);
+					}
+				} else {
+					LOGGER.warn("No virtual file for PsiFile: " + file);
+				}
 			} // else skip non .java and .class files
         }
+		private void addPath(final String path) {
+			if (!ret.contains(path)) {
+				ret.add(path);
+			} // LATER: check why visitFile is called multiple times for the same PsiFile ?
+		}
       });
     } finally {
       psiManager.finishBatchFilesProcessingMode();
