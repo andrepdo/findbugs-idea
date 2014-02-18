@@ -167,7 +167,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 									 {border, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_annotationPathPanel = new JPanel(tbl);
-			_annotationPathPanel.setBorder(BorderFactory.createTitledBorder("FindBugs Annotation class (@SuppressWarnings). e.g. edu.umd.cs.findbugs.annotations.SuppressWarnings"));
+			_annotationPathPanel.setBorder(BorderFactory.createTitledBorder("FindBugs Annotation class (@SuppressFBWarnings). e.g. edu.umd.cs.findbugs.annotations.SuppressFBWarnings"));
 
 			_annotationPathPanel.add(getAnnotationPathField(), "1, 1, 1, 1"); // col ,row, col, row
 

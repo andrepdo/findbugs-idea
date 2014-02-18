@@ -92,7 +92,7 @@ public class FindBugsPreferences extends Properties {
 	public static final String ANNOTATION_GUTTER_ICON_ENABLED = PROPERTIES_PREFIX + "annotationGutterIconEnabled";
 	public static final String ANNOTATION_TEXT_RAGE_MARKUP_ENABLED = PROPERTIES_PREFIX + "annotationTextRangeMarkupEnabled";
 	public static final String ANNOTATION_TYPE_SETTINGS = PROPERTIES_PREFIX + "annotationTypeSettings";
-	public static final String DEFAULT_ANNOTATION_CLASS_NAME = "edu.umd.cs.findbugs.annotations.SuppressWarnings";
+	public static final String DEFAULT_ANNOTATION_CLASS_NAME = "edu.umd.cs.findbugs.annotations.SuppressFBWarnings";
 
 	public transient boolean _annotationTextRangeMarkupEnabled;
 	public transient boolean _annotationGutterIconEnabled;
