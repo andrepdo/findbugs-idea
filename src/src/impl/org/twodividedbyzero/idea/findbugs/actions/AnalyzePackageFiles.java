@@ -31,6 +31,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
@@ -92,7 +93,7 @@ public class AnalyzePackageFiles extends BaseAction implements EventListener<Bug
 			final Project project = DataKeys.PROJECT.getData(_dataContext);
 			final Presentation presentation = event.getPresentation();
 
-			// check a project is loaded
+			// check a project is loaded, true when project is null
 			if (isProjectNotLoaded(project, presentation)) {
 				return;
 			}
@@ -114,7 +115,9 @@ public class AnalyzePackageFiles extends BaseAction implements EventListener<Bug
 
 			// enable ?
 			if (!_running) {
-				_enabled = selectedSourceFiles != null && selectedSourceFiles.length == 1 && selectedSourceFiles.length > 0 && (IdeaUtilImpl.isValidFileType(selectedSourceFiles[0].getFileType()) || selectedSourceFiles[0].isDirectory());
+				_enabled = selectedSourceFiles != null && selectedSourceFiles.length == 1 &&
+						(IdeaUtilImpl.isValidFileType(selectedSourceFiles[0].getFileType()) || selectedSourceFiles[0].isDirectory()) &&
+						null != getPackagePath(selectedSourceFiles, project);
 			}
 			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
 			presentation.setVisible(true);
@@ -137,29 +140,8 @@ public class AnalyzePackageFiles extends BaseAction implements EventListener<Bug
 
 		final FindBugsWorker worker = new FindBugsWorker(project, module);
 
-		VirtualFile packagePath = null;
 		final VirtualFile[] selectedSourceFiles = IdeaUtilImpl.getVirtualFiles(_dataContext);
-
-		if (selectedSourceFiles != null && selectedSourceFiles.length > 0) {
-			for (final VirtualFile virtualFile : selectedSourceFiles) {
-				final Module moduleOfFile = IdeaUtilImpl.findModuleForFile(virtualFile, project);
-				if (moduleOfFile == null) {
-					return;
-				}
-
-
-				if (virtualFile.isDirectory()) {
-					if (!virtualFile.getPath().endsWith(moduleOfFile.getName())) {
-						packagePath = virtualFile;
-					}
-				} else {
-					final VirtualFile parent = virtualFile.getParent();
-					if (parent != null && !parent.getPath().endsWith(moduleOfFile.getName())) {
-						packagePath = parent;
-					}
-				}
-			}
-		}
+		final VirtualFile packagePath = getPackagePath(selectedSourceFiles, project);
 
 		// set aux classpath
 		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(_dataContext);
@@ -178,6 +160,33 @@ public class AnalyzePackageFiles extends BaseAction implements EventListener<Bug
 			worker.configureOutputFiles(output);
 			worker.work("Running FindBugs analysis for directory '" + output + "'...");
 		}
+	}
+
+
+	@Nullable
+	private VirtualFile getPackagePath(@Nullable final VirtualFile[] selectedSourceFiles, @NotNull final Project project) {
+		VirtualFile packagePath = null;
+		if (selectedSourceFiles != null && selectedSourceFiles.length > 0) {
+			for (final VirtualFile virtualFile : selectedSourceFiles) {
+				final Module moduleOfFile = IdeaUtilImpl.findModuleForFile(virtualFile, project);
+				if (moduleOfFile == null) {
+					return null;
+				}
+
+
+				if (virtualFile.isDirectory()) {
+					if (!virtualFile.getPath().endsWith(moduleOfFile.getName())) {
+						packagePath = virtualFile;
+					}
+				} else {
+					final VirtualFile parent = virtualFile.getParent();
+					if (parent != null && !parent.getPath().endsWith(moduleOfFile.getName())) {
+						packagePath = parent;
+					}
+				}
+			}
+		}
+		return packagePath;
 	}
 
 
