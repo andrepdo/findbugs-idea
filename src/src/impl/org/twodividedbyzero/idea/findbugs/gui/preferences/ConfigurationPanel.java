@@ -43,6 +43,7 @@ import org.twodividedbyzero.idea.findbugs.gui.common.AaComboBox;
 import org.twodividedbyzero.idea.findbugs.gui.common.AaSlider;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
+import org.twodividedbyzero.idea.findbugs.gui.preferences.importer.SonarProfileImporter;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
@@ -577,8 +578,19 @@ public class ConfigurationPanel extends JPanel {
 		final PersistencePreferencesBean prefs;
 		try {
 			final Document document = JDOMUtil.loadDocument(files[0].getInputStream());
-			prefs = XmlSerializer.deserialize(document, PersistencePreferencesBean.class);
-			if (!validatePreferences(document, prefs)) {
+			if (SonarProfileImporter.isValid(document)) {
+				prefs = SonarProfileImporter.doImport(this, document);
+				if (prefs == null) {
+					return;
+				}
+			} else {
+				if (!PERSISTENCE_ROOT_NAME.equals(document.getRootElement().getName())) {
+					Messages.showErrorDialog(this, "The file format is invalid.", "Invalid File");
+					return;
+				}
+				prefs = XmlSerializer.deserialize(document, PersistencePreferencesBean.class);
+			}
+			if (!validatePreferences(prefs)) {
 				return;
 			}
 		} catch (final Exception ex) {
@@ -599,11 +611,7 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
-	private boolean validatePreferences(final Document document, @Nullable final PersistencePreferencesBean prefs) {
-		if (!PERSISTENCE_ROOT_NAME.equals(document.getRootElement().getName())) {
-			Messages.showErrorDialog(this, "The file format is invalid.", "Invalid File");
-			return false;
-		}
+	private boolean validatePreferences(@Nullable final PersistencePreferencesBean prefs) {
 		if (prefs == null) {
 			Messages.showErrorDialog(this, "The configuration is invalid.", "Invalid Configuration");
 			return false;
