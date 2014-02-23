@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2008-2013 Andre Pfeiler
+  ~ Copyright 2008-2014 Andre Pfeiler
   ~
   ~ This file is part of FindBugs-IDEA.
   ~
@@ -46,15 +46,15 @@
 		<p>
 		FindBugs-IDEA plugin features:
 		<ul>
-		    <li>findbugs-2 support</li>
-		    <li>Quickfix: annotate, suppress findbugs patterns (GutterIcon and document markup (alt+enter))</li>
-			<li>idea 9 until 12 compatibility</li>
-		    <li>configure findbugs on idea project and module level</li>
-		    <li>jump to source from results shown in toolwindow including anonymous classes</li>
-		    <li>bug descriptions, solutions</li>
-		    <li>run analysis always in background</li>
-		    <li>run findbugs analysis on all affected files after compile</li>
-		    <li>min. priority to report</li>
+            <li>findbugs-2 support</li>
+            <li>Quickfix: annotate, suppress findbugs patterns (GutterIcon and document markup (alt+enter))</li>
+            <li>idea 12.1 until the latest 13.1 EAP compatibility</li>
+            <li>configure findbugs on idea project and module level</li>
+            <li>jump to source from results shown in toolwindow including anonymous classes</li>
+            <li>bug descriptions, solutions</li>
+            <li>run analysis always in background</li>
+            <li>run findbugs analysis on all affected files after compile</li>
+            <li>min. priority to report</li>
             <li>background scanning</li>
             <li>configurable effort run level</li>
             <li>configurable detectors</li>
@@ -75,6 +75,7 @@
                     <li>analyze all files of an intellij module</li>
                     <li>analyze all files of the selected package</li>
                     <li>analyze a bunch of selected files (project tree)</li>
+                    <li>analyze a scope</li>
                 </ul>
             </li>
             <li>export a bug collection to html and/or xml with limited configurable dir based archive support</li>
@@ -87,6 +88,16 @@
     </description>
     <change-notes>
         <![CDATA[<html>
+        <h3>0.9.992</h3>
+        <ul>
+            <li>Issue 46: support import findbugs settings from sonar profile xml</li>
+            <li>Issue 50: bundle with findbugs 2.0.3</li>
+            <li>Issue 52: Fix NPE and make element visitor more defensive</li>
+            <li>Issue 55: new default SuppressFBWarnings</li>
+            <li>Issue 56: disable "Analyze Package" action on invalid VirtualFile selection (f.e module directory selected)</li>
+            <li>Minor cleanups and improvements</li>
+            <li>Plugin compatibility: IDEA 12.1.4 (129.713) until the newest IDEA 13 release 13.0.2 (133.969) inclusive the latest EAP 13.1 (134.1160)</li>
+        </ul>
         <h3>0.9.991</h3>
         <ul>
             <li>Issue 29: annotation color: do not change foreground and background - make only use of effect color and effect type (dark color theme problems)</li>
