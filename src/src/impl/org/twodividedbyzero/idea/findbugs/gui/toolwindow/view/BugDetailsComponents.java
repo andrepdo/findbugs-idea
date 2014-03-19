@@ -80,6 +80,7 @@ import java.net.URL;
  * @version $Revision$
  * @since 0.0.1
  */
+@SuppressWarnings("MagicNumber")
 public class BugDetailsComponents {
 
 	private static final Logger LOGGER = Logger.getInstance(BugDetailsComponents.class.getName());
@@ -128,9 +129,8 @@ public class BugDetailsComponents {
 					g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 					g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 					g2d.transform(AffineTransform.getRotateInstance(1 * Math.PI / 2.0));
-					g2d.translate(0, -getIconWidth());
 
-					GuiResources.FINDBUGS_ICON_13X13.paintIcon(c, g, getIconWidth() - 2, y + 8);
+					GuiResources.FINDBUGS_ICON_13X13.paintIcon(c, g, 0, y + 8);
 					g2d.setColor(JBColor.BLACK);
 					final Font font = _jTabbedPane.getFont().deriveFont(Font.PLAIN);
 					g2d.setFont(font);
@@ -139,14 +139,14 @@ public class BugDetailsComponents {
 					g2d.drawString(
 							detailsTabTitle,
 							getIconHeight() / 2 - width / 2 + GuiResources.FINDBUGS_ICON.getIconHeight() + y - 5,
-							-getIconWidth() + (fontMetrics.getAscent() / 2)
+							-getIconWidth() + (fontMetrics.getAscent() / 2) + 2
 							);
 				}
 
 
 				@Override
 				public int getIconWidth() {
-					return 5;
+					return 11;
 				}
 
 
@@ -171,20 +171,20 @@ public class BugDetailsComponents {
 						g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 						g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 						g2d.transform(AffineTransform.getRotateInstance(1 * Math.PI / 2.0));
-						g2d.translate(0, -getIconWidth());
 
-						GuiResources.FINDBUGS_CLOUD_ICON.paintIcon(c, g, getIconWidth(), y + 8);
+						GuiResources.FINDBUGS_CLOUD_ICON.paintIcon(c, g, 0, y + 8);
 						g2d.setColor(JBColor.BLACK);
 						final Font font = _jTabbedPane.getFont().deriveFont(Font.PLAIN);
 						g2d.setFont(font);
+						final FontMetrics fontMetrics = _jTabbedPane.getFontMetrics(_jTabbedPane.getFont());
 						final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), cloudTabTitle);
-						g2d.drawString(cloudTabTitle, getIconHeight() / 2 - width / 2 + GuiResources.FINDBUGS_ICON.getIconHeight() + y - 5, -getIconWidth());
+						g2d.drawString(cloudTabTitle, getIconHeight() / 2 - width / 2 + GuiResources.FINDBUGS_ICON.getIconHeight() + y - 5, -getIconWidth() + (fontMetrics.getAscent() / 2) + 2);
 					}
 
 
 					@Override
 					public int getIconWidth() {
-						return 5;
+						return 11;
 					}
 
 
