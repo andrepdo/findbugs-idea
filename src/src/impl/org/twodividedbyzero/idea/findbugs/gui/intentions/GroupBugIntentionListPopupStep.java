@@ -19,13 +19,14 @@
 
 package org.twodividedbyzero.idea.findbugs.gui.intentions;
 
-import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.PopupStep;
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
 import com.intellij.openapi.util.Iconable;
+import com.intellij.openapi.vfs.ReadonlyStatusHandler;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.intentions.SuppressReportBugIntentionAction;
@@ -63,13 +64,19 @@ public class GroupBugIntentionListPopupStep extends BaseListPopupStep<SuppressRe
 
 	@Override
 	public PopupStep<?> onChosen(final SuppressReportBugIntentionAction selectedValue, final boolean finalChoice) {
-		ApplicationManager.getApplication().runWriteAction(new Runnable() {
-			public void run() {
-				final Project project = _psiElement.getProject();
+		final Project project = _psiElement.getProject();
+		ReadonlyStatusHandler.getInstance(project).ensureFilesWritable();
+
+
+		new WriteCommandAction.Simple<Object>(project,  "Add findbugs-idea Suppress warning", _psiElement.getContainingFile()) {
+
+			@Override
+			protected void run() throws Throwable {
 				final Editor editor = FileEditorManager.getInstance(project).getSelectedTextEditor();
 				selectedValue.invoke(project, editor, _psiElement);
 			}
-		});
+		}.execute();
+
 		return super.onChosen(selectedValue, finalChoice);
 	}
 
