@@ -21,6 +21,7 @@ package org.twodividedbyzero.idea.findbugs.gui.toolwindow.view;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBTabbedPane;
 import edu.umd.cs.findbugs.BugAnnotation;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.DetectorFactory;
@@ -47,6 +48,8 @@ import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
@@ -77,9 +80,10 @@ import java.net.URL;
  * @version $Revision$
  * @since 0.0.1
  */
-public class BugDetailsComponents /*extends JPanel*/ {
+public class BugDetailsComponents {
 
 	private static final Logger LOGGER = Logger.getInstance(BugDetailsComponents.class.getName());
+	private static final String EDU_UMD_CS_FINDBUGS_PLUGINS_WEB_CLOUD = "edu.umd.cs.findbugs.plugins.webCloud";
 
 	private HTMLEditorKit _htmlEditorKit;
 	private JEditorPane _bugDetailsPane;
@@ -111,12 +115,14 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 	JTabbedPane getTabbedPane() {
 		if (_jTabbedPane == null) {
-			_jTabbedPane = new JTabbedPane(JTabbedPane.RIGHT);
+			_jTabbedPane = new JBTabbedPane(SwingConstants.RIGHT);
 			_jTabbedPane.setFocusable(false);
 			_jTabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
 			final String detailsTabTitle = "Bug Details";
+			//noinspection AnonymousInnerClass
 			final Icon detailsIcon = new Icon() {
+				@Override
 				public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
 					final Graphics2D g2d = (Graphics2D) g.create();
 					g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -138,11 +144,13 @@ public class BugDetailsComponents /*extends JPanel*/ {
 				}
 
 
+				@Override
 				public int getIconWidth() {
 					return 5;
 				}
 
 
+				@Override
 				public int getIconHeight() {
 					final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), detailsTabTitle);
 					return width + GuiResources.FINDBUGS_ICON.getIconHeight() + 20;
@@ -151,12 +159,13 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 			_jTabbedPane.addTab(null, detailsIcon, getBugDetailsSplitPane(), "Bug details concerning the current selected bug in the left tree");
 			_jTabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
-			//_jTabbedPane.setDisplayedMnemonicIndexAt(0, 0);
 
 
-			if (Plugin.getByPluginId("edu.umd.cs.findbugs.plugins.webCloud") != null) {
+			if (Plugin.getByPluginId(EDU_UMD_CS_FINDBUGS_PLUGINS_WEB_CLOUD) != null) {
 				final String cloudTabTitle = "Comments";
+				//noinspection AnonymousInnerClass
 				final Icon cloudIcon = new Icon() {
+					@Override
 					public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
 						final Graphics2D g2d = (Graphics2D) g.create();
 						g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -173,11 +182,13 @@ public class BugDetailsComponents /*extends JPanel*/ {
 					}
 
 
+					@Override
 					public int getIconWidth() {
 						return 5;
 					}
 
 
+					@Override
 					public int getIconHeight() {
 						final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), cloudTabTitle);
 						return width + GuiResources.FINDBUGS_CLOUD_ICON.getIconHeight() + 20;
@@ -214,7 +225,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	@SuppressWarnings("MagicNumber")
 	JPanel getBugDetailsPanel() {
 		if (_bugDetailsPanel == null) {
-			final JScrollPane scrollPane = ScrollPaneFacade.createScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final JScrollPane scrollPane = ScrollPaneFacade.createScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			scrollPane.setViewportView(getBugDetailsPane());
 			//scrollPane.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(0, 0, 0, 3), new CustomLineBorder(new Color(98, 95, 89), 0, 0, 1, 1)));
 			scrollPane.setBorder(new CustomLineBorder(new JBColor(new Color(98, 95, 89), new Color(53, 51, 48)), 0, 0, 1, 0));
@@ -238,6 +249,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 			_bugDetailsPane.setContentType("text/html");
 			_bugDetailsPane.setEditorKit(_htmlEditorKit);
 			_bugDetailsPane.addHyperlinkListener(new HyperlinkListener() {
+				@Override
 				public void hyperlinkUpdate(final HyperlinkEvent evt) {
 					if (_parent != null) {
 						handleDetailsClick(evt);
@@ -252,7 +264,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 	JPanel getBugExplanationPanel() {
 		if (_explanationPanel == null) {
-			final JScrollPane scrollPane = ScrollPaneFacade.createScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final JScrollPane scrollPane = ScrollPaneFacade.createScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			scrollPane.setViewportView(getExplanationPane());
 			scrollPane.setBorder(BorderFactory.createCompoundBorder(new CustomLineBorder(new JBColor(new Color(208, 206, 203), new Color(170, 168, 165)), 1, 0, 0, 0), new CustomLineBorder(new JBColor(new Color(98, 95, 89), new Color(71, 68, 62)), 1, 0, 0, 0)));
 
@@ -275,6 +287,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 			_explanationPane.setContentType("text/html");
 			_explanationPane.setEditorKit(_htmlEditorKit);
 			_explanationPane.addHyperlinkListener(new HyperlinkListener() {
+				@Override
 				public void hyperlinkUpdate(final HyperlinkEvent evt) {
 					editorPaneHyperlinkUpdate(evt);
 				}
@@ -287,7 +300,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 
 	JPanel getCloudCommentsPanel() {
 		if (_cloudCommentsPanel == null) {
-			final JScrollPane scrollPane = ScrollPaneFacade.createScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final JScrollPane scrollPane = ScrollPaneFacade.createScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			scrollPane.setBorder(null);
 			scrollPane.setViewportView(getCloudCommentsPane());
 			_cloudCommentsPanel = new JPanel();
@@ -520,6 +533,7 @@ public class BugDetailsComponents /*extends JPanel*/ {
 	@SuppressWarnings({"AnonymousInnerClass"})
 	private static void scrollRectToVisible(final JEditorPane pane) {
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				pane.scrollRectToVisible(new Rectangle(0, 0, 0, 0));
 			}

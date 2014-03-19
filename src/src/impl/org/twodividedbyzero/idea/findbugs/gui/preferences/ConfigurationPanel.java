@@ -32,6 +32,7 @@ import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
 import com.intellij.ui.FilterComponent;
+import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.util.xmlb.XmlSerializer;
 import info.clearthought.layout.TableLayout;
 import org.jdesktop.swingx.color.ColorUtil;
@@ -39,9 +40,9 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.AaComboBox;
 import org.twodividedbyzero.idea.findbugs.gui.common.AaSlider;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.importer.SonarProfileImporter;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
@@ -56,7 +57,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -100,7 +100,7 @@ public class ConfigurationPanel extends JPanel {
 	private JCheckBox _detectorThresholdChkb;
 	private JPanel _effortPanel;
 	private JLabel _effortLabel;
-	private JTabbedPane _tabbedPane;
+	private JBTabbedPane _tabbedPane;
 	private transient DetectorConfiguration _detectorConfig;
 	private transient ReportConfiguration _reporterConfig;
 	private JButton _restoreDefaultsButton;
@@ -336,7 +336,7 @@ public class ConfigurationPanel extends JPanel {
 
 	private Component getTabbedPane() {
 		if (_tabbedPane == null) {
-			_tabbedPane = new JTabbedPane();
+			_tabbedPane = new JBTabbedPane();
 
 			final List<ConfigurationPage> configPages = getConfigPages();
 			for (final ConfigurationPage configPage : configPages) {
