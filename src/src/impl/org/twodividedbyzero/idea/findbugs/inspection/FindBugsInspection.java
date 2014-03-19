@@ -182,11 +182,11 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 
 	@Override
 	public ProblemDescriptor[] checkFile(@NotNull final PsiFile psiFile, @NotNull final InspectionManager manager, final boolean isOnTheFly) {
-		LOGGER.debug("Running FindBugs-IDEA inspection on psiFile: " + psiFile.getName());
+		LOGGER.info("EXPERIMENTAL: Running FindBugs-IDEA inspection on psiFile: " + psiFile.getName());
 		LOGGER.debug("Inspection has been invoked.");
 
 		if (!psiFile.isValid() || !psiFile.isPhysical() || !IdeaUtilImpl.isValidFileType(psiFile.getFileType())) {
-			LOGGER.debug("Skipping file as invalid: " + psiFile.getName());
+			LOGGER.info("Skipping file as invalid: " + psiFile.getName());
 			return EMPTY_PROBLEM_DESCRIPTOR;
 		}
 
@@ -324,7 +324,9 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 				final BugInstance bugInstance = event.getBugInstance();
 				if (bugInstance != null) {
 					final ProblemDescriptor problemDescriptor = createProblemDescriptor(bugInstance);
-					_problems.add(problemDescriptor);
+					if (problemDescriptor != null) {
+						_problems.add(problemDescriptor);
+					}
 				}
 				break;
 			default:
