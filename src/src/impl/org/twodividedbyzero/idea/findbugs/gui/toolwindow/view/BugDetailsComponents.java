@@ -37,13 +37,13 @@ import org.twodividedbyzero.idea.findbugs.gui.common.CustomLineBorder;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitLayout;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitPane;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
+import org.twodividedbyzero.idea.findbugs.gui.common.VerticalTextIcon;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.DetectorConfiguration;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.BugTree;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -60,14 +60,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
-import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
@@ -120,81 +117,12 @@ public class BugDetailsComponents {
 			_jTabbedPane.setFocusable(false);
 			_jTabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
-			final String detailsTabTitle = "Bug Details";
-			//noinspection AnonymousInnerClass
-			final Icon detailsIcon = new Icon() {
-				@Override
-				public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
-					final Graphics2D g2d = (Graphics2D) g.create();
-					g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-					g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-					g2d.transform(AffineTransform.getRotateInstance(1 * Math.PI / 2.0));
-
-					GuiResources.FINDBUGS_ICON_13X13.paintIcon(c, g, 0, y + 8);
-					g2d.setColor(JBColor.BLACK);
-					final Font font = _jTabbedPane.getFont().deriveFont(Font.PLAIN);
-					g2d.setFont(font);
-					final FontMetrics fontMetrics = _jTabbedPane.getFontMetrics(_jTabbedPane.getFont());
-					final int width = SwingUtilities.computeStringWidth(fontMetrics, detailsTabTitle);
-					g2d.drawString(
-							detailsTabTitle,
-							getIconHeight() / 2 - width / 2 + GuiResources.FINDBUGS_ICON.getIconHeight() + y - 5,
-							-getIconWidth() + (fontMetrics.getAscent() / 2) + 2
-							);
-				}
-
-
-				@Override
-				public int getIconWidth() {
-					return 11;
-				}
-
-
-				@Override
-				public int getIconHeight() {
-					final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), detailsTabTitle);
-					return width + GuiResources.FINDBUGS_ICON.getIconHeight() + 20;
-				}
-			};
-
-			_jTabbedPane.addTab(null, detailsIcon, getBugDetailsSplitPane(), "Bug details concerning the current selected bug in the left tree");
+			_jTabbedPane.addTab(null, new VerticalTextIcon("Bug Details", true, GuiResources.FINDBUGS_ICON), getBugDetailsSplitPane(), "Bug details concerning the current selected bug in the left tree");
 			_jTabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
 
 			if (Plugin.getByPluginId(EDU_UMD_CS_FINDBUGS_PLUGINS_WEB_CLOUD) != null) {
-				final String cloudTabTitle = "Comments";
-				//noinspection AnonymousInnerClass
-				final Icon cloudIcon = new Icon() {
-					@Override
-					public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
-						final Graphics2D g2d = (Graphics2D) g.create();
-						g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-						g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-						g2d.transform(AffineTransform.getRotateInstance(1 * Math.PI / 2.0));
-
-						GuiResources.FINDBUGS_CLOUD_ICON.paintIcon(c, g, 0, y + 8);
-						g2d.setColor(JBColor.BLACK);
-						final Font font = _jTabbedPane.getFont().deriveFont(Font.PLAIN);
-						g2d.setFont(font);
-						final FontMetrics fontMetrics = _jTabbedPane.getFontMetrics(_jTabbedPane.getFont());
-						final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), cloudTabTitle);
-						g2d.drawString(cloudTabTitle, getIconHeight() / 2 - width / 2 + GuiResources.FINDBUGS_ICON.getIconHeight() + y - 5, -getIconWidth() + (fontMetrics.getAscent() / 2) + 2);
-					}
-
-
-					@Override
-					public int getIconWidth() {
-						return 11;
-					}
-
-
-					@Override
-					public int getIconHeight() {
-						final int width = SwingUtilities.computeStringWidth(_jTabbedPane.getFontMetrics(_jTabbedPane.getFont()), cloudTabTitle);
-						return width + GuiResources.FINDBUGS_CLOUD_ICON.getIconHeight() + 20;
-					}
-				};
-				_jTabbedPane.addTab(null, cloudIcon, getCloudCommentsPanel(), "Comments from the FindBugs Cloud");
+				_jTabbedPane.addTab(null, new VerticalTextIcon("Comments", true, GuiResources.FINDBUGS_CLOUD_ICON), getCloudCommentsPanel(), "Comments from the FindBugs Cloud");
 				_jTabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 			}
 		}
