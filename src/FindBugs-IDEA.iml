@@ -21,13 +21,13 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.2/src/gui" />
-          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.2/src/java" />
-          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.2/src/junit" />
-          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.2/src/tools" />
-          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.2/src/antTask" />
-          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.2/src/obsolete" />
-          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.2/src/infonodeJava" />
+          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.3/findbugs-2.0.3/src/gui" />
+          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.3/findbugs-2.0.3/src/java" />
+          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.3/findbugs-2.0.3/src/junit" />
+          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.3/findbugs-2.0.3/src/tools" />
+          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.3/findbugs-2.0.3/src/antTask" />
+          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.3/findbugs-2.0.3/src/obsolete" />
+          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.3/findbugs-2.0.3/src/infonodeJava" />
         </SOURCES>
         <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
       </library>
@@ -65,6 +65,7 @@
         <entry key="CheckCalls" value="false" />
         <entry key="CheckExpectedWarnings" value="false" />
         <entry key="CheckImmutableAnnotation" value="true" />
+        <entry key="CheckRelaxingNullnessAnnotation" value="true" />
         <entry key="CheckTypeQualifiers" value="true" />
         <entry key="CloneIdiom" value="true" />
         <entry key="ComparatorIdiom" value="true" />
