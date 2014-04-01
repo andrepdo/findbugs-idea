@@ -324,7 +324,7 @@ public class FilterConfiguration implements ConfigurationPage {
 				public void actionPerformed(final ActionEvent e) {
 					final int index = _baselineList.getSelectedIndex();
 					getModel(_baselineList).remove(index);
-					_preferences.removeIncludeFilter(index);
+					_preferences.removeBaselineExcludeFilter(index);
 				}
 			});
 			buttonPanel.add(removeButton, "1, 3, 1, 3");

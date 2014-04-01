@@ -452,12 +452,13 @@ public class FindBugsPreferences extends Properties {
 
 
 	public Map<String, Boolean> getIncludeFiltersMap() {
-		if (_includeFiltersMap.isEmpty()) {
+		if (_includeFiltersMap.size() != _includeFilters.size()) {
 			for (final String includeFilter : _includeFilters) {
 				_includeFiltersMap.put(includeFilter, true);
 			}
 
 		}
+		//noinspection ReturnOfCollectionOrArrayField
 		return _includeFiltersMap;
 	}
 
@@ -469,12 +470,13 @@ public class FindBugsPreferences extends Properties {
 
 
 	public Map<String, Boolean> getExcludeFiltersMap() {
-		if (_excludeFiltersMap.isEmpty()) {
+		if (_excludeFiltersMap.size() != _excludeFilters.size()) {
 			for (final String excludeFilter : _excludeFilters) {
 				_excludeFiltersMap.put(excludeFilter, true);
 			}
 
 		}
+		//noinspection ReturnOfCollectionOrArrayField
 		return _excludeFiltersMap;
 	}
 
@@ -486,12 +488,13 @@ public class FindBugsPreferences extends Properties {
 
 
 	public Map<String, Boolean> getExcludeBaselineBugsMap() {
-		if (_excludeBaselineBugsMap.isEmpty()) {
+		if (_excludeBaselineBugsMap.size() != _excludeBaselineBugs.size()) {
 			for (final String excludeBaseLineBug : _excludeBaselineBugs) {
 				_excludeBaselineBugsMap.put(excludeBaseLineBug, true);
 			}
 
 		}
+		//noinspection ReturnOfCollectionOrArrayField
 		return _excludeBaselineBugsMap;
 	}
 
