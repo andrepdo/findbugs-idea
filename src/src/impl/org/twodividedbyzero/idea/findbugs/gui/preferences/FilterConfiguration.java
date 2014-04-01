@@ -18,7 +18,9 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
+import com.intellij.openapi.project.Project;
 import info.clearthought.layout.TableLayout;
+import info.clearthought.layout.TableLayoutConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.ExtensionFileFilter;
@@ -30,13 +32,14 @@ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.Component;
@@ -53,6 +56,7 @@ import java.io.File;
  * @version $Revision$
  * @since 0.9.9
  */
+@SuppressWarnings("AnonymousInnerClass")
 public class FilterConfiguration implements ConfigurationPage {
 
 	private final FindBugsPreferences _preferences;
@@ -73,13 +77,14 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
+	@Override
 	public Component getComponent() {
 		if (_component == null) {
 			final double border = 5;
 			final double rowsGap = 5;
 			final double colsGap = 10;
-			final double[][] size = {{border, TableLayout.FILL, border}, // Columns
-									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
+			final double[][] size = {{border, TableLayoutConstants.FILL, border}, // Columns
+									 {border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 
 			final Container mainPanel = new JPanel(tbl);
@@ -94,12 +99,14 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
+	@Override
 	public void updatePreferences() {
 		clearModels();
 		syncModels();
 	}
 
 
+	@SuppressWarnings("unchecked")
 	private void syncModels() {
 		for (final String s : _preferences.getIncludeFilters()) {
 			getModel(getIncludeList()).addElement(s);
@@ -127,8 +134,8 @@ public class FilterConfiguration implements ConfigurationPage {
 
 			final double border = 5;
 			final double colsGap = 10;
-			final double[][] size = {{border, TableLayout.FILL, colsGap, TableLayout.PREFERRED, border}, // Columns
-									 {border, TableLayout.FILL, border}};// Rows
+			final double[][] size = {{border, TableLayoutConstants.FILL, colsGap, TableLayoutConstants.PREFERRED, border}, // Columns
+									 {border, TableLayoutConstants.FILL, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_includePanel = new JPanel(tbl);
 			_includePanel.setBorder(BorderFactory.createTitledBorder("Include filter files"));
@@ -138,14 +145,15 @@ public class FilterConfiguration implements ConfigurationPage {
 			_includeList = ListFacade.createList(model);
 			_includeList.setVisibleRowCount(7);
 			_includeList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			_includeList.setCellRenderer(new ExpandPathMacroListRenderer(_parent.getProject()));
 
-			final Component scrollPane = ScrollPaneFacade.createScrollPane(_includeList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final Component scrollPane = ScrollPaneFacade.createScrollPane(_includeList, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			_includePanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 
 			final double rowsGap = 5;
-			final double[][] bPanelSize = {{border, TableLayout.PREFERRED}, // Columns
-										   {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
+			final double[][] bPanelSize = {{border, TableLayoutConstants.PREFERRED}, // Columns
+										   {border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout btbl = new TableLayout(bPanelSize);
 
 			final Container buttonPanel = new JPanel(btbl);
@@ -153,8 +161,10 @@ public class FilterConfiguration implements ConfigurationPage {
 
 			final AbstractButton addButton = new JButton();
 			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTENSIONS_SET), new BrowseActionCallback() {
+				@Override
 				public void addSelection(final File selectedFile) {
-					final String replacement = IdeaUtilImpl.replace$PROJECT_DIR$(_parent.getProject(), selectedFile.getAbsolutePath());
+					final String replacement = IdeaUtilImpl.collapsePathMacro(_parent.getProject(), selectedFile.getAbsolutePath());
+					//noinspection unchecked
 					((DefaultListModel) _includeList.getModel()).addElement(replacement);
 					_preferences.getIncludeFilters().add(replacement);
 					_preferences.setModified(true);
@@ -172,6 +182,7 @@ public class FilterConfiguration implements ConfigurationPage {
 				}
 			};
 			removeButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final int index = _includeList.getSelectedIndex();
 					getModel(_includeList).remove(index);
@@ -192,8 +203,8 @@ public class FilterConfiguration implements ConfigurationPage {
 
 			final double border = 5;
 			final double colsGap = 10;
-			final double[][] size = {{border, TableLayout.FILL, colsGap, TableLayout.PREFERRED, border}, // Columns
-									 {border, TableLayout.FILL, border}};// Rows
+			final double[][] size = {{border, TableLayoutConstants.FILL, colsGap, TableLayoutConstants.PREFERRED, border}, // Columns
+									 {border, TableLayoutConstants.FILL, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_excludePanel = new JPanel(tbl);
 			_excludePanel.setBorder(BorderFactory.createTitledBorder("Exclude filter files"));
@@ -203,14 +214,15 @@ public class FilterConfiguration implements ConfigurationPage {
 			_excludeList = ListFacade.createList(model);
 			_excludeList.setVisibleRowCount(7);
 			_excludeList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			_excludeList.setCellRenderer(new ExpandPathMacroListRenderer(_parent.getProject()));
 
-			final Component scrollPane = ScrollPaneFacade.createScrollPane(_excludeList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final Component scrollPane = ScrollPaneFacade.createScrollPane(_excludeList, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			_excludePanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 
 			final double rowsGap = 5;
-			final double[][] bPanelSize = {{border, TableLayout.PREFERRED}, // Columns
-										   {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
+			final double[][] bPanelSize = {{border, TableLayoutConstants.PREFERRED}, // Columns
+										   {border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout btbl = new TableLayout(bPanelSize);
 
 			final Container buttonPanel = new JPanel(btbl);
@@ -218,8 +230,10 @@ public class FilterConfiguration implements ConfigurationPage {
 
 			final AbstractButton addButton = new JButton();
 			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTENSIONS_SET), new BrowseActionCallback() {
+				@Override
 				public void addSelection(final File selectedFile) {
-					final String replacement = IdeaUtilImpl.replace$PROJECT_DIR$(_parent.getProject(), selectedFile.getAbsolutePath());
+					final String replacement = IdeaUtilImpl.collapsePathMacro(_parent.getProject(), selectedFile.getAbsolutePath());
+					//noinspection unchecked
 					((DefaultListModel) _excludeList.getModel()).addElement(replacement);
 					_preferences.getExcludeFilters().add(replacement);
 					_preferences.setModified(true);
@@ -237,6 +251,7 @@ public class FilterConfiguration implements ConfigurationPage {
 				}
 			};
 			removeButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final int index = _excludeList.getSelectedIndex();
 					getModel(_excludeList).remove(index);
@@ -257,8 +272,8 @@ public class FilterConfiguration implements ConfigurationPage {
 
 			final double border = 5;
 			final double colsGap = 10;
-			final double[][] size = {{border, TableLayout.FILL, colsGap, TableLayout.PREFERRED, border}, // Columns
-									 {border, TableLayout.FILL, border}};// Rows
+			final double[][] size = {{border, TableLayoutConstants.FILL, colsGap, TableLayoutConstants.PREFERRED, border}, // Columns
+									 {border, TableLayoutConstants.FILL, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_baselinePanel = new JPanel(tbl);
 			_baselinePanel.setBorder(BorderFactory.createTitledBorder("Exclude baseline bugs"));
@@ -268,14 +283,15 @@ public class FilterConfiguration implements ConfigurationPage {
 			_baselineList = ListFacade.createList(model);
 			_baselineList.setVisibleRowCount(7);
 			_baselineList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			_baselineList.setCellRenderer(new ExpandPathMacroListRenderer(_parent.getProject()));
 
-			final Component scrollPane = ScrollPaneFacade.createScrollPane(_baselineList, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			final Component scrollPane = ScrollPaneFacade.createScrollPane(_baselineList, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			_baselinePanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 
 			final double rowsGap = 5;
-			final double[][] bPanelSize = {{border, TableLayout.PREFERRED}, // Columns
-										   {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
+			final double[][] bPanelSize = {{border, TableLayoutConstants.PREFERRED}, // Columns
+										   {border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout btbl = new TableLayout(bPanelSize);
 
 			final Container buttonPanel = new JPanel(btbl);
@@ -283,8 +299,10 @@ public class FilterConfiguration implements ConfigurationPage {
 
 			final AbstractButton addButton = new JButton();
 			final Action action = new BrowseAction(_parent, "Add...", new ExtensionFileFilter(FindBugsUtil.XML_EXTENSIONS_SET), new BrowseActionCallback() {
+				@Override
 				public void addSelection(final File selectedFile) {
-					final String replacement = IdeaUtilImpl.replace$PROJECT_DIR$(_parent.getProject(), selectedFile.getAbsolutePath());
+					final String replacement = IdeaUtilImpl.collapsePathMacro(_parent.getProject(), selectedFile.getAbsolutePath());
+					//noinspection unchecked
 					((DefaultListModel) _baselineList.getModel()).addElement(replacement);
 					_preferences.getExcludeBaselineBugs().add(replacement);
 					_preferences.setModified(true);
@@ -302,6 +320,7 @@ public class FilterConfiguration implements ConfigurationPage {
 				}
 			};
 			removeButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final int index = _baselineList.getSelectedIndex();
 					getModel(_baselineList).remove(index);
@@ -317,7 +336,7 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	JList getIncludeList() {
+	JList<?> getIncludeList() {
 		if (_includeList == null) {
 			getIncludePanel();
 		}
@@ -325,7 +344,7 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	JList getExcludeList() {
+	JList<?> getExcludeList() {
 		if (_excludeList == null) {
 			getExcludePanel();
 		}
@@ -333,7 +352,7 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	JList getBaselineList() {
+	JList<?> getBaselineList() {
 		if (_baselineList == null) {
 			getBaseLinePanel();
 		}
@@ -341,11 +360,12 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	private static DefaultListModel getModel(final JList list) {
+	private static DefaultListModel getModel(final JList<?> list) {
 		return (DefaultListModel) list.getModel();
 	}
 
 
+	@Override
 	public void setEnabled(final boolean enabled) {
 		getIncludePanel().setEnabled(enabled);
 		getIncludeList().setEnabled(enabled);
@@ -357,21 +377,25 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
+	@Override
 	public boolean showInModulePreferences() {
 		return true;
 	}
 
 
+	@Override
 	public boolean isAdvancedConfig() {
 		return false;
 	}
 
 
+	@Override
 	public String getTitle() {
 		return "Filters";
 	}
 
 
+	@Override
 	public void filter(final String filter) {
 		// TODO support search
 	}
@@ -387,6 +411,7 @@ public class FilterConfiguration implements ConfigurationPage {
 		}
 
 
+		@Override
 		public void valueChanged(final ListSelectionEvent e) {
 			_removeButton.setEnabled(!e.getValueIsAdjusting() && e.getFirstIndex() >= 0);
 
@@ -403,6 +428,7 @@ public class FilterConfiguration implements ConfigurationPage {
 		}
 
 
+		@Override
 		public void valueChanged(final ListSelectionEvent e) {
 			_removeButton.setEnabled(!e.getValueIsAdjusting() && e.getFirstIndex() >= 0);
 
@@ -419,8 +445,28 @@ public class FilterConfiguration implements ConfigurationPage {
 		}
 
 
+		@Override
 		public void valueChanged(final ListSelectionEvent e) {
 			_removeButton.setEnabled(!e.getValueIsAdjusting() && e.getFirstIndex() >= 0);
+		}
+	}
+
+
+	private static class ExpandPathMacroListRenderer extends DefaultListCellRenderer {
+
+		private final Project _project;
+
+
+		public ExpandPathMacroListRenderer(final Project project) {
+			_project = project;
+		}
+
+
+		@Override
+		public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+			final Component rendererComponent = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+			setText(IdeaUtilImpl.expandPathMacro(_project, String.valueOf(value)));
+			return rendererComponent;
 		}
 	}
 }

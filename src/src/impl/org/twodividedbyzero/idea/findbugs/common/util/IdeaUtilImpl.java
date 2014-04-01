@@ -23,6 +23,8 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.compiler.CompilerPaths;
+import com.intellij.openapi.components.ComponentManager;
+import com.intellij.openapi.components.PathMacroManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -1038,24 +1040,14 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static String replace$PROJECT_DIR$(final Project project, @NotNull final String path) {
-		final StringBuilder result = new StringBuilder(20);
-		final String rootPath = getProjectRootPath(project);
-		if (path.contains(rootPath)) {
-			result.append(path.replace(rootPath, IDEA_PROJECT_DIR_VAR));
-			return result.toString();
-		} else if (path.contains(IDEA_PROJECT_DIR_VAR)) {
-			result.append(path.replace(IDEA_PROJECT_DIR_VAR, rootPath));
-			return result.toString();
-		}
-		return path;
+	public static String collapsePathMacro(final ComponentManager project, @NotNull final String path) {
+		final PathMacroManager macroManager = PathMacroManager.getInstance(project);
+		return macroManager.collapsePath(path);
 	}
 
 
-	/*public static void collapsePathMacro() {
-		PathMacroManager macroManager = PathMacroManager.getInstance(project);
-		String pathWithMacro = macroManager.collapsePath("/path/to/your/project/your/file");
-		assert pathWithMacro.equals("$PROJECT_DIR$/your/file");
-
-	}*/
+	public static String expandPathMacro(final ComponentManager project, @NotNull final String path) {
+		final PathMacroManager macroManager = PathMacroManager.getInstance(project);
+		return macroManager.expandPath(path);
+	}
 }
