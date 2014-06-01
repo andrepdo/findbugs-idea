@@ -48,6 +48,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
@@ -65,7 +66,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.List;
 
 
@@ -130,7 +130,6 @@ public class PluginConfiguration implements ConfigurationPage {
 		final Project currentProject = getCurrentFbProject();
 		JPanel pluginComponent = null;
 		for (final Plugin plugin : Plugin.getAllPlugins()) {
-			plugin.setGloballyEnabled(true);
 			final PluginComponent pluginPanel = new PluginComponent(currentProject, plugin, _preferences);
 			pluginComponent = pluginPanel.getComponent();
 			_pluginComponentPanel.add(pluginComponent);
@@ -176,14 +175,8 @@ public class PluginConfiguration implements ConfigurationPage {
 			final Action action = new BrowseAction(_parent, "Install New Plugin...", new ExtensionFileFilter(FindBugsUtil.PLUGINS_EXTENSIONS_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
 					try {
-						Plugin.loadCustomPlugin(selectedFile, getCurrentFbProject());
-						//noinspection NestedTryStatement
-						try {
-							_preferences.addPlugin(FindBugsPreferences.getPluginAsString(selectedFile));
-							showRestartHint(_parent);
-						} catch (final MalformedURLException e) {
-							Messages.showErrorDialog(e.getMessage(), e.getClass().getSimpleName());
-						}
+						final Plugin plugin = Plugin.loadCustomPlugin(selectedFile, getCurrentFbProject());
+						_preferences.addPlugin(plugin);
 						updatePreferences();
 					} catch (final Throwable e) {
 						//noinspection DialogTitleCapitalization
@@ -216,7 +209,8 @@ public class PluginConfiguration implements ConfigurationPage {
 		if (bugCollection == null) {
 			return null;
 		}
-		return bugCollection.getProject();
+		//return bugCollection.getProject(); TODO wieder rein
+		return null;
 	}
 
 
@@ -300,7 +294,7 @@ public class PluginConfiguration implements ConfigurationPage {
 					text = id;
 				}
 
-				final String pluginUrl = _plugin.getPluginLoader().getURL().toExternalForm();
+				final String pluginUrl = FindBugsPreferences.getPluginAsString(_plugin);
 				final boolean enabled = isEnabled(getCurrentFbProject(), _plugin);
 				final AbstractButton checkbox = new JCheckBox();
 				checkbox.setEnabled(enabled);
@@ -311,11 +305,23 @@ public class PluginConfiguration implements ConfigurationPage {
 				if (longText != null) {
 					checkbox.setToolTipText("<html>" + longText + "</html>");
 				}
-				checkbox.setSelected(!_preferences.isPluginDisabled(_plugin.getPluginId()));
+				checkbox.setSelected(!_preferences.isPluginDisabled(_plugin));
 				checkbox.addActionListener(new ActionListener() {
 					public void actionPerformed(final ActionEvent e) {
-						_preferences.enablePlugin(_plugin.getPluginId(), checkbox.isSelected());
-						_preferences.setModified(true);
+						if (checkbox.isSelected()) {
+							_preferences.addPlugin(_plugin);
+						} else {
+							final Object[] options = {"Disable", "Remove", "Cancel"};
+							final int answer = JOptionPane.showOptionDialog(checkbox, "Would you like to disable or remove the plugin?", "Disable or Remove", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+							if (JOptionPane.YES_OPTION == answer) {
+								_preferences.enablePlugin(_plugin, false);
+							} else if (JOptionPane.NO_OPTION == answer) {
+								_preferences.removePlugin(_plugin);
+							} else {
+								// cancel ; restore
+								checkbox.setSelected(true);
+							}
+						}
 					}
 				});
 
@@ -362,7 +368,7 @@ public class PluginConfiguration implements ConfigurationPage {
 				return false;
 			}
 			if (project == null) {
-				return plugin.isGloballyEnabled();
+				return !plugin.cannotDisable();
 			}
 			final Boolean pluginStatus = project.getPluginStatus(plugin);
 			return pluginStatus != null;

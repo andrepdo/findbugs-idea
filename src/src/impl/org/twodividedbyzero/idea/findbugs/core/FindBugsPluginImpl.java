@@ -50,6 +50,7 @@ import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.BugPattern;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.FindBugs;
+import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.ba.AnalysisException;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -363,7 +364,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 	public FindBugsPreferences getPreferences() {
 		if (_preferences == null) {
-			_preferences = getEmptyPreferences(Collections.<String>emptyList());
+			_preferences = getEmptyPreferences(Collections.<String>emptyList(), Collections.<String>emptyList());
 		}
 		//noinspection ReturnOfCollectionOrArrayField
 		return _preferences;
@@ -405,6 +406,20 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 
 	public void apply() throws ConfigurationException {
+		for (final Plugin plugin : Plugin.getAllPlugins()) {
+			if (plugin.isCorePlugin()) {
+				continue;
+			}
+			if (_preferences.isPluginInstalled(plugin)) {
+				final boolean enable = !_preferences.isPluginDisabled(plugin);
+				plugin.setGloballyEnabled(enable);
+			} else {
+				Plugin.removeCustomPlugin(plugin);
+				_preferences.enablePlugin(plugin, false);
+			}
+		}
+		_preferences.applyDetectors();
+		_configPanel.updatePreferences(); // at least DetectorConfiguration needs a reload
 		_preferences.setModified(false);
 	}
 
@@ -431,23 +446,17 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
-	private synchronized FindBugsPreferences getEmptyPreferences(final List<String> pluginList) {
+	private synchronized FindBugsPreferences getEmptyPreferences(final List<String> plugins, final List<String> disabledPlugins) {
 		if (_preferences == null) {
-			_preferences = FindBugsPreferences.createEmpty(pluginList);
+			_preferences = FindBugsPreferences.createEmpty(plugins, disabledPlugins);
 		}
 		return _preferences;
 	}
 
 
 	public void loadState(final PersistencePreferencesBean state) {
-		//_preferences.clear();
-
 		if (!state.isEmpty()) {
-			_preferences = getEmptyPreferences(state.getPlugins());
-			//_preferences.clear();
-			_preferences.setPlugins(state.getPlugins()); // needs to be set first before DetectorFactoryCollection instance is created first
-			_preferences.setEnabledPlugins(state.getEnabledPlugins());
-			_preferences.setDisabledPlugins(state.getDisabledPlugins());
+			_preferences = getEmptyPreferences(state.getPlugins(), state.getDisabledPlugins());
 
 			for (final String key : state.getBasePreferences().keySet()) {
 				_preferences.setProperty(key, state.getBasePreferences().get(key));
@@ -513,7 +522,6 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 		preferencesBean.getExcludeFilters().addAll(_preferences.getExcludeFilters());
 		preferencesBean.getExcludeBaselineBugs().addAll(_preferences.getExcludeBaselineBugs());
 		preferencesBean.getPlugins().addAll(_preferences.getPlugins());
-		preferencesBean.getEnabledPlugins().addAll(_preferences.getEnabledPlugins());
 		preferencesBean.getDisabledPlugins().addAll(_preferences.getDisabledPlugins());
 
 		preferencesBean.getEnabledModuleConfigs().addAll(_preferences.getEnabledModuleConfigs());

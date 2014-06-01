@@ -21,7 +21,9 @@ package org.twodividedbyzero.idea.findbugs.gui.preferences;
 import com.intellij.ui.JBColor;
 import edu.umd.cs.findbugs.BugPattern;
 import edu.umd.cs.findbugs.DetectorFactory;
+import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import edu.umd.cs.findbugs.I18N;
+import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import info.clearthought.layout.TableLayout;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
@@ -280,26 +282,16 @@ public class DetectorConfiguration implements ConfigurationPage {
 
 
 	private void populateAvailableRulesTable() {
-		/*final List<DetectorFactory> allAvailableList = new ArrayList<DetectorFactory>();
-		_factoriesToBugAbbrev = new HashMap<DetectorFactory, String>();
-		Iterator<DetectorFactory> iterator = DetectorFactoryCollection.instance().factoryIterator();
-		while (iterator.hasNext()) {
-			final DetectorFactory factory = iterator.next();
-
-			// Only configure non-hidden factories
-			*//*if (factory.isHidden() && !isHiddenVisible()) {
-				continue;
-			}*//*
-
-			allAvailableList.add(factory);
-			addBugsAbbreviation(factory);
-		}*/
-
+		final DetectorFactoryCollection detectorFactoryCollection = FindBugsPreferences.getDetectorFactorCollection();
 		for (final Entry<String, String> entry : _preferences.getDetectors().entrySet()) {
-			final DetectorFactory factory = FindBugsPreferences.getDetectorFactorCollection().getFactory(entry.getKey());
+			final DetectorFactory factory = detectorFactoryCollection.getFactory(entry.getKey());
 			if (factory != null) {
 				// Only configure non-hidden factories
 				if (factory.isHidden() && !getHiddenCheckBox().isSelected()) {
+					continue;
+				}
+				final Plugin plugin = factory.getPlugin();
+				if (!plugin.isCorePlugin() && !plugin.isGloballyEnabled()) {
 					continue;
 				}
 				_bugPatternModel.add(factory);
