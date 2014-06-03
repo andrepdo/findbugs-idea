@@ -25,10 +25,12 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.JBColor;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.Plugin;
+import edu.umd.cs.findbugs.PluginException;
 import edu.umd.cs.findbugs.Project;
 import info.clearthought.layout.TableLayout;
 import info.clearthought.layout.TableLayoutConstants;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.util.FindBugsPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.gui.common.CustomLineBorder;
@@ -66,6 +68,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.List;
 
 
@@ -80,6 +83,13 @@ import java.util.List;
 public class PluginConfiguration implements ConfigurationPage {
 
 	private static final Logger LOGGER = Logger.getInstance(PluginConfiguration.class.getName());
+
+	/**
+	 * False because:
+	 * - Its not yet possible to clear/eject current bug collection
+	 * - Needs some UI visualization to make clear plugins states comes from bug collection
+	 */
+	private static final boolean RESPECT_PROJECT_PLUGIN_STATE = false;
 
 	private static final Color PLUGIN_DESCRIPTION_BG_COLOR = UIManager.getColor("Tree.textBackground");
 
@@ -129,11 +139,55 @@ public class PluginConfiguration implements ConfigurationPage {
 		_pluginComponentPanel.removeAll();
 		final Project currentProject = getCurrentFbProject();
 		JPanel pluginComponent = null;
-		for (final Plugin plugin : Plugin.getAllPlugins()) {
-			final PluginComponent pluginPanel = new PluginComponent(currentProject, plugin, _preferences);
-			pluginComponent = pluginPanel.getComponent();
-			_pluginComponentPanel.add(pluginComponent);
+
+		// list core plugin
+		for (Plugin plugin : Plugin.getAllPlugins()) {
+			if (plugin.isCorePlugin()) {
+				final PluginComponent pluginPanel = new PluginComponent(currentProject, plugin, _preferences);
+				pluginComponent = pluginPanel.getComponent();
+				_pluginComponentPanel.add(pluginComponent);
+			}
 		}
+
+		// TODO show notification on error
+		// list custom plugin, load plugin temporary if necessary to get plugin infos
+		for (String pluginUrl : _preferences.getPlugins()) {
+			Plugin plugin = FindBugsPluginUtil.getPlugin(pluginUrl);
+			boolean unload = false;
+			try {
+				if (plugin == null) {
+					try {
+						final File pluginFile = FindBugsPluginUtil.getPluginAsFile(pluginUrl);
+						if (FindBugsPluginUtil.checkPlugin(pluginFile)) {
+							unload = true;
+							plugin = FindBugsPluginUtil.loadTemporary(pluginUrl);
+							if (plugin == null) {
+								LOGGER.error("Could not load plugin: " + pluginUrl);
+							}
+						} else {
+							LOGGER.warn("Plugin '" + pluginUrl + "' not loaded. Archive '" + pluginFile.getPath() + "' inaccessible or not exists.");
+						}
+					} catch (MalformedURLException e) {
+						LOGGER.error("Could not load plugin: " + pluginUrl, e);
+					} catch (PluginException e) {
+						LOGGER.error("Could not load plugin: " + pluginUrl, e);
+					}
+				}
+				if (plugin == null) {
+					continue;
+				}
+				final PluginComponent pluginPanel = new PluginComponent(currentProject, plugin, _preferences);
+				pluginComponent = pluginPanel.getComponent();
+				_pluginComponentPanel.add(pluginComponent);
+
+			} finally {
+				if (unload && plugin != null) {
+					FindBugsPluginUtil.unload(plugin);
+				}
+			}
+
+		}
+
 		if (pluginComponent != null) {
 			final JPanel scrollToThis = pluginComponent;
 			SwingUtilities.invokeLater(new Runnable() {
@@ -172,17 +226,9 @@ public class PluginConfiguration implements ConfigurationPage {
 			_pluginsPanel.add(buttonPanel, "3, 1, 3, 1");
 
 			final AbstractButton addButton = new JButton();
-			final Action action = new BrowseAction(_parent, "Install New Plugin...", new ExtensionFileFilter(FindBugsUtil.PLUGINS_EXTENSIONS_SET), new BrowseActionCallback() {
+			final Action action = new BrowseAction(_parent, "Add Plugin...", new ExtensionFileFilter(FindBugsUtil.PLUGINS_EXTENSIONS_SET), new BrowseActionCallback() {
 				public void addSelection(final File selectedFile) {
-					try {
-						final Plugin plugin = Plugin.loadCustomPlugin(selectedFile, getCurrentFbProject());
-						_preferences.addPlugin(plugin);
-						updatePreferences();
-					} catch (final Throwable e) {
-						//noinspection DialogTitleCapitalization
-						Messages.showErrorDialog(_parent, "Error loading " + selectedFile.getPath() + ":\n\n" + e.getClass().getSimpleName() + ": " + e.getMessage(), "Error loading plugin");
-					}
-					_preferences.setModified(true);
+					doAddPlugin(selectedFile);
 				}
 			});
 			addButton.setAction(action);
@@ -194,8 +240,27 @@ public class PluginConfiguration implements ConfigurationPage {
 	}
 
 
-	static void showRestartHint(final Component parent) {
-		Messages.showInfoMessage(parent, "Restart Intellij IDEA to load custom findbugs plugins.", "Intellij Needs to Be Restarted");
+	private void doAddPlugin(final File selectedFile) {
+		try {
+			final Plugin plugin = FindBugsPluginUtil.loadTemporary(selectedFile);
+			if (plugin == null) {
+				Messages.showErrorDialog(_parent, "Can not load plugin " + selectedFile.getPath(), "Plugin Loading");
+				return;
+			}
+			try {
+				final int answer = Messages.showYesNoDialog(_parent, "Add plugin '" + plugin.getPluginId() + "'?", "Add Plugin", null);
+				if (answer == Messages.YES) {
+					_preferences.addPlugin(plugin, true);
+					updatePreferences();
+					_preferences.setModified(true);
+				}
+			} finally {
+				FindBugsPluginUtil.unload(plugin);
+			}
+		} catch (final Throwable e) {
+			//noinspection DialogTitleCapitalization
+			Messages.showErrorDialog(_parent, "Error loading " + selectedFile.getPath() + ":\n\n" + e.getClass().getSimpleName() + ": " + e.getMessage(), "Error loading plugin");
+		}
 	}
 
 
@@ -209,8 +274,7 @@ public class PluginConfiguration implements ConfigurationPage {
 		if (bugCollection == null) {
 			return null;
 		}
-		//return bugCollection.getProject(); TODO wieder rein
-		return null;
+		return bugCollection.getProject();
 	}
 
 
@@ -264,114 +328,123 @@ public class PluginConfiguration implements ConfigurationPage {
 
 	private static class PluginComponent {
 
-		private final Plugin _plugin;
 		private JPanel _component;
-		private final Project _currentProject;
 		private final FindBugsPreferences _preferences;
 		private static final Border SELECTION_BORDER = BorderFactory.createLineBorder(GuiResources.HIGHLIGHT_COLOR_DARKER);
 
 
 		private PluginComponent(@Nullable final Project currentProject, final Plugin plugin, final FindBugsPreferences preferences) {
-			_plugin = plugin;
-			_currentProject = currentProject;
+			/**
+			 * Do not hold reference to currentProject nor plugin
+			 */
 			_preferences = preferences;
+			init(currentProject, plugin);
+		}
+
+
+		void init(@Nullable final Project currentProject, final Plugin plugin) {
+			final double border = 5;
+			final double[][] size = {{border, TableLayoutConstants.PREFERRED, 5, TableLayoutConstants.FILL, border}, // Columns
+									 {border, TableLayoutConstants.PREFERRED, border}};// Rows
+			final TableLayout tbl = new TableLayout(size);
+			_component = new JPanel(tbl);
+			_component.setBorder(new CustomLineBorder(JBColor.GRAY, 0, 0, 1, 0));
+			_component.setBackground(PLUGIN_DESCRIPTION_BG_COLOR);
+
+			String text = plugin.getShortDescription();
+			final String id = plugin.getPluginId();
+			if (text == null) {
+				text = id;
+			}
+
+			final String pluginUrl = FindBugsPluginUtil.getPluginAsString(plugin);
+			final boolean enabled = isEnabled(currentProject, plugin);
+			final AbstractButton checkbox = new JCheckBox();
+			checkbox.setEnabled(enabled);
+			checkbox.setBackground(PLUGIN_DESCRIPTION_BG_COLOR);
+			_component.add(checkbox,"1, 1, 1, 1, L, T");
+
+			final String longText = plugin.getDetailedDescription();
+			if (longText != null) {
+				checkbox.setToolTipText("<html>" + longText + "</html>");
+			}
+			checkbox.setSelected(isSelected(currentProject, plugin));
+			checkbox.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					if (checkbox.isSelected()) {
+						_preferences.addPlugin(plugin, true);
+					} else {
+						final Object[] options = {"Disable", "Remove", "Cancel"};
+						final int answer = JOptionPane.showOptionDialog(checkbox, "Would you like to disable or remove the plugin?", "Disable or Remove", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+						if (JOptionPane.YES_OPTION == answer) {
+							_preferences.addPlugin(plugin, false);
+						} else if (JOptionPane.NO_OPTION == answer) {
+							_preferences.removePlugin(plugin);
+						} else {
+							// cancel ; restore
+							checkbox.setSelected(true);
+						}
+					}
+				}
+			});
+
+			final JEditorPane editorPane = new PluginEditorPane();
+			editorPane.setEditable(false);
+			editorPane.setEditorKit(new HTMLEditorKit());
+			editorPane.setFocusable(false);
+			editorPane.setContentType("text/html");
+
+			final String website = plugin.getWebsite();
+			final StringBuilder html = new StringBuilder("<html><body width='300px'>");
+			html.append("<p><b>").append(text).append("</b> <font style='color:gray; font-size: 8px'>(").append(plugin.getPluginId()).append(")</font> </p>");
+			html.append("<p><font style='color: gray; font-weight: normal; font-style:italic'>");
+			html.append(pluginUrl);
+			html.append("</font>");
+			html.append(longText);
+			html.append("</p>");
+
+			if (website != null && !website.isEmpty()) {
+				html.append("<br><p>");
+				html.append("<font style='font-weight: bold; color:gray; font-size: 8px'>Website: ").append(website).append("</font>");
+				html.append("</p>");
+			}
+			html.append("</html></body>");
+
+			editorPane.setText(html.toString());
+			_component.add(editorPane, "3, 1, 3, 1");
+
+			_component.addMouseListener(new PluginComponentMouseAdapter(editorPane, checkbox));
+			editorPane.addMouseListener(new PluginComponentMouseAdapter(editorPane, checkbox));
 		}
 
 
 		JPanel getComponent() {
-			if (_component == null) {
-				final double border = 5;
-				final double[][] size = {{border, TableLayoutConstants.PREFERRED, 5, TableLayoutConstants.FILL, border}, // Columns
-										 {border, TableLayoutConstants.PREFERRED, border}};// Rows
-				final TableLayout tbl = new TableLayout(size);
-				_component = new JPanel(tbl);
-				_component.setBorder(new CustomLineBorder(JBColor.GRAY, 0, 0, 1, 0));
-				_component.setBackground(PLUGIN_DESCRIPTION_BG_COLOR);
-
-				String text = _plugin.getShortDescription();
-				final String id = _plugin.getPluginId();
-				if (text == null) {
-					text = id;
-				}
-
-				final String pluginUrl = FindBugsPreferences.getPluginAsString(_plugin);
-				final boolean enabled = isEnabled(getCurrentFbProject(), _plugin);
-				final AbstractButton checkbox = new JCheckBox();
-				checkbox.setEnabled(enabled);
-				checkbox.setBackground(PLUGIN_DESCRIPTION_BG_COLOR);
-				_component.add(checkbox,"1, 1, 1, 1, L, T");
-
-				final String longText = _plugin.getDetailedDescription();
-				if (longText != null) {
-					checkbox.setToolTipText("<html>" + longText + "</html>");
-				}
-				checkbox.setSelected(!_preferences.isPluginDisabled(_plugin));
-				checkbox.addActionListener(new ActionListener() {
-					public void actionPerformed(final ActionEvent e) {
-						if (checkbox.isSelected()) {
-							_preferences.addPlugin(_plugin);
-						} else {
-							final Object[] options = {"Disable", "Remove", "Cancel"};
-							final int answer = JOptionPane.showOptionDialog(checkbox, "Would you like to disable or remove the plugin?", "Disable or Remove", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
-							if (JOptionPane.YES_OPTION == answer) {
-								_preferences.enablePlugin(_plugin, false);
-							} else if (JOptionPane.NO_OPTION == answer) {
-								_preferences.removePlugin(_plugin);
-							} else {
-								// cancel ; restore
-								checkbox.setSelected(true);
-							}
-						}
-					}
-				});
-
-				final JEditorPane editorPane = new PluginEditorPane();
-				editorPane.setEditable(false);
-				editorPane.setEditorKit(new HTMLEditorKit());
-				editorPane.setFocusable(false);
-				editorPane.setContentType("text/html");
-
-				final String website = _plugin.getWebsite();
-				final StringBuilder html = new StringBuilder("<html><body width='300px'>");
-				html.append("<p><b>").append(text).append("</b> <font style='color:gray; font-size: 8px'>(").append(_plugin.getPluginId()).append(")</font> </p>");
-				html.append("<p><font style='color: gray; font-weight: normal; font-style:italic'>");
-				html.append(pluginUrl);
-				html.append("</font>");
-				html.append(longText);
-				html.append("</p>");
-
-				if (website != null && !website.isEmpty()) {
-					html.append("<br><p>");
-					html.append("<font style='font-weight: bold; color:gray; font-size: 8px'>Website: ").append(website).append("</font>");
-					html.append("</p>");
-				}
-				html.append("</html></body>");
-
-				editorPane.setText(html.toString());
-				_component.add(editorPane, "3, 1, 3, 1");
-
-				_component.addMouseListener(new PluginComponentMouseAdapter(editorPane, checkbox));
-				editorPane.addMouseListener(new PluginComponentMouseAdapter(editorPane, checkbox));
-			}
 			return _component;
 		}
 
 
-		@Nullable
-		private Project getCurrentFbProject() {
-			return _currentProject;
-		}
-
-
+		@SuppressWarnings({"PointlessBooleanExpression", "SimplifiableIfStatement"})
 		static boolean isEnabled(@Nullable final Project project, final Plugin plugin) {
 			if (plugin.isCorePlugin()) {
 				return false;
 			}
-			if (project == null) {
+			if (project == null || !RESPECT_PROJECT_PLUGIN_STATE) {
 				return !plugin.cannotDisable();
 			}
+			return false;
+		}
+
+
+		@SuppressWarnings("PointlessBooleanExpression")
+		boolean isSelected(@Nullable final Project project, final Plugin plugin) {
+			if (plugin.isCorePlugin()) {
+				return true;
+			}
+			if (project == null || !RESPECT_PROJECT_PLUGIN_STATE) {
+				return !_preferences.isPluginDisabled(plugin);
+			}
 			final Boolean pluginStatus = project.getPluginStatus(plugin);
-			return pluginStatus != null;
+			return pluginStatus != null && pluginStatus; // need tristate checkbox for better visual state representation
 		}
 
 

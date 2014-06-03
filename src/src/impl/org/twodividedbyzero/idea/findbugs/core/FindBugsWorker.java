@@ -150,9 +150,10 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 			_findBugsProject.setPluginStatusTrinary(plugin.getPluginId(), !preferences.isPluginDisabled(plugin.getPluginId()));
 		}
 
-		_bugCollection = new SortedBugCollection();
 		final FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(_project);
-		_bugCollection.getProject().setGuiCallback(new PluginGuiCallback(pluginComponent));
+		_findBugsProject.setGuiCallback(new PluginGuiCallback(pluginComponent));
+
+		_bugCollection = new SortedBugCollection(_findBugsProject);
 		_bugCollection.setDoNotUseCloud(true);
 
 		//CompilerManager.getInstance(_project).addCompilationStatusListener(this);

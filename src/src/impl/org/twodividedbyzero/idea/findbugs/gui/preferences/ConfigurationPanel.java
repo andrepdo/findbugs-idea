@@ -602,10 +602,8 @@ public class ConfigurationPanel extends JPanel {
 		_pluginConfig.importPreferences( getProject(), prefs, new PluginConfiguration.ImportCallback() {
 			public void validated( final PersistencePreferencesBean prefs ) {
 				_plugin.loadState( prefs );
+				_plugin.getPreferences().setModified(true);
 				updatePreferences();
-				if ( !prefs.getPlugins().isEmpty() ) {
-					PluginConfiguration.showRestartHint( ConfigurationPanel.this );
-				}
 			}
 		} );
 	}

@@ -21,10 +21,13 @@ package org.twodividedbyzero.idea.findbugs.common.util;
 
 
 import com.intellij.openapi.diagnostic.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 
 /**
@@ -62,22 +65,12 @@ public class IoUtil {
 	}
 
 
-	public static void saveClose(@Nullable final Closeable closable) {
-		safeClose(closable);
-	}
-
-
 	public static void safeClose(@Nullable final Closeable... closeables) {
 		if (closeables != null) {
 			for (final Closeable closeable : closeables) {
 				safeClose(closeable);
 			}
 		}
-	}
-
-
-	public static void saveClose(@Nullable final Closeable... closeables) {
-		safeClose(closeables);
 	}
 
 
@@ -91,8 +84,19 @@ public class IoUtil {
 	}
 
 
-	public static void saveClose(@Nullable final Iterable<Closeable> list) {
-		safeClose(list);
+	public static void copy(@NotNull InputStream in, @NotNull OutputStream out) throws IOException {
+		copy(in, out, new byte[8*1024]);
 	}
 
+
+	public static void copy(@NotNull InputStream in, @NotNull OutputStream out, @NotNull byte[] buffer) throws IOException {
+		int read;
+		while ((read = in.read(buffer)) != -1) {
+			if (read > 0) {
+				out.write(buffer, 0, read);
+			} else {
+				Thread.yield();
+			}
+		}
+	}
 }

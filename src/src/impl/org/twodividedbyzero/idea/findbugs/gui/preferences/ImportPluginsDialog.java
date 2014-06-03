@@ -8,7 +8,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+import org.twodividedbyzero.idea.findbugs.common.util.FindBugsPluginUtil;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
 
 import javax.swing.Box;
@@ -87,7 +87,7 @@ final class ImportPluginsDialog extends DialogWrapper {
 		for (final PluginPathPane plugin : _invalidPluginPanes) {
 			if (plugin.isImport()) {
 				try {
-					plugins.add(FindBugsPreferences.getPluginAsString(plugin.getPlugin()));
+					plugins.add(FindBugsPluginUtil.getPluginAsString(plugin.getPlugin()));
 				} catch (final MalformedURLException e) {
 					throw new RuntimeException(e);
 				}
@@ -143,7 +143,7 @@ final class ImportPluginsDialog extends DialogWrapper {
 			_pathTextField = new TextFieldWithBrowseButton();
 			_pathTextField.setEnabled(false);
 			try {
-				_pathTextField.setText(FindBugsPreferences.getPluginAsFile(plugin).getPath());
+				_pathTextField.setText(FindBugsPluginUtil.getPluginAsFile(plugin).getPath());
 			} catch (final MalformedURLException e) {
 				LOGGER.debug("invalid plugin=" + plugin, e);
 				_pathTextField.setText(plugin);
@@ -175,7 +175,7 @@ final class ImportPluginsDialog extends DialogWrapper {
 				final String path = getPath();
 				if (null != path) {
 					final File archive = new File(path);
-					if (!FindBugsPreferences.checkPlugin(archive)) {
+					if (!FindBugsPluginUtil.checkPlugin(archive)) {
 						return new ValidationInfo("Path is invalid", _pathTextField);
 					}
 				} else {

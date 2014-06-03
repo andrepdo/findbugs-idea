@@ -51,6 +51,7 @@ import edu.umd.cs.findbugs.BugPattern;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.FindBugs;
 import edu.umd.cs.findbugs.Plugin;
+import edu.umd.cs.findbugs.PluginException;
 import edu.umd.cs.findbugs.ba.AnalysisException;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -62,12 +63,14 @@ import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
+import org.twodividedbyzero.idea.findbugs.common.util.FindBugsPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.AnnotationType;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.ConfigurationPanel;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
+import org.twodividedbyzero.idea.findbugs.plugins.Plugins;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
@@ -75,6 +78,7 @@ import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -125,11 +129,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 			throw new IllegalStateException(FindBugsPluginConstants.PLUGIN_NAME + " could not be instantiated! PluginManager returned null!");
 		}
 		FindBugs.setHome(plugin.getPath().toURI().toString());
-
-		// todo: extract plugins to /home/findbugs-idea/... ???
-		// build fb-bundled-plugins.jar
-		//plugin.getPath()
-
+		Plugins.deploy(plugin);
 
 		_registeredMainToolbarActions = new HashSet<AnAction>();
 		_mainToolbarActions = new HashSet<AnAction>();
@@ -364,7 +364,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 	public FindBugsPreferences getPreferences() {
 		if (_preferences == null) {
-			_preferences = getEmptyPreferences(Collections.<String>emptyList(), Collections.<String>emptyList());
+			_preferences = getEmptyPreferences(Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String, String>emptyMap());
 		}
 		//noinspection ReturnOfCollectionOrArrayField
 		return _preferences;
@@ -406,18 +406,51 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 
 	public void apply() throws ConfigurationException {
+
+		// 1. unload not installed plugins
 		for (final Plugin plugin : Plugin.getAllPlugins()) {
 			if (plugin.isCorePlugin()) {
 				continue;
 			}
-			if (_preferences.isPluginInstalled(plugin)) {
-				final boolean enable = !_preferences.isPluginDisabled(plugin);
-				plugin.setGloballyEnabled(enable);
-			} else {
-				Plugin.removeCustomPlugin(plugin);
-				_preferences.enablePlugin(plugin, false);
+			if (!_preferences.isPluginInstalled(plugin)) {
+				_preferences.setDetectorEnabled(plugin, null); // cleanup, remove detector states
+				_preferences.getDisabledPlugins().remove(plugin.getPluginId()); // cleanup
+				FindBugsPluginUtil.unload(plugin);
 			}
 		}
+
+		// 2. load installed plugins if necessary and load default detector configuration if necessary
+		// TODO use FindBugsPluginUtil.check(plugin)
+		for (final String pluginUrl : _preferences.getPlugins()) {
+
+			// load plugin if necessary
+			Plugin loaded = FindBugsPluginUtil.getPlugin(pluginUrl);
+			if (loaded == null) {
+				try {
+					loaded = FindBugsPluginUtil.loadPermanently(pluginUrl);
+					if (loaded == null) {
+						LOGGER.error("Could not load custom plugin: " + pluginUrl);
+					}
+				} catch (PluginException e) {
+					LOGGER.error("Could not load custom plugin: " + pluginUrl, e);
+				} catch (MalformedURLException e) {
+					LOGGER.error("Could not load custom plugin: " + pluginUrl, e);
+				}
+			}
+			if (loaded == null) {
+				continue;
+			}
+
+			if (!_preferences.isPluginDisabled(loaded)) {
+				// load default detector configuration if necessary
+				if (!_preferences.isPluginConfigured(loaded)) {
+					_preferences.setDetectorEnabled(loaded, true);
+				}
+			} else {
+				FindBugsPluginUtil.unload(loaded);
+			}
+		}
+
 		_preferences.applyDetectors();
 		_configPanel.updatePreferences(); // at least DetectorConfiguration needs a reload
 		_preferences.setModified(false);
@@ -446,9 +479,11 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
-	private synchronized FindBugsPreferences getEmptyPreferences(final List<String> plugins, final List<String> disabledPlugins) {
+	private synchronized FindBugsPreferences getEmptyPreferences(final List<String> plugins, final List<String> disabledPlugins, final Map<String, String> detectors) {
 		if (_preferences == null) {
-			_preferences = FindBugsPreferences.createEmpty(plugins, disabledPlugins);
+			_preferences = FindBugsPreferences.createEmpty(plugins, disabledPlugins, detectors);
+		} else {
+			_preferences.loadPlugins(plugins, disabledPlugins, detectors);
 		}
 		return _preferences;
 	}
@@ -456,13 +491,14 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 	public void loadState(final PersistencePreferencesBean state) {
 		if (!state.isEmpty()) {
-			_preferences = getEmptyPreferences(state.getPlugins(), state.getDisabledPlugins());
+			final Map<String, String> detectors = state.getDetectors();
+
+			_preferences = getEmptyPreferences(state.getPlugins(), state.getDisabledPlugins(), detectors);
 
 			for (final String key : state.getBasePreferences().keySet()) {
 				_preferences.setProperty(key, state.getBasePreferences().get(key));
 			}
 
-			final Map<String, String> detectors = state.getDetectors();
 			_preferences.setDetectors(detectors);
 			for (final Entry<String, String> entry : detectors.entrySet()) {
 				final DetectorFactory detectorFactory = FindBugsPreferences.getDetectorFactorCollection().getFactory(entry.getKey());

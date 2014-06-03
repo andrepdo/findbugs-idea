@@ -26,12 +26,13 @@ import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import edu.umd.cs.findbugs.config.UserPreferences;
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.common.util.FindBugsPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.StringUtil;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.AnnotationType;
+import org.twodividedbyzero.idea.findbugs.plugins.Plugins;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -322,12 +323,8 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	private void setDetectorEnabled(final DetectorFactory detector, boolean enabled) {
-		if (enabled) {
-			getDetectors().put(detector.getShortName(), String.valueOf(enabled));
-		} else {
-			getDetectors().remove(detector.getShortName());
-		}
+	public void setDetectorEnabled(final Plugin plugin, final Boolean enabled) {
+		FindBugsPluginUtil.setDetectorEnabled(plugin, getDetectors(), enabled);
 	}
 
 
@@ -342,24 +339,44 @@ public class FindBugsPreferences extends Properties {
 			final boolean enable = enabledByUser && plugin.isGloballyEnabled();
 			getUserPreferences().enableDetector(factory, enable);
 		}
-		_detectors = getAvailableDetectors(getUserPreferences());
+
+		// DO NOT DO THIS HERE:
+		//_detectors = getAvailableDetectors(getUserPreferences());
+		// see this#loadPlugins() and FindBugsPluginImpl#apply()
 	}
 
 
-	private void loadPlugins(final List<String> plugins, final List<String> disabledPlugins) {
+	public void loadPlugins(final List<String> plugins, final List<String> disabledPlugins, final Map<String, String> detectors) {
 		_plugins.clear();
 		_plugins.addAll(plugins);
 		_disabledPlugins.clear();
 		_disabledPlugins.addAll(disabledPlugins);
 
+		// first load bundled plugins if necessary. must be first to allow
+		// overwrite plugin (f. e. same pluginId but different version).
+		// otherwise the unload will cause side effects (f. e. unregister detectors).
+		for (Plugins plugin : Plugins.values()) {
+			// TODO
+		}
+
 		// TODO: show notification on error/not found
 		for (final String pluginUrl : plugins) {
 			try {
-				final File file = getPluginAsFile(pluginUrl);
-				if (checkPlugin(file)) {
-					final Plugin plugin = Plugin.loadCustomPlugin(new URL(pluginUrl), null);
-					final boolean enable = !disabledPlugins.contains(plugin.getPluginId());
-					plugin.setGloballyEnabled(enable);
+				final File file = FindBugsPluginUtil.getPluginAsFile(pluginUrl);
+				if (FindBugsPluginUtil.checkPlugin(file)) {
+					Plugin plugin = FindBugsPluginUtil.loadTemporary(file);
+					if (null == plugin) {
+						LOGGER.warn("Could not load plugin '" + file.getPath() + "'.");
+						continue;
+					}
+					if (disabledPlugins.contains(plugin.getPluginId())) {
+						FindBugsPluginUtil.unload(plugin);
+					} else {
+						plugin = FindBugsPluginUtil.loadTemporaryPermanently(plugin);
+						if (!FindBugsPluginUtil.isPluginConfigured(plugin, detectors)) {
+							FindBugsPluginUtil.setDetectorEnabled(plugin, detectors, true);
+						}
+					}
 				} else {
 					LOGGER.warn("Plugin '" + pluginUrl + "' not loaded. Archive '" + file + "' does not exists.");
 				}
@@ -395,8 +412,8 @@ public class FindBugsPreferences extends Properties {
 		final List<String> invalid = new ArrayList<String>();
 		for (final String plugin : plugins) {
 			try {
-				final File file = getPluginAsFile(plugin);
-				if (!checkPlugin(file)) {
+				final File file = FindBugsPluginUtil.getPluginAsFile(plugin);
+				if (!FindBugsPluginUtil.checkPlugin(file)) {
 					invalid.add(plugin);
 				}
 			} catch (final MalformedURLException e) {
@@ -405,26 +422,6 @@ public class FindBugsPreferences extends Properties {
 			}
 		}
 		return invalid;
-	}
-
-
-	public static boolean checkPlugin(final File plugin) {
-		return plugin.exists() && plugin.canRead();
-	}
-
-
-	public static String getPluginAsString(final Plugin plugin) {
-		return plugin.getPluginLoader().getURL().toExternalForm();
-	}
-
-
-	public static String getPluginAsString(final File plugin) throws MalformedURLException {
-		return plugin.toURI().toURL().toExternalForm();
-	}
-
-
-	public static File getPluginAsFile(final String plugin) throws MalformedURLException {
-		return new File(new URL(plugin).getFile());
 	}
 
 
@@ -564,15 +561,18 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public void addPlugin(final Plugin plugin) {
-		_plugins.add(getPluginAsString(plugin));
-		enablePlugin(plugin, true);
+	public void addPlugin(final Plugin plugin, final boolean enabled) {
+		final String pluginUrl = FindBugsPluginUtil.getPluginAsString(plugin);
+		if (!_plugins.contains(pluginUrl)) {
+			_plugins.add(pluginUrl);
+		}
+		setPluginEnabled(plugin, enabled);
 		setModified(true);
 	}
 
 
 	public void removePlugin(final Plugin plugin) {
-		_plugins.remove(getPluginAsString(plugin));
+		_plugins.remove(FindBugsPluginUtil.getPluginAsString(plugin));
 		setModified(true);
 	}
 
@@ -664,10 +664,10 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public static FindBugsPreferences createEmpty(final List<String> plugins, final List<String> disabledPlugins) {
+	public static FindBugsPreferences createEmpty(final List<String> plugins, final List<String> disabledPlugins, final Map<String, String> detectors) {
 		final FindBugsPreferences preferences = new FindBugsPreferences();
 		preferences.clear();
-		preferences.loadPlugins(plugins, disabledPlugins);
+		preferences.loadPlugins(plugins, disabledPlugins, detectors);
 
 		final UserPreferences userPrefs = UserPreferences.createDefaultUserPreferences();
 		final ProjectFilterSettings filterSettings = userPrefs.getFilterSettings();
@@ -704,7 +704,7 @@ public class FindBugsPreferences extends Properties {
 
 
 	public static FindBugsPreferences createDefault() {
-		final FindBugsPreferences preferences = createEmpty(Collections.<String>emptyList(), Collections.<String>emptyList());
+		final FindBugsPreferences preferences = createEmpty(Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String, String>emptyMap());
 		final UserPreferences userPrefs = preferences.getUserPreferences();
 
 		final Map<String, String> detectorsAvailableList = getAvailableDetectors(userPrefs);
@@ -753,16 +753,16 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public void enablePlugin(final Plugin plugin, final boolean enabled) {
-		final String pluginId = plugin.getPluginId();
+	public void setPluginEnabled(final Plugin plugin, final boolean enabled) {
+		setPluginEnabled(plugin.getPluginId(), enabled);
+	}
+
+
+	public void setPluginEnabled(final String pluginId, final boolean enabled) {
 		if (enabled) {
 			_disabledPlugins.remove(pluginId);
 		} else {
 			_disabledPlugins.add(pluginId);
-		}
-		plugin.setGloballyEnabled(enabled);
-		for (final DetectorFactory detector : plugin.getDetectorFactories()) {
-			setDetectorEnabled(detector, enabled && detector.isDefaultEnabled());
 		}
 		setModified(true);
 	}
@@ -774,7 +774,12 @@ public class FindBugsPreferences extends Properties {
 
 
 	public boolean isPluginInstalled(final Plugin plugin) {
-		return getPlugins().contains(getPluginAsString(plugin));
+		return getPlugins().contains(FindBugsPluginUtil.getPluginAsString(plugin));
+	}
+
+
+	public boolean isPluginConfigured(final Plugin plugin) {
+		return FindBugsPluginUtil.isPluginConfigured(plugin, getDetectors());
 	}
 
 
