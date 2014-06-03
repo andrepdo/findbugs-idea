@@ -24,6 +24,7 @@ import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.PluginException;
 import edu.umd.cs.findbugs.PluginLoader;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -38,19 +39,19 @@ import java.util.Map;
  * @version $Revision: 308 $
  * @since 0.9.993
  */
-public final class FindBugsPluginUtil {
+public final class FindBugsCustomPluginUtil {
 
 
-	private FindBugsPluginUtil() {
+	private FindBugsCustomPluginUtil() {
 	}
 
 
-	public static boolean checkPlugin(@NotNull final File plugin) {
+	public static boolean check(@NotNull final File plugin) {
 		return plugin.exists() && plugin.canRead();
 	}
 
 
-	public static String getPluginAsString(@NotNull final Plugin plugin) {
+	public static String getAsString(@NotNull final Plugin plugin) {
 		return getAsURL(plugin).toExternalForm();
 	}
 
@@ -60,32 +61,32 @@ public final class FindBugsPluginUtil {
 	}
 
 
-	public static String getPluginAsString(@NotNull final File plugin) throws MalformedURLException {
-		return getPluginAsURL(plugin).toExternalForm();
+	public static String getAsString(@NotNull final File plugin) throws MalformedURLException {
+		return getAsURL(plugin).toExternalForm();
 	}
 
 
-	public static URL getPluginAsURL(@NotNull final File plugin) throws MalformedURLException {
+	private static URL getAsURL(@NotNull final File plugin) throws MalformedURLException {
 		return plugin.toURI().toURL();
 	}
 
 
-	public static File getPluginAsFile(@NotNull final String pluginUrl) throws MalformedURLException {
+	public static File getAsFile(@NotNull final String pluginUrl) throws MalformedURLException {
 		return new File(new URL(pluginUrl).getFile());
 	}
 
 
-	public static Plugin loadTemporary(final File file) throws MalformedURLException, PluginException {
-		return loadTemporary(getPluginAsURL(file));
+	public static Plugin loadTemporary(@NotNull final File file) throws MalformedURLException, PluginException {
+		return loadTemporary(getAsURL(file));
 	}
 
 
-	public static Plugin loadTemporary(final String plugin) throws MalformedURLException, PluginException {
+	public static Plugin loadTemporary(@NotNull final String plugin) throws MalformedURLException, PluginException {
 		return loadTemporary(new URL(plugin));
 	}
 
 
-	private static Plugin loadTemporary(URL plugin) throws MalformedURLException, PluginException {
+	private static Plugin loadTemporary(@NotNull URL plugin) throws MalformedURLException, PluginException {
 		final PluginLoader pluginLoader = PluginLoader.getPluginLoader(plugin, PluginLoader.class.getClassLoader(), false, true);
 		final Plugin ret = pluginLoader.loadPlugin();
 		if (ret != null) {
@@ -95,12 +96,12 @@ public final class FindBugsPluginUtil {
 	}
 
 
-	public static Plugin loadPermanently(final String pluginUrl) throws MalformedURLException, PluginException {
+	public static Plugin loadPermanently(@NotNull final String pluginUrl) throws MalformedURLException, PluginException {
 		return loadPermanently(new URL(pluginUrl));
 	}
 
 
-	public static Plugin loadPermanently(final URL plugin) throws PluginException {
+	public static Plugin loadPermanently(@NotNull final URL plugin) throws PluginException {
 		final Plugin ret = Plugin.loadCustomPlugin(plugin, null);
 		if (ret != null) {
 			ret.setGloballyEnabled(true);
@@ -109,12 +110,12 @@ public final class FindBugsPluginUtil {
 	}
 
 
-	public static void unload(final Plugin plugin) {
+	public static void unload(@NotNull final Plugin plugin) {
 		Plugin.removeCustomPlugin(plugin);
 	}
 
 
-	public static Plugin loadTemporaryPermanently(final Plugin plugin) throws PluginException {
+	public static Plugin loadTemporaryPermanently(@NotNull final Plugin plugin) throws PluginException {
 		// since DetectorFactoryCollection.instance().loadPlugin() is package protected we need to unload an load
 		final URL url = getAsURL(plugin);
 		unload(plugin);
@@ -122,9 +123,9 @@ public final class FindBugsPluginUtil {
 	}
 
 
-	public static Plugin getPlugin(final String pluginUrl) {
+	public static Plugin getPlugin(@NotNull final String pluginUrl) {
 		for (Plugin loaded : Plugin.getAllPlugins()) {
-			if (pluginUrl.equals(getPluginAsString(loaded))) {
+			if (pluginUrl.equals(getAsString(loaded))) {
 				return loaded;
 			}
 		}
@@ -132,7 +133,7 @@ public final class FindBugsPluginUtil {
 	}
 
 
-	private static void setDetectorEnabled(final Map<String, String> detectors, final DetectorFactory detector, final Boolean enabled) {
+	private static void setDetectorEnabled(@NotNull final Map<String, String> detectors, @NotNull final DetectorFactory detector, @Nullable final Boolean enabled) {
 		if (enabled == null) {
 			detectors.remove(detector.getShortName());
 		} else {
@@ -141,7 +142,7 @@ public final class FindBugsPluginUtil {
 	}
 
 
-	public static void setDetectorEnabled(final Plugin plugin, final Map<String, String> detectors, final Boolean enabled) {
+	public static void setDetectorEnabled(@NotNull final Plugin plugin, @NotNull final Map<String, String> detectors, @Nullable final Boolean enabled) {
 		for (final DetectorFactory detector : plugin.getDetectorFactories()) {
 			if (enabled != null && enabled) {
 				setDetectorEnabled(detectors, detector, detector.isDefaultEnabled());
@@ -152,12 +153,12 @@ public final class FindBugsPluginUtil {
 	}
 
 
-	public static boolean isDetectorConfigured(final Map<String, String> detectors, final DetectorFactory detector) {
+	public static boolean isDetectorConfigured(@NotNull final Map<String, String> detectors, @NotNull final DetectorFactory detector) {
 		return null != detectors.get(detector.getShortName());
 	}
 
 
-	public static boolean isPluginConfigured(final Plugin plugin, final Map<String, String> detectors) {
+	public static boolean isConfigured(@NotNull final Plugin plugin, @NotNull final Map<String, String> detectors) {
 		for (final DetectorFactory detector : plugin.getDetectorFactories()) {
 			if (isDetectorConfigured(detectors, detector)) {
 				return true;

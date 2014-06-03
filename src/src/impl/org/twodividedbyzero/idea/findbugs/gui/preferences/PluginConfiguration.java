@@ -30,7 +30,7 @@ import edu.umd.cs.findbugs.Project;
 import info.clearthought.layout.TableLayout;
 import info.clearthought.layout.TableLayoutConstants;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.util.FindBugsPluginUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.gui.common.CustomLineBorder;
@@ -152,15 +152,15 @@ public class PluginConfiguration implements ConfigurationPage {
 		// TODO show notification on error
 		// list custom plugin, load plugin temporary if necessary to get plugin infos
 		for (String pluginUrl : _preferences.getPlugins()) {
-			Plugin plugin = FindBugsPluginUtil.getPlugin(pluginUrl);
+			Plugin plugin = FindBugsCustomPluginUtil.getPlugin(pluginUrl);
 			boolean unload = false;
 			try {
 				if (plugin == null) {
 					try {
-						final File pluginFile = FindBugsPluginUtil.getPluginAsFile(pluginUrl);
-						if (FindBugsPluginUtil.checkPlugin(pluginFile)) {
+						final File pluginFile = FindBugsCustomPluginUtil.getAsFile(pluginUrl);
+						if (FindBugsCustomPluginUtil.check(pluginFile)) {
 							unload = true;
-							plugin = FindBugsPluginUtil.loadTemporary(pluginUrl);
+							plugin = FindBugsCustomPluginUtil.loadTemporary(pluginUrl);
 							if (plugin == null) {
 								LOGGER.error("Could not load plugin: " + pluginUrl);
 							}
@@ -182,7 +182,7 @@ public class PluginConfiguration implements ConfigurationPage {
 
 			} finally {
 				if (unload && plugin != null) {
-					FindBugsPluginUtil.unload(plugin);
+					FindBugsCustomPluginUtil.unload(plugin);
 				}
 			}
 
@@ -242,7 +242,7 @@ public class PluginConfiguration implements ConfigurationPage {
 
 	private void doAddPlugin(final File selectedFile) {
 		try {
-			final Plugin plugin = FindBugsPluginUtil.loadTemporary(selectedFile);
+			final Plugin plugin = FindBugsCustomPluginUtil.loadTemporary(selectedFile);
 			if (plugin == null) {
 				Messages.showErrorDialog(_parent, "Can not load plugin " + selectedFile.getPath(), "Plugin Loading");
 				return;
@@ -255,7 +255,7 @@ public class PluginConfiguration implements ConfigurationPage {
 					_preferences.setModified(true);
 				}
 			} finally {
-				FindBugsPluginUtil.unload(plugin);
+				FindBugsCustomPluginUtil.unload(plugin);
 			}
 		} catch (final Throwable e) {
 			//noinspection DialogTitleCapitalization
@@ -357,7 +357,7 @@ public class PluginConfiguration implements ConfigurationPage {
 				text = id;
 			}
 
-			final String pluginUrl = FindBugsPluginUtil.getPluginAsString(plugin);
+			final String pluginUrl = FindBugsCustomPluginUtil.getAsString(plugin);
 			final boolean enabled = isEnabled(currentProject, plugin);
 			final AbstractButton checkbox = new JCheckBox();
 			checkbox.setEnabled(enabled);

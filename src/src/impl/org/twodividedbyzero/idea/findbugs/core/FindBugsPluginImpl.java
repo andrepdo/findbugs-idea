@@ -63,7 +63,7 @@ import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
-import org.twodividedbyzero.idea.findbugs.common.util.FindBugsPluginUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
@@ -415,19 +415,19 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 			if (!_preferences.isPluginInstalled(plugin)) {
 				_preferences.setDetectorEnabled(plugin, null); // cleanup, remove detector states
 				_preferences.getDisabledPlugins().remove(plugin.getPluginId()); // cleanup
-				FindBugsPluginUtil.unload(plugin);
+				FindBugsCustomPluginUtil.unload(plugin);
 			}
 		}
 
 		// 2. load installed plugins if necessary and load default detector configuration if necessary
-		// TODO use FindBugsPluginUtil.check(plugin)
+		// TODO use FindBugsCustomPluginUtil.check(plugin)
 		for (final String pluginUrl : _preferences.getPlugins()) {
 
 			// load plugin if necessary
-			Plugin loaded = FindBugsPluginUtil.getPlugin(pluginUrl);
+			Plugin loaded = FindBugsCustomPluginUtil.getPlugin(pluginUrl);
 			if (loaded == null) {
 				try {
-					loaded = FindBugsPluginUtil.loadPermanently(pluginUrl);
+					loaded = FindBugsCustomPluginUtil.loadPermanently(pluginUrl);
 					if (loaded == null) {
 						LOGGER.error("Could not load custom plugin: " + pluginUrl);
 					}
@@ -447,7 +447,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 					_preferences.setDetectorEnabled(loaded, true);
 				}
 			} else {
-				FindBugsPluginUtil.unload(loaded);
+				FindBugsCustomPluginUtil.unload(loaded);
 			}
 		}
 
