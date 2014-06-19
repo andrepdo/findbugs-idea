@@ -58,7 +58,7 @@ public final class BrowseAction extends AbstractAction {
 	private final transient BrowseActionCallback _callback;
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"})
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"})
 	public BrowseAction(final ConfigurationPanel parent, final String name, final FileFilter fileFilter, final BrowseActionCallback callback) {
 
 		_callback = callback;
@@ -66,7 +66,7 @@ public final class BrowseAction extends AbstractAction {
 		_parent = parent;
 		final Project project = _parent.getProject();
 		//noinspection AssignmentToStaticFieldFromInstanceMethod
-		_lastDir = IdeaUtilImpl.getProjectRootPath(project);
+		_lastDir = IdeaUtilImpl.getFirstProjectRootPath(project);
 
 		putValue(Action.NAME, name);
 		putValue(Action.SHORT_DESCRIPTION, name);
@@ -74,21 +74,25 @@ public final class BrowseAction extends AbstractAction {
 	}
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"})
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"})
 	public void actionPerformed(final ActionEvent e) {
-    final FileChooserDescriptor descriptor = new FilterFileChooserDescriptor(
-        (String)getValue(Action.NAME),
-        (String)getValue(Action.SHORT_DESCRIPTION),
-        _fileFilter);
+		final FileChooserDescriptor descriptor = new FilterFileChooserDescriptor(
+			(String)getValue(Action.NAME),
+			(String)getValue(Action.SHORT_DESCRIPTION),
+			_fileFilter);
 
-    final VirtualFile toSelect = LocalFileSystem.getInstance().findFileByPath(_lastDir);
-    final VirtualFile chosen = FileChooser.chooseFile(descriptor, _parent, _parent.getProject(), toSelect);
-    if (chosen != null) {
-      final File selectedFile = VfsUtilCore.virtualToIoFile(chosen);
-      //noinspection AssignmentToStaticFieldFromInstanceMethod
-      _lastDir = selectedFile.getPath();
-      _callback.addSelection(selectedFile);
-    }
+		VirtualFile toSelect = null;
+		if (_lastDir != null) {
+			toSelect = LocalFileSystem.getInstance().findFileByPath(_lastDir);
+		}
+
+		final VirtualFile chosen = FileChooser.chooseFile(descriptor, _parent, _parent.getProject(), toSelect);
+		if (chosen != null) {
+		  final File selectedFile = VfsUtilCore.virtualToIoFile(chosen);
+		  //noinspection AssignmentToStaticFieldFromInstanceMethod
+		  _lastDir = selectedFile.getPath();
+		  _callback.addSelection(selectedFile);
+		}
 	}
 
 

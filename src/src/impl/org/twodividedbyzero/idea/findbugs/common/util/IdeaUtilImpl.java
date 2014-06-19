@@ -1033,9 +1033,13 @@ public final class IdeaUtilImpl {
 	}
 
 
-	public static String getProjectRootPath(final Project project) {
+	@Nullable
+	public static String getFirstProjectRootPath(final Project project) {
 		final ProjectRootManager projectManager = ProjectRootManager.getInstance(project);
 		final VirtualFile rootFiles[] = projectManager.getContentRoots();
+		if (rootFiles.length == 0) {
+			return null;
+		}
 		return rootFiles[0].getPath();
 	}
 
