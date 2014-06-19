@@ -78,7 +78,7 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 	public ModuleComponentImpl(final Project project, final Module module) {
 		_project = project;
 		_module = module;
-		_preferences = FindBugsPreferences.createDefault();
+		_preferences = FindBugsPreferences.createDefault(false);
 	}
 
 

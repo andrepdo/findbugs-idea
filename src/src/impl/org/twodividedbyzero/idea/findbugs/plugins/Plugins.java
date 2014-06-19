@@ -20,6 +20,7 @@
 package org.twodividedbyzero.idea.findbugs.plugins;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.IoUtil;
 
 import java.io.File;
@@ -29,7 +30,7 @@ import java.io.InputStream;
 
 
 /**
- * $Date: 2013-06-01 23:40:00 +0100 (So, 01 June 2014) $
+ * $Date: 2014-06-01 23:40:00 +0100 (So, 01 June 2014) $
  *
  * @author Reto Merz<reto.merz@gmail.com>
  * @version $Revision: 308 $
@@ -47,13 +48,19 @@ public enum Plugins {
 	}
 
 
-	public static void deploy(final IdeaPluginDescriptor plugin) {
+	public static File getDirectory(@NotNull final IdeaPluginDescriptor plugin) {
 		final File dir = new File(plugin.getPath(), "customPlugins");
 		if (!dir.isDirectory()) {
 			if (!dir.mkdirs()) {
 				throw new IllegalStateException("Could not create plugins directory: " + dir.getPath());
 			}
 		}
+		return dir;
+	}
+
+
+	public static void deploy(final IdeaPluginDescriptor plugin) {
+		final File dir = getDirectory(plugin);
 		for (Plugins customPlugin : values()) {
 			final File jar = new File(dir, customPlugin._jarName);
 			if (!jar.isFile()) {

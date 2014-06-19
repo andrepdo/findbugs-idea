@@ -20,9 +20,12 @@
 package org.twodividedbyzero.idea.findbugs.preferences;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -45,10 +48,12 @@ public class PersistencePreferencesBean {
 	public List<String> _excludeBaselineBugs;
 
 	/**
-	 * URL's, use {@link FindBugsPreferences#getPluginAsFile(String)} and {@link FindBugsPreferences#getPluginAsString(java.io.File)}.
+	 * URL's, use {@link org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil#getAsFile(String)} etc.
 	 */
 	public List<String> _plugins;
-	public List<String> _disabledPlugins;
+	public Set<String> _enabledUserPluginIds;
+	public Set<String> _disabledUserPluginIds;
+	public Set<String> _disabledBundledPluginIds;
 
 	public List<String> _enabledModuleConfigs;
 
@@ -68,7 +73,9 @@ public class PersistencePreferencesBean {
 		_excludeFilters = new ArrayList<String>();
 		_excludeBaselineBugs = new ArrayList<String>();
 		_plugins = new ArrayList<String>();
-		_disabledPlugins = new ArrayList<String>();
+		_enabledUserPluginIds = new HashSet<String>();
+		_disabledUserPluginIds = new HashSet<String>();
+		_disabledBundledPluginIds = new HashSet<String>();
 
 		_enabledModuleConfigs = new ArrayList<String>();
 
@@ -121,8 +128,18 @@ public class PersistencePreferencesBean {
 	}
 
 
-	public List<String> getDisabledPlugins() {
-		return _disabledPlugins;
+	public Collection<String> getEnabledUserPluginIds() {
+		return _enabledUserPluginIds;
+	}
+
+
+	public Collection<String> getDisabledUserPluginIds() {
+		return _disabledUserPluginIds;
+	}
+
+
+	public Collection<String> getDisabledBundledPluginIds() {
+		return _disabledBundledPluginIds;
 	}
 
 

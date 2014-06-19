@@ -529,7 +529,7 @@ public class ConfigurationPanel extends JPanel {
 
 	private void restoreDefaultPreferences() {
 		final FindBugsPreferences bugsPreferences = getPreferences();
-		bugsPreferences.setDefaults(FindBugsPreferences.createDefault());
+		bugsPreferences.setDefaults(FindBugsPreferences.createDefault(true));
 		updatePreferences();
 		bugsPreferences.setModified(true);
 	}
@@ -553,7 +553,7 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON", "REC_CATCH_EXCEPTION"})
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON", "REC_CATCH_EXCEPTION"})
 	private void importPreferences() {
 		@SuppressWarnings("AnonymousInnerClassMayBeStatic")
 		final FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, true, false, true, false) {

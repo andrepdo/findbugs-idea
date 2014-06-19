@@ -147,7 +147,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 		_findBugsProject = new FindBugsProject();
 		_findBugsProject.setProjectName(_project.getName());
 		for (final Plugin plugin : Plugin.getAllPlugins()) {
-			_findBugsProject.setPluginStatusTrinary(plugin.getPluginId(), !preferences.isPluginDisabled(plugin.getPluginId()));
+			_findBugsProject.setPluginStatusTrinary(plugin.getPluginId(), !preferences.isPluginDisabledXX(plugin.getPluginId()));
 		}
 
 		final FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(_project);

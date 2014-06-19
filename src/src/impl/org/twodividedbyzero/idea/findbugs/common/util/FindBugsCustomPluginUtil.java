@@ -33,7 +33,7 @@ import java.util.Map;
 
 
 /**
- * $Date: 2013-06-02 00:44:00 +0100 (Mo, 02 June 2014) $
+ * $Date: 2014-06-02 00:44:00 +0100 (Mo, 02 June 2014) $
  *
  * @author Reto Merz<reto.merz@gmail.com>
  * @version $Revision: 308 $
@@ -96,11 +96,13 @@ public final class FindBugsCustomPluginUtil {
 	}
 
 
+	@Nullable
 	public static Plugin loadPermanently(@NotNull final String pluginUrl) throws MalformedURLException, PluginException {
 		return loadPermanently(new URL(pluginUrl));
 	}
 
 
+	@Nullable
 	public static Plugin loadPermanently(@NotNull final URL plugin) throws PluginException {
 		final Plugin ret = Plugin.loadCustomPlugin(plugin, null);
 		if (ret != null) {
@@ -115,11 +117,23 @@ public final class FindBugsCustomPluginUtil {
 	}
 
 
-	public static Plugin loadTemporaryPermanently(@NotNull final Plugin plugin) throws PluginException {
+	@NotNull
+	public static Plugin loadTemporaryPermanently(Plugin plugin) throws PluginException {
 		// since DetectorFactoryCollection.instance().loadPlugin() is package protected we need to unload an load
 		final URL url = getAsURL(plugin);
 		unload(plugin);
-		return loadPermanently(url);
+		plugin = loadPermanently(url);
+		if (plugin == null) {
+			throw new IllegalStateException("Could not load custom findbugs plugin permanently: " + url);
+		}
+		return plugin;
+	}
+
+
+	public static void loadDefaultConfigurationIfNecessary(@NotNull final Plugin plugin, @NotNull final Map<String, String> detectors) {
+		if (!isConfigured(plugin, detectors)) {
+			setDetectorEnabled(plugin, detectors, true);
+		}
 	}
 
 
