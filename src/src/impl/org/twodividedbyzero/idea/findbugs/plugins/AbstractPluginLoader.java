@@ -19,6 +19,7 @@
 
 package org.twodividedbyzero.idea.findbugs.plugins;
 
+import com.intellij.openapi.diagnostic.Logger;
 import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.PluginException;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginUtil;
@@ -39,6 +40,8 @@ import java.util.Set;
  * @since 0.9.993
  */
 public abstract class AbstractPluginLoader {
+
+	private static final Logger LOGGER = Logger.getInstance(AbstractPluginLoader.class.getName());
 
 
 	protected AbstractPluginLoader() {
@@ -62,7 +65,9 @@ public abstract class AbstractPluginLoader {
 		final Set<String> enabledBundledPluginUrls = new HashSet<String>();
 		if (bundledPlugins != null) {
 			for (final File pluginFile : bundledPlugins) {
-				// TODO: skip non-jars
+				if (!pluginFile.getName().endsWith(".jar")) {
+					continue;
+				}
 				try {
 					if (FindBugsCustomPluginUtil.check(pluginFile)) {
 						Plugin plugin = FindBugsCustomPluginUtil.loadTemporary(pluginFile);
@@ -153,11 +158,11 @@ public abstract class AbstractPluginLoader {
 
 
 	protected void handleError(final String message) {
-		// TODO CUSTOM_PLUGIN: impl a default
+		LOGGER.error(message);
 	}
 
 
 	protected void handleError(final String message, final Exception exception) {
-		// TODO CUSTOM_PLUGIN: impl a default
+		LOGGER.error(message, exception);
 	}
 }

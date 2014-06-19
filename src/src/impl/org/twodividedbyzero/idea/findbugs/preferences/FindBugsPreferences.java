@@ -788,8 +788,7 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	// TODO CUSTOM_PLUGIN: rename -XX
-	public boolean isPluginDisabledXX(final String pluginId) {
+	public boolean isPluginDisabled(final String pluginId) {
 		return isUserPluginDisabled(pluginId) || isBundledPluginDisabled(pluginId);
 	}
 

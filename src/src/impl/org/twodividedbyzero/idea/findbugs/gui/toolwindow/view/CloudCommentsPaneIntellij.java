@@ -133,7 +133,7 @@ public class CloudCommentsPaneIntellij extends CloudCommentsPane {
 	protected boolean isDisabled(final CloudPlugin plugin) {
 		final FindBugsPlugin findBugsPlugin = _toolWindowPanel.getProject().getComponent(FindBugsPlugin.class);
 		final FindBugsPreferences prefs = findBugsPlugin.getPreferences();
-		return prefs.isPluginDisabledXX(plugin.getFindbugsPluginId());
+		return prefs.isPluginDisabled(plugin.getFindbugsPluginId());
 	}
 
 

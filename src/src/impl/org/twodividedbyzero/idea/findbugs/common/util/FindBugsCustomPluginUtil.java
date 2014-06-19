@@ -86,7 +86,7 @@ public final class FindBugsCustomPluginUtil {
 	}
 
 
-	private static Plugin loadTemporary(@NotNull URL plugin) throws MalformedURLException, PluginException {
+	private static Plugin loadTemporary(@NotNull final URL plugin) throws MalformedURLException, PluginException {
 		final PluginLoader pluginLoader = PluginLoader.getPluginLoader(plugin, PluginLoader.class.getClassLoader(), false, true);
 		final Plugin ret = pluginLoader.loadPlugin();
 		if (ret != null) {
@@ -117,33 +117,10 @@ public final class FindBugsCustomPluginUtil {
 	}
 
 
-	@NotNull
-	public static Plugin loadTemporaryPermanently(Plugin plugin) throws PluginException {
-		// since DetectorFactoryCollection.instance().loadPlugin() is package protected we need to unload an load
-		final URL url = getAsURL(plugin);
-		unload(plugin);
-		plugin = loadPermanently(url);
-		if (plugin == null) {
-			throw new IllegalStateException("Could not load custom findbugs plugin permanently: " + url);
-		}
-		return plugin;
-	}
-
-
 	public static void loadDefaultConfigurationIfNecessary(@NotNull final Plugin plugin, @NotNull final Map<String, String> detectors) {
 		if (!isConfigured(plugin, detectors)) {
 			setDetectorEnabled(plugin, detectors, true);
 		}
-	}
-
-
-	public static Plugin getPlugin(@NotNull final String pluginUrl) {
-		for (Plugin loaded : Plugin.getAllPlugins()) {
-			if (pluginUrl.equals(getAsString(loaded))) {
-				return loaded;
-			}
-		}
-		return null;
 	}
 
 

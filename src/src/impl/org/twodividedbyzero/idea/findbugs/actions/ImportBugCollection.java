@@ -159,7 +159,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 					importProject.setGuiCallback(new PluginGuiCallback(pluginComponent));
 					_importBugCollection.setDoNotUseCloud(true);
 					for (final Plugin plugin : Plugin.getAllPlugins()) {
-						importProject.setPluginStatusTrinary(plugin.getPluginId(), !preferences.isPluginDisabledXX(plugin.getPluginId()));
+						importProject.setPluginStatusTrinary(plugin.getPluginId(), !preferences.isPluginDisabled(plugin.getPluginId()));
 					}
 					_importBugCollection.readXML(fileToImport);
 
