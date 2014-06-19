@@ -292,7 +292,7 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer/*, 
 
 
 	/** Paints the value.  The background is filled based on selected color. */
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
 			value = "BC_UNCONFIRMED_CAST",
 			justification = "")
 	@Override

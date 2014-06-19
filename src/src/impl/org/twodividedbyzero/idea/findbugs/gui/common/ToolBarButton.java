@@ -244,7 +244,7 @@ public class ToolBarButton extends ToggleableButton {
 		}
 
 
-		@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+		@edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
 				value = "BC_UNCONFIRMED_CAST",
 				justification = "")
 		@SuppressWarnings({"AssignmentToMethodParameter"})

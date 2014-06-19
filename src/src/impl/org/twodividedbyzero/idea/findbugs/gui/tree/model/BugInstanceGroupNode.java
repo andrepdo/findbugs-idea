@@ -394,7 +394,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 		private static final long serialVersionUID = 0L;
 
 
-		@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+		@edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
 				value = "BC_UNCONFIRMED_CAST",
 				justification = "")
 		public int compare(final TreeNode a, final TreeNode b) {

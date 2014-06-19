@@ -129,7 +129,7 @@ public class PluginConfiguration implements ConfigurationPage {
 	}
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON"})
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON"})
 	@SuppressWarnings({"ObjectAllocationInLoop"})
 	private void rebuildPluginComponents() {
 		if (_pluginComponentPanel == null) {

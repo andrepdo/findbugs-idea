@@ -54,7 +54,7 @@ public final class LookUp {
 	}
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@NotNull
 	public static <T> T getNotNull(@NotNull final Class<T> type) throws IllegalStateException {
 		final T result = get(type);

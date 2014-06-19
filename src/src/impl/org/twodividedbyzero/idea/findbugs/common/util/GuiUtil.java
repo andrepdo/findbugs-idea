@@ -95,7 +95,7 @@ public final class GuiUtil {
 	}
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"DB_DUPLICATE_SWITCH_CLAUSES"})
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"DB_DUPLICATE_SWITCH_CLAUSES"})
 	@Nullable
 	public static Icon getIcon(final ExtendedProblemDescriptor problemDescriptor) {
 		final BugInstance bugInstance = problemDescriptor.getBugInstance();
@@ -125,7 +125,7 @@ public final class GuiUtil {
 
 
 	@SuppressWarnings("HardcodedFileSeparator")
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"DB_DUPLICATE_SWITCH_CLAUSES"})
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"DB_DUPLICATE_SWITCH_CLAUSES"})
 	@Nullable
 	public static Icon getTinyIcon(final ExtendedProblemDescriptor problemDescriptor) {
 		final BugInstance bugInstance = problemDescriptor.getBugInstance();
@@ -155,7 +155,7 @@ public final class GuiUtil {
 
 
 	@SuppressWarnings("HardcodedFileSeparator")
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"DB_DUPLICATE_SWITCH_CLAUSES"})
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"DB_DUPLICATE_SWITCH_CLAUSES"})
 	@Nullable
 	public static Icon getCombinedIcon(final ExtendedProblemDescriptor problemDescriptor) {
 		final BugInstance bugInstance = problemDescriptor.getBugInstance();

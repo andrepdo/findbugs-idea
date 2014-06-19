@@ -177,7 +177,7 @@ public abstract class AbstractBar extends JToolBar {
 	}
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"BC_UNCONFIRMED_CAST_OF_RETURN_VALUE"})
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"BC_UNCONFIRMED_CAST_OF_RETURN_VALUE"})
 	public void addAllComponents() {
 		for (final Entry<String, Action> action : getAllActionComponents().entrySet()) {
 			if (action.getValue() instanceof Component) {

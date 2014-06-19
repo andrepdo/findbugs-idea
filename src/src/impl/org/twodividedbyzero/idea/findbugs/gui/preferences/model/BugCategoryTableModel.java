@@ -32,7 +32,7 @@ import java.util.List;
  * @version $Revision$
  * @since 0.9.90-dev
  */
-@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
 public class BugCategoryTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 0L;

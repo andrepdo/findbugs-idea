@@ -87,7 +87,7 @@ import java.util.regex.PatternSyntaxException;
  * @since 0.9.29-dev
  */
 @SuppressWarnings({"HardCodedStringLiteral", "MagicCharacter", "AnonymousInnerClass", "AnonymousInnerClass"})
-@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_BAD_FIELD_INNER_CLASS"})
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SE_BAD_FIELD_INNER_CLASS"})
 public abstract class QuickSearch<E> {
 
 	private static final Logger LOGGER = Logger.getInstance(QuickSearch.class.getName());

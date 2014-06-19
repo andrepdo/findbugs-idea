@@ -68,7 +68,7 @@ import java.util.Map;
  * @since 0.9.97
  */
 @SuppressWarnings({"HardcodedFileSeparator"})
-@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED", "SE_BAD_FIELD", "SIC_INNER_SHOULD_BE_STATIC_ANON"})
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED", "SE_BAD_FIELD", "SIC_INNER_SHOULD_BE_STATIC_ANON"})
 public class AnnotationConfiguration implements ConfigurationPage {
 
 	private AnnotationTypePanel _annotationTypePanel;

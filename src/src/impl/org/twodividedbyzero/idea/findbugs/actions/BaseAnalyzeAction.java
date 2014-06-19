@@ -137,10 +137,10 @@ public abstract class BaseAnalyzeAction extends BaseAction {
 	}
 
 
-	protected abstract void analyze(@NotNull Project project, AnalysisScope scope);
+	protected abstract void analyze(@NotNull final Project project, final AnalysisScope scope);
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON"})
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON"})
 	protected final Iterable<String> findClasses(@NotNull final Project project, final AnalysisScope scope) {
 		final Collection<String> ret = new ArrayList<String>(256);
 		final PsiManager psiManager = PsiManager.getInstance(project);

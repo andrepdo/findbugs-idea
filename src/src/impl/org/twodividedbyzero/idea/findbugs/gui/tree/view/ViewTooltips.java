@@ -73,7 +73,7 @@ import java.beans.PropertyChangeListener;
  * @author Tim Boudreau
  * @author Andre Pfeiler - made some tiny modification on positioning the buffered image rect
  */
-@edu.umd.cs.findbugs.annotations.SuppressWarnings({"RI_REDUNDANT_INTERFACES"})
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"RI_REDUNDANT_INTERFACES"})
 @SuppressWarnings({"AssignmentToNull", "RedundantInterfaceDeclaration"})
 public final class ViewTooltips extends MouseAdapter implements MouseMotionListener {
 
@@ -89,7 +89,7 @@ public final class ViewTooltips extends MouseAdapter implements MouseMotionListe
 	private final Popup[] popups = new Popup[2];
 	/** A component we'll reuse to paint into the popups */
 
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
 			value = "SE_TRANSIENT_FIELD_NOT_RESTORED",
 			justification = "because I know better")
 	private final ImgComp painter = new ImgComp();
@@ -613,7 +613,7 @@ public final class ViewTooltips extends MouseAdapter implements MouseMotionListe
 		}
 
 
-		@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+		@edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
 				value = "BC_UNCONFIRMED_CAST",
 				justification = "")
 		@Override
@@ -665,7 +665,7 @@ public final class ViewTooltips extends MouseAdapter implements MouseMotionListe
 		private final JList list;
 
 
-		@edu.umd.cs.findbugs.annotations.SuppressWarnings(
+		@edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
 				value = "BC_UNCONFIRMED_CAST",
 				justification = "")
 		private Hider(final JComponent comp, final JScrollPane pane) {

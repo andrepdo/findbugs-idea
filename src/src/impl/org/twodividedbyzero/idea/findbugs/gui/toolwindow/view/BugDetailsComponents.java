@@ -285,7 +285,7 @@ public class BugDetailsComponents {
 	}
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@SuppressWarnings({"HardCodedStringLiteral"})
 	public void setBugsDetails(final BugInstanceNode bugInstanceNode, final TreePath treePath) {
 		_currentTreePath = treePath;

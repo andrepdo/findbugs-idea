@@ -74,7 +74,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @since 0.0.1
  */
 @SuppressWarnings({"HardCodedStringLiteral", "AnonymousInnerClass", "AnonymousInnerClassMayBeStatic"})
-@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_BAD_FIELD"})
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SE_BAD_FIELD"})
 public class ToolWindowPanel extends JPanel implements EventListener<BugReporterEvent> {
 
 	private static final Logger LOGGER = Logger.getInstance(ToolWindowPanel.class.getName());
@@ -263,7 +263,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 	}
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON"})
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON"})
 	public void onEvent(@NotNull final BugReporterEvent event) {
 
 		switch (event.getOperation()) {

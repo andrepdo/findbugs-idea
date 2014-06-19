@@ -124,7 +124,7 @@ public class AnalyzeProjectFiles extends BaseAction implements EventListener<Bug
 	}
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"}) // action is not enabled
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"}) // action is not enabled
 	@SuppressWarnings("ConstantConditions")
 	private void initWorker() {
 		final com.intellij.openapi.project.Project project = IdeaUtilImpl.getProject(_dataContext);

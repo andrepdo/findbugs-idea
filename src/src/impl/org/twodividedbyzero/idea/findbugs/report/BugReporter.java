@@ -61,7 +61,7 @@ import java.util.Set;
  * @version $Revision$
  * @since 0.0.1
  */
-@edu.umd.cs.findbugs.annotations.SuppressWarnings({"IS2_INCONSISTENT_SYNC"})
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"IS2_INCONSISTENT_SYNC"})
 @SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "HardcodedFileSeparator"})
 public class BugReporter extends AbstractBugReporter implements FindBugsProgress {
 

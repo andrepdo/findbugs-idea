@@ -48,7 +48,7 @@ public class FindBugsInspectionProvider implements InspectionToolProvider, Appli
 	}
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@Override
 	@NonNls
 	@NotNull

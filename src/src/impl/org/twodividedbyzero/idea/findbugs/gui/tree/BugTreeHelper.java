@@ -221,7 +221,7 @@ public class BugTreeHelper {
 
 
 	// todo: fix me
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"BC_UNCONFIRMED_CAST_OF_RETURN_VALUE"})
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"BC_UNCONFIRMED_CAST_OF_RETURN_VALUE"})
 	@Nullable
 	private BugInstanceNode getPreviousBugInstanceLeafNode(@SuppressWarnings("TypeMayBeWeakened") final AbstractTreeNode<VisitableTreeNode> node) {
 		if (node instanceof BugInstanceNode) {

@@ -591,7 +591,7 @@ public final class IdeaUtilImpl {
 	}
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@Nullable
 	public static Module findModuleForFile(@NotNull final VirtualFile virtualFile, @NotNull final Project project) {
 		//noinspection ConstantConditions
@@ -900,7 +900,7 @@ public final class IdeaUtilImpl {
 	}
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@Nullable
 	public static PsiElement getElementAtLine(@NotNull final PsiFile file, final int line) {
 		//noinspection ConstantConditions

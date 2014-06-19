@@ -57,7 +57,7 @@ import java.io.File;
  * @version $Revision$
  * @since 0.9.96
  */
-@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
 @SuppressWarnings({"HardCodedStringLiteral"})
 public class ExportFileDialog extends JPanel {
 

@@ -158,7 +158,7 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor, ProblemGrou
 	}
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressWarnings({"PZLA_PREFER_ZERO_LENGTH_ARRAYS"})
+	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"PZLA_PREFER_ZERO_LENGTH_ARRAYS"})
 	@Nullable
 	public QuickFix<?>[] getFixes() {
 		return null;

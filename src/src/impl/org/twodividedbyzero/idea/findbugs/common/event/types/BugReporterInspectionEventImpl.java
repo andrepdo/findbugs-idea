@@ -35,7 +35,7 @@ import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
  * @version $Revision$
  * @since 0.9.29-dev
  */
-@edu.umd.cs.findbugs.annotations.SuppressWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED", "SE_BAD_FIELD"})
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED", "SE_BAD_FIELD"})
 public class BugReporterInspectionEventImpl extends EventImpl implements BugReporterInspectionEvent {
 
 	private static final long serialVersionUID = 0L;

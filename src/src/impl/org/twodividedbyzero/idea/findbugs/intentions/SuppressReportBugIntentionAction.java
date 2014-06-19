@@ -67,7 +67,7 @@ import java.util.Map;
  * @since 0.9.97
  */
 @SuppressWarnings({"RedundantInterfaceDeclaration"})
-@edu.umd.cs.findbugs.annotations.SuppressWarnings({"RI_REDUNDANT_INTERFACES"})
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"RI_REDUNDANT_INTERFACES"})
 public class SuppressReportBugIntentionAction extends SuppressIntentionAction implements Iconable {
 
 	private final String _bugPatternId;
