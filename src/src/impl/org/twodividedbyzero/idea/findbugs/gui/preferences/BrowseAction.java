@@ -47,7 +47,12 @@ import java.util.Collection;
 public final class BrowseAction extends AbstractAction {
 
 	private static final long serialVersionUID = 0L;
-	private static String _lastDir;
+
+	/**
+	 * Used as initial location of file chooser.
+	 * volatile because constructor is called by the Application thread and actionPerformed by the AWT thread.
+	 */
+	private static volatile String _lastDir;
 
 	private final ConfigurationPanel _parent;
 	private final transient FileFilter _fileFilter;
