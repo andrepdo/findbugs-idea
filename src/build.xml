@@ -53,6 +53,7 @@
 
     <fileset id="component.classes.impl" dir="${target.dir}/impl">
         <include name="**/**.class"/>
+        <include name="**/**.jar"/>
         <include name="**/**.png"/>
         <include name="**/**.properties"/>
     </fileset>
@@ -196,7 +197,7 @@
     </target>
 
 
-    <target name="assemble" depends="getversion, makePluginXml, compile.all, init, copyResources"
+    <target name="assemble" depends="getversion, makePluginXml, compile.all, init, copyResources, copyPlugins"
             description="Create ${component.name} jar files">
         <buildnumber/>
 
@@ -316,6 +317,14 @@
         </copy>
     </target>
 
+    <target name="copyPlugins">
+        <copy failonerror="true" overwrite="true" todir="${target.dir}/impl/${component.package.path}/plugins">
+            <fileset dir="${src.dir}/impl/${component.package.path}/plugins">
+                <include name="**/*.jar"/>
+            </fileset>
+        </copy>
+    </target>
+
     <target name="assemble-src" depends="init">
         <jar destfile="${target.dir}/zip/${final.name}-src.zip">
             <exclude name="${src.dir}/impl/${component.package.path}/common/nevent"/>
@@ -359,7 +368,7 @@
         </echo>
     </target>
 
-    <taskdef classname="net.bluecow.googlecode.ant.GoogleCodeUploadTask" classpath="ant/lib/ant-googlecode.jar"
+    <!-- <taskdef classname="net.bluecow.googlecode.ant.GoogleCodeUploadTask" classpath="ant/lib/ant-googlecode.jar"
              name="gcupload"/>
 
     <target name="gcupload" depends="init, getversion">
@@ -371,6 +380,6 @@
                 targetfilename="${final.name}.zip"
                 summary="${versionString} of ${component.name}"
                 labels="Featured, Type-Package, OpSys-All"/>
-    </target>
+    </target> -->
 
 </project>
