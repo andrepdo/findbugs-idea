@@ -68,7 +68,7 @@ public class GroupBugIntentionListPopupStep extends BaseListPopupStep<SuppressRe
 		ReadonlyStatusHandler.getInstance(project).ensureFilesWritable();
 
 
-		new WriteCommandAction.Simple<Object>(project,  "Add findbugs-idea Suppress warning", _psiElement.getContainingFile()) {
+		new WriteCommandAction.Simple/*<Object>*/(project,  "Add findbugs-idea Suppress warning", _psiElement.getContainingFile()) {
 
 			@Override
 			protected void run() throws Throwable {
