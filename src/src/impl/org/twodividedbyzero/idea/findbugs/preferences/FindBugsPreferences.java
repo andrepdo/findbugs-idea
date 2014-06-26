@@ -696,7 +696,9 @@ public class FindBugsPreferences extends Properties {
 	public static FindBugsPreferences createDefault(final boolean loadPlugins) {
 		final Map<String, String> detectors = new HashMap<String, String>();
 		final FindBugsPreferences preferences = createEmpty(loadPlugins, Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String>emptyList(), detectors);
-		preferences.setDetectors(detectors);
+		if (loadPlugins) {
+			preferences.setDetectors(detectors);
+		}
 
 		preferences.setAnnotationTypeSettings(createDefaultAnnotationTypeSettings());
 
@@ -884,6 +886,10 @@ public class FindBugsPreferences extends Properties {
 			_detectors = detectors;
 		}
 
+		@Override
+		protected void seenCorePlugin(Plugin plugin) {
+			FindBugsCustomPluginUtil.loadDefaultConfigurationIfNecessary(plugin, _detectors);
+		}
 
 		@Override
 		protected void pluginPermanentlyLoaded(final Plugin plugin, final boolean userPlugin) {
