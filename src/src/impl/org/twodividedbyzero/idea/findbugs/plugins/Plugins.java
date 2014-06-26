@@ -30,6 +30,8 @@ import java.io.InputStream;
 
 
 /**
+ * TODO disable plugins by default
+ *
  * $Date: 2014-06-01 23:40:00 +0100 (So, 01 June 2014) $
  *
  * @author Reto Merz<reto.merz@gmail.com>
@@ -38,7 +40,14 @@ import java.io.InputStream;
  */
 public enum Plugins {
 
-	fb_contrib("fb-contrib-5.2.1.jar");
+	// https://code.google.com/p/findbugs-for-android/
+	AndroidFindbugs_0_5("AndroidFindbugs_0.5.jar"),
+
+	// http://fb-contrib.sourceforge.net/
+	fb_contrib("fb-contrib-5.2.1.jar"),
+
+	// http://h3xstream.github.io/find-sec-bugs/
+	findsecbugs_plugin_1_2_0("findsecbugs-plugin-1.2.0.jar");
 
 	private final String _jarName;
 
