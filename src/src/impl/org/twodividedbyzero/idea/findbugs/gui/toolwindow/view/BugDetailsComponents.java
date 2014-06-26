@@ -30,6 +30,7 @@ import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.MethodAnnotation;
 import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.SortedBugCollection;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import edu.umd.cs.findbugs.cloud.Cloud;
 import edu.umd.cs.findbugs.cloud.Cloud.UserDesignation;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
@@ -285,7 +286,7 @@ public class BugDetailsComponents {
 	}
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+	@SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@SuppressWarnings({"HardCodedStringLiteral"})
 	public void setBugsDetails(final BugInstanceNode bugInstanceNode, final TreePath treePath) {
 		_currentTreePath = treePath;

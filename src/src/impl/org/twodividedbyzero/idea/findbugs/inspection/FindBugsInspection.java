@@ -41,7 +41,7 @@ import com.intellij.psi.PsiFileSystemItem;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.FieldAnnotation;
 import edu.umd.cs.findbugs.MethodAnnotation;
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -99,7 +99,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
-	@SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+	@SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@Override
 	@Nls
 	@NotNull
@@ -108,7 +108,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
-	@SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+	@SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@Override
 	@Nls
 	@NotNull
@@ -132,7 +132,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
-	@SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+	@SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@Nls
 	@Override
 	@NotNull
@@ -167,8 +167,8 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 
 
 	// do not remove to be idea < 10.5.1 compatible
-	@java.lang.SuppressWarnings("MethodMayBeStatic")
-	@SuppressWarnings( {"MethodMayBeStatic", "UnusedDeclaration", "UnusedDeclaration"})
+	@SuppressWarnings("MethodMayBeStatic")
+	@SuppressFBWarnings( {"MethodMayBeStatic", "UnusedDeclaration", "UnusedDeclaration"})
 	public void inspectionStarted(final LocalInspectionToolSession session) {
 		LOGGER.debug("Inspection started...");
 	}
@@ -210,8 +210,8 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	 * @param bugInstance a fb Bug pattern container
 	 * @return the created ProblemDescriptor
 	 */
-	@java.lang.SuppressWarnings("HardcodedLineSeparator")
-	@SuppressWarnings({"HardcodedLineSeparator"})
+	@SuppressWarnings("HardcodedLineSeparator")
+	@SuppressFBWarnings({"HardcodedLineSeparator"})
 	private static ProblemDescriptor createProblemDescriptor(final PsiFile psiFile, final BugInstance bugInstance) {
 		final int[] lines = BugInstanceUtil.getSourceLines(bugInstance);
 		final MethodAnnotation methodAnnotation = BugInstanceUtil.getPrimaryMethod(bugInstance);
@@ -282,7 +282,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
-	private void initWorker(@SuppressWarnings("TypeMayBeWeakened") final PsiFileSystemItem psiFile) {
+	private void initWorker(@SuppressFBWarnings("TypeMayBeWeakened") final PsiFileSystemItem psiFile) {
 		final com.intellij.openapi.project.Project project = IdeaUtilImpl.getProject(psiFile);
 		final FindBugsInspector worker = new FindBugsInspector(project, this);
 
@@ -349,7 +349,7 @@ public class FindBugsInspection extends LocalInspectionTool implements EventList
 	}
 
 
-	@SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+	@SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@NotNull
 	@Override
 	public HighlightDisplayLevel getDefaultLevel() {

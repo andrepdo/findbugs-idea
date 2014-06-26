@@ -50,7 +50,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiRecursiveElementVisitor;
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
@@ -103,7 +103,7 @@ public abstract class BaseAnalyzeAction extends BaseAction {
 					HelpManager.getInstance().invokeHelp(getHelpTopic());
 				}
 
-				@SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+				@SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 				@NotNull
 				@Override
 				protected Action[] createActions() {
@@ -140,7 +140,7 @@ public abstract class BaseAnalyzeAction extends BaseAction {
 	protected abstract void analyze(@NotNull final Project project, final AnalysisScope scope);
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON"})
+	@SuppressFBWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON"})
 	protected final Iterable<String> findClasses(@NotNull final Project project, final AnalysisScope scope) {
 		final Collection<String> ret = new ArrayList<String>(256);
 		final PsiManager psiManager = PsiManager.getInstance(project);

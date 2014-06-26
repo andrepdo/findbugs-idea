@@ -26,7 +26,7 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementFactory;
 import com.intellij.util.IncorrectOperationException;
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 
@@ -89,7 +89,7 @@ public class SurroundWithTagFix implements LocalQuickFix {
 	}
 
 
-	@SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+	@SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@NotNull
 	public String getFamilyName() {
 		return FindBugsPluginConstants.PLUGIN_ID;
