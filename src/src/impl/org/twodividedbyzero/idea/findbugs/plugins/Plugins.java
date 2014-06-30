@@ -30,8 +30,6 @@ import java.io.InputStream;
 
 
 /**
- * TODO disable plugins by default
- *
  * $Date: 2014-06-01 23:40:00 +0100 (So, 01 June 2014) $
  *
  * @author Reto Merz<reto.merz@gmail.com>

@@ -48,7 +48,7 @@ public abstract class AbstractPluginLoader {
 	}
 
 
-	public void load(final Collection<String> userPluginsUrls, final Collection<String> disabledUserPluginIds, final Collection<String> disabledBundledPluginIds) {
+	public void load(final Collection<String> userPluginsUrls, final Collection<String> disabledUserPluginIds, final Collection<String> enabledBundledPluginIds, final Collection<String> disabledBundledPluginIds) {
 
 		// 1. unload plugins
 		for (Plugin plugin : Plugin.getAllPlugins()) {
@@ -76,7 +76,7 @@ public abstract class AbstractPluginLoader {
 							continue;
 						}
 						seenBundledPlugin(plugin);
-						if (!disabledBundledPluginIds.contains(plugin.getPluginId())) {
+						if (!disabledBundledPluginIds.contains(plugin.getPluginId()) && enabledBundledPluginIds.contains(plugin.getPluginId())) {
 							enabledBundledPluginUrls.add(FindBugsCustomPluginUtil.getAsString(plugin));
 						}
 						FindBugsCustomPluginUtil.unload(plugin);

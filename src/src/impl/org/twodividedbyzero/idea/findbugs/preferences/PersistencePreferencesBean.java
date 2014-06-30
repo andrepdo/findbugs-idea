@@ -53,6 +53,7 @@ public class PersistencePreferencesBean {
 	public List<String> _plugins;
 	public Set<String> _enabledUserPluginIds;
 	public Set<String> _disabledUserPluginIds;
+	public Set<String> _enabledBundledPluginIds;
 	public Set<String> _disabledBundledPluginIds;
 
 	public List<String> _enabledModuleConfigs;
@@ -75,6 +76,7 @@ public class PersistencePreferencesBean {
 		_plugins = new ArrayList<String>();
 		_enabledUserPluginIds = new HashSet<String>();
 		_disabledUserPluginIds = new HashSet<String>();
+		_enabledBundledPluginIds = new HashSet<String>();
 		_disabledBundledPluginIds = new HashSet<String>();
 
 		_enabledModuleConfigs = new ArrayList<String>();
@@ -135,6 +137,11 @@ public class PersistencePreferencesBean {
 
 	public Collection<String> getDisabledUserPluginIds() {
 		return _disabledUserPluginIds;
+	}
+
+
+	public Collection<String> getEnabledBundledPluginIds() {
+		return _enabledBundledPluginIds;
 	}
 
 

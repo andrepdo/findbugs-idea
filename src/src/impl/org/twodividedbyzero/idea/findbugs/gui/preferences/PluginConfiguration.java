@@ -138,7 +138,7 @@ public class PluginConfiguration implements ConfigurationPage {
 		_pluginComponentPanel.removeAll();
 
 		final PluginLoaderImpl pluginLoader = new PluginLoaderImpl(getCurrentFbProject());
-		pluginLoader.load(_preferences.getPlugins(), _preferences.getDisabledUserPluginIds(), _preferences.getDisabledBundledPluginIds());
+		pluginLoader.load(_preferences.getPlugins(), _preferences.getDisabledUserPluginIds(), _preferences.getEnabledBundledPluginIds(), _preferences.getDisabledBundledPluginIds());
 
 		final JPanel pluginComponent = pluginLoader.getLastPluginComponent();
 		if (pluginComponent != null) {
@@ -446,7 +446,7 @@ public class PluginConfiguration implements ConfigurationPage {
 				return true;
 			}
 			if (project == null || !RESPECT_PROJECT_PLUGIN_STATE) {
-				return !_preferences.isPluginDisabled(plugin.getPluginId(), userPlugin);
+				return _preferences.isPluginEnabled(plugin.getPluginId(), userPlugin);
 			}
 			final Boolean pluginStatus = project.getPluginStatus(plugin);
 			return pluginStatus != null && pluginStatus; // need tristate checkbox for better visual state representation

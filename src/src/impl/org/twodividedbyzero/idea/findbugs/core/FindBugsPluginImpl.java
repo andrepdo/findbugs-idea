@@ -361,7 +361,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 	public FindBugsPreferences getPreferences() {
 		if (_preferences == null) {
-			_preferences = getEmptyPreferences(Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String, String>emptyMap());
+			_preferences = getEmptyPreferences(Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String, String>emptyMap());
 		}
 		//noinspection ReturnOfCollectionOrArrayField
 		return _preferences;
@@ -405,7 +405,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	public void apply() throws ConfigurationException {
 
 		final PluginLoaderImpl pluginLoader = new PluginLoaderImpl();
-		pluginLoader.load(_preferences.getPlugins(), _preferences.getDisabledUserPluginIds(), _preferences.getDisabledBundledPluginIds());
+		pluginLoader.load(_preferences.getPlugins(), _preferences.getDisabledUserPluginIds(), _preferences.getEnabledBundledPluginIds(), _preferences.getDisabledBundledPluginIds());
 
 		_preferences.applyDetectors();
 		_configPanel.updatePreferences(); // at least DetectorConfiguration needs a reload
@@ -435,11 +435,11 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
-	private synchronized FindBugsPreferences getEmptyPreferences(final List<String> plugins, final Collection<String> enabledUserPluginIds, final Collection<String> disabledUserPluginIds, final Collection<String> disabledBundledPluginIds, final Map<String, String> detectors) {
+	private synchronized FindBugsPreferences getEmptyPreferences(final List<String> plugins, final Collection<String> enabledUserPluginIds, final Collection<String> disabledUserPluginIds, final Collection<String> enabledBundledPluginIds, final Collection<String> disabledBundledPluginIds, final Map<String, String> detectors) {
 		if (_preferences == null) {
-			_preferences = FindBugsPreferences.createEmpty(true, plugins, enabledUserPluginIds, disabledUserPluginIds, disabledBundledPluginIds, detectors);
+			_preferences = FindBugsPreferences.createEmpty(true, plugins, enabledUserPluginIds, disabledUserPluginIds, enabledBundledPluginIds, disabledBundledPluginIds, detectors);
 		} else {
-			_preferences.loadPlugins(plugins, enabledUserPluginIds, disabledUserPluginIds, disabledBundledPluginIds, detectors);
+			_preferences.loadPlugins(plugins, enabledUserPluginIds, disabledUserPluginIds, enabledBundledPluginIds, disabledBundledPluginIds, detectors);
 		}
 		return _preferences;
 	}
@@ -449,7 +449,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 		if (!state.isEmpty()) {
 			final Map<String, String> detectors = state.getDetectors();
 
-			_preferences = getEmptyPreferences(state.getPlugins(), state.getEnabledUserPluginIds(), state.getDisabledUserPluginIds(), state.getDisabledBundledPluginIds(), detectors);
+			_preferences = getEmptyPreferences(state.getPlugins(), state.getEnabledUserPluginIds(), state.getDisabledUserPluginIds(), state.getEnabledBundledPluginIds(), state.getDisabledBundledPluginIds(), detectors);
 
 			for (final String key : state.getBasePreferences().keySet()) {
 				_preferences.setProperty(key, state.getBasePreferences().get(key));
@@ -516,6 +516,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 		preferencesBean.getPlugins().addAll(_preferences.getPlugins());
 		preferencesBean.getEnabledUserPluginIds().addAll(_preferences.getEnabledUserPluginIds());
 		preferencesBean.getDisabledUserPluginIds().addAll(_preferences.getDisabledUserPluginIds());
+		preferencesBean.getEnabledBundledPluginIds().addAll(_preferences.getEnabledBundledPluginIds());
 		preferencesBean.getDisabledBundledPluginIds().addAll(_preferences.getDisabledBundledPluginIds());
 
 		preferencesBean.getEnabledModuleConfigs().addAll(_preferences.getEnabledModuleConfigs());
