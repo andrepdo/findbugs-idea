@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2014 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -287,6 +287,7 @@ public class PluginConfiguration implements ConfigurationPage {
 
 
 		protected PluginLoaderImpl(final Project currentProject) {
+			super(false);
 			_currentProject = currentProject;
 		}
 

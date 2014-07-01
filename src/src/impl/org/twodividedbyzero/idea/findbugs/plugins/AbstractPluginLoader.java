@@ -19,16 +19,24 @@
 
 package org.twodividedbyzero.idea.findbugs.plugins;
 
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.util.ui.UIUtil;
 import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.PluginException;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -43,8 +51,13 @@ public abstract class AbstractPluginLoader {
 
 	private static final Logger LOGGER = Logger.getInstance(AbstractPluginLoader.class.getName());
 
+	private final boolean _treatErrorsAsWarnings;
+	private final List<String> _errorMessages;
 
-	protected AbstractPluginLoader() {
+
+	protected AbstractPluginLoader(final boolean treatErrorsAsWarnings) {
+		_treatErrorsAsWarnings = treatErrorsAsWarnings;
+		_errorMessages = new ArrayList<String>();
 	}
 
 
@@ -158,11 +171,47 @@ public abstract class AbstractPluginLoader {
 
 
 	protected void handleError(final String message) {
-		LOGGER.error(message);
+		if (_treatErrorsAsWarnings) {
+			LOGGER.warn(message);
+		} else {
+			LOGGER.error(message);
+		}
+		_errorMessages.add(message);
 	}
 
 
 	protected void handleError(final String message, final Exception exception) {
-		LOGGER.error(message, exception);
+		if (_treatErrorsAsWarnings) {
+			LOGGER.warn(message, exception);
+		} else {
+			LOGGER.error(message, exception);
+		}
+		_errorMessages.add(message);
+	}
+
+
+	public void showErrorBalloonIfNecessary(@Nullable final Project project) {
+		if (!_errorMessages.isEmpty()) {
+			final StringBuilder message = new StringBuilder();
+			for (final String errorMessage : _errorMessages) {
+				if (message.length() > 0) {
+					message.append("<b>");
+				}
+				message.append(" - ").append(errorMessage);
+			}
+
+			// do not use BalloonTipFactory here, at this point FindBugs tool window is not yet created
+			// code adapted from com.intellij.openapi.components.impl.stores.StorageUtil#notifyUnknownMacros
+			UIUtil.invokeLaterIfNeeded(new Runnable() {
+				@Override
+				public void run() {
+					Project currentProject = project;
+					if (project == null) {
+						currentProject = ProjectManager.getInstance().getDefaultProject();
+					}
+					new Notification("FindBugs Custom Plugin Load Error", "Error while loading custom FindBugs plugins", message.toString(), NotificationType.ERROR).notify(currentProject);
+				}
+			});
+		}
 	}
 }

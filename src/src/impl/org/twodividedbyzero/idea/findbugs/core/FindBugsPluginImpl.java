@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2014 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -429,7 +429,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 	private synchronized FindBugsPreferences getDefaultPreferences() {
 		if (_preferences == null) {
-			_preferences = FindBugsPreferences.createDefault(true);
+			_preferences = FindBugsPreferences.createDefault(_project, true);
 		}
 		return _preferences;
 	}
@@ -437,9 +437,9 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 	private synchronized FindBugsPreferences getEmptyPreferences(final List<String> plugins, final Collection<String> enabledUserPluginIds, final Collection<String> disabledUserPluginIds, final Collection<String> enabledBundledPluginIds, final Collection<String> disabledBundledPluginIds, final Map<String, String> detectors) {
 		if (_preferences == null) {
-			_preferences = FindBugsPreferences.createEmpty(true, plugins, enabledUserPluginIds, disabledUserPluginIds, enabledBundledPluginIds, disabledBundledPluginIds, detectors);
+			_preferences = FindBugsPreferences.createEmpty(_project, true, plugins, enabledUserPluginIds, disabledUserPluginIds, enabledBundledPluginIds, disabledBundledPluginIds, detectors);
 		} else {
-			_preferences.loadPlugins(plugins, enabledUserPluginIds, disabledUserPluginIds, enabledBundledPluginIds, disabledBundledPluginIds, detectors);
+			_preferences.loadPlugins(_project, plugins, enabledUserPluginIds, disabledUserPluginIds, enabledBundledPluginIds, disabledBundledPluginIds, detectors);
 		}
 		return _preferences;
 	}
@@ -489,7 +489,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 		} else {
 			_preferences.clear();
-			_preferences = FindBugsPreferences.createDefault(true);
+			_preferences = FindBugsPreferences.createDefault(_project, true);
 		}
 		_preferences.setModified(false); // make sure not modified at the end of loading
 		buildSearchIndexIfNecessary();
@@ -581,6 +581,11 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 
 	private class PluginLoaderImpl extends AbstractPluginLoader {
+
+		protected PluginLoaderImpl() {
+			super(false);
+		}
+
 
 		@Override
 		protected void seenBundledPlugin(final Plugin plugin) {

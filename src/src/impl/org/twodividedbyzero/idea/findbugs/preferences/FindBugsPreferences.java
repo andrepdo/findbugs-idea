@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2014 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -20,12 +20,14 @@ package org.twodividedbyzero.idea.findbugs.preferences;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import edu.umd.cs.findbugs.config.UserPreferences;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.StringUtil;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.AnnotationType;
@@ -353,7 +355,15 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public void loadPlugins(final List<String> userPluginUrls, final Collection<String> enabledUserPluginIds, final Collection<String> disabledUserPluginIds, final Collection<String> enabledBundledPluginIds, final Collection<String> disabledBundledPluginIds, final Map<String, String> detectors) {
+	public void loadPlugins(
+			@Nullable final Project project,
+			final List<String> userPluginUrls,
+			final Collection<String> enabledUserPluginIds,
+			final Collection<String> disabledUserPluginIds,
+			final Collection<String> enabledBundledPluginIds,
+			final Collection<String> disabledBundledPluginIds,
+			final Map<String, String> detectors
+	) {
 		_plugins.clear();
 		_plugins.addAll(userPluginUrls);
 		_enabledUserPluginIds.clear();
@@ -367,6 +377,7 @@ public class FindBugsPreferences extends Properties {
 
 		final PluginLoaderImpl pluginLoader = new PluginLoaderImpl(detectors);
 		pluginLoader.load(userPluginUrls, disabledUserPluginIds, enabledBundledPluginIds, disabledBundledPluginIds);
+		pluginLoader.showErrorBalloonIfNecessary(project);
 	}
 
 
@@ -655,11 +666,11 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public static FindBugsPreferences createEmpty(final boolean loadPlugins, final List<String> plugins, final Collection<String> enabledUserPluginIds, final Collection<String> disabledUserPluginIds, final Collection<String> enabledBundledPluginIds, final Collection<String> disabledBundledPluginIds, final Map<String, String> detectors) {
+	public static FindBugsPreferences createEmpty(@Nullable final Project project, final boolean loadPlugins, final List<String> plugins, final Collection<String> enabledUserPluginIds, final Collection<String> disabledUserPluginIds, final Collection<String> enabledBundledPluginIds, final Collection<String> disabledBundledPluginIds, final Map<String, String> detectors) {
 		final FindBugsPreferences preferences = new FindBugsPreferences();
 		preferences.clear();
 		if (loadPlugins) {
-			preferences.loadPlugins(plugins, enabledUserPluginIds, disabledUserPluginIds, enabledBundledPluginIds, disabledBundledPluginIds, detectors);
+			preferences.loadPlugins(project, plugins, enabledUserPluginIds, disabledUserPluginIds, enabledBundledPluginIds, disabledBundledPluginIds, detectors);
 		}
 
 		final UserPreferences userPrefs = UserPreferences.createDefaultUserPreferences();
@@ -696,9 +707,9 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public static FindBugsPreferences createDefault(final boolean loadPlugins) {
+	public static FindBugsPreferences createDefault(@Nullable final Project project, final boolean loadPlugins) {
 		final Map<String, String> detectors = new HashMap<String, String>();
-		final FindBugsPreferences preferences = createEmpty(loadPlugins, Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String>emptyList(), detectors);
+		final FindBugsPreferences preferences = createEmpty(project, loadPlugins, Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String>emptyList(), detectors);
 		if (loadPlugins) {
 			preferences.setDetectors(detectors);
 		}
@@ -895,13 +906,13 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	// TODO CUSTOM_PLUGIN: impl. handleErrors -> collect errors and show *one* notification if necessary
 	private static class PluginLoaderImpl extends AbstractPluginLoader {
 
 		private final Map<String, String> _detectors;
 
 
 		protected PluginLoaderImpl(final Map<String, String> detectors) {
+			super(true);
 			_detectors = detectors;
 		}
 

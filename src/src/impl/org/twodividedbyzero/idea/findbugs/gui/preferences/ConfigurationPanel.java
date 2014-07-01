@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2014 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -529,7 +529,7 @@ public class ConfigurationPanel extends JPanel {
 
 	private void restoreDefaultPreferences() {
 		final FindBugsPreferences bugsPreferences = getPreferences();
-		bugsPreferences.setDefaults(FindBugsPreferences.createDefault(true));
+		bugsPreferences.setDefaults(FindBugsPreferences.createDefault(getProject(), true));
 		updatePreferences();
 		bugsPreferences.setModified(true);
 	}

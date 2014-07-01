@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2014 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -78,7 +78,7 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 	public ModuleComponentImpl(final Project project, final Module module) {
 		_project = project;
 		_module = module;
-		_preferences = FindBugsPreferences.createDefault(false /* do not load plugins because custom plugins per module is not supported */);
+		_preferences = FindBugsPreferences.createDefault(_project, false /* do not load plugins because custom plugins per module is not supported */);
 	}
 
 
