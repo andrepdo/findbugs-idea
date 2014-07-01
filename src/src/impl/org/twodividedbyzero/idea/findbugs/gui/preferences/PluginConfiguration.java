@@ -139,6 +139,7 @@ public class PluginConfiguration implements ConfigurationPage {
 
 		final PluginLoaderImpl pluginLoader = new PluginLoaderImpl(getCurrentFbProject());
 		pluginLoader.load(_preferences.getPlugins(), _preferences.getDisabledUserPluginIds(), _preferences.getEnabledBundledPluginIds(), _preferences.getDisabledBundledPluginIds());
+		pluginLoader.showErrorBalloonIfNecessary(_parent.getProject()); // LATER: check can we display errors in the bottom of the settings dialog?
 
 		final JPanel pluginComponent = pluginLoader.getLastPluginComponent();
 		if (pluginComponent != null) {
@@ -279,7 +280,6 @@ public class PluginConfiguration implements ConfigurationPage {
 	}
 
 
-	// TODO CUSTOM_PLUGIN: impl. handleErrors -> collect errors and show *one* notification if necessary
 	private class PluginLoaderImpl extends AbstractPluginLoader {
 
 		private Project _currentProject;
@@ -287,7 +287,7 @@ public class PluginConfiguration implements ConfigurationPage {
 
 
 		protected PluginLoaderImpl(final Project currentProject) {
-			super(false);
+			super(true);
 			_currentProject = currentProject;
 		}
 
