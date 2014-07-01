@@ -50,7 +50,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
@@ -376,12 +375,15 @@ public class PluginConfiguration implements ConfigurationPage {
 						}
 					} else {
 						if (userPlugin) {
-							final Object[] options = {"Disable", "Remove", "Cancel"};
-							// LATER: use Messages instead of JOptionPane
-							final int answer = JOptionPane.showOptionDialog(checkbox, "Would you like to disable or remove the plugin?", "Disable or Remove", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
-							if (JOptionPane.YES_OPTION == answer) {
+							final String[] options = {
+									"Disable",
+									"Remove",
+									"Cancel"
+							};
+							final int answer = Messages.showDialog(checkbox, "Would you like to disable or remove the plugin?", "Disable or Remove", options, 0, Messages.getQuestionIcon());
+							if (0 == answer) {
 								_preferences.addUserPlugin(pluginUrl, pluginId, false);
-							} else if (JOptionPane.NO_OPTION == answer) {
+							} else if (1 == answer) {
 								_preferences.removeUserPlugin(pluginUrl);
 							} else {
 								// cancel ; restore
