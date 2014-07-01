@@ -362,7 +362,7 @@ public class FindBugsPreferences extends Properties {
 			final Collection<String> disabledUserPluginIds,
 			final Collection<String> enabledBundledPluginIds,
 			final Collection<String> disabledBundledPluginIds,
-			final Map<String, String> detectors
+			@Nullable final Map<String, String> detectors
 	) {
 		_plugins.clear();
 		_plugins.addAll(userPluginUrls);
@@ -666,7 +666,16 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public static FindBugsPreferences createEmpty(@Nullable final Project project, final boolean loadPlugins, final List<String> plugins, final Collection<String> enabledUserPluginIds, final Collection<String> disabledUserPluginIds, final Collection<String> enabledBundledPluginIds, final Collection<String> disabledBundledPluginIds, final Map<String, String> detectors) {
+	public static FindBugsPreferences createEmpty(
+			@Nullable final Project project,
+			final boolean loadPlugins,
+			final List<String> plugins,
+			final Collection<String> enabledUserPluginIds,
+			final Collection<String> disabledUserPluginIds,
+			final Collection<String> enabledBundledPluginIds,
+			final Collection<String> disabledBundledPluginIds,
+			@Nullable final Map<String, String> detectors
+	) {
 		final FindBugsPreferences preferences = new FindBugsPreferences();
 		preferences.clear();
 		if (loadPlugins) {
@@ -919,13 +928,17 @@ public class FindBugsPreferences extends Properties {
 
 		@Override
 		protected void seenCorePlugin(Plugin plugin) {
-			FindBugsCustomPluginUtil.loadDefaultConfigurationIfNecessary(plugin, _detectors);
+			if (_detectors != null) {
+				FindBugsCustomPluginUtil.loadDefaultConfigurationIfNecessary(plugin, _detectors);
+			}
 		}
 
 
 		@Override
 		protected void pluginPermanentlyLoaded(final Plugin plugin, final boolean userPlugin) {
-			FindBugsCustomPluginUtil.loadDefaultConfigurationIfNecessary(plugin, _detectors);
+			if (_detectors != null) {
+				FindBugsCustomPluginUtil.loadDefaultConfigurationIfNecessary(plugin, _detectors);
+			}
 		}
 	}
 }

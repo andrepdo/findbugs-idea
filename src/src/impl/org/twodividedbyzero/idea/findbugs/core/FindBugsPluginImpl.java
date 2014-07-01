@@ -361,7 +361,14 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 	public FindBugsPreferences getPreferences() {
 		if (_preferences == null) {
-			_preferences = getEmptyPreferences(Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String>emptyList(), Collections.<String, String>emptyMap());
+			_preferences = getEmptyPreferences(
+					Collections.<String>emptyList(),
+					Collections.<String>emptyList(),
+					Collections.<String>emptyList(),
+					Collections.<String>emptyList(),
+					Collections.<String>emptyList(),
+					null
+			);
 		}
 		//noinspection ReturnOfCollectionOrArrayField
 		return _preferences;
@@ -435,7 +442,14 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
-	private synchronized FindBugsPreferences getEmptyPreferences(final List<String> plugins, final Collection<String> enabledUserPluginIds, final Collection<String> disabledUserPluginIds, final Collection<String> enabledBundledPluginIds, final Collection<String> disabledBundledPluginIds, final Map<String, String> detectors) {
+	private synchronized FindBugsPreferences getEmptyPreferences(
+			final List<String> plugins,
+			final Collection<String> enabledUserPluginIds,
+			final Collection<String> disabledUserPluginIds,
+			final Collection<String> enabledBundledPluginIds,
+			final Collection<String> disabledBundledPluginIds,
+			@Nullable final Map<String, String> detectors
+	) {
 		if (_preferences == null) {
 			_preferences = FindBugsPreferences.createEmpty(_project, true, plugins, enabledUserPluginIds, disabledUserPluginIds, enabledBundledPluginIds, disabledBundledPluginIds, detectors);
 		} else {
