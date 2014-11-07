@@ -118,7 +118,11 @@ public class AnalyzeClassUnderCursor extends BaseAction implements EventListener
 			final VirtualFile[] selectedSourceFiles = IdeaUtilImpl.getVirtualFiles(_dataContext);
 
 			if (!_running) {
-				_enabled = selectedSourceFiles != null && selectedSourceFiles.length > 0 && selectedSourceFiles[0].isValid() && IdeaUtilImpl.isValidFileType(selectedSourceFiles[0].getFileType());
+				_enabled = selectedSourceFiles != null &&
+						selectedSourceFiles.length > 0 &&
+						selectedSourceFiles[0].isValid() &&
+						IdeaUtilImpl.isValidFileType(selectedSourceFiles[0].getFileType()) &&
+						IdeaUtilImpl.getCurrentClass(_dataContext) != null;
 			}
 
 			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
