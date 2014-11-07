@@ -33,7 +33,9 @@ import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import edu.umd.cs.findbugs.BugCollection;
+import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.HTMLBugReporter;
+import edu.umd.cs.findbugs.cloud.Cloud;
 import org.dom4j.Document;
 import org.dom4j.io.DocumentSource;
 import org.jetbrains.annotations.NotNull;
@@ -193,9 +195,9 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 						_bugCollection.setWithMessages(true);
 						final String exportDirAndFilenameWithoutSuffix = exportDir + fileName;
 						if (finalExportXml && !finalExportBoth) {
-							_bugCollection.writeXML(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_RAW_SUFFIX);
+							exportXml(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_RAW_SUFFIX);
 						} else if (finalExportBoth) {
-							_bugCollection.writeXML(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_RAW_SUFFIX);
+							exportXml(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_RAW_SUFFIX);
 							writer = exportHtml(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_HTML_SUFFIX);
 						} else if (finalExportHtml) {
 							writer = exportHtml(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_HTML_SUFFIX);
@@ -247,6 +249,20 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 		} else {
 			exportTask.get().queue();
 		}
+	}
+
+
+	private void exportXml(final String fileName) throws IOException {
+		// Issue 77: workaround internal FindBugs NPE
+		// As of my point of view, the NPE is a FindBugs bug
+		for (final BugInstance bugInstance : _bugCollection) {
+			if (bugInstance.hasXmlProps()) {
+				if (null == bugInstance.getXmlProps().getConsensus()) {
+					bugInstance.getXmlProps().setConsensus(Cloud.UserDesignation.UNCLASSIFIED.toString());
+				}
+			}
+		}
+		_bugCollection.writeXML(fileName);
 	}
 
 
