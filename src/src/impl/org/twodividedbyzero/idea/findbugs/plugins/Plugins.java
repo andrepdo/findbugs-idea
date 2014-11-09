@@ -20,6 +20,7 @@
 package org.twodividedbyzero.idea.findbugs.plugins;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.IoUtil;
 
@@ -42,16 +43,20 @@ public enum Plugins {
 	AndroidFindbugs_0_5("AndroidFindbugs_0.5.jar"),
 
 	// http://fb-contrib.sourceforge.net/
-	fb_contrib("fb-contrib-5.2.1.jar"),
+	fb_contrib_6_0_0("fb-contrib-6.0.0.jar", "fb-contrib-5.2.1.jar"),
 
 	// http://h3xstream.github.io/find-sec-bugs/
-	findsecbugs_plugin_1_2_0("findsecbugs-plugin-1.2.0.jar");
+	findsecbugs_plugin_1_2_1("findsecbugs-plugin-1.2.1.jar", "findsecbugs-plugin-1.2.0.jar");
+
+	private static final Logger LOGGER = Logger.getInstance(Plugins.class.getName());
 
 	private final String _jarName;
+	private final String[] _legacyJarNames;
 
 
-	Plugins(final String jarName) {
+	Plugins(final String jarName, final String... legacyJarNames) {
 		_jarName = jarName;
+		_legacyJarNames = legacyJarNames;
 	}
 
 
@@ -68,7 +73,15 @@ public enum Plugins {
 
 	public static void deploy(final IdeaPluginDescriptor plugin) {
 		final File dir = getDirectory(plugin);
-		for (Plugins customPlugin : values()) {
+		for (final Plugins customPlugin : values()) {
+			for (final String legacyJarName : customPlugin._legacyJarNames) {
+				final File legacyJar = new File(dir, legacyJarName);
+				if (legacyJar.exists()) {
+					if (!legacyJar.delete()) {
+						LOGGER.warn("Could not delete legacy custom plugin: " + legacyJar.getAbsolutePath());
+					}
+				}
+			}
 			final File jar = new File(dir, customPlugin._jarName);
 			if (!jar.isFile()) {
 				deployImpl(jar, customPlugin);
