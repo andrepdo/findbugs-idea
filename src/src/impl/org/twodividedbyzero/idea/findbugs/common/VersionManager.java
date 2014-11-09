@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2014 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -41,7 +41,7 @@ public class VersionManager {
 
 	private static final long _major = 0;
 	private static final long _minor = 9;
-	private static final long _build = 993;
+	private static final long _build = 994;
 
 	private static final String _branch = "trunk";
 	private static final String rev = "$Revision$";

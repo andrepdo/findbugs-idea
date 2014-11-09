@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2014 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -31,7 +31,7 @@ import java.util.List;
  * @version $Revision$
  * @since 0.9.992
  */
-public class AaComboBox<E> extends JComboBox<E> {
+public class AaComboBox<E> extends JComboBox {
 
 	private List<ActionListener> _selectionChangeListeners;
 	private ActionListener _internalActionListener;
@@ -43,7 +43,7 @@ public class AaComboBox<E> extends JComboBox<E> {
 	}
 
 
-	public AaComboBox(final ComboBoxModel<E> model) {
+	public AaComboBox(final ComboBoxModel model) {
 		super(model);
 	}
 

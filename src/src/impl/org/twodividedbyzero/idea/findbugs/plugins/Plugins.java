@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 
 
 /**
@@ -40,22 +41,24 @@ import java.io.InputStream;
 public enum Plugins {
 
 	// https://code.google.com/p/findbugs-for-android/
-	AndroidFindbugs_0_5("AndroidFindbugs_0.5.jar"),
+	AndroidFindbugs_0_5("AndroidFindbugs_0.5.jar", true),
 
 	// http://fb-contrib.sourceforge.net/
-	fb_contrib_6_0_0("fb-contrib-6.0.0.jar", "fb-contrib-5.2.1.jar"),
+	fb_contrib_6_0_0("fb-contrib-6.0.0.jar", false, "fb-contrib-5.2.1.jar"),
 
 	// http://h3xstream.github.io/find-sec-bugs/
-	findsecbugs_plugin_1_2_1("findsecbugs-plugin-1.2.1.jar", "findsecbugs-plugin-1.2.0.jar");
+	findsecbugs_plugin_1_2_1("findsecbugs-plugin-1.2.1.jar", false, "findsecbugs-plugin-1.2.0.jar");
 
 	private static final Logger LOGGER = Logger.getInstance(Plugins.class.getName());
 
 	private final String _jarName;
+	private final boolean _needsJava7OrLater;
 	private final String[] _legacyJarNames;
 
 
-	Plugins(final String jarName, final String... legacyJarNames) {
+	Plugins(final String jarName, boolean needsJava7OrLater, final String... legacyJarNames) {
 		_jarName = jarName;
+		_needsJava7OrLater = needsJava7OrLater;
 		_legacyJarNames = legacyJarNames;
 	}
 
@@ -72,6 +75,7 @@ public enum Plugins {
 
 
 	public static void deploy(final IdeaPluginDescriptor plugin) {
+		final boolean isJava7OrLater = isJava7OrLater();
 		final File dir = getDirectory(plugin);
 		for (final Plugins customPlugin : values()) {
 			for (final String legacyJarName : customPlugin._legacyJarNames) {
@@ -83,8 +87,16 @@ public enum Plugins {
 				}
 			}
 			final File jar = new File(dir, customPlugin._jarName);
-			if (!jar.isFile()) {
-				deployImpl(jar, customPlugin);
+			if (customPlugin._needsJava7OrLater && !isJava7OrLater) {
+				if (jar.exists()) {
+					if (!jar.delete()) {
+						LOGGER.error("Could not delete custom plugin (only supported with Java 7 or later): " + jar.getAbsolutePath());
+					}
+				}
+			} else {
+				if (!jar.isFile()) {
+					deployImpl(jar, customPlugin);
+				}
 			}
 		}
 	}
@@ -107,5 +119,11 @@ public enum Plugins {
 		} finally {
 			IoUtil.safeClose(in);
 		}
+	}
+
+
+	public static boolean isJava7OrLater() {
+		final BigDecimal current = new BigDecimal(System.getProperty("java.specification.version"));
+		return current.compareTo(new BigDecimal("1.7")) >= 0;
 	}
 }

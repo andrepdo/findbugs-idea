@@ -336,7 +336,7 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	JList<?> getIncludeList() {
+	JList getIncludeList() {
 		if (_includeList == null) {
 			getIncludePanel();
 		}
@@ -344,7 +344,7 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	JList<?> getExcludeList() {
+	JList getExcludeList() {
 		if (_excludeList == null) {
 			getExcludePanel();
 		}
@@ -352,7 +352,7 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	JList<?> getBaselineList() {
+	JList getBaselineList() {
 		if (_baselineList == null) {
 			getBaseLinePanel();
 		}
@@ -360,7 +360,7 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	private static DefaultListModel getModel(final JList<?> list) {
+	private static DefaultListModel getModel(final JList list) {
 		return (DefaultListModel) list.getModel();
 	}
 
@@ -463,7 +463,7 @@ public class FilterConfiguration implements ConfigurationPage {
 
 
 		@Override
-		public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+		public Component getListCellRendererComponent(final JList list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
 			final Component rendererComponent = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			setText(IdeaUtilImpl.expandPathMacro(_project, String.valueOf(value)));
 			return rendererComponent;

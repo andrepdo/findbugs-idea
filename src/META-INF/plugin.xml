@@ -29,7 +29,6 @@
 		FindBugs can identify hundreds of serious defects in large applications (typically about 1 defect per 1000-2000
 		lines of non-commenting source statements). The name FindBugs&trade; and the FindBugs logo are trademarked by The University of Maryland.
 		As of July, 2008, FindBugs has been downloaded more than 700,000 times.
-        FindBugs 3 requires Java 1.7 or later to run. However, it can analyze programs compiled for any version of Java.
 		FindBugs-IDEA uses FindBugs&trade; under the hood. For more information
 		see <a href="http://findbugs.sourceforge.net/">http://findbugs.sourceforge.net/</a>.
 		<p>
@@ -87,9 +86,16 @@
     </description>
     <change-notes>
         <![CDATA[<html>
+        <h3>0.9.994</h3>
+        <ul>
+            <li>Bundle with FindBugs 3.0.1 EAP (Rev. 11189b911ff3) compiled with JDK 6</li>
+            <li>Issue 77</li>
+            <li>Update bundled custom plugins: fb-contrib 6.0.0 and find-sec-bugs 1.2.1</li>
+            <li>Plugin compatibility: IDEA 12.1.4 (129.713) until the latest IDEA 14 release (139.224)</li>
+        </ul>
         <h3>0.9.993</h3>
         <ul>
-            <li>bundle with findbugs 3.0.0</li>
+            <li>Bundle with FindBugs 3.0.0</li>
             <li>Issue 51</li>
             <li>Issue 62</li>
             <li>Issue 63</li>
