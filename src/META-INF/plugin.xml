@@ -46,7 +46,7 @@
 		<ul>
             <li>FindBugs 3 support</li>
             <li>Quickfix: annotate, suppress findbugs patterns (GutterIcon and document markup (alt+enter))</li>
-            <li>idea 12.1 until the latest 14 EAP compatibility</li>
+            <li>idea 13.0 until the latest 14 EAP compatibility</li>
             <li>configure findbugs on idea project and module level</li>
             <li>jump to source from results shown in toolwindow including anonymous classes</li>
             <li>bug descriptions, solutions</li>
@@ -86,6 +86,14 @@
     </description>
     <change-notes>
         <![CDATA[<html>
+        <h3>0.9.995</h3>
+        <ul>
+            <li>Issue 78: avoid assertion error</li>
+            <li>Issue 87: support -Didea.is.internal=true</li>
+            <li>Support analyze after auto make</li>
+            <li>Plugin compatibility: IDEA 13.0 (133.193) until the latest IDEA 14 release (140.2285)</li>
+            <li>Note that IDEA 12.x is no longer supported</li>
+        </ul>
         <h3>0.9.994</h3>
         <ul>
             <li>Bundle with FindBugs 3.0.1 EAP (Rev. 11189b911ff3) compiled with JDK 6</li>

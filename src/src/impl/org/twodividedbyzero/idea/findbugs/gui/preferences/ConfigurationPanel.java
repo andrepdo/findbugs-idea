@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -91,6 +91,7 @@ public class ConfigurationPanel extends JPanel {
 	private final transient FindBugsPlugin _plugin;
 	private JCheckBox _compileBeforeAnalyseChkb;
 	private JCheckBox _analyzeAfterCompileChkb;
+	private JCheckBox _analyzeAfterAutoMakeChkb;
 	private JCheckBox _runInBackgroundChkb;
 	private JCheckBox _toolwindowToFront;
 
@@ -173,6 +174,7 @@ public class ConfigurationPanel extends JPanel {
 			final Container checkboxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 			checkboxPanel.add(getRunInBgCheckbox());
 			checkboxPanel.add(getAnalyzeAfterCompileCheckbox());
+			checkboxPanel.add(getAnalyzeAfterAutoMakeCheckbox());
 			checkboxPanel.add(getToolwindowToFrontCheckbox());
 			_mainPanel.add(checkboxPanel, "1, 1, 3, 1");
 			//_mainPanel.add(_detectorThresholdChkb);
@@ -200,6 +202,7 @@ public class ConfigurationPanel extends JPanel {
 		getEffortSlider().setValue(AnalysisEffort.valueOfLevel(getPreferences().getProperty(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL, AnalysisEffort.DEFAULT.getEffortLevel())).getValue(), false);
 		getRunInBgCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND, false));
 		getAnalyzeAfterCompileCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.ANALYZE_AFTER_COMPILE, false));
+		getAnalyzeAfterAutoMakeCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE, false));
 		getToolwindowToFrontCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT, true));
 		getEffortLevelComboBox().setSelectedItem(AnalysisEffort.valueOfLevel(getPreferences().getProperty(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL, AnalysisEffort.DEFAULT.getEffortLevel())), false);
 		//((FindBugsPluginImpl) _plugin).setPreferences(FindBugsPreferences.createDefaultPreferences());
@@ -244,6 +247,20 @@ public class ConfigurationPanel extends JPanel {
 			});
 		}
 		return _analyzeAfterCompileChkb;
+	}
+
+
+	private AbstractButton getAnalyzeAfterAutoMakeCheckbox() {
+		if (_analyzeAfterAutoMakeChkb == null) {
+			_analyzeAfterAutoMakeChkb = new JCheckBox("Analyze affected files after auto make");
+			_analyzeAfterAutoMakeChkb.setFocusable(false);
+			_analyzeAfterAutoMakeChkb.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					getPreferences().setProperty(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE, _analyzeAfterAutoMakeChkb.isSelected());
+				}
+			});
+		}
+		return _analyzeAfterAutoMakeChkb;
 	}
 
 
@@ -632,6 +649,7 @@ public class ConfigurationPanel extends JPanel {
 		//     - getMyFilter() -> allow filter/search
 		getMainPanel().setEnabled(enabled);
 		getAnalyzeAfterCompileCheckbox().setEnabled(enabled);
+		getAnalyzeAfterAutoMakeCheckbox().setEnabled(enabled);
 		getRunInBgCheckbox().setEnabled(enabled);
 		getToolwindowToFrontCheckbox().setEnabled(enabled);
 		final List<ConfigurationPage> configPages = getConfigPages();

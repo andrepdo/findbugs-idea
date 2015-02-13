@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -82,6 +82,7 @@ public class FindBugsPreferences extends Properties {
 	public static final String COMPILE_BEFORE_ANALYZE = PROPERTIES_PREFIX + "compileBeforeAnalyse";
 
 	public static final String ANALYZE_AFTER_COMPILE = PROPERTIES_PREFIX + "analyzeAfterCompile";
+	public static final String ANALYZE_AFTER_AUTOMAKE = PROPERTIES_PREFIX + "analyzeAfterAutoMake";
 
 	public static final String EXPORT_BASE_DIR = PROPERTIES_PREFIX + "exportBaseDir";
 	public static final String EXPORT_CREATE_ARCHIVE_DIR = PROPERTIES_PREFIX + "exportCreateArchiveDir";
@@ -693,6 +694,7 @@ public class FindBugsPreferences extends Properties {
 		preferences.setProperty(FindBugsPreferences.SHOW_HIDDEN_DETECTORS, false);
 		preferences.setProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT, true);
 		preferences.setProperty(FindBugsPreferences.ANALYZE_AFTER_COMPILE, false);
+		preferences.setProperty(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE, false);
 
 		preferences.setProperty(FindBugsPreferences.EXPORT_AS_HTML, true);
 		preferences.setProperty(FindBugsPreferences.EXPORT_AS_XML, true);

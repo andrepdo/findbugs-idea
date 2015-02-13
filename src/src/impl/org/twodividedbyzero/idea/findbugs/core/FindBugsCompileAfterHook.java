@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -18,6 +18,8 @@
  */
 package org.twodividedbyzero.idea.findbugs.core;
 
+import com.intellij.compiler.server.BuildManagerListener;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.compiler.CompilationStatusListener;
 import com.intellij.openapi.compiler.CompileContext;
 import com.intellij.openapi.compiler.CompileScope;
@@ -25,6 +27,7 @@ import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
@@ -36,6 +39,9 @@ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -47,15 +53,35 @@ import java.util.Collection;
  */
 public class FindBugsCompileAfterHook implements CompilationStatusListener, ProjectComponent {
 
+
+	static {
+		ApplicationManager.getApplication().getMessageBus().connect().subscribe(BuildManagerListener.TOPIC, new BuildManagerListener() {
+			public void buildStarted(final Project project, final UUID sessionId, final boolean isAutomake) {
+			}
+
+
+			@Override
+			public void buildFinished(final Project project, final UUID sessionId, final boolean isAutomake) {
+				// TODO: get CompileContext? -> want only analyze affected files
+				if (isAutomake) {
+					initWorkerForAutoMake(project);
+				} // else do nothing ; see FindBugsCompileAfterHook#compilationFinished
+			}
+		});
+	}
+
+
 	private final Project _project;
 
 
-	public FindBugsCompileAfterHook(final Project project) {
+	public FindBugsCompileAfterHook(@NotNull final Project project) {
 		_project = project;
 	}
 
 
+	@Override
 	public void compilationFinished(final boolean aborted, final int errors, final int warnings, final CompileContext compileContext) {
+		// note that this is not invoked when auto make trigger compilation
 		initWorker(compileContext);
 	}
 
@@ -131,5 +157,34 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		// set class files
 		worker.configureOutputFiles(affectedFiles);
 		worker.work("Running FindBugs analysis for affectes files...");
+	}
+
+
+	private static void initWorkerForAutoMake(@NotNull final Project project) {
+		final FindBugsPlugin findBugsPlugin = IdeaUtilImpl.getPluginComponent(project);
+		final FindBugsPreferences preferences = findBugsPlugin.getPreferences();
+
+		if (!Boolean.valueOf(preferences.getProperty(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE))) {
+			return;
+		}
+
+		final FindBugsWorker worker = new FindBugsWorker(project);
+
+		// set aux classpath
+		final Module[] modules = ModuleManager.getInstance(project).getModules();
+		final List<VirtualFile> classpaths = new LinkedList<VirtualFile>();
+		for (final Module module : modules) {
+			IdeaUtilImpl.addProjectClasspath(module, classpaths);
+		}
+		worker.configureAuxClasspathEntries(classpaths.toArray(new VirtualFile[classpaths.size()]));
+
+		// set source dirs
+		final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(project);
+		worker.configureSourceDirectories(sourceRoots);
+
+		// set class files
+		final String[] outPath = IdeaUtilImpl.getCompilerOutputUrls(project);
+		worker.configureOutputFiles(outPath);
+		worker.work("Running FindBugs analysis for project '" + project.getName() + "'...");
 	}
 }

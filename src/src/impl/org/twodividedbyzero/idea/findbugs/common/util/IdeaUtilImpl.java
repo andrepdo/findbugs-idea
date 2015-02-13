@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -497,10 +497,17 @@ public final class IdeaUtilImpl {
 	}
 
 
+	@NotNull
 	public static VirtualFile[] getModulesSourceRoots(@NotNull final DataContext dataContext) {
 		final Project project = getProject(dataContext);
-		final ProjectRootManager projectRootManager = ProjectRootManager.getInstance(project);
+		//noinspection ConstantConditions
+		return getModulesSourceRoots(project);
+	}
 
+
+	@NotNull
+	public static VirtualFile[] getModulesSourceRoots(@NotNull final Project project) {
+		final ProjectRootManager projectRootManager = ProjectRootManager.getInstance(project);
 		return projectRootManager.getContentSourceRoots();
 	}
 
@@ -522,23 +529,26 @@ public final class IdeaUtilImpl {
 
 	@NotNull
 	public static VirtualFile[] getProjectClasspath(@Nullable final Module module) {
-		//noinspection ConstantConditions
 		if (module == null) {
 			return EMPTY_VIRTUAL_FILE;
 		}
-		final VirtualFile[] files;
+		final List<VirtualFile> found = new LinkedList<VirtualFile>();
+		addProjectClasspath(module, found);
+		return found.toArray(new VirtualFile[found.size()]);
+	}
+
+
+	public static void addProjectClasspath(@Nullable final Module module, @NotNull List<VirtualFile> classpath) {
 		try {
-			final List<VirtualFile> found = new LinkedList<VirtualFile>();
+			@SuppressWarnings("ConstantConditions")
 			final ModuleRootManager mrm = ModuleRootManager.getInstance(module);
 			final OrderEntry[] orderEntries = mrm.getOrderEntries();
 			for (final OrderEntry entry : orderEntries) {
-				Collections.addAll(found, entry.getFiles(OrderRootType.CLASSES));
+				Collections.addAll(classpath, entry.getFiles(OrderRootType.CLASSES));
 			}
-			files = found.toArray(new VirtualFile[found.size()]);
 		} catch (final Exception e) {
 			throw new FindBugsPluginException("ModuleRootManager must not be null. may be the current class is not a project/module class. check your project/module outpath configuration.", e);
 		}
-		return files;
 	}
 
 
