@@ -131,8 +131,11 @@ public class RecurseClassCollector {
 				assert s != null;
 
 				final VirtualFile compilerOutputPath = IdeaUtilImpl.getCompilerOutputPath(virtualFile, _project);
+				if (compilerOutputPath == null) {
+					LOGGER.warn("No output path specified for " + virtualFile + " in " + _project);
+					return; // f. e. project/module compiled and then compiler output path removed (empty text field)
+				}
 
-				assert compilerOutputPath != null;
 				final String fqp = buildFullQualifiedPath(compilerOutputPath.getPresentableUrl(), psiClass);
 				final String fqn = fqp + CLASS_FILE_SUFFIX;
 
