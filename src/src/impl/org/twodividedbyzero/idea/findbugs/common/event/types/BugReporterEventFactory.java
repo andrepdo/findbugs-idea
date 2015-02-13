@@ -21,7 +21,10 @@ package org.twodividedbyzero.idea.findbugs.common.event.types;
 
 
 import com.intellij.openapi.project.Project;
+import edu.umd.cs.findbugs.BugCollection;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 
 
 /**
@@ -35,12 +38,36 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class BugReporterEventFactory {
 
+
 	private BugReporterEventFactory() {
 	}
 
 
 	@NotNull
 	public static BugReporterEvent newAborted(@NotNull final Project project) {
-		return new BugReporterEventImpl(BugReporterEvent.Operation.ANALYSIS_ABORTED, project.getName());
+		return new BugReporterEventImpl(
+				BugReporterEvent.Operation.ANALYSIS_ABORTED,
+				null,
+				null,
+				null,
+				null,
+				project.getName(),
+				null
+		);
 	}
+
+
+	@NotNull
+	public static BugReporterEvent newFinished(@NotNull final BugCollection bugCollection, @NotNull final Project project, @Nullable final FindBugsProject findBugsProject) {
+		return new BugReporterEventImpl(
+				BugReporterEvent.Operation.ANALYSIS_FINISHED,
+				null,
+				null,
+				bugCollection,
+				null,
+				project.getName(),
+				findBugsProject
+		);
+	}
+
 }

@@ -50,26 +50,6 @@ public class BugReporterEventImpl extends EventImpl implements BugReporterEvent 
 	private final FindBugsProject _findBugsProject;
 
 
-	BugReporterEventImpl(@NotNull final Operation operation, @NotNull final String projectName) {
-		this(operation, null, projectName);
-	}
-
-
-	public BugReporterEventImpl(@NotNull final Operation operation, @Nullable final BugInstance bugInstance, @NotNull final String projectName) {
-		this(operation, bugInstance, null, projectName);
-	}
-
-
-	public BugReporterEventImpl(@NotNull final Operation operation, @Nullable final Integer bugCount, @NotNull final BugCollection bugCollection, @NotNull final String projectName) {
-		this(operation, null, bugCount, bugCollection, projectName);
-	}
-
-
-	public BugReporterEventImpl(@NotNull final Operation operation, @Nullable final Integer bugCount, @NotNull final BugCollection bugCollection, @NotNull final String projectName, @Nullable final FindBugsProject findBugsProject) {
-		this(operation, null, bugCount, bugCollection, null, projectName, findBugsProject);
-	}
-
-
 	public BugReporterEventImpl(@NotNull final Operation operation, @Nullable final BugInstance bugInstance, @Nullable final Integer bugCount, @NotNull final String projectName) {
 		this(operation, bugInstance, bugCount, null, null, projectName, null);
 	}
@@ -80,12 +60,7 @@ public class BugReporterEventImpl extends EventImpl implements BugReporterEvent 
 	}
 
 
-	public BugReporterEventImpl(@NotNull final Operation operation, @Nullable final BugInstance bugInstance, @Nullable final Integer bugCount, @Nullable final BugCollection bugCollection, @NotNull final String projectName) {
-		this(operation, bugInstance, bugCount, bugCollection, null, projectName, null);
-	}
-
-
-	public BugReporterEventImpl(@NotNull final Operation operation, @Nullable final BugInstance bugInstance, @Nullable final Integer bugCount, @Nullable final BugCollection bugCollection, @Nullable final ProjectStats projectStats, @NotNull final String projectName, @Nullable final FindBugsProject findBugsProject) {
+	BugReporterEventImpl(@NotNull final Operation operation, @Nullable final BugInstance bugInstance, @Nullable final Integer bugCount, @Nullable final BugCollection bugCollection, @Nullable final ProjectStats projectStats, @NotNull final String projectName, @Nullable final FindBugsProject findBugsProject) {
 		super(EventType.FINDBUGS);
 		_operation = operation;
 		_bugInstance = bugInstance;
@@ -149,6 +124,13 @@ public class BugReporterEventImpl extends EventImpl implements BugReporterEvent 
 
 	@Override
 	public String toString() {
-		return new StringBuilder().append("BugReporterEventImpl{").append("_operation=").append(_operation).append(", _bugInstance=").append(_bugInstance).append(", _bugCount=").append(_bugCount).append(", _bugCollection=").append(_bugCollection).append(", _projectStats=").append(_projectStats).append(", _projectName=").append(_projectName).append('}').toString();
+		return "BugReporterEventImpl{" +
+				"_operation=" + _operation +
+				", _bugInstance=" + _bugInstance +
+				", _bugCount=" + _bugCount +
+				", _bugCollection=" + _bugCollection +
+				", _projectStats=" + _projectStats +
+				", _projectName=" + _projectName +
+				'}';
 	}
 }

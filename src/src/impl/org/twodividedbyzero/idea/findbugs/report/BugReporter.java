@@ -201,7 +201,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 		if (_isInspectionRun) {
 			EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent.Operation.ANALYSIS_FINISHED, null, getBugCollection(), _project.getName(), _findBugsProject));
 		} else {
-			EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_FINISHED, null, getBugCollection(), _project.getName(), _findBugsProject));
+			EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newFinished(getBugCollection(), _project, _findBugsProject));
 		}
 
 		setRunning(false);

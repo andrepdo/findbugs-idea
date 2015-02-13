@@ -197,7 +197,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 					LOGGER.error(message, e1);
 
 				} finally {
-					EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_FINISHED, null, _importBugCollection, project.getName()));
+					EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newFinished(_importBugCollection, project, null));
 					_importBugCollection = null;
 					Thread.currentThread().interrupt();
 				}
