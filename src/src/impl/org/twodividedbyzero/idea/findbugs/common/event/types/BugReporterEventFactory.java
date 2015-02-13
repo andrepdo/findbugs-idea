@@ -44,6 +44,20 @@ public final class BugReporterEventFactory {
 
 
 	@NotNull
+	public static BugReporterEvent newStarted(@NotNull final Project project) {
+		return new BugReporterEventImpl(
+				BugReporterEvent.Operation.ANALYSIS_STARTED,
+				null,
+				0,
+				null,
+				null,
+				project.getName(),
+				null
+		);
+	}
+
+
+	@NotNull
 	public static BugReporterEvent newAborted(@NotNull final Project project) {
 		return new BugReporterEventImpl(
 				BugReporterEvent.Operation.ANALYSIS_ABORTED,

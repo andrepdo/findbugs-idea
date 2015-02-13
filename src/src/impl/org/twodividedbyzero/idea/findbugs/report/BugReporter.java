@@ -33,7 +33,6 @@ import org.jetbrains.annotations.NonNls;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent.Operation;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventFactory;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent;
@@ -313,7 +312,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 		if (_isInspectionRun) {
 			EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent.Operation.ANALYSIS_STARTED, null, 0, _project.getName()));
 		} else if (!isRunning()) {
-			EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_STARTED, null, 0, _project.getName()));
+			EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newStarted(_project));
 		}
 	}
 

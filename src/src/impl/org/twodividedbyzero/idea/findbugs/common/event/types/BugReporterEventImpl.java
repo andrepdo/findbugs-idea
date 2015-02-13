@@ -50,11 +50,6 @@ public class BugReporterEventImpl extends EventImpl implements BugReporterEvent 
 	private final FindBugsProject _findBugsProject;
 
 
-	public BugReporterEventImpl(@NotNull final Operation operation, @Nullable final BugInstance bugInstance, @Nullable final Integer bugCount, @NotNull final String projectName) {
-		this(operation, bugInstance, bugCount, null, null, projectName, null);
-	}
-
-
 	public BugReporterEventImpl(@NotNull final Operation operation, @Nullable final BugInstance bugInstance, @Nullable final Integer bugCount, @Nullable final ProjectStats projectStats, @NotNull final String projectName) {
 		this(operation, bugInstance, bugCount, null, projectStats, projectName, null);
 	}

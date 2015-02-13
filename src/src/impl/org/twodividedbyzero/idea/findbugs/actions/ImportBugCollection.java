@@ -147,7 +147,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 			@Override
 			public void run(@NotNull final ProgressIndicator indicator) {
 
-				EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_STARTED, null, 0, project.getName()));
+				EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newStarted(project));
 				setProgressIndicator(indicator);
 				indicator.setFraction(0.0);
 				indicator.setIndeterminate(false);
