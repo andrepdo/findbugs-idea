@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -18,6 +18,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.resources;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.ui.JBColor;
 import org.jdesktop.swingx.color.ColorUtil;
 
@@ -102,16 +103,16 @@ public class GuiResources {
 	 * --------------------------------------------------------------------------------------------------
 	 * Tree icons
 	 */
-	public static final Icon TREENODE_OPEN_ICON = ResourcesLoader.findIcon("/nodes/TreeOpen.png");
-	public static final Icon TREENODE_CLOSED_ICON = ResourcesLoader.findIcon("/nodes/TreeClosed.png");
+	public static final Icon TREENODE_OPEN_ICON = AllIcons.Nodes.TreeOpen;
+	public static final Icon TREENODE_CLOSED_ICON = AllIcons.Nodes.TreeClosed;
 
 
 	/**
 	 * --------------------------------------------------------------------------------------------------
 	 * Navigation icons
 	 */
-	public static final Icon NAVIGATION_MOVEUP_ICON = ResourcesLoader.findIcon("/actions/moveUp.png");
-	public static final Icon NAVIGATION_MOVEDOWN_ICON = ResourcesLoader.findIcon("/actions/moveDown.png");
+	public static final Icon NAVIGATION_MOVEUP_ICON = AllIcons.Actions.MoveUp;
+	public static final Icon NAVIGATION_MOVEDOWN_ICON = AllIcons.Actions.MoveDown;
 
 	public static final StyleSheet EDITORPANE_STYLESHEET;
 	static {

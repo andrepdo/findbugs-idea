@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -39,7 +39,7 @@ import java.io.OutputStream;
  * @version $Revision$
  * @since 0.9.991
  */
-public class IoUtil {
+public final class IoUtil {
 
 	private static final Logger LOGGER = Logger.getInstance(IoUtil.class.getName());
 
@@ -54,11 +54,11 @@ public class IoUtil {
 				closable.close();
 			} catch (final RuntimeException e) {
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("exception occured when closing " + closable + " - " + e);
+					LOGGER.debug("exception occurred when closing " + closable + " - " + e);
 				}
 			} catch (final IOException e) {
 				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("exception occured when closing " + closable + " - " + e);
+					LOGGER.debug("exception occurred when closing " + closable + " - " + e);
 				}
 			}
 		}

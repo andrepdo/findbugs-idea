@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -19,6 +19,7 @@
 package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 
 import com.intellij.codeInspection.ProblemDescriptor;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.JBColor;
@@ -30,7 +31,6 @@ import org.twodividedbyzero.idea.findbugs.common.DoneCallback;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.gui.tree.NodeVisitor;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.MaskIcon;
-import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.Icon;
 import javax.swing.tree.TreeNode;
@@ -56,7 +56,7 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	private final List<VisitableTreeNode> _childs;
 	private final Project _project;
 
-	private static final Icon _expandedIcon = new MaskIcon(ResourcesLoader.findIcon("/nodes/class.png", BugInstanceNode.class), JBColor.BLACK);
+	private static final Icon _expandedIcon = new MaskIcon(AllIcons.Nodes.Class, JBColor.BLACK);
 	private static final Icon _collapsedIcon = _expandedIcon;
 
 

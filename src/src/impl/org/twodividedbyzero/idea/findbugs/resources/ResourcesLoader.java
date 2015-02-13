@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -20,14 +20,15 @@ package org.twodividedbyzero.idea.findbugs.resources;
 
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.util.containers.SoftHashMap;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.util.ErrorUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.IoUtil;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import java.awt.Image;
-import java.awt.Toolkit;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
@@ -51,14 +52,14 @@ public final class ResourcesLoader {
 	private static volatile ResourceBundle _bundle;
 	private static final String LOCALE_RESOURCES_PKG = "org.twodividedbyzero.idea.findbugs.resources.i18n.Messages";
 	private static final String ICON_RESOURCES_PKG = "/org/twodividedbyzero/idea/findbugs/resources/icons";
-	private static final byte[] BYTE = new byte[0];
-	private static final Map<String, Object> _iconCache = new SoftHashMap<String, Object>();
+	private static final Map<String, Icon> _iconCache = new SoftHashMap<String, Icon>();
 
 
 	private ResourcesLoader() {
 	}
 
 
+	@NotNull
 	public static ResourceBundle getResourceBundle() {
 		LOGGER.info("Loading locale properties for '" + Locale.getDefault() + ')');
 
@@ -72,19 +73,6 @@ public final class ResourcesLoader {
 			_bundle = ResourceBundle.getBundle(LOCALE_RESOURCES_PKG, Locale.getDefault());
 		} catch (final MissingResourceException e) {
 			throw new MissingResourceException("Missing Resource bundle: " + Locale.getDefault() + ' ', LOCALE_RESOURCES_PKG, "");
-		}
-
-		return _bundle;
-	}
-
-
-	public static ResourceBundle getResourceBundle(final String localeResourceFolder) {
-		LOGGER.info("Loading locale properties for '" + Locale.getDefault() + '\'');
-		//noinspection UnusedCatchParameter
-		try {
-			_bundle = ResourceBundle.getBundle(localeResourceFolder, Locale.getDefault());
-		} catch (final MissingResourceException e) {
-			throw new MissingResourceException("Missing Resource bundle: " + Locale.getDefault() + ' ', localeResourceFolder, "");
 		}
 
 		return _bundle;
@@ -105,288 +93,71 @@ public final class ResourcesLoader {
 	}
 
 
-	private static InputStream getResourceStream(final String iconResourcePkg, final String filename) {
+	@Nullable
+	private static InputStream getResourceStream(@NotNull final String iconResourcePkg, final String filename) {
 		String iconResourcePkg1 = iconResourcePkg;
 		if (!iconResourcePkg1.isEmpty() && iconResourcePkg1.charAt(0) == '/') {
 			iconResourcePkg1 = iconResourcePkg1.replaceFirst("/", "");
 		}
 
-		final String resourceNname = '/' + iconResourcePkg1.replace('.', '/') + '/' + filename;
+		final String resourceName = '/' + iconResourcePkg1.replace('.', '/') + '/' + filename;
 		final Class<?> clazz = ResourcesLoader.class;
 
-		return clazz.getResourceAsStream(resourceNname);
+		return clazz.getResourceAsStream(resourceName);
 	}
 
 
 	@Nullable
-	private static Object queryIconCache(final String pkgName, final String filename) {
+	private static Icon queryIconCache(final String pkgName, final String filename) {
 		final String key = pkgName + '/' + filename;
-		if (_iconCache.containsKey(key)) {
-			LOGGER.debug("IconCache (size: " + _iconCache.size() + ") hit for '" + key + '\'');
+		synchronized (_iconCache) {
 			return _iconCache.get(key);
 		}
-		LOGGER.debug("IconCache (size: " + _iconCache.size() + ") miss for '" + key + '\'');
-
-		return null;
 	}
 
 
-	/**
-	 * Load string from file from jar or external resources.
-	 * <p> <blockquote><pre>
-	 * ModuleResources.loadTextResource("core.txt");
-	 * </pre></blockquote>
-	 *
-	 * @param filename the filename string
-	 * @return the text <code>String</code>
-	 */
-	public static String loadTextResource(final String filename) {
-		return loadTextResource(LOCALE_RESOURCES_PKG, filename);
-	}
-
-
-	/**
-	 * Load string from file from jar or external resources.
-	 * <p> <blockquote><pre>
-	 * ModuleResources.loadTextResource("de.espirit.firstspirit.opt.vscan.resources.locale", "core.txt");
-	 * </pre></blockquote>
-	 *
-	 * @param pkgName  the java package
-	 * @param filename the filename string
-	 * @return the text <code>String</code>
-	 */
-	private static String loadTextResource(final String pkgName, final String filename) {
-		String ret = null;
-		final InputStream is = getResourceStream(pkgName, filename);
-
-		if (is != null) {
-			final StringBuilder sb = new StringBuilder();
-
-			while (true) {
-				int c = 0;
-				try {
-					c = is.read();
-				} catch (final IOException e) {
-					LOGGER.error("InputStream read failure!", e);
-				}
-				if (c == -1) {
-					break;
-				}
-
-				sb.append((char) c);
-			}
-
-			try {
-				is.close();
-			} catch (final IOException e) {
-				LOGGER.error("Couldn't close InputStream.", e);
-			}
-			ret = sb.toString();
-		}
-
-		return ret;
-	}
-
-
-	ImageIcon loadImageIcon(final String filename, final String description) {
-		final java.net.URL imgURL = getClass().getResource(ICON_RESOURCES_PKG + '/' + filename);
-		if (imgURL != null) {
-			return new ImageIcon(imgURL, description);
-		} else {
-			LOGGER.info("Couldn't find file: " + filename);
-			return null;
-		}
-	}
-
-
-	/**
-	 * Load an image resource from jar or external locations.
-	 * <p> <blockquote><pre>
-	 * ModuleResources.loadImageResource("core.png");
-	 * </pre></blockquote>
-	 *
-	 * @param filename the image filename <code>String</code>
-	 * @return java.awt.Image
-	 */
-	public static Image loadImage(final String filename) {
-		return loadImage(ICON_RESOURCES_PKG, filename);
-	}
-
-
-	/**
-	 * Load an image resource from jar or external locations.
-	 *
-	 * @param pkgName  the java package
-	 * @param filename the image filename <code>String</code>
-	 * @return java.awt.Image
-	 */
-	@SuppressWarnings({"CheckForOutOfMemoryOnLargeArrayAllocation"})
-	private static Image loadImage(final String pkgName, final String filename) {
-		final Object cacheHit = queryIconCache(pkgName, filename);
-		if (cacheHit != null) {
-			return (Image) cacheHit;
-		}
-		Image ret = null;
-		final InputStream is = getResourceStream(pkgName, filename);
-
-		if (is != null) {
-			byte[] buffer = BYTE;
-			final byte[] tmBuf = new byte[1024];
-
-			while (true) {
-				int len = 0;
-				try {
-					len = is.read(tmBuf);
-				} catch (final IOException e) {
-					LOGGER.error("InputStream read failure!", e);
-				}
-
-				if (len <= 0) {
-					break;
-				}
-
-				final byte[] newbuf = new byte[buffer.length + len];
-				System.arraycopy(buffer, 0, newbuf, 0, buffer.length);
-				System.arraycopy(tmBuf, 0, newbuf, buffer.length, len);
-				buffer = newbuf;
-			}
-
-			ret = Toolkit.getDefaultToolkit().createImage(buffer);
-			addIfAbsent(pkgName, filename, ret);
-			try {
-				is.close();
-			} catch (final IOException e) {
-				LOGGER.error("Couldn't close InputStream.", e);
-			}
-		}
-
-		return ret;
-	}
-
-
-	private static void addIfAbsent(final String pkgName, final String filename, final Object ret) {
+	private static void addIfAbsent(final String pkgName, final String filename, final Icon ret) {
 		synchronized (_iconCache) {
 			_iconCache.put(pkgName + '/' + filename, ret);
 		}
 	}
 
 
-	/**
-	 * Load an image resource from jar or external locations.
-	 * <p> <blockquote><pre>
-	 * ModuleResources.loadIconResource("core.png");
-	 * </pre></blockquote>
-	 *
-	 * @param filename the image filename <code>String</code>
-	 * @return javax.swing.Icon
-	 */
+	@NotNull
 	public static Icon loadIcon(final String filename) {
 		return loadIcon(ICON_RESOURCES_PKG, filename);
 	}
 
 
-	/**
-	 * Load an image resource from jar or external locations.
-	 *
-	 * @param pkgName  the java package
-	 * @param filename the image filename <code>String</code>
-	 * @return javax.swing.Icon
-	 */
+	@NotNull
 	private static Icon loadIcon(final String pkgName, final String filename) {
 		final Object cacheHit = queryIconCache(pkgName, filename);
 		if (cacheHit != null) {
 			return (Icon) cacheHit;
 		}
-		Icon ret = null;
 		final InputStream is = getResourceStream(pkgName, filename);
-
-		if (is != null) {
-			byte[] buffer = BYTE;
-			@SuppressWarnings({"CheckForOutOfMemoryOnLargeArrayAllocation"})
-			final byte[] tmpBuffer = new byte[1024];
-
-			while (true) {
-				int len = 0;
-				try {
-					len = is.read(tmpBuffer);
-				} catch (final IOException e) {
-					LOGGER.error("InputStream read failure!", e);
-				}
-
-				if (len <= 0) {
-					break;
-				}
-
-				final byte[] newBuf = new byte[buffer.length + len];
-				System.arraycopy(buffer, 0, newBuf, 0, buffer.length);
-				System.arraycopy(tmpBuffer, 0, newBuf, buffer.length, len);
-				buffer = newBuf;
-			}
-
-			ret = new ImageIcon(buffer);
-			addIfAbsent(pkgName, filename, ret);
-			try {
-				is.close();
-			} catch (final IOException e) {
-				LOGGER.error("Couldn't close InputStream.", e);
-			}
+		if (is == null) {
+			throw new IllegalArgumentException("Could not find " + pkgName + filename);
 		}
 
-		if (ret == null || ret.getIconWidth() == 0 || ret.getIconHeight() == 0) {
-			return IconLoader.getIcon(pkgName.replace(ICON_RESOURCES_PKG + '/', "") + filename);
+		final Icon ret;
+		try {
+			final ByteArrayOutputStream out = new ByteArrayOutputStream();
+			IoUtil.copy(is, out);
+			ret = new ImageIcon(out.toByteArray());
+			addIfAbsent(pkgName, filename, ret);
+		} catch (final IOException e) {
+			throw ErrorUtil.toUnchecked(pkgName + filename, e);
+		} finally {
+			IoUtil.safeClose(is);
+		}
+
+		if (ret.getIconWidth() == 0 || ret.getIconHeight() == 0) {
+			throw new IllegalArgumentException("Could not load " + pkgName + filename);
 		}
 
 		return ret;
 	}
 
-
-	public static Icon findIcon(final String iconName) {
-		return findIcon(ICON_RESOURCES_PKG + '/' + iconName, ResourcesLoader.class);
-	}
-
-
-	public static Icon getIcon(final String path) {
-		return findIcon(path);
-	}
-
-
-	public static Icon findIcon(final String path, final Class<?> clazz) {
-		final Object cacheHit = queryIconCache(ICON_RESOURCES_PKG, path);
-		if (cacheHit != null) {
-			return (Icon) cacheHit;
-		}
-
-
-		final Icon icon = IconLoader.findIcon(path, clazz);
-
-		synchronized (_iconCache) {
-			_iconCache.put(ICON_RESOURCES_PKG + '!' + path, icon);
-		}
-
-		if (icon == null || icon.getIconWidth() == 0 || icon.getIconHeight() == 0) {
-			return  IconLoader.getIcon(path.replace(ICON_RESOURCES_PKG + '/', ""));
-		}
-
-		return icon;
-	}
-
-
-	public static Icon findIcon(final String iconName, final ClassLoader classLoader) {
-		final Object cacheHit = queryIconCache(ICON_RESOURCES_PKG, iconName);
-		if (cacheHit != null) {
-			return (Icon) cacheHit;
-		}
-
-		final Icon icon = IconLoader.findIcon(ICON_RESOURCES_PKG + '/' + iconName, classLoader);
-
-		synchronized (_iconCache) {
-			_iconCache.put(ICON_RESOURCES_PKG + '!' + iconName, icon);
-		}
-		if (icon == null || icon.getIconWidth() == 0 || icon.getIconHeight() == 0) {
-			return  IconLoader.getIcon(iconName.replace(ICON_RESOURCES_PKG + '/', ""));
-		}
-
-		return icon;
-	}
 
 }
