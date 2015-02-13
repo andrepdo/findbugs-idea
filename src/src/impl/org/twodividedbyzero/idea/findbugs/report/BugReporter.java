@@ -30,11 +30,10 @@ import edu.umd.cs.findbugs.ProjectStats;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import edu.umd.cs.findbugs.classfile.ClassDescriptor;
 import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventFactory;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEventImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
@@ -101,7 +100,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 	 * @see edu.umd.cs.findbugs.AbstractBugReporter#doReportBug(edu.umd.cs.findbugs.BugInstance)
 	 */
 	@Override
-	protected void doReportBug(final BugInstance bug) {
+	protected void doReportBug(@NotNull final BugInstance bug) {
 		if (_bugCollection == null) {
 			throw new IllegalStateException("Expected non null _bugCollection");
 		}
@@ -120,7 +119,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 		if (_isInspectionRun) {
 			EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(BugReporterInspectionEvent.Operation.NEW_BUG_INSTANCE, bug, _filteredBugCount, getProjectStats(), _project.getName()));
 		} else {
-			EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(BugReporterEvent.Operation.NEW_BUG_INSTANCE, bug, _filteredBugCount, getProjectStats(), _project.getName()));
+			EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newBug(bug, _filteredBugCount, getProjectStats(), _project));
 		}
 	}
 

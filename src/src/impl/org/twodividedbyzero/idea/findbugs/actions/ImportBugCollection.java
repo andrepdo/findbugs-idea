@@ -44,9 +44,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent.Operation;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventFactory;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventImpl;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
@@ -176,7 +174,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 						final double fraction = bugCounter.doubleValue() / projectStats.getTotalBugs();
 						indicator.setFraction(fraction);
 						indicator.setText2("Importing bug '" + bugCount + "' of '" + projectStats.getTotalBugs() + "' - " + bugInstance.getMessageWithoutPrefix());
-						EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.NEW_BUG_INSTANCE, bugInstance, bugCounter, projectStats, project.getName()));
+						EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newBug(bugInstance, bugCounter, projectStats, project));
 					}
 
 					showToolWindowNotifier(project, "Imported bug collection from '" + fileToImport + "'.", MessageType.INFO);
