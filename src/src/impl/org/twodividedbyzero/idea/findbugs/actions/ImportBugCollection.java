@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -45,6 +45,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent.Operation;
+import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventFactory;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventImpl;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
@@ -167,7 +168,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 					int bugCount = 0;
 					for (final BugInstance bugInstance : _importBugCollection) {
 						if (indicator.isCanceled()) {
-							EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_ABORTED, project.getName()));
+							EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 							Thread.currentThread().interrupt();
 							return;
 						}
@@ -184,13 +185,13 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 					_importBugCollection.setTimestamp(System.currentTimeMillis());
 					_importBugCollection.reinitializeCloud();
 				} catch (final IOException e1) {
-					EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_ABORTED, project.getName()));
+					EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 					final String message = "Import failed";
 					showToolWindowNotifier(project, message, MessageType.ERROR);
 					LOGGER.error(message, e1);
 
 				} catch (final DocumentException e1) {
-					EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_ABORTED, project.getName()));
+					EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 					final String message = "Import failed";
 					showToolWindowNotifier(project, message, MessageType.ERROR);
 					LOGGER.error(message, e1);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -34,6 +34,7 @@ import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent.Operation;
+import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventFactory;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEventImpl;
@@ -87,21 +88,10 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 	private final FindBugsProject _findBugsProject;
 
 
-	/**
-	 * Constructor.
-	 *
-	 * @param project the project whose classes are being analyzed for bugs
-	 */
-	public BugReporter(final Project project, final SortedBugCollection bugCollection, final FindBugsProject findBugsProject) {
-		this(project, false, bugCollection, findBugsProject);
-	}
-
-
 	public BugReporter(final Project project, final boolean isInspectionRun, final SortedBugCollection bugCollection, final FindBugsProject findBugsProject) {
-		//this.monitor = monitor;
 		_project = project;
-        final FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(project);
-        _preferences = pluginComponent.getPreferences();
+		final FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(project);
+		_preferences = pluginComponent.getPreferences();
 		_isInspectionRun = isInspectionRun;
 		_bugCollection = bugCollection;
 		_findBugsProject = findBugsProject;
@@ -247,7 +237,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 			if (_isInspectionRun) {
 				EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent.Operation.ANALYSIS_ABORTED, _project.getName()));
 			} else if (!isRunning()) {
-				EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_ABORTED, _project.getName()));
+				EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(_project));
 			}
 		}
 

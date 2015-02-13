@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -30,8 +30,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent.Operation;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventImpl;
+import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventFactory;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 
@@ -58,7 +57,7 @@ public class StopAction extends BaseAction implements EventListener<BugReporterE
 		_dataContext = e.getDataContext();
 		final com.intellij.openapi.project.Project project = DataKeys.PROJECT.getData(_dataContext);
 		if (project != null) {
-			EventManagerImpl.getInstance().fireEvent(new BugReporterEventImpl(Operation.ANALYSIS_ABORTED, project.getName()));
+			EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 		} else {
 			LOGGER.error("No active project");
 		}

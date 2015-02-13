@@ -87,12 +87,12 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	//private RecurseCollectorTask _collectorTask;
 
 
-	public FindBugsWorker(final com.intellij.openapi.project.Project project) {
+	public FindBugsWorker(final Project project) {
 		this(project, IdeaUtilImpl.getPluginComponent(project).getPreferences().getBooleanProperty(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND, false));
 	}
 
 
-	public FindBugsWorker(final com.intellij.openapi.project.Project project, final Module module) {
+	public FindBugsWorker(final Project project, final Module module) {
 		final FindBugsPreferences preferences = IdeaUtilImpl.getPluginComponent(project).getPreferences();
 		_startInBackground = preferences.getBooleanProperty(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND, false);
 		_project = project;
@@ -102,7 +102,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	}
 
 
-	public FindBugsWorker(final com.intellij.openapi.project.Project project, final boolean startInBackground) {
+	public FindBugsWorker(final Project project, final boolean startInBackground) {
 		_startInBackground = startInBackground;
 		_project = project;
 
@@ -233,7 +233,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 
 	protected IFindBugsEngine createFindBugsEngine() {
 		// Create BugReporter
-		_bugReporter = new BugReporter(_project, _bugCollection, _findBugsProject);
+		_bugReporter = new BugReporter(_project, false, _bugCollection, _findBugsProject);
 
 		//final ProjectFilterSettings projectFilterSettings = _userPrefs.getFilterSettings();
 		_bugReporter.setPriorityThreshold(_userPrefs.getUserDetectorThreshold());

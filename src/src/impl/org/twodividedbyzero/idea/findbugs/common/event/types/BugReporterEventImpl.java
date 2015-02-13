@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -50,7 +50,7 @@ public class BugReporterEventImpl extends EventImpl implements BugReporterEvent 
 	private final FindBugsProject _findBugsProject;
 
 
-	public BugReporterEventImpl(@NotNull final Operation operation, @NotNull final String projectName) {
+	BugReporterEventImpl(@NotNull final Operation operation, @NotNull final String projectName) {
 		this(operation, null, projectName);
 	}
 
