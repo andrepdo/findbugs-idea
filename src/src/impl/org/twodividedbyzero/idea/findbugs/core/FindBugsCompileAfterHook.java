@@ -138,15 +138,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 	@Override
 	public void projectClosed() {
 		CompilerManager.getInstance(_project).removeCompilationStatusListener(this);
-		if (isAfterAutoMakeEnabled(_project)) {
-			final boolean empty = Changes.INSTANCE.removeListener(_project);
-			if (empty) {
-				if (CHANGE_COLLECTOR != null) {
-					VirtualFileManager.getInstance().removeVirtualFileListener(CHANGE_COLLECTOR);
-					CHANGE_COLLECTOR = null;
-				}
-			}
-		}
+		setAnalyzeAfterAutomake(_project, false);
 	}
 
 
@@ -161,10 +153,25 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 	public void projectOpened() {
 		CompilerManager.getInstance(_project).addCompilationStatusListener(this);
 		if (isAfterAutoMakeEnabled(_project)) {
-			Changes.INSTANCE.addListener(_project);
+			setAnalyzeAfterAutomake(_project, true);
+		}
+	}
+
+
+	public static void setAnalyzeAfterAutomake(@NotNull final Project project, boolean enabled) {
+		if (enabled) {
+			Changes.INSTANCE.addListener(project);
 			if (CHANGE_COLLECTOR == null) {
 				CHANGE_COLLECTOR = new ChangeCollector();
 				VirtualFileManager.getInstance().addVirtualFileListener(CHANGE_COLLECTOR);
+			}
+		} else {
+			final boolean empty = Changes.INSTANCE.removeListener(project);
+			if (empty) {
+				if (CHANGE_COLLECTOR != null) {
+					VirtualFileManager.getInstance().removeVirtualFileListener(CHANGE_COLLECTOR);
+					CHANGE_COLLECTOR = null;
+				}
 			}
 		}
 	}

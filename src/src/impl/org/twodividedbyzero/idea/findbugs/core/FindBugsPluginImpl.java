@@ -414,6 +414,9 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 		final PluginLoaderImpl pluginLoader = new PluginLoaderImpl();
 		pluginLoader.load(_preferences.getPlugins(), _preferences.getDisabledUserPluginIds(), _preferences.getEnabledBundledPluginIds(), _preferences.getDisabledBundledPluginIds());
 
+		final boolean analyzeAfterAutomake = getPreferences().getBooleanProperty(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE, false);
+		FindBugsCompileAfterHook.setAnalyzeAfterAutomake(_project, analyzeAfterAutomake);
+
 		_preferences.applyDetectors();
 		_configPanel.updatePreferences(); // at least DetectorConfiguration needs a reload
 		_preferences.setModified(false);
