@@ -30,6 +30,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.wm.ToolWindow;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
@@ -41,7 +42,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 
 /**
@@ -54,17 +58,40 @@ import java.util.UUID;
 public class FindBugsCompileAfterHook implements CompilationStatusListener, ProjectComponent {
 
 
+	private static final ConcurrentMap<UUID, Set<VirtualFile>> CHANGED_BY_SESSION_ID = new ConcurrentHashMap<UUID, Set<VirtualFile>>();
+	private static ChangeCollector CHANGE_COLLECTOR; // EDT thread confinement
+
+
 	static {
+		/**
+		 * Note that ProjectData is cleared before BuildManagerListener#buildStarted is invoked,
+		 * so we can not use BuildManager.getInstance().getFilesChangedSinceLastCompilation(project).
+		 * There is no way to get the affect/compiled files (check with source of IC-140.2285.5).
+		 * As a workaround, {@link ChangeCollector} will collect the changes.
+		 */
 		ApplicationManager.getApplication().getMessageBus().connect().subscribe(BuildManagerListener.TOPIC, new BuildManagerListener() {
 			public void buildStarted(final Project project, final UUID sessionId, final boolean isAutomake) {
+				if (isAutomake && isAfterAutoMakeEnabled(project)) {
+					final Set<VirtualFile> changed = Changes.INSTANCE.getAndRemoveChanged(project);
+					if (changed != null) {
+						CHANGED_BY_SESSION_ID.put(sessionId, changed);
+					}
+				}
 			}
 
 
 			@Override
 			public void buildFinished(final Project project, final UUID sessionId, final boolean isAutomake) {
-				// TODO: get CompileContext? -> want only analyze affected files
 				if (isAutomake) {
-					initWorkerForAutoMake(project);
+					final Set<VirtualFile> changed = CHANGED_BY_SESSION_ID.remove(sessionId);
+					if (changed != null) {
+						ApplicationManager.getApplication().runReadAction(new Runnable() {
+							@Override
+							public void run() {
+								initWorkerForAutoMake(project, changed.toArray( new VirtualFile[changed.size()]));
+							}
+						});
+					}
 				} // else do nothing ; see FindBugsCompileAfterHook#compilationFinished
 			}
 		});
@@ -105,8 +132,21 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 	}
 
 
+	/**
+	 * Invoked by EDT.
+	 */
+	@Override
 	public void projectClosed() {
 		CompilerManager.getInstance(_project).removeCompilationStatusListener(this);
+		if (isAfterAutoMakeEnabled(_project)) {
+			final boolean empty = Changes.INSTANCE.removeListener(_project);
+			if (empty) {
+				if (CHANGE_COLLECTOR != null) {
+					VirtualFileManager.getInstance().removeVirtualFileListener(CHANGE_COLLECTOR);
+					CHANGE_COLLECTOR = null;
+				}
+			}
+		}
 	}
 
 
@@ -114,8 +154,19 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 	}
 
 
+	/**
+	 * Invoked by EDT.
+	 */
+	@Override
 	public void projectOpened() {
 		CompilerManager.getInstance(_project).addCompilationStatusListener(this);
+		if (isAfterAutoMakeEnabled(_project)) {
+			Changes.INSTANCE.addListener(_project);
+			if (CHANGE_COLLECTOR == null) {
+				CHANGE_COLLECTOR = new ChangeCollector();
+				VirtualFileManager.getInstance().addVirtualFileListener(CHANGE_COLLECTOR);
+			}
+		}
 	}
 
 
@@ -160,14 +211,14 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 	}
 
 
-	private static void initWorkerForAutoMake(@NotNull final Project project) {
+	private static boolean isAfterAutoMakeEnabled(@NotNull final Project project) {
 		final FindBugsPlugin findBugsPlugin = IdeaUtilImpl.getPluginComponent(project);
 		final FindBugsPreferences preferences = findBugsPlugin.getPreferences();
+		return Boolean.valueOf(preferences.getProperty(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE));
+	}
 
-		if (!Boolean.valueOf(preferences.getProperty(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE))) {
-			return;
-		}
 
+	private static void initWorkerForAutoMake(@NotNull final Project project, @NotNull final VirtualFile[] changed) {
 		final FindBugsWorker worker = new FindBugsWorker(project);
 
 		// set aux classpath
@@ -178,13 +229,11 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		}
 		worker.configureAuxClasspathEntries(classpaths.toArray(new VirtualFile[classpaths.size()]));
 
-		// set source dirs
-		final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(project);
-		worker.configureSourceDirectories(sourceRoots);
+		// set source files
+		worker.configureSourceDirectories(changed);
 
 		// set class files
-		final String[] outPath = IdeaUtilImpl.getCompilerOutputUrls(project);
-		worker.configureOutputFiles(outPath);
+		worker.configureOutputFiles(changed);
 		worker.work("Running FindBugs analysis for project '" + project.getName() + "'...");
 	}
 }
