@@ -26,7 +26,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
@@ -69,45 +68,6 @@ final class ChangeCollector extends VirtualFileAdapter {
 		if (VirtualFile.PROP_NAME.equals(event.getPropertyName())) {
 			final VirtualFile eventFile = event.getFile();
 			if (isInContentOfOpenedProject(eventFile)) {
-				final VirtualFile parent = event.getParent();
-				if (parent != null) {
-					final String oldName = (String)event.getOldValue();
-					final String root = parent.getPath() + "/" + oldName;
-					final Set<File> toMark = new THashSet<File>(FileUtil.FILE_HASHING_STRATEGY);
-					if (eventFile.isDirectory()) {
-						VfsUtilCore.visitChildrenRecursively(eventFile, new VirtualFileVisitor() {
-							private StringBuilder filePath = new StringBuilder(root);
-
-							@Override
-							public boolean visitFile(@NotNull VirtualFile child) {
-								if (child.isDirectory()) {
-									if (!Comparing.equal(child, eventFile)) {
-										filePath.append("/").append(child.getName());
-									}
-								}
-								else {
-									String childPath = filePath.toString();
-									if (!Comparing.equal(child, eventFile)) {
-										childPath += "/" + child.getName();
-									}
-									toMark.add(new File(childPath));
-								}
-								return true;
-							}
-
-							@Override
-							public void afterChildrenVisited(@NotNull VirtualFile file) {
-								if (file.isDirectory() && !Comparing.equal(file, eventFile)) {
-									filePath.delete(filePath.length() - file.getName().length() - 1, filePath.length());
-								}
-							}
-						});
-					}
-					else {
-						toMark.add(new File(root));
-					}
-					notifyFilesDeleted(toMark);
-				}
 				collectPathsAndNotify(eventFile, NOTIFY_CHANGED);
 			}
 		}
@@ -135,18 +95,6 @@ final class ChangeCollector extends VirtualFileAdapter {
 	@Override
 	public void fileMoved(@NotNull VirtualFileMoveEvent event) {
 		collectPathsAndNotify(event.getFile(), NOTIFY_CHANGED);
-	}
-
-
-	@Override
-	public void beforeFileDeletion(@NotNull final VirtualFileEvent event) {
-		collectPathsAndNotify(event.getFile(), NOTIFY_DELETED);
-	}
-
-
-	@Override
-	public void beforeFileMovement(@NotNull final VirtualFileMoveEvent event) {
-		collectPathsAndNotify(event.getFile(), NOTIFY_DELETED);
 	}
 
 
@@ -211,14 +159,6 @@ final class ChangeCollector extends VirtualFileAdapter {
 	};
 
 
-	private static final Function<Collection<File>, Void> NOTIFY_DELETED = new Function<Collection<File>, Void>() {
-		public Void fun(Collection<File> files) {
-			notifyFilesDeleted(files);
-			return null;
-		}
-	};
-
-
 	private static void collectPathsAndNotify(final VirtualFile file, final Function<Collection<File>, Void> notification) {
 		final Set<File> pathsToMark = new THashSet<File>(FileUtil.FILE_HASHING_STRATEGY);
 		if (!isIgnoredOrUnderIgnoredDirectory(file)) {
@@ -264,12 +204,4 @@ final class ChangeCollector extends VirtualFileAdapter {
 			Changes.INSTANCE.addChanged( paths );
 		}
 	}
-
-
-	private static void notifyFilesDeleted(Collection<File> paths) {
-		//if (!paths.isEmpty()) {
-		//	Changes.INSTANCE.addDeleted(paths);
-		//}
-	}
-
 }
