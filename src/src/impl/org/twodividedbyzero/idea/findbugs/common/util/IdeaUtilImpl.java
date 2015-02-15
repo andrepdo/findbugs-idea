@@ -121,7 +121,7 @@ public final class IdeaUtilImpl {
 	@NotNull
 	private static final String IDEA_PROJECT_DIR_VAR = "$PROJECT_DIR$";
 
-	private static final Set<String> SUPPORTED_FILE_TYPES_EXT = new THashSet<String>(Arrays.asList("java", "scala", "groovy", "gradle"));
+	private static final Set<String> SUPPORTED_FILE_TYPES_EXT = new THashSet<String>(Arrays.asList("java", "scala", "groovy", "gradle", "aj"));
 	public static final Set<FileType> SUPPORTED_FILE_TYPES;
 	static {
 		final THashSet<FileType> supported = new THashSet<FileType>(4);
@@ -134,6 +134,10 @@ public final class IdeaUtilImpl {
 		final FileType groovy = FileTypeManager.getInstance().getFileTypeByExtension("GROOVY");
 		if (!(groovy instanceof UnknownFileType)) {
 			supported.add(groovy);
+		}
+		final FileType aspectJ = FileTypeManager.getInstance().getFileTypeByExtension("AJ");
+		if (!(aspectJ instanceof UnknownFileType)) {
+			supported.add(aspectJ);
 		}
 		SUPPORTED_FILE_TYPES = supported;
 	}
@@ -149,10 +153,14 @@ public final class IdeaUtilImpl {
 		if (groovy != null) {
 			supported.add(groovy);
 		}
+		final Language aspectJ = Language.findLanguageByID("AspectJ");
+		if (aspectJ != null) {
+			supported.add(aspectJ);
+		}
 		SUPPORTED_LANGUAGES = supported;
 	}
 	public static boolean isLanguageSupported(@NotNull final Language language) {
-		return language.isKindOf(JavaLanguage.INSTANCE) || language.isKindOf("Scala") || language.isKindOf("Groovy");
+		return language.isKindOf(JavaLanguage.INSTANCE) || language.isKindOf("Scala") || language.isKindOf("Groovy") || language.isKindOf("AspectJ");
 	}
 
 	private IdeaUtilImpl() {
