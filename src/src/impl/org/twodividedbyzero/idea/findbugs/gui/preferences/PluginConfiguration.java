@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -401,6 +401,7 @@ public class PluginConfiguration implements ConfigurationPage {
 			editorPane.setEditorKit(new HTMLEditorKit());
 			editorPane.setFocusable(false);
 			editorPane.setContentType("text/html");
+			editorPane.setBackground(PLUGIN_DESCRIPTION_BG_COLOR);
 
 			final String website = plugin.getWebsite();
 			final StringBuilder html = new StringBuilder("<html><body width='300px'>");
