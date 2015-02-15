@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -342,7 +342,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	}
 
 
-	public void configureOutputFile(final PsiClass psiClass) {
+	public void configureOutputFile(@NotNull final PsiClass psiClass) {
 		_findBugsProject.configureOutputFile(_project, psiClass);
 	}
 

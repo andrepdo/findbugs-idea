@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -94,9 +94,10 @@ public class FindBugsProject extends Project {
 
 	public void configureOutputFiles(@NotNull final com.intellij.openapi.project.Project project, @NotNull final Collection<VirtualFile> files) {
 		_outputFiles = asPathList(files);
+		final RecurseClassCollector rcc = new RecurseClassCollector(this, project, true);
 		for (final VirtualFile file : files) {
 			if (IdeaUtilImpl.isValidFileType(file.getFileType())) {
-				new RecurseClassCollector(this, project).addContainingClasses(file);
+				rcc.addContainingClasses(file);
 			}
 		}
 	}
@@ -104,26 +105,20 @@ public class FindBugsProject extends Project {
 
 	public void configureOutputFiles(@NotNull final com.intellij.openapi.project.Project project, @NotNull final VirtualFile[] files) {
 		_outputFiles = asPathList(files);
+		final RecurseClassCollector rcc = new RecurseClassCollector(this, project, true);
 		for (final VirtualFile file : files) {
 			if (IdeaUtilImpl.isValidFileType(file.getFileType())) {
-				new RecurseClassCollector(this, project).addContainingClasses(file);
+				rcc.addContainingClasses(file);
 			}
 		}
 	}
 
 
-	public void configureOutputFile(final com.intellij.openapi.project.Project project, final PsiClass selectedPsiClass) {
-		//final com.intellij.openapi.project.Project project = IdeaUtilImpl.getProject(dataContext);
-		final VirtualFile vFile = IdeaUtilImpl.getVirtualFile(selectedPsiClass);
+	public void configureOutputFile(@NotNull final com.intellij.openapi.project.Project project, final PsiClass psiClass) {
+		final VirtualFile vFile = IdeaUtilImpl.getVirtualFile(psiClass);
 		if (vFile != null) {
 			_outputFiles = Arrays.asList(vFile.getPath());
-
-			final RecurseClassCollector classCollector = new RecurseClassCollector(this, project);
-			//classCollector.setVirtualFile(file);
-			classCollector.addContainingClasses(selectedPsiClass);
-
-			// clear for gc
-			classCollector.getResult().clear();
+			new RecurseClassCollector(this, project, true).addContainingClasses(psiClass);
 		}
 	}
 

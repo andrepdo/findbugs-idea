@@ -40,44 +40,50 @@ import java.util.Map;
 
 
 /**
- * $Date$
+ * Note that 'this' should not escape since a instance is reusable.
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
  * @version $Revision$
  * @since 0.0.1
  */
-public class RecurseClassCollector {
+public final class RecurseClassCollector {
 
 	private static final Logger LOGGER = Logger.getInstance(RecurseClassCollector.class.getName());
+	public static final String CLASS_FILE_SUFFIX = ".class";
+	private static final String ANONYMOUS_CLASS_DELIMITER = "$";
 
 	private final FindBugsProject _findBugsProject;
 	private final Project _project;
-	private final Map<String, PsiElement> _classes; // TODO: collect all classes url's and addFile later
-	public static final String CLASS_FILE_SUFFIX = ".class";
 	private final boolean _collectAndAdd;
-	private static final String ANONYMOUSE_CLASS_DELIMITER = "$";
-
-
-	public RecurseClassCollector(final FindBugsProject findBugsProject, @NotNull final Project project) {
-		this(findBugsProject, project, true);
-	}
+	private final PsiManager _psiManager;
+	private final Map<String, PsiElement> _classes; // TODO: collect all classes url's and addFile later
 
 
 	public RecurseClassCollector(final FindBugsProject findBugsProject, @NotNull final Project project, final boolean collectAndAdd) {
 		_findBugsProject = findBugsProject;
 		_project = project;
 		_collectAndAdd = collectAndAdd;
-		_classes = new HashMap<String, PsiElement>();
+		_psiManager = PsiManager.getInstance(_project);
+		if (_collectAndAdd) {
+			_classes = null;
+		} else {
+			_classes = new HashMap<String, PsiElement>();
+		}
+	}
+
+
+	private void put(@NotNull final String fqp, @NotNull final PsiElement element) {
+		if (_collectAndAdd) {
+			addFile(fqp + CLASS_FILE_SUFFIX);
+		} else {
+			_classes.put(fqp + CLASS_FILE_SUFFIX, element);
+		}
 	}
 
 
 	public void addContainingClasses(@NotNull final VirtualFile virtualFile) {
 
-		if (!IdeaUtilImpl.isValidFileType(virtualFile.getFileType())) {
-			return;
-		}
-
-		final PsiFile psiFile = PsiManager.getInstance(_project).findFile(virtualFile);
+		final PsiFile psiFile = _psiManager.findFile(virtualFile);
 
 		if (psiFile instanceof PsiClassOwner) {
 			final PsiClassOwner psiClassOwner = (PsiClassOwner) psiFile;
@@ -89,11 +95,7 @@ public class RecurseClassCollector {
 					continue;
 				}
 				final String fqp = buildFullQualifiedPath(compilerOutputPath.getPresentableUrl(), psiClass);
-				final String fqn = fqp + CLASS_FILE_SUFFIX;
-				if (isCollectAndAdd()) {
-					addFile(fqn);
-				}
-				_classes.put(fqn, psiClass);
+				put(fqp, psiClass);
 				addAnonymousClasses(psiClass, fqp);
 				addInnerClasses(psiClass, fqp);
 			}
@@ -115,7 +117,7 @@ public class RecurseClassCollector {
 			return;
 		}
 
-		final PsiFile psiFile = PsiManager.getInstance(_project).findFile(virtualFile);
+		final PsiFile psiFile = _psiManager.findFile(virtualFile);
 
 		if (psiFile instanceof PsiClassOwner) {
 			final PsiClassOwner psiClassOwner = (PsiClassOwner) psiFile;
@@ -134,14 +136,8 @@ public class RecurseClassCollector {
 				}
 
 				final String fqp = buildFullQualifiedPath(compilerOutputPath.getPresentableUrl(), psiClass);
-				final String fqn = fqp + CLASS_FILE_SUFFIX;
-
 				if (s.equals(s1)) {
-					if (isCollectAndAdd()) {
-						addFile(fqn);
-					}
-
-					_classes.put(fqn, psiClass);
+					put(fqp, psiClass);
 				} else {
 					addAnonymousClasses(psiClass, fqp, s);
 					addInnerClasses(psiClass, fqp, s);
@@ -162,25 +158,18 @@ public class RecurseClassCollector {
 
 		for (final PsiClass innerPsiClass : psiClasses) {
 			final String innerClassName = innerPsiClass.getName();
-			final String fqp = fullQualifiedPath + ANONYMOUSE_CLASS_DELIMITER + innerClassName;
-
+			final String fqp = fullQualifiedPath + ANONYMOUS_CLASS_DELIMITER + innerClassName;
 
 			assert innerClassName != null;
 			if (findClass != null && innerClassName.equals(findClass)) {
-				if (isCollectAndAdd()) {
-					addFile(fqp + CLASS_FILE_SUFFIX);
-				}
-				_classes.put(fqp + CLASS_FILE_SUFFIX, innerPsiClass);
-
+				put(fqp, innerPsiClass);
 				return;
+
 			} else if (findClass != null) {
 				addAnonymousClasses(innerPsiClass, fqp, findClass);
 				addInnerClasses(innerPsiClass, fqp, findClass);
 			} else { // default branch: no analyze class under cursor
-				if (isCollectAndAdd()) {
-					addFile(fqp + CLASS_FILE_SUFFIX);
-				}
-				_classes.put(fqp + CLASS_FILE_SUFFIX, innerPsiClass);
+				put(fqp, innerPsiClass);
 				addAnonymousClasses(innerPsiClass, fqp);
 				addInnerClasses(innerPsiClass, fqp);
 			}
@@ -202,24 +191,17 @@ public class RecurseClassCollector {
 			final String className = psiClass.getName();
 
 			if (!"null".equals(className)) {
-				final String fqp = fullQualifiedPath + ANONYMOUSE_CLASS_DELIMITER + anonymousClassPrefix + className;
+				final String fqp = fullQualifiedPath + ANONYMOUS_CLASS_DELIMITER + anonymousClassPrefix + className;
 
 				if (findClass != null && String.valueOf(anonymousClassPrefix).equals(findClass)) {
-					if (isCollectAndAdd()) {
-						addFile(fqp + CLASS_FILE_SUFFIX);
-					}
-					_classes.put(fqp + CLASS_FILE_SUFFIX, element);
-
+					put(fqp, element);
 					return;
+
 				} else if (findClass != null) {
 					addAnonymousClasses(psiElement, fqp, findClass);
 					addInnerClasses(psiClass, fqp, anonymousClassPrefix, findClass);
 				} else { // default branch: no analyze class under cursor
-					if (isCollectAndAdd()) {
-						addFile(fqp + CLASS_FILE_SUFFIX);
-					}
-					_classes.put(fqp + CLASS_FILE_SUFFIX, element);
-
+					put(fqp, element);
 					// add nested inner/anonymous classes of current anonymous psiClass/Element
 					addAnonymousClasses(psiElement, fqp);
 					addInnerClasses(psiClass, fqp);
@@ -242,25 +224,17 @@ public class RecurseClassCollector {
 		for (int i = 0; i < length; i++) {
 
 			final int anonymousClassPrefix = i + 1;
-			final String fqp = fullQualifiedPath + ANONYMOUSE_CLASS_DELIMITER + anonymousClassPrefix;
+			final String fqp = fullQualifiedPath + ANONYMOUS_CLASS_DELIMITER + anonymousClassPrefix;
 
 			if (findClass != null && String.valueOf(anonymousClassPrefix).equals(findClass)) {
-				if (isCollectAndAdd()) {
-					addFile(fqp + CLASS_FILE_SUFFIX);
-				}
-				_classes.put(fqp + CLASS_FILE_SUFFIX, classes[i]);
-
+				put(fqp, classes[i]);
 				return;
+
 			} else if (findClass != null) {
 				addAnonymousClasses(classes[i], fqp, findClass);
 				addInnerClasses(classes[i], fqp, anonymousClassPrefix, findClass);
 			} else { // default branch: no analyze class under cursor
-
-				if (isCollectAndAdd()) {
-					addFile(fqp + CLASS_FILE_SUFFIX);
-				}
-				_classes.put(fqp + CLASS_FILE_SUFFIX, classes[i]);
-
+				put(fqp, classes[i]);
 				// add nested inner/anonymous classes of current anonymous psiClass/Element
 				addAnonymousClasses(classes[i], fqp);
 				addInnerClasses(classes[i], fqp, anonymousClassPrefix);
@@ -313,11 +287,6 @@ public class RecurseClassCollector {
 		} else {
 			LOGGER.debug("class file: " + fullQualifiedName + " does not exists. maybe an inner/anonymous class? try to recompile your sources.");
 		}
-	}
-
-
-	private boolean isCollectAndAdd() {
-		return _collectAndAdd;
 	}
 
 
