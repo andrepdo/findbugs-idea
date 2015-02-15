@@ -23,8 +23,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import edu.umd.cs.findbugs.Project;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.collectors.RecurseClassCollector;
 import org.twodividedbyzero.idea.findbugs.collectors.RecurseFileCollector;
+import org.twodividedbyzero.idea.findbugs.collectors.StatelessClassAdder;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 
 import java.io.File;
@@ -94,10 +94,10 @@ public class FindBugsProject extends Project {
 
 	public void configureOutputFiles(@NotNull final com.intellij.openapi.project.Project project, @NotNull final Collection<VirtualFile> files) {
 		_outputFiles = asPathList(files);
-		final RecurseClassCollector rcc = new RecurseClassCollector(this, project, true);
+		final StatelessClassAdder sca = new StatelessClassAdder(this, project);
 		for (final VirtualFile file : files) {
 			if (IdeaUtilImpl.isValidFileType(file.getFileType())) {
-				rcc.addContainingClasses(file);
+				sca.addContainingClasses(file);
 			}
 		}
 	}
@@ -105,10 +105,10 @@ public class FindBugsProject extends Project {
 
 	public void configureOutputFiles(@NotNull final com.intellij.openapi.project.Project project, @NotNull final VirtualFile[] files) {
 		_outputFiles = asPathList(files);
-		final RecurseClassCollector rcc = new RecurseClassCollector(this, project, true);
+		final StatelessClassAdder sca = new StatelessClassAdder(this, project);
 		for (final VirtualFile file : files) {
 			if (IdeaUtilImpl.isValidFileType(file.getFileType())) {
-				rcc.addContainingClasses(file);
+				sca.addContainingClasses(file);
 			}
 		}
 	}
@@ -118,7 +118,7 @@ public class FindBugsProject extends Project {
 		final VirtualFile vFile = IdeaUtilImpl.getVirtualFile(psiClass);
 		if (vFile != null) {
 			_outputFiles = Arrays.asList(vFile.getPath());
-			new RecurseClassCollector(this, project, true).addContainingClasses(psiClass);
+			new StatelessClassAdder(this, project).addContainingClasses(psiClass);
 		}
 	}
 

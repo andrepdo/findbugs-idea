@@ -81,7 +81,8 @@ import com.intellij.psi.util.PsiUtilCore;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.collectors.RecurseClassCollector;
+import org.twodividedbyzero.idea.findbugs.collectors.AbstractClassAdder;
+import org.twodividedbyzero.idea.findbugs.collectors.ClassCollector;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
@@ -1079,13 +1080,13 @@ public final class IdeaUtilImpl {
 	public static PsiElement findAnonymousClassPsiElement(@Nullable final PsiFileSystemItem psiFile, @NotNull final BugInstanceNode bugInstanceNode, @NotNull final Project project) {
 		if (psiFile != null) {
 			final String classNameToFind = BugInstanceUtil.getSimpleClassName(bugInstanceNode.getBugInstance());
-			final RecurseClassCollector recurseClassCollector = new RecurseClassCollector(null, project, false);
-			recurseClassCollector.addContainingClasses(psiFile.getVirtualFile());
-			final Map<String, PsiElement> result = recurseClassCollector.getResult();
+			final ClassCollector cc = new ClassCollector(project);
+			cc.addContainingClasses(psiFile.getVirtualFile());
+			final Map<String, PsiElement> classes = cc.getClasses();
 
-			for (final Entry<String, PsiElement> entry : result.entrySet()) {
+			for (final Entry<String, PsiElement> entry : classes.entrySet()) {
 				final String fileName = new File(entry.getKey()).getName();
-				if (fileName.equals(classNameToFind + RecurseClassCollector.CLASS_FILE_SUFFIX)) {
+				if (fileName.equals(classNameToFind + AbstractClassAdder.CLASS_FILE_SUFFIX)) {
 					return entry.getValue();
 				}
 			}

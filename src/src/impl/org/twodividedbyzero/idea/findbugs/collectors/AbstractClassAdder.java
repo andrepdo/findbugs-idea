@@ -32,56 +32,35 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
- * Note that 'this' should not escape since a instance is reusable.
- *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
  * @version $Revision$
  * @since 0.0.1
  */
-public final class RecurseClassCollector {
+public abstract class AbstractClassAdder {
 
-	private static final Logger LOGGER = Logger.getInstance(RecurseClassCollector.class.getName());
+	private static final Logger LOGGER = Logger.getInstance(AbstractClassAdder.class.getName());
 	public static final String CLASS_FILE_SUFFIX = ".class";
 	private static final String ANONYMOUS_CLASS_DELIMITER = "$";
 
-	private final FindBugsProject _findBugsProject;
 	private final Project _project;
-	private final boolean _collectAndAdd;
 	private final PsiManager _psiManager;
-	private final Map<String, PsiElement> _classes; // TODO: collect all classes url's and addFile later
 
 
-	public RecurseClassCollector(final FindBugsProject findBugsProject, @NotNull final Project project, final boolean collectAndAdd) {
-		_findBugsProject = findBugsProject;
+	AbstractClassAdder(@NotNull final Project project) {
 		_project = project;
-		_collectAndAdd = collectAndAdd;
 		_psiManager = PsiManager.getInstance(_project);
-		if (_collectAndAdd) {
-			_classes = null;
-		} else {
-			_classes = new HashMap<String, PsiElement>();
-		}
 	}
 
 
-	private void put(@NotNull final String fqp, @NotNull final PsiElement element) {
-		if (_collectAndAdd) {
-			addFile(fqp + CLASS_FILE_SUFFIX);
-		} else {
-			_classes.put(fqp + CLASS_FILE_SUFFIX, element);
-		}
-	}
+	abstract void put(@NotNull final String fqp, @NotNull final PsiElement element);
 
 
-	public void addContainingClasses(@NotNull final VirtualFile virtualFile) {
+	public final void addContainingClasses(@NotNull final VirtualFile virtualFile) {
 
 		final PsiFile psiFile = _psiManager.findFile(virtualFile);
 
@@ -104,7 +83,7 @@ public final class RecurseClassCollector {
 
 
 	// analyze class under cursor
-	public void addContainingClasses(@NotNull final PsiClass selectedPsiClass) {
+	public final void addContainingClasses(@NotNull final PsiClass selectedPsiClass) {
 		final VirtualFile virtualFile = IdeaUtilImpl.getVirtualFile(selectedPsiClass);
 
 		assert virtualFile != null;
@@ -278,30 +257,6 @@ public final class RecurseClassCollector {
 
 		return fqn.toString();
 	}*/
-
-
-	private void addFile(final String fullQualifiedName) {
-		if (new File(fullQualifiedName).exists()) {
-			_findBugsProject.addFile(fullQualifiedName);
-			LOGGER.debug("adding class file: " + fullQualifiedName);
-		} else {
-			LOGGER.debug("class file: " + fullQualifiedName + " does not exists. maybe an inner/anonymous class? try to recompile your sources.");
-		}
-	}
-
-
-	/**
-	 * Get the collected class files. use {@link RecurseClassCollector#addFile(String)} to add
-	 * them to a {@link org.twodividedbyzero.idea.findbugs.core.FindBugsProject}. if using the collectAndAdd flag <code>true</code>
-	 * {@link RecurseClassCollector#RecurseClassCollector(FindBugsProject, com.intellij.openapi.project.Project, boolean)}
-	 * the files were automaticaly added to the given FindBugsProject.
-	 *
-	 * @return the collected full qualified class names and path in the file system
-	 */
-	@SuppressWarnings({"ReturnOfCollectionOrArrayField"})
-	public Map<String, PsiElement> getResult() {
-		return _classes;
-	}
 
 
 }
