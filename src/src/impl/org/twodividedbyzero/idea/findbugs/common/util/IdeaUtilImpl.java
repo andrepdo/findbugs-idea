@@ -467,6 +467,7 @@ public final class IdeaUtilImpl {
 	}
 
 
+	@NotNull
 	public static String getPackageUrl(@NotNull final PsiElement psiElement) {
 		return getPackage(psiElement).replace('.', '/');
 	}
