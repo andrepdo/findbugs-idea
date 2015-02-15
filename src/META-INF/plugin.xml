@@ -259,6 +259,10 @@
         <annotator language="Scala" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugAnnotator"/>
         <codeInsight.lineMarkerProvider language="Scala" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugsLineMarkerProvider"/>
     </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <annotator language="Groovy" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugAnnotator"/>
+        <codeInsight.lineMarkerProvider language="Groovy" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugsLineMarkerProvider"/>
+    </extensions>
     <project-components>
         <component>
             <implementation-class>org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl</implementation-class>
