@@ -19,6 +19,8 @@
 package org.twodividedbyzero.idea.findbugs.common.util;
 
 import com.intellij.ide.plugins.PluginManager;
+import com.intellij.lang.Language;
+import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.application.ApplicationInfo;
@@ -35,6 +37,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.fileTypes.StdFileTypes;
+import com.intellij.openapi.fileTypes.UnknownFileType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtilCore;
@@ -69,13 +72,13 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileSystemItem;
-import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiPackage;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtilCore;
+import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.collectors.RecurseClassCollector;
@@ -89,6 +92,7 @@ import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -116,6 +120,39 @@ public final class IdeaUtilImpl {
 	@NotNull
 	private static final String IDEA_PROJECT_DIR_VAR = "$PROJECT_DIR$";
 
+	private static final Set<String> SUPPORTED_FILE_TYPES_EXT = new THashSet<String>(Arrays.asList("java", "scala", "groovy", "gradle"));
+	public static final Set<FileType> SUPPORTED_FILE_TYPES;
+	static {
+		final THashSet<FileType> supported = new THashSet<FileType>(4);
+		supported.add(StdFileTypes.JAVA);
+		supported.add(StdFileTypes.CLASS);
+		final FileType scala = FileTypeManager.getInstance().getFileTypeByExtension("SCALA");
+		if (!(scala instanceof UnknownFileType)) {
+			supported.add(scala);
+		}
+		final FileType groovy = FileTypeManager.getInstance().getFileTypeByExtension("GROOVY");
+		if (!(groovy instanceof UnknownFileType)) {
+			supported.add(groovy);
+		}
+		SUPPORTED_FILE_TYPES = supported;
+	}
+	private static final Set<Language> SUPPORTED_LANGUAGES;
+	static {
+		final THashSet<Language> supported = new THashSet<Language>(3);
+		supported.add(JavaLanguage.INSTANCE);
+		final Language scala = Language.findLanguageByID("Scala");
+		if (scala != null) {
+			supported.add(scala);
+		}
+		final Language groovy = Language.findLanguageByID("Groovy");
+		if (groovy != null) {
+			supported.add(groovy);
+		}
+		SUPPORTED_LANGUAGES = supported;
+	}
+	public static boolean isLanguageSupported(@NotNull final Language language) {
+		return language.isKindOf(JavaLanguage.INSTANCE) || language.isKindOf("Scala") || language.isKindOf("Groovy");
+	}
 
 	private IdeaUtilImpl() {
 	}
@@ -315,8 +352,8 @@ public final class IdeaUtilImpl {
 
 		//noinspection ZeroLengthArrayAllocation
 		PsiClass[] clazzes = new PsiClass[0];
-		if (psiFile instanceof PsiJavaFile) {
-			clazzes = ((PsiJavaFile) psiFile).getClasses();
+		if (psiFile instanceof PsiClassOwner) {
+			clazzes = ((PsiClassOwner) psiFile).getClasses();
 			if (clazzes.length > 0) {
 				// note, there could be more then one class in the file
 				// one needs to find public class or class with name = name of
@@ -877,7 +914,7 @@ public final class IdeaUtilImpl {
 	 */
 	@Nullable
 	public static PsiClass findJavaPsiClass(@NotNull final Project project, @NotNull final String classname) {
-		final String fqn = classname.endsWith(".java") ? classname.substring(0, classname.length()-".java".length()) : classname;
+		final String fqn = removeExtension(classname);
 		final String dottedName = fqn.contains("/") ? fqn.replace('/', '.') : fqn;
 		final GlobalSearchScope scope = GlobalSearchScope.allScope(project);
 		return findJavaPsiClass(project, dottedName, scope);
@@ -953,8 +990,21 @@ public final class IdeaUtilImpl {
 	}
 
 
+	@NotNull
+	public static String removeExtension(@NotNull final String name) {
+		int pos = name.lastIndexOf('.');
+		if (pos != -1) {
+			final String ext = name.substring(pos+1).toLowerCase();
+			if (SUPPORTED_FILE_TYPES_EXT.contains(ext)) {
+				return name.substring(0, pos);
+			}
+		}
+		return name;
+	}
+
+
 	public static boolean isValidFileType(@Nullable final FileType fileType) {
-		return fileType != null && StdFileTypes.JAVA.equals(fileType) || StdFileTypes.CLASS.equals(fileType);
+		return fileType != null && SUPPORTED_FILE_TYPES.contains(fileType);
 	}
 
 

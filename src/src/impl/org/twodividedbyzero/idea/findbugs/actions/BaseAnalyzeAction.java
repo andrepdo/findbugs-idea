@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -34,8 +34,6 @@ import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.application.Result;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.help.HelpManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -53,13 +51,14 @@ import com.intellij.psi.PsiRecursiveElementVisitor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 
 import javax.annotation.Nullable;
 import javax.swing.Action;
 import javax.swing.JComponent;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 /**
@@ -140,54 +139,24 @@ public abstract class BaseAnalyzeAction extends BaseAction {
 	protected abstract void analyze(@NotNull final Project project, final AnalysisScope scope);
 
 
-	@SuppressFBWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON"})
-	protected final Iterable<String> findClasses(@NotNull final Project project, final AnalysisScope scope) {
-		final Collection<String> ret = new ArrayList<String>(256);
+	@NotNull
+	protected final VirtualFile[] findClasses(@NotNull final Project project, final AnalysisScope scope) {
+		final Collection<VirtualFile> ret = new LinkedList<VirtualFile>();
 		final PsiManager psiManager = PsiManager.getInstance(project);
 		psiManager.startBatchFilesProcessingMode();
 		try {
-			//noinspection AnonymousInnerClass
 			scope.accept(new PsiRecursiveElementVisitor() {
-
-				FileType fileType;
-				String path;
-				VirtualFile virtualFile;
-
 				@Override
 				public void visitFile(final PsiFile file) {
-					fileType = file.getFileType();
-					if (StdFileTypes.JAVA.equals(fileType)) {
-						path = AnalyzeUtil.getOutputClassFilePathForJavaFile(file, project);
-						if (path != null) {
-							addPath(path);
-						} else {
-							LOGGER.warn("No output class path found for PsiFile: " + file);
-						}
-					} else if (StdFileTypes.CLASS.equals(fileType)) {
-						virtualFile = file.getVirtualFile();
-						if (virtualFile != null) {
-							path = virtualFile.getPath();
-							if (path != null) {
-								addPath(path);
-							} else {
-								LOGGER.warn("No path for VirtualFile: " + virtualFile);
-							}
-						} else {
-							LOGGER.warn("No virtual file for PsiFile: " + file);
-						}
-					} // else skip non .java and .class files
-				}
-
-				private void addPath(final String path) {
-					if (!ret.contains(path)) {
-						ret.add(path);
-					} // LATER: check why visitFile is called multiple times for the same PsiFile ?
+					if (IdeaUtilImpl.SUPPORTED_FILE_TYPES.contains(file.getFileType())) {
+						ret.add(file.getVirtualFile());
+					}
 				}
 			});
 		} finally {
 			psiManager.finishBatchFilesProcessingMode();
 		}
-		return ret;
+		return ret.toArray(new VirtualFile[ret.size()]); // TODO optimize, return iterable/collection
 	}
 
 

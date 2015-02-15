@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -26,7 +26,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassOwner;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.Nullable;
@@ -79,9 +78,9 @@ public class RecurseClassCollector {
 
 		final PsiFile psiFile = PsiManager.getInstance(_project).findFile(virtualFile);
 
-		if (psiFile instanceof PsiJavaFile) {
-			final PsiClassOwner psiJavaFile = (PsiJavaFile) psiFile;
-			final PsiClass[] psiClasses = psiJavaFile.getClasses();
+		if (psiFile instanceof PsiClassOwner) {
+			final PsiClassOwner psiClassOwner = (PsiClassOwner) psiFile;
+			final PsiClass[] psiClasses = psiClassOwner.getClasses();
 
 			for (final PsiClass psiClass : psiClasses) {
 				//final String fqp = buildFullQualifiedPath(_compileOutputDir.getPresentableUrl(), psiClass);
@@ -120,9 +119,9 @@ public class RecurseClassCollector {
 
 		final PsiFile psiFile = PsiManager.getInstance(_project).findFile(virtualFile);
 
-		if (psiFile instanceof PsiJavaFile) {
-			final PsiClassOwner psiJavaFile = (PsiJavaFile) psiFile;
-			final PsiClass[] psiClasses = psiJavaFile.getClasses();
+		if (psiFile instanceof PsiClassOwner) {
+			final PsiClassOwner psiClassOwner = (PsiClassOwner) psiFile;
+			final PsiClass[] psiClasses = psiClassOwner.getClasses();
 
 			for (final PsiClass psiClass : psiClasses) {
 

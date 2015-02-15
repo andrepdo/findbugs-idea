@@ -91,6 +91,7 @@
             <li>Issue 78: avoid assertion error</li>
             <li>Issue 87: support -Didea.is.internal=true</li>
             <li>Support analyze after auto make</li>
+            <li>Basic Scala/Groovy support</li>
             <li>Plugin compatibility: IDEA 13.0 (133.193) until the latest IDEA 14 release (140.2285)</li>
             <li>Note that IDEA 12.x is no longer supported</li>
         </ul>
@@ -253,6 +254,10 @@
     <extensions defaultExtensionNs="com.intellij">
         <annotator language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugAnnotator"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugsLineMarkerProvider"/>
+    </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <annotator language="Scala" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugAnnotator"/>
+        <codeInsight.lineMarkerProvider language="Scala" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugsLineMarkerProvider"/>
     </extensions>
     <project-components>
         <component>

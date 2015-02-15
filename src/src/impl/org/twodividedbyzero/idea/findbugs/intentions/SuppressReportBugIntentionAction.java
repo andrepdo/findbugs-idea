@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -121,7 +121,7 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 			// for PsiDirectory
 			return null;
 		}
-		if (!containingFile.getLanguage().isKindOf(JavaLanguage.INSTANCE) || context instanceof PsiFile) {
+		if (!IdeaUtilImpl.isLanguageSupported(containingFile.getLanguage()) || context instanceof PsiFile) {
 			return null;
 		}
 		PsiElement container = context;
@@ -153,6 +153,16 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 
 	@Override
 	public void invoke(@NotNull final Project project, final Editor editor, @NotNull final PsiElement element) throws IncorrectOperationException {
+
+		if (!element.getLanguage().isKindOf(JavaLanguage.INSTANCE)) {
+			/**
+			 * TODO Scala Plugin:
+			 * org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
+			 * crash with PsiManager and ScalaPsiManager#instance always return null
+			 */
+			return;
+		}
+
 		/*final IntentionsInfo intentionsInfo = new IntentionsInfo();
 		intentionsInfo.filterActions();
 		IntentionHintComponent.showIntentionHint(project, element.getContainingFile(), editor, intentionsInfo, true);*/

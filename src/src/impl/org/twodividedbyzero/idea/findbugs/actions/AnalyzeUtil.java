@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -22,16 +22,8 @@ package org.twodividedbyzero.idea.findbugs.actions;
 import com.intellij.analysis.AnalysisScope;
 import com.intellij.openapi.actionSystem.DataKey;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.CompilerModuleExtension;
-import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFileSystemItem;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 
-import java.io.File;
 import java.lang.reflect.Field;
 
 /**
@@ -82,63 +74,6 @@ public final class AnalyzeUtil {
 		if (clazz != null) {
 			final Field key = clazz.getDeclaredField("KEY");
 			return (DataKey<AnalysisScope>)key.get(null);
-		}
-		return null;
-	}
-
-
-	/**
-	 * Copy from \ideaIC-129.354\plugins\ByteCodeViewer\src\com\intellij\byteCodeViewer\ByteCodeViewerManager#getByteCode(PsiElement)
-	 * (first unused part "detect module" removed)
-	 */
-	@SuppressWarnings("HardcodedFileSeparator")
-	@Nullable
-	public static String getOutputClassFilePathForJavaFile(final PsiFileSystemItem psiFile, final Project project) {
-		try {
-			final Module module = IdeaUtilImpl.findModuleForPsiElement(psiFile, project);
-			final VirtualFile virtualFile = psiFile.getVirtualFile();
-			if (virtualFile == null) {
-				LOGGER.warn("No virtual file for psi file: " + psiFile);
-				return null;
-			}
-			final CompilerModuleExtension moduleExtension = CompilerModuleExtension.getInstance(module);
-			if (moduleExtension == null) return null;
-			String classPath;
-			if (ProjectRootManager.getInstance(module.getProject()).getFileIndex().isInTestSourceContent(virtualFile)) {
-				final VirtualFile pathForTests = moduleExtension.getCompilerOutputPathForTests();
-				if (pathForTests == null) {
-					LOGGER.warn("No compiler test output path for:" + virtualFile);
-					return null;
-				}
-				classPath = pathForTests.getPath();
-			} else {
-				final VirtualFile compilerOutputPath = moduleExtension.getCompilerOutputPath();
-				if (compilerOutputPath == null) {
-					LOGGER.warn("No compiler output path for:" + virtualFile);
-					return null;
-				}
-				classPath = compilerOutputPath.getPath();
-			}
-
-			final String packageName = IdeaUtilImpl.getPackage(psiFile);
-			String className = psiFile.getName();
-			if (className.endsWith(".java")) {
-				className = className.substring(0, className.length()-".java".length());
-			} else {
-				LOGGER.warn("Unexpected file type:" + virtualFile);
-				return null;
-			}
-			classPath += '/' + packageName.replace('.', '/') + '/' + className + ".class";
-
-			final File classFile = new File(classPath);
-			if (!classFile.exists()) {
-				LOGGER.warn("Compiled class file for source file '" + virtualFile + "' not exists: " + classPath);
-				return null;
-			}
-			return classFile.getCanonicalPath();
-		}
-		catch (final Exception e1) {
-			LOGGER.error(e1);
 		}
 		return null;
 	}

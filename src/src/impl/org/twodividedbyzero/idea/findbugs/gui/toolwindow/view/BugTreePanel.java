@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -31,7 +31,6 @@ import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
-import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
@@ -41,6 +40,7 @@ import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.ProjectStats;
 import edu.umd.cs.findbugs.SortedBugCollection;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
@@ -215,7 +215,7 @@ public class BugTreePanel extends JPanel {
 			if (psiFile != null) {
 				final Document document = PsiDocumentManager.getInstance(_project).getDocument(psiFile);
 				if (document != null) {
-					final Editor editor = createEditor(bugInstanceNode, document);
+					final Editor editor = createEditor(bugInstanceNode, psiFile, document);
 					_parent.setPreviewEditor(editor, psiFile);
 					scrollToPreviewSource(bugInstanceNode, editor);
 				}
@@ -224,8 +224,8 @@ public class BugTreePanel extends JPanel {
 	}
 
 
-	private Editor createEditor(final BugInstanceNode bugInstanceNode, final Document document) {
-		final Editor editor = EditorFactory.getInstance().createEditor(document, _project, StdFileTypes.JAVA, false);
+	private Editor createEditor(@NotNull final BugInstanceNode bugInstanceNode, @NotNull final PsiFile psiFile, @NotNull final Document document) {
+		final Editor editor = EditorFactory.getInstance().createEditor(document, _project, psiFile.getFileType(), false);
 		final EditorColorsScheme scheme = editor.getColorsScheme();
 		scheme.setEditorFontSize(scheme.getEditorFontSize() - 1);
 
@@ -240,17 +240,14 @@ public class BugTreePanel extends JPanel {
 		final int lineStart = bugInstanceNode.getSourceLines()[0] - 1;
 		final int lineEnd = bugInstanceNode.getSourceLines()[1];
 		PsiElement element = null;
-		
-		final PsiFile psiFile = bugInstanceNode.getPsiFile();
+
 		if(lineStart < 0 && lineEnd < 0) {   // find anonymous classes
 			final PsiElement psiElement = IdeaUtilImpl.findAnonymousClassPsiElement(bugInstanceNode, _project);
 			if (psiElement != null) {
 				element = psiElement;
 			}
 		} else {
-			if (psiFile != null) {
-				element = IdeaUtilImpl.getElementAtLine(psiFile, lineStart);
-			}
+			element = IdeaUtilImpl.getElementAtLine(psiFile, lineStart);
 		}
 
 		RangeMarker marker = null;

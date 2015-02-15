@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -55,14 +55,12 @@ public class AnalyzeScopeFiles extends BaseAnalyzeAction implements EventListene
 	private static final Logger LOGGER = Logger.getInstance(AnalyzePackageFiles.class.getName());
 
 	private DataContext _dataContext;
-	private AnActionEvent _actionEvent;
 	private boolean _enabled;
 	private boolean _running;
 
 
 	@Override
 	public void actionPerformed(final AnActionEvent e) {
-		_actionEvent = e;
 		_dataContext = e.getDataContext();
 
 		final com.intellij.openapi.project.Project project = DataKeys.PROJECT.getData(_dataContext);
@@ -88,7 +86,6 @@ public class AnalyzeScopeFiles extends BaseAnalyzeAction implements EventListene
 	@Override
 	public void update(final AnActionEvent event) {
 		try {
-			_actionEvent = event;
 			_dataContext = event.getDataContext();
 			final Project project = DataKeys.PROJECT.getData(_dataContext);
 			final Presentation presentation = event.getPresentation();
@@ -145,7 +142,7 @@ public class AnalyzeScopeFiles extends BaseAnalyzeAction implements EventListene
 		worker.configureSourceDirectories(sourceRoots);
 
 		// set class files
-		final Iterable<String> classes = findClasses(project, scope);
+		final VirtualFile[] classes = findClasses(project, scope);
 		worker.configureOutputFiles(classes);
 		worker.work("Running FindBugs analysis...");
 	}

@@ -25,7 +25,7 @@ import com.intellij.openapi.compiler.CompileContext;
 import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.components.ProjectComponent;
-import com.intellij.openapi.fileTypes.StdFileTypes;
+import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
@@ -40,6 +40,7 @@ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -190,7 +191,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		}
 
 		final CompileScope compileScope = compileContext.getCompileScope();
-		final VirtualFile[] affectedFiles = compileScope.getFiles(StdFileTypes.JAVA, true);
+		final VirtualFile[] affectedFiles = getAffectedFiles(compileScope);
 
 		if (Boolean.valueOf(preferences.getProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT))) {
 			final ToolWindow toolWindow = IdeaUtilImpl.getToolWindowById(findBugsPlugin.getInternalToolWindowId(), project);
@@ -215,6 +216,31 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		// set class files
 		worker.configureOutputFiles(affectedFiles);
 		worker.work("Running FindBugs analysis for affectes files...");
+	}
+
+
+	@NotNull
+	private static VirtualFile[] getAffectedFiles(@NotNull final CompileScope compileScope) {
+		VirtualFile[] affectedFiles = null;
+		List<VirtualFile> affectedFilesList = null;
+
+		for (FileType fileType : IdeaUtilImpl.SUPPORTED_FILE_TYPES) {
+			final VirtualFile[] af = compileScope.getFiles(fileType, true);
+			if (affectedFiles == null || affectedFiles.length == 0) {
+				affectedFiles = af;
+			} else if (af.length > 0) {
+				if (affectedFilesList == null) {
+					affectedFilesList = new ArrayList<VirtualFile>(affectedFiles.length+af.length);
+					Collections.addAll(affectedFilesList, affectedFiles);
+				}
+				Collections.addAll(affectedFilesList, af);
+			}
+		}
+		if (affectedFilesList != null) {
+			return affectedFilesList.toArray(new VirtualFile[affectedFilesList.size()]);
+		}
+		//noinspection ConstantConditions
+		return affectedFiles;
 	}
 
 
