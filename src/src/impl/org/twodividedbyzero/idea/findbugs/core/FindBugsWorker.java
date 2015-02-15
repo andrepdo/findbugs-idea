@@ -51,6 +51,7 @@ import org.twodividedbyzero.idea.findbugs.report.BugReporter;
 import org.twodividedbyzero.idea.findbugs.tasks.FindBugsTask;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -324,10 +325,13 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 	}
 
 
-	public void configureOutputFiles(final VirtualFile[] files) {
-		// set class files
+	public void configureOutputFiles(@NotNull final Collection<VirtualFile> files) {
 		_findBugsProject.configureOutputFiles(_project, files);
-		//_collectorTask.setOutputFiles(compilerOutputPath, _project, files);
+	}
+
+
+	public void configureOutputFiles(@NotNull final VirtualFile[] files) {
+		_findBugsProject.configureOutputFiles(_project, files);
 	}
 
 

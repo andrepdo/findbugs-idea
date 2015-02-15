@@ -30,6 +30,7 @@ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -91,22 +92,22 @@ public class FindBugsProject extends Project {
 	}
 
 
-	public void configureOutputFiles(final com.intellij.openapi.project.Project project, final VirtualFile[] selectedSourceFiles) {
-		//final com.intellij.openapi.project.Project project = IdeaUtilImpl.getProject(dataContext);
-		_outputFiles = asPathList(selectedSourceFiles);
-
-		RecurseClassCollector classCollector = null;
-		for (final VirtualFile file : selectedSourceFiles) {
+	public void configureOutputFiles(@NotNull final com.intellij.openapi.project.Project project, @NotNull final Collection<VirtualFile> files) {
+		_outputFiles = asPathList(files);
+		for (final VirtualFile file : files) {
 			if (IdeaUtilImpl.isValidFileType(file.getFileType())) {
-				classCollector = new RecurseClassCollector(this, project);
-				//classCollector.setVirtualFile(file);
-				classCollector.addContainingClasses(file);
+				new RecurseClassCollector(this, project).addContainingClasses(file);
 			}
 		}
+	}
 
-		// clear for gc
-		if (classCollector != null) {
-			classCollector.getResult().clear();
+
+	public void configureOutputFiles(@NotNull final com.intellij.openapi.project.Project project, @NotNull final VirtualFile[] files) {
+		_outputFiles = asPathList(files);
+		for (final VirtualFile file : files) {
+			if (IdeaUtilImpl.isValidFileType(file.getFileType())) {
+				new RecurseClassCollector(this, project).addContainingClasses(file);
+			}
 		}
 	}
 
@@ -164,6 +165,16 @@ public class FindBugsProject extends Project {
 	@NotNull
 	private static List<String> asPathList(@NotNull final VirtualFile[] files) {
 		final List<String> ret = new ArrayList<String>(files.length);
+		for (final VirtualFile file : files) {
+			ret.add(file.getPath());
+		}
+		return ret;
+	}
+
+
+	@NotNull
+	private static List<String> asPathList(@NotNull final Collection<VirtualFile> files) {
+		final List<String> ret = new ArrayList<String>(files.size());
 		for (final VirtualFile file : files) {
 			ret.add(file.getPath());
 		}

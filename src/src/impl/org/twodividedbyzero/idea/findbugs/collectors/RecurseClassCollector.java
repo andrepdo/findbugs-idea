@@ -58,12 +58,12 @@ public class RecurseClassCollector {
 	private static final String ANONYMOUSE_CLASS_DELIMITER = "$";
 
 
-	public RecurseClassCollector(final FindBugsProject findBugsProject, final Project project) {
+	public RecurseClassCollector(final FindBugsProject findBugsProject, @NotNull final Project project) {
 		this(findBugsProject, project, true);
 	}
 
 
-	public RecurseClassCollector(final FindBugsProject findBugsProject, final Project project, final boolean collectAndAdd) {
+	public RecurseClassCollector(final FindBugsProject findBugsProject, @NotNull final Project project, final boolean collectAndAdd) {
 		_findBugsProject = findBugsProject;
 		_project = project;
 		_collectAndAdd = collectAndAdd;
@@ -84,15 +84,12 @@ public class RecurseClassCollector {
 			final PsiClass[] psiClasses = psiClassOwner.getClasses();
 
 			for (final PsiClass psiClass : psiClasses) {
-				//final String fqp = buildFullQualifiedPath(_compileOutputDir.getPresentableUrl(), psiClass);
 				final VirtualFile compilerOutputPath = IdeaUtilImpl.getCompilerOutputPath(virtualFile, _project);
 				if (compilerOutputPath == null) {
 					continue;
 				}
-
 				final String fqp = buildFullQualifiedPath(compilerOutputPath.getPresentableUrl(), psiClass);
 				final String fqn = fqp + CLASS_FILE_SUFFIX;
-
 				if (isCollectAndAdd()) {
 					addFile(fqn);
 				}
@@ -163,7 +160,7 @@ public class RecurseClassCollector {
 	private void addInnerClasses(final PsiClass psiClass, final String fullQualifiedPath, @Nullable final String findClass) {
 		final PsiClass[] psiClasses = psiClass.getInnerClasses();
 
-		for (final PsiClass innerPsiClass : psiClasses) {			//final String fqn = buildOutputFilePath(_compileOutputDir.getPresentableUrl(), innerPsiClass);
+		for (final PsiClass innerPsiClass : psiClasses) {
 			final String innerClassName = innerPsiClass.getName();
 			final String fqp = fullQualifiedPath + ANONYMOUSE_CLASS_DELIMITER + innerClassName;
 

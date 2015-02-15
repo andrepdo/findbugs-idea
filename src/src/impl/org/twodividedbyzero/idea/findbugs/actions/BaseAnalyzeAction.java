@@ -140,7 +140,7 @@ public abstract class BaseAnalyzeAction extends BaseAction {
 
 
 	@NotNull
-	protected final VirtualFile[] findClasses(@NotNull final Project project, final AnalysisScope scope) {
+	protected final Collection<VirtualFile> findClasses(@NotNull final Project project, final AnalysisScope scope) {
 		final Collection<VirtualFile> ret = new LinkedList<VirtualFile>();
 		final PsiManager psiManager = PsiManager.getInstance(project);
 		psiManager.startBatchFilesProcessingMode();
@@ -156,7 +156,7 @@ public abstract class BaseAnalyzeAction extends BaseAction {
 		} finally {
 			psiManager.finishBatchFilesProcessingMode();
 		}
-		return ret.toArray(new VirtualFile[ret.size()]); // TODO optimize, return iterable/collection
+		return ret;
 	}
 
 

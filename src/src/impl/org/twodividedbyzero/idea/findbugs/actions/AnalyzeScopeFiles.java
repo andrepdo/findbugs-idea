@@ -43,6 +43,8 @@ import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsWorker;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
+import java.util.Collection;
+
 /**
  * $Date$
  *
@@ -142,7 +144,7 @@ public class AnalyzeScopeFiles extends BaseAnalyzeAction implements EventListene
 		worker.configureSourceDirectories(sourceRoots);
 
 		// set class files
-		final VirtualFile[] classes = findClasses(project, scope);
+		final Collection<VirtualFile> classes = findClasses(project, scope);
 		worker.configureOutputFiles(classes);
 		worker.work("Running FindBugs analysis...");
 	}
