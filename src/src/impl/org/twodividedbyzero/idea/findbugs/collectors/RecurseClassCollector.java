@@ -28,6 +28,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
@@ -70,7 +71,7 @@ public class RecurseClassCollector {
 	}
 
 
-	public void addContainingClasses(final VirtualFile virtualFile) {
+	public void addContainingClasses(@NotNull final VirtualFile virtualFile) {
 
 		if (!IdeaUtilImpl.isValidFileType(virtualFile.getFileType())) {
 			return;
@@ -104,7 +105,7 @@ public class RecurseClassCollector {
 
 
 	// analyze class under cursor
-	public void addContainingClasses(final PsiClass selectedPsiClass) {
+	public void addContainingClasses(@NotNull final PsiClass selectedPsiClass) {
 		final VirtualFile virtualFile = IdeaUtilImpl.getVirtualFile(selectedPsiClass);
 
 		assert virtualFile != null;
@@ -271,19 +272,20 @@ public class RecurseClassCollector {
 	}
 
 
-	private static String buildFullQualifiedPath(final String compileOutputDir, final PsiClass psiClass) {
+	@NotNull
+	private static String buildFullQualifiedPath(@NotNull final String compileOutputDir, @NotNull final PsiClass psiClass) {
 		final String packageUrl = IdeaUtilImpl.getPackageUrl(psiClass);
 		final StringBuilder fqn = new StringBuilder();
 
 		fqn.append(compileOutputDir);
 		fqn.append(FindBugsPluginConstants.FILE_SEPARATOR);
-		fqn.append(packageUrl);
-		fqn.append(FindBugsPluginConstants.FILE_SEPARATOR);
-
+		if (!packageUrl.isEmpty()) {
+			fqn.append(packageUrl);
+			fqn.append(FindBugsPluginConstants.FILE_SEPARATOR);
+		}
 
 		//fqn.append(getParentClassNotation(psiClass));
-		fqn.append(psiClass.getName());		//fqn.append(".class");
-
+		fqn.append(psiClass.getName());
 		return fqn.toString();
 	}
 
@@ -307,24 +309,17 @@ public class RecurseClassCollector {
 	}*/
 
 
-	public void addFile(final String fullQualifiedName) {
+	private void addFile(final String fullQualifiedName) {
 		if (new File(fullQualifiedName).exists()) {
 			_findBugsProject.addFile(fullQualifiedName);
 			LOGGER.debug("adding class file: " + fullQualifiedName);
-
-			/*ApplicationManager.getApplication().invokeLater(new Runnable() {
-				public void run() {*/
-			//_findBugsProject.getCollectorTask().setIndicatorText("adding class file: " + fullQualifiedName);
-			/*}
-			});*/
-
 		} else {
 			LOGGER.debug("class file: " + fullQualifiedName + " does not exists. maybe an inner/anonymous class? try to recompile your sources.");
 		}
 	}
 
 
-	public boolean isCollectAndAdd() {
+	private boolean isCollectAndAdd() {
 		return _collectAndAdd;
 	}
 
