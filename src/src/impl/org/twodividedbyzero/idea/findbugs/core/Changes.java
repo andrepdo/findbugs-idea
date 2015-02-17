@@ -64,15 +64,17 @@ final class Changes {
 
 	synchronized boolean removeListener(@NotNull final Project project) {
 		_listeners.remove(project);
+		_changed.remove(project);
 		return _listeners.isEmpty();
 	}
 
 
 	synchronized void addChanged(@NotNull final Collection<File> paths) {
+		final LocalFileSystem lfs = LocalFileSystem.getInstance();
 		VirtualFile vf;
 		List<VirtualFile> vfs = null;
 		for (File f : paths) {
-			vf = LocalFileSystem.getInstance().findFileByIoFile(f);
+			vf = lfs.findFileByIoFile(f);
 			if (vf != null && vf.isValid() && !vf.isDirectory() && IdeaUtilImpl.isValidFileType(vf.getFileType())) {
 				if (vfs == null) {
 					vfs = new ArrayList<VirtualFile>();
