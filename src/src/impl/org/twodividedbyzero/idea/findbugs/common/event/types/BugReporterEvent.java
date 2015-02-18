@@ -40,8 +40,7 @@ public interface BugReporterEvent extends Event {
 
 		ANALYSIS_STARTED,
 		ANALYSIS_ABORTED,
-		ANALYSIS_FINISHED,
-		NEW_BUG_INSTANCE
+		ANALYSIS_FINISHED
 	}
 
 	@NotNull

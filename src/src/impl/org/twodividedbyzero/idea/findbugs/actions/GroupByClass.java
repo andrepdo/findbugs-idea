@@ -146,8 +146,6 @@ public class GroupByClass extends BaseToggleAction implements EventListener<BugR
 				setEnabled(true);
 				setRunning(false);
 				break;
-			case NEW_BUG_INSTANCE:
-				break;
 		}
 	}
 

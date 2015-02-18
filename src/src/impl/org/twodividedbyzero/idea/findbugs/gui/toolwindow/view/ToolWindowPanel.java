@@ -30,6 +30,7 @@ import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiFile;
 import edu.umd.cs.findbugs.BugCollection;
+import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.ProjectStats;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,6 +54,7 @@ import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitPane;
 import org.twodividedbyzero.idea.findbugs.gui.common.NDockLayout;
 import org.twodividedbyzero.idea.findbugs.messages.ClearListener;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
+import org.twodividedbyzero.idea.findbugs.messages.NewBugInstanceListener;
 
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -112,6 +114,13 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 			public void clear() {
 				ToolWindowPanel.this.clear(null);
 				DaemonCodeAnalyzer.getInstance(_project).restart();
+			}
+		});
+		MessageBusManager.subscribe(project, this, NewBugInstanceListener.TOPIC, new NewBugInstanceListener() {
+			@Override
+			public void newBugInstance(@NotNull final BugInstance bugInstance, @NotNull final ProjectStats projectStats) {
+				_bugTreePanel.addNode(bugInstance);
+				_bugTreePanel.updateRootNode(projectStats);
 			}
 		});
 	}
@@ -337,14 +346,6 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 					}
 				});
 
-				break;
-			case NEW_BUG_INSTANCE:
-				EventDispatchThreadHelper.invokeLater(new Runnable() {
-					public void run() {
-						_bugTreePanel.addNode(event.getBugInstance());
-						_bugTreePanel.updateRootNode(event.getProjectStats());
-					}
-				});
 				break;
 			default:
 		}

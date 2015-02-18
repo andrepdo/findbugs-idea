@@ -30,7 +30,10 @@ import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.util.Processor;
+import com.intellij.util.containers.TransferToEDTQueue;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.Plugin;
@@ -51,11 +54,14 @@ import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
 import org.twodividedbyzero.idea.findbugs.gui.common.ImportFileDialog;
+import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
+import org.twodividedbyzero.idea.findbugs.messages.NewBugInstanceListener;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.tasks.BackgroundableTask;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 
@@ -136,7 +142,21 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 			}
 		}
 
-		//Create a task to export the bug collection to html
+		final AtomicBoolean taskCanceled = new AtomicBoolean();
+		final TransferToEDTQueue<Runnable> transferToEDTQueue = new TransferToEDTQueue<Runnable>("Add New Bug Instance", new Processor<Runnable>() {
+			@Override
+			public boolean process(Runnable runnable) {
+				runnable.run();
+				return true;
+			}
+		}, new Condition<Object>() {
+			@Override
+			public boolean value(Object o) {
+				return project.isDisposed() || taskCanceled.get();
+			}
+		}, 500);
+
+		//Create a task to import the bug collection from XML
 		final AtomicReference<Task> importTask = new AtomicReference<Task>(new BackgroundableTask(project, "Importing Findbugs Result", true) {
 			private ProgressIndicator _indicator;
 
@@ -166,6 +186,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 					int bugCount = 0;
 					for (final BugInstance bugInstance : _importBugCollection) {
 						if (indicator.isCanceled()) {
+							taskCanceled.set(true);
 							EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 							Thread.currentThread().interrupt();
 							return;
@@ -174,10 +195,23 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 						final double fraction = bugCounter.doubleValue() / projectStats.getTotalBugs();
 						indicator.setFraction(fraction);
 						indicator.setText2("Importing bug '" + bugCount + "' of '" + projectStats.getTotalBugs() + "' - " + bugInstance.getMessageWithoutPrefix());
-						EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newBug(bugInstance, bugCounter, projectStats, project));
+						transferToEDTQueue.offer(new Runnable() {
+							/**
+							 * Invoked by EDT.
+							 */
+							@Override
+							public void run() {
+								MessageBusManager.publish(NewBugInstanceListener.TOPIC).newBugInstance(bugInstance, projectStats);
+							}
+						});
 					}
 
-					showToolWindowNotifier(project, "Imported bug collection from '" + fileToImport + "'.", MessageType.INFO);
+					EventDispatchThreadHelper.invokeLater(new Runnable() {
+						public void run() {
+							transferToEDTQueue.drain();
+							FindBugsPluginImpl.showToolWindowNotifier(project, "Imported bug collection from '" + fileToImport + "'.", MessageType.INFO);
+						}
+					});
 
 					_importBugCollection.setDoNotUseCloud(false);
 					_importBugCollection.setTimestamp(System.currentTimeMillis());
@@ -284,8 +318,6 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 				_bugCollection = (SortedBugCollection) event.getBugCollection();
 				setEnabled(true);
 				setRunning(false);
-				break;
-			case NEW_BUG_INSTANCE:
 				break;
 			default:
 		}

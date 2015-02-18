@@ -392,8 +392,6 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 			case ANALYSIS_FINISHED:
 				unregisterEventListener();
 				break;
-			case NEW_BUG_INSTANCE:
-				break;
 		}
 	}
 

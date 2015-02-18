@@ -256,8 +256,6 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 			case ANALYSIS_FINISHED:
 				_analysisRunning = false;
 				break;
-			case NEW_BUG_INSTANCE:
-				break;
 			default:
 		}
 	}

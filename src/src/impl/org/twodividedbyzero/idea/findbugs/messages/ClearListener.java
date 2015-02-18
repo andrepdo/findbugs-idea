@@ -30,6 +30,9 @@ import com.intellij.util.messages.Topic;
 public interface ClearListener {
 	Topic<ClearListener> TOPIC = Topic.create("Clear", ClearListener.class);
 
+	/**
+	 * Invoked by EDT.
+	 */
 	void clear();
 
 }

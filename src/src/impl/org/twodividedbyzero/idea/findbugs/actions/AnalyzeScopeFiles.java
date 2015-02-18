@@ -200,8 +200,6 @@ public class AnalyzeScopeFiles extends BaseAnalyzeAction implements EventListene
 				setEnabled(true);
 				setRunning(false);
 				break;
-			case NEW_BUG_INSTANCE:
-				break;
 		}
 	}
 }

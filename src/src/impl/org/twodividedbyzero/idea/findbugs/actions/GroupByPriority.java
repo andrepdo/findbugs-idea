@@ -146,8 +146,6 @@ public class GroupByPriority extends BaseToggleAction implements EventListener<B
 				setEnabled(true);
 				setRunning(false);
 				break;
-			case NEW_BUG_INSTANCE:
-				break;
 		}
 	}
 

@@ -210,8 +210,6 @@ public class AnalyzeSelectedFiles extends BaseAction implements EventListener<Bu
 				setEnabled(true);
 				setRunning(false);
 				break;
-			case NEW_BUG_INSTANCE:
-				break;
 		}
 	}
 }

@@ -200,8 +200,6 @@ public class GroupByFilter extends BaseAction implements EventListener<BugReport
 				setEnabled(true);
 				setRunning(false);
 				break;
-			case NEW_BUG_INSTANCE:
-				break;
 		}
 	}
 

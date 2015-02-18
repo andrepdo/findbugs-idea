@@ -213,8 +213,6 @@ public class AnalyzeAllModifiedFiles extends BaseAction implements EventListener
 				setEnabled(true);
 				setRunning(false);
 				break;
-			case NEW_BUG_INSTANCE:
-				break;
 		}
 	}
 }

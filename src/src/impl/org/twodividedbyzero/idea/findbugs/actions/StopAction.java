@@ -133,8 +133,6 @@ public class StopAction extends BaseAction implements EventListener<BugReporterE
 			case ANALYSIS_FINISHED:
 				setEnabled(false);
 				break;
-			case NEW_BUG_INSTANCE:
-				break;
 		}
 	}
 }

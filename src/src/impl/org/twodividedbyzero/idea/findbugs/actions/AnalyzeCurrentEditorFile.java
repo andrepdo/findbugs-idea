@@ -277,8 +277,6 @@ public class AnalyzeCurrentEditorFile extends BaseAction implements EventListene
 				setEnabled(true);
 				setRunning(false);
 				break;
-			case NEW_BUG_INSTANCE:
-				break;
 		}
 		//}
 	}

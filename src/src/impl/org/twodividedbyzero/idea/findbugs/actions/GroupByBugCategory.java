@@ -146,8 +146,6 @@ public class GroupByBugCategory extends BaseToggleAction implements EventListene
 				setEnabled(true);
 				setRunning(false);
 				break;
-			case NEW_BUG_INSTANCE:
-				break;
 		}
 	}
 }

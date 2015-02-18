@@ -22,6 +22,9 @@ package org.twodividedbyzero.idea.findbugs.report;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Condition;
+import com.intellij.util.Processor;
+import com.intellij.util.containers.TransferToEDTQueue;
 import edu.umd.cs.findbugs.AbstractBugReporter;
 import edu.umd.cs.findbugs.AnalysisError;
 import edu.umd.cs.findbugs.BugInstance;
@@ -40,6 +43,8 @@ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
+import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
+import org.twodividedbyzero.idea.findbugs.messages.NewBugInstanceListener;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.tasks.FindBugsTask;
 
@@ -84,6 +89,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 	private boolean _isRunning;
 	private final FindBugsPreferences _preferences;
 	private final FindBugsProject _findBugsProject;
+	private final TransferToEDTQueue<Runnable> _transferToEDTQueue;
 
 
 	public BugReporter(final Project project, final boolean isInspectionRun, final SortedBugCollection bugCollection, final FindBugsProject findBugsProject) {
@@ -93,6 +99,18 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 		_isInspectionRun = isInspectionRun;
 		_bugCollection = bugCollection;
 		_findBugsProject = findBugsProject;
+		_transferToEDTQueue = new TransferToEDTQueue<Runnable>("Add New Bug Instance", new Processor<Runnable>() {
+			@Override
+			public boolean process(Runnable runnable) {
+				runnable.run();
+				return true;
+			}
+		}, new Condition<Object>() {
+			@Override
+			public boolean value(Object o) {
+				return project.isDisposed(); // TODO check cancel
+			}
+		}, 500);
 	}
 
 
@@ -119,7 +137,15 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 		if (_isInspectionRun) {
 			EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(BugReporterInspectionEvent.Operation.NEW_BUG_INSTANCE, bug, _filteredBugCount, getProjectStats(), _project.getName()));
 		} else {
-			EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newBug(bug, _filteredBugCount, getProjectStats(), _project));
+			_transferToEDTQueue.offer(new Runnable() {
+				/**
+				 * Invoked by EDT.
+				 */
+				@Override
+				public void run() {
+					MessageBusManager.publish(NewBugInstanceListener.TOPIC).newBugInstance(bug, getProjectStats());
+				}
+			});
 		}
 	}
 
@@ -181,6 +207,12 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 
 	/** @see edu.umd.cs.findbugs.BugReporter#finish() */
 	public void finish() {
+		EventDispatchThreadHelper.invokeAndWait(new EventDispatchThreadHelper.OperationAdapter() {
+			@Override
+			public void run() {
+				_transferToEDTQueue.drain();
+			}
+		} );
 		final String message = "Finished: Found " + _filteredBugCount + " bugs.";
 		_findBugsTask.setIndicatorText(message);
 		//LOGGER.debug(message);

@@ -151,8 +151,6 @@ public class ShowPreferencesPage extends BaseAction implements EventListener<Bug
 				setEnabled(true);
 				setRunning(false);
 				break;
-			case NEW_BUG_INSTANCE:
-				break;
 		}
 	}
 }

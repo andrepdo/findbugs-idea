@@ -210,8 +210,6 @@ public class AnalyzeModuleFiles extends BaseAction implements EventListener<BugR
 				setEnabled(true);
 				setRunning(false);
 				break;
-			case NEW_BUG_INSTANCE:
-				break;
 		}
 	}
 }
