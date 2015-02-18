@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -51,6 +51,8 @@ import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitLayout;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitPane;
 import org.twodividedbyzero.idea.findbugs.gui.common.NDockLayout;
+import org.twodividedbyzero.idea.findbugs.messages.ClearListener;
+import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
 
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -100,11 +102,18 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 	private FindBugsProject _bugsProject;
 
 
-	public ToolWindowPanel(final Project project, final ToolWindow parent) {
+	public ToolWindowPanel(@NotNull final Project project, final ToolWindow parent) {
 		_project = project;
 		_parent = parent;
 		checkFindBugsPlugin();
 		initGui();
+		MessageBusManager.subscribe(project, this, ClearListener.TOPIC, new ClearListener() {
+			@Override
+			public void clear() {
+				ToolWindowPanel.this.clear(null);
+				DaemonCodeAnalyzer.getInstance(_project).restart();
+			}
+		});
 	}
 
 
@@ -275,9 +284,7 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 					}
 				});
 				updateLayout(false);
-
-				_bugTreePanel.clear(true);
-				_bugTreePanel.updateRootNode(event.getProjectStats());
+				clear(event.getProjectStats());
 				break;
 			case ANALYSIS_ABORTED:
 				//noinspection ConstantConditions
@@ -377,6 +384,12 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 			_bugDetailsComponents = new BugDetailsComponents(this);
 		}
 		return _bugDetailsComponents;
+	}
+
+
+	private void clear(@Nullable final ProjectStats projectStats) {
+		_bugTreePanel.clear();
+		_bugTreePanel.updateRootNode(projectStats);
 	}
 
 

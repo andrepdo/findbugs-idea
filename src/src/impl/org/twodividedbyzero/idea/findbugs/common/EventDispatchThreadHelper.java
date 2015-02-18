@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -52,6 +52,13 @@ public final class EventDispatchThreadHelper {
 			} catch (final Exception e) {
 				operation.onFailure(e);
 			}
+		}
+	}
+
+
+	public static void checkEDT() {
+		if (!EventQueue.isDispatchThread()) {
+			throw new IllegalStateException();
 		}
 	}
 

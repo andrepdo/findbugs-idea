@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -24,6 +24,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.messages.ClearListener;
+import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
 
 
 /**
@@ -31,7 +33,7 @@ import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
  *
  * @version $Revision$
  */
-public class CloseToolWindow extends BaseAction {
+public final class CloseToolWindow extends BaseAction {
 
 	@Override
 	public void actionPerformed(final AnActionEvent e) {
@@ -48,6 +50,7 @@ public class CloseToolWindow extends BaseAction {
 		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(getPluginInterface(project).getInternalToolWindowId());
 		toolWindow.hide(null);
 
+		MessageBusManager.publish(ClearListener.TOPIC).clear();
 	}
 
 

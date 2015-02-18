@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -51,6 +51,8 @@ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.IoUtil;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.ExportFileDialog;
+import org.twodividedbyzero.idea.findbugs.messages.ClearListener;
+import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.tasks.BackgroundableTask;
 
@@ -88,7 +90,7 @@ import java.util.regex.Pattern;
  * @since 0.9.95
  */
 @SuppressWarnings({"HardCodedStringLiteral"})
-public class ExportBugCollection extends BaseAction implements EventListener<BugReporterEvent> {
+public class ExportBugCollection extends BaseAction implements EventListener<BugReporterEvent>, ClearListener {
 
 	private static final Logger LOGGER = Logger.getInstance(ExportBugCollection.class.getName());
 
@@ -391,12 +393,13 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 	}
 
 
-	private void registerEventListener(final Project project) {
+	private void registerEventListener(@NotNull final Project project) {
 		final String projectName = project.getName();
 		if (!isRegistered(projectName)) {
 			EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(projectName), this);
 			addRegisteredProject(projectName);
 		}
+		MessageBusManager.subscribe(project, this, ClearListener.TOPIC, this);
 	}
 
 
@@ -411,5 +414,12 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 			_running = running;
 		}
 		return was;
+	}
+
+
+	@Override
+	public void clear() {
+		_bugCollection = null;
+		setEnabled(false);
 	}
 }

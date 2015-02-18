@@ -303,6 +303,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 	}
 
 
+	@Override
 	public void startAnalysis(final int numClasses) {
 		_pass++;
 		//_findBugsTask.setIndicatorText("Analyzing classes: " + numClasses);

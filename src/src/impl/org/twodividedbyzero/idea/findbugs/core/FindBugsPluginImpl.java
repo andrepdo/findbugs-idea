@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -69,6 +69,7 @@ import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.AnnotationType;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.ConfigurationPanel;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
+import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
 import org.twodividedbyzero.idea.findbugs.plugins.AbstractPluginLoader;
 import org.twodividedbyzero.idea.findbugs.plugins.Plugins;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -180,7 +181,11 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
+	/**
+	 * Invoked by EDT.
+	 */
 	@SuppressWarnings({"NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"})
+	@Override
 	public void projectOpened() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
 		//noinspection ConstantConditions
@@ -193,12 +198,17 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
+	/**
+	 * Invoked by EDT.
+	 */
 	@SuppressWarnings({"NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"})
+	@Override
 	public void projectClosed() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
 		//noinspection ConstantConditions
 		LOGGER.debug("project is being closed: " + plugin.getName() + " project="  + getProject());
 		EventManagerImpl.getInstance().removeEventListener(_project);
+		MessageBusManager.dispose(_project);
 		final AnalyzeChangelistFiles action = (AnalyzeChangelistFiles) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTIVE_CHANGELIST_ACTION);
 		ChangeListManager.getInstance(_project).removeChangeListListener(action.getChangelistAdapter());
 		unregisterToolWindow();
@@ -232,7 +242,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 	private void unregisterToolWindow() {
 		final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(_project);
-		toolWindowManager.unregisterToolWindow(getInternalToolWindowId());
+		toolWindowManager.unregisterToolWindow( getInternalToolWindowId() );
 	}
 
 

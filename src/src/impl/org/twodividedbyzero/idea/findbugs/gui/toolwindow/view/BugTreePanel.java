@@ -139,7 +139,7 @@ public class BugTreePanel extends JPanel {
 			numClasses = projectStats.getNumClasses();
 		}
 
-		_visibleRootNode.setBugCount(_treeModel.getBugCount());
+		_visibleRootNode.setBugCount(projectStats == null ? -1 : _treeModel.getBugCount());
 		_visibleRootNode.setClassesCount(numClasses);
 
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
@@ -150,12 +150,9 @@ public class BugTreePanel extends JPanel {
 	}
 
 
-	void clear(final boolean resetBugCount) {
+	void clear() {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
-				if (resetBugCount) {
-					_visibleRootNode.setBugCount(0);
-				}
 				_treeModel.clear();
 			}
 		});
@@ -361,7 +358,7 @@ public class BugTreePanel extends JPanel {
 		if (_bugCollection != null) {
 			final Collection<BugInstance> instanceCollection = _bugCollection.getCollection();
 			if (instanceCollection != null && !instanceCollection.isEmpty()) {
-				clear(false);
+				clear();
 				for (final BugInstance bugInstance : instanceCollection) {
 					addNode(bugInstance);
 				}

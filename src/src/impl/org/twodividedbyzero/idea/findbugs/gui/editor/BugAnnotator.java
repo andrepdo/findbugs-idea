@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -82,6 +82,7 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 	}
 
 
+	@Override
 	public void annotate(@NotNull final PsiElement psiElement, @NotNull final AnnotationHolder annotationHolder) {
 		if (! getPreferences(psiElement).isAnnotationTextRangeMarkupEnabled()) {
 			return;

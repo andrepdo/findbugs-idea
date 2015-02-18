@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -75,8 +75,9 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 	}
 
 
+	@Override
 	@Nullable
-	public LineMarkerInfo<?> getLineMarkerInfo(final PsiElement psiElement) {
+	public LineMarkerInfo<?> getLineMarkerInfo(@NotNull final PsiElement psiElement) {
 		final FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(psiElement.getProject());
 		if (! pluginComponent.getPreferences().isAnnotationGutterIconEnabled()) {
 			return null;
@@ -122,7 +123,7 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 	}
 
 
-	public void collectSlowLineMarkers(final List<PsiElement> elements, final Collection<LineMarkerInfo> result) {
+	public void collectSlowLineMarkers(@NotNull final List<PsiElement> elements, @NotNull final Collection<LineMarkerInfo> result) {
 	}
 
 
