@@ -23,6 +23,8 @@ import com.intellij.codeInspection.InspectionsBundle;
 import com.intellij.codeInspection.SuppressIntentionAction;
 import com.intellij.codeInspection.SuppressManager;
 import com.intellij.lang.java.JavaLanguage;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
@@ -148,13 +150,19 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 	}
 
 
-
-
-
+	/**
+	 * Invoked by EDT.
+	 *
+	 * @param project ..
+	 * @param editor ..
+	 * @param element ..
+	 * @throws IncorrectOperationException ..
+	 */
 	@Override
 	public void invoke(@NotNull final Project project, final Editor editor, @NotNull final PsiElement element) throws IncorrectOperationException {
 
 		if (!element.getLanguage().isKindOf(JavaLanguage.INSTANCE)) {
+			new Notification("FindBugs Missing Feature", "Not Supported", "Sorry, insert annotation not supported for this language.", NotificationType.INFORMATION).notify(project);
 			/**
 			 * TODO Scala Plugin:
 			 * org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
