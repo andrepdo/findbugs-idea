@@ -151,11 +151,9 @@ public class BugTreePanel extends JPanel {
 
 
 	void clear() {
-		EventDispatchThreadHelper.invokeLater(new Runnable() {
-			public void run() {
-				_treeModel.clear();
-			}
-		});
+		EventDispatchThreadHelper.checkEDT();
+		_bugCollection = null;
+		_treeModel.clear();
 	}
 
 
@@ -358,7 +356,7 @@ public class BugTreePanel extends JPanel {
 		if (_bugCollection != null) {
 			final Collection<BugInstance> instanceCollection = _bugCollection.getCollection();
 			if (instanceCollection != null && !instanceCollection.isEmpty()) {
-				clear();
+				_treeModel.clear();
 				for (final BugInstance bugInstance : instanceCollection) {
 					addNode(bugInstance);
 				}

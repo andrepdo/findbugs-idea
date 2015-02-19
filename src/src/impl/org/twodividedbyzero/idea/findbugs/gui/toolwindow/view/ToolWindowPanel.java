@@ -184,32 +184,36 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 	private void updateLayout(final boolean enablePreviewLayout) {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
-
-				if (!_isPreviewLayoutEnabled && enablePreviewLayout) {
-					_updateMultiSplitLayout(PREVIEW_LAYOUT_DEF);
-					getMultiSplitPane().add(getBugTreePanel(), "left");
-					_multiSplitPane.add(getPreviewPanel().getComponent(), "middle");
-					getMultiSplitPane().add(getBugDetailsComponents().getTabbedPane(), "right");
-					//getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
-					_isPreviewLayoutEnabled = true;
-
-				} else if (!enablePreviewLayout) {
-					getPreviewPanel().release();
-
-					_updateMultiSplitLayout(DEFAULT_LAYOUT_DEF);
-					getMultiSplitPane().add(getBugTreePanel(), "left");
-					getMultiSplitPane().add(getBugDetailsComponents().getTabbedPane(), "right");
-					//getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
-					////getMultiSplitPane().add(_bugDetailsComponents.getCloudCommentsPanel(), "right");
-
-					if (getPreviewPanel().getEditor() != null) {
-						resizeSplitNodes(ToolWindowPanel.this);
-					}
-					_previewPanel = null;
-					_isPreviewLayoutEnabled = false;
-				}
+				updateLayoutImpl(enablePreviewLayout);
 			}
 		});
+	}
+
+
+	private void updateLayoutImpl(final boolean enablePreviewLayout) {
+		if (!_isPreviewLayoutEnabled && enablePreviewLayout) {
+			_updateMultiSplitLayout(PREVIEW_LAYOUT_DEF);
+			getMultiSplitPane().add(getBugTreePanel(), "left");
+			_multiSplitPane.add(getPreviewPanel().getComponent(), "middle");
+			getMultiSplitPane().add(getBugDetailsComponents().getTabbedPane(), "right");
+			//getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
+			_isPreviewLayoutEnabled = true;
+
+		} else if (!enablePreviewLayout) {
+			getPreviewPanel().release();
+
+			_updateMultiSplitLayout(DEFAULT_LAYOUT_DEF);
+			getMultiSplitPane().add(getBugTreePanel(), "left");
+			getMultiSplitPane().add(getBugDetailsComponents().getTabbedPane(), "right");
+			//getMultiSplitPane().add(getBugDetailsComponents().getBugExplanationPanel(), "right.bottom");
+			////getMultiSplitPane().add(_bugDetailsComponents.getCloudCommentsPanel(), "right");
+
+			if (getPreviewPanel().getEditor() != null) {
+				resizeSplitNodes(ToolWindowPanel.this);
+			}
+			_previewPanel = null;
+			_isPreviewLayoutEnabled = false;
+		}
 	}
 
 
@@ -290,10 +294,10 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 					public void run() {
 						EditorFactory.getInstance().refreshAllEditors();
 						DaemonCodeAnalyzer.getInstance(_project).restart();
+						updateLayoutImpl(false);
+						clear(event.getProjectStats());
 					}
 				});
-				updateLayout(false);
-				clear(event.getProjectStats());
 				break;
 			case ANALYSIS_ABORTED:
 				//noinspection ConstantConditions
