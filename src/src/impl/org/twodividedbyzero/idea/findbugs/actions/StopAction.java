@@ -33,6 +33,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventFactory;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
+import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
 
 
 /**
@@ -57,6 +58,7 @@ public class StopAction extends BaseAction implements EventListener<BugReporterE
 		_dataContext = e.getDataContext();
 		final com.intellij.openapi.project.Project project = DataKeys.PROJECT.getData(_dataContext);
 		if (project != null) {
+			MessageBusManager.publishAnalysisAbortedToEDT();
 			EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 		} else {
 			LOGGER.error("No active project");

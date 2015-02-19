@@ -28,7 +28,7 @@ import com.intellij.util.messages.Topic;
  * @since 0.9.995
  */
 public interface ClearListener {
-	Topic<ClearListener> TOPIC = Topic.create("Clear", ClearListener.class);
+	Topic<ClearListener> TOPIC = Topic.create("FindBugs ToolWindow Clear", ClearListener.class);
 
 	/**
 	 * Invoked by EDT.

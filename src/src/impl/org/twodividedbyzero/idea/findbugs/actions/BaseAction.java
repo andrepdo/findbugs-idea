@@ -29,6 +29,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
@@ -81,12 +82,15 @@ public abstract class BaseAction extends AnAction {
 			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
 			presentation.setVisible(true);
 
+			updateImpl(project);
 		} catch (final Throwable e) {
 			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
 			LOGGER.error("Action update failed", processed);
 		}
 	}
 
+	protected void updateImpl(@NotNull final Project project) {
+	}
 
 	protected ToolWindow isToolWindowRegistered(final Project project) {
 		return ToolWindowManager.getInstance(project).getToolWindow(getPluginInterface(project).getInternalToolWindowId());

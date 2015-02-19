@@ -40,6 +40,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventFac
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEventImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
@@ -56,6 +57,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -137,13 +139,18 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 		if (_isInspectionRun) {
 			EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(BugReporterInspectionEvent.Operation.NEW_BUG_INSTANCE, bug, _filteredBugCount, getProjectStats(), _project.getName()));
 		} else {
+			/**
+			 * Guarantee thread visibility *one* time.
+			 */
+			final AtomicReference<BugInstance> bugRef = New.atomicRef(bug);
+			final AtomicReference<ProjectStats> projectStatsRef = New.atomicRef(getProjectStats());
 			_transferToEDTQueue.offer(new Runnable() {
 				/**
 				 * Invoked by EDT.
 				 */
 				@Override
 				public void run() {
-					MessageBusManager.publish(NewBugInstanceListener.TOPIC).newBugInstance(bug, getProjectStats());
+					MessageBusManager.publish(NewBugInstanceListener.TOPIC).newBugInstance(bugRef.get(), projectStatsRef.get());
 				}
 			});
 		}
@@ -231,6 +238,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 		if (_isInspectionRun) {
 			EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent.Operation.ANALYSIS_FINISHED, null, getBugCollection(), _project.getName(), _findBugsProject));
 		} else {
+			MessageBusManager.publishAnalysisFinishedToEDT(getBugCollection(), _findBugsProject);
 			EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newFinished(getBugCollection(), _project, _findBugsProject));
 		}
 
@@ -267,6 +275,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 			if (_isInspectionRun) {
 				EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent.Operation.ANALYSIS_ABORTED, _project.getName()));
 			} else if (!isRunning()) {
+				MessageBusManager.publishAnalysisAbortedToEDT();
 				EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(_project));
 			}
 		}
@@ -344,6 +353,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 		if (_isInspectionRun) {
 			EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent.Operation.ANALYSIS_STARTED, null, 0, _project.getName()));
 		} else if (!isRunning()) {
+			MessageBusManager.publishAnalysisStartedToEDT();
 			EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newStarted(_project));
 		}
 	}

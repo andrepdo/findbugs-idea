@@ -16,45 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.twodividedbyzero.idea.findbugs.common.util;
-
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
+package org.twodividedbyzero.idea.findbugs.messages;
 
 
 /**
  * @author Reto Merz<reto.merz@gmail.com>
- * @version $Revision: 358 $
+ * @version $Revision: 364 $
  * @since 0.9.995
  */
-public final class New {
-
-
-	private New() {
-	}
-
-
-	@NotNull
-	public static <V> AtomicReference<V> atomicRef(@Nullable V initialValue) {
-		return new AtomicReference<V>(initialValue);
-	}
-
-
-	@NotNull
-	public static <K, V> Map<K, V> map() {
-		return new HashMap<K, V>();
-	}
-
-
-	@NotNull
-	public static <E> Set<E> set() {
-		return new HashSet<E>();
-	}
+public interface AnalysisStateListener extends AnalysisStartedListener, AnalysisAbortedListener, AnalysisFinishedListener {
 }

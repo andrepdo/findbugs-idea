@@ -6,7 +6,7 @@ import edu.umd.cs.findbugs.ProjectStats;
 import org.jetbrains.annotations.NotNull;
 
 public interface NewBugInstanceListener {
-	Topic<NewBugInstanceListener> TOPIC = Topic.create("New Bug Instance", NewBugInstanceListener.class);
+	Topic<NewBugInstanceListener> TOPIC = Topic.create("FindBugs New Bug Instance", NewBugInstanceListener.class);
 
 	/**
 	 * Invoked by EDT.

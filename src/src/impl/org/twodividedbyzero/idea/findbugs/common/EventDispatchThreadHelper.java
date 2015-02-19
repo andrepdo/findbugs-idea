@@ -56,6 +56,13 @@ public final class EventDispatchThreadHelper {
 	}
 
 
+	public static void checkNotEDT() {
+		if (EventQueue.isDispatchThread()) {
+			throw new IllegalStateException();
+		}
+	}
+
+
 	public static void checkEDT() {
 		if (!EventQueue.isDispatchThread()) {
 			throw new IllegalStateException();

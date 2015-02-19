@@ -25,12 +25,16 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Pair;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.messages.Topic;
+import edu.umd.cs.findbugs.BugCollection;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -45,6 +49,13 @@ public final class MessageBusManager {
 
 
 	private MessageBusManager() {
+	}
+
+
+	public static <L extends AnalysisStateListener> void subscribeAnalysisState(@NotNull final Project project, @NotNull final Object subscriber, @NotNull final L handler) {
+		subscribe(project, subscriber, AnalysisStartedListener.TOPIC, handler);
+		subscribe(project, subscriber, AnalysisAbortedListener.TOPIC, handler);
+		subscribe(project, subscriber, AnalysisFinishedListener.TOPIC, handler);
 	}
 
 
@@ -80,6 +91,44 @@ public final class MessageBusManager {
 				subscriberPair.getFirst().subscribe(topic, handler);
 			} // else do nothing ; topic already subscriber has already subscribed this topic
 		}
+	}
+
+
+	public static void publishAnalysisStartedToEDT() {
+		EventDispatchThreadHelper.checkNotEDT();
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				publish(AnalysisStartedListener.TOPIC).analysisStarted();
+			}
+		});
+	}
+
+
+	public static void publishAnalysisAbortedToEDT() {
+		EventDispatchThreadHelper.checkNotEDT();
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				publish(AnalysisAbortedListener.TOPIC).analysisAborted();
+			}
+		});
+	}
+
+
+	public static void publishAnalysisFinishedToEDT(@NotNull final BugCollection bugCollection, @Nullable final FindBugsProject findBugsProject) {
+		EventDispatchThreadHelper.checkNotEDT();
+		/**
+		 * Guarantee thread visibility *one* time.
+		 */
+		final AtomicReference<BugCollection> bugCollectionRef = New.atomicRef(bugCollection);
+		final AtomicReference<FindBugsProject> findBugsProjectRef = New.atomicRef(findBugsProject);
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				publish(AnalysisFinishedListener.TOPIC).analysisFinished(bugCollectionRef.get(), findBugsProjectRef.get());
+			}
+		});
 	}
 
 

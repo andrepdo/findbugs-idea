@@ -24,7 +24,6 @@ import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -50,6 +49,7 @@ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventFactory;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
@@ -157,7 +157,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 		}, 500);
 
 		//Create a task to import the bug collection from XML
-		final AtomicReference<Task> importTask = new AtomicReference<Task>(new BackgroundableTask(project, "Importing Findbugs Result", true) {
+		final BackgroundableTask task = new BackgroundableTask(project, "Importing Findbugs Result", true) {
 			private ProgressIndicator _indicator;
 
 
@@ -165,6 +165,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 			@Override
 			public void run(@NotNull final ProgressIndicator indicator) {
 
+				MessageBusManager.publishAnalysisStartedToEDT();
 				EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newStarted(project));
 				setProgressIndicator(indicator);
 				indicator.setFraction(0.0);
@@ -187,6 +188,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 					for (final BugInstance bugInstance : _importBugCollection) {
 						if (indicator.isCanceled()) {
 							taskCanceled.set(true);
+							MessageBusManager.publishAnalysisAbortedToEDT();
 							EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 							Thread.currentThread().interrupt();
 							return;
@@ -195,13 +197,18 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 						final double fraction = bugCounter.doubleValue() / projectStats.getTotalBugs();
 						indicator.setFraction(fraction);
 						indicator.setText2("Importing bug '" + bugCount + "' of '" + projectStats.getTotalBugs() + "' - " + bugInstance.getMessageWithoutPrefix());
+						/**
+						 * Guarantee thread visibility *one* time.
+						 */
+						final AtomicReference<BugInstance> bugInstanceRef = New.atomicRef(bugInstance);
+						final AtomicReference<ProjectStats> projectStatsRef = New.atomicRef(projectStats);
 						transferToEDTQueue.offer(new Runnable() {
 							/**
 							 * Invoked by EDT.
 							 */
 							@Override
 							public void run() {
-								MessageBusManager.publish(NewBugInstanceListener.TOPIC).newBugInstance(bugInstance, projectStats);
+								MessageBusManager.publish(NewBugInstanceListener.TOPIC).newBugInstance(bugInstanceRef.get(), projectStatsRef.get());
 							}
 						});
 					}
@@ -217,18 +224,21 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 					_importBugCollection.setTimestamp(System.currentTimeMillis());
 					_importBugCollection.reinitializeCloud();
 				} catch (final IOException e1) {
+					MessageBusManager.publishAnalysisAbortedToEDT();
 					EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 					final String message = "Import failed";
 					showToolWindowNotifier(project, message, MessageType.ERROR);
 					LOGGER.error(message, e1);
 
 				} catch (final DocumentException e1) {
+					MessageBusManager.publishAnalysisAbortedToEDT();
 					EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 					final String message = "Import failed";
 					showToolWindowNotifier(project, message, MessageType.ERROR);
 					LOGGER.error(message, e1);
 
 				} finally {
+					MessageBusManager.publishAnalysisFinishedToEDT(_importBugCollection, null);
 					EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newFinished(_importBugCollection, project, null));
 					_importBugCollection = null;
 					Thread.currentThread().interrupt();
@@ -246,11 +256,11 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 			public ProgressIndicator getProgressIndicator() {
 				return _indicator;
 			}
-		});
+		};
 
-		importTask.get().setCancelText("Cancel");
-		importTask.get().asBackgroundable();
-		importTask.get().queue();
+		task.setCancelText( "Cancel" );
+		task.asBackgroundable();
+		task.queue();
 	}
 
 

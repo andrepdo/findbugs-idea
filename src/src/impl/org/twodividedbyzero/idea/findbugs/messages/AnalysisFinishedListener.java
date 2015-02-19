@@ -16,45 +16,27 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.twodividedbyzero.idea.findbugs.common.util;
+package org.twodividedbyzero.idea.findbugs.messages;
 
 
+import com.intellij.util.messages.Topic;
+import edu.umd.cs.findbugs.BugCollection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 
 
 /**
  * @author Reto Merz<reto.merz@gmail.com>
- * @version $Revision: 358 $
+ * @version $Revision: 364 $
  * @since 0.9.995
  */
-public final class New {
+public interface AnalysisFinishedListener {
+	Topic<AnalysisFinishedListener> TOPIC = Topic.create("FindBugs Analysis Finished", AnalysisFinishedListener.class);
 
+	/**
+	 * Invoked by EDT.
+	 */
+	void analysisFinished(@NotNull final BugCollection bugCollection, @Nullable final FindBugsProject findBugsProject);
 
-	private New() {
-	}
-
-
-	@NotNull
-	public static <V> AtomicReference<V> atomicRef(@Nullable V initialValue) {
-		return new AtomicReference<V>(initialValue);
-	}
-
-
-	@NotNull
-	public static <K, V> Map<K, V> map() {
-		return new HashMap<K, V>();
-	}
-
-
-	@NotNull
-	public static <E> Set<E> set() {
-		return new HashSet<E>();
-	}
 }
