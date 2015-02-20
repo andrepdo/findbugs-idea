@@ -38,10 +38,6 @@ import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
-import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
-import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
-import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
@@ -52,6 +48,7 @@ import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitLayout;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitPane;
 import org.twodividedbyzero.idea.findbugs.gui.common.NDockLayout;
+import org.twodividedbyzero.idea.findbugs.messages.AnalysisStateListener;
 import org.twodividedbyzero.idea.findbugs.messages.ClearListener;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
 import org.twodividedbyzero.idea.findbugs.messages.NewBugInstanceListener;
@@ -67,7 +64,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -79,7 +75,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @SuppressWarnings({"HardCodedStringLiteral", "AnonymousInnerClass", "AnonymousInnerClassMayBeStatic"})
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SE_BAD_FIELD"})
-public class ToolWindowPanel extends JPanel implements EventListener<BugReporterEvent> {
+public class ToolWindowPanel extends JPanel implements AnalysisStateListener {
 
 	private static final Logger LOGGER = Logger.getInstance(ToolWindowPanel.class.getName());
 
@@ -109,10 +105,11 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 		_parent = parent;
 		checkFindBugsPlugin();
 		initGui();
+		MessageBusManager.subscribeAnalysisState(project, this, this);
 		MessageBusManager.subscribe(project, this, ClearListener.TOPIC, new ClearListener() {
 			@Override
 			public void clear() {
-				ToolWindowPanel.this.clear(null);
+				ToolWindowPanel.this.clear();
 				DaemonCodeAnalyzer.getInstance(_project).restart();
 			}
 		});
@@ -276,8 +273,6 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 
 
 	private void installListeners() {
-		EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(_project.getName()), this);
-
 		if (_componentListener == null) {
 			_componentListener = createComponentListener();
 		}
@@ -285,74 +280,53 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 	}
 
 
-	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON"})
-	public void onEvent(@NotNull final BugReporterEvent event) {
+	@Override
+	public void analysisStarted() {
+		EditorFactory.getInstance().refreshAllEditors();
+		DaemonCodeAnalyzer.getInstance(_project).restart();
+		updateLayoutImpl(false);
+		clear();
+	}
 
-		switch (event.getOperation()) {
-			case ANALYSIS_STARTED:
-				EventDispatchThreadHelper.invokeLater(new Runnable() {
-					public void run() {
-						EditorFactory.getInstance().refreshAllEditors();
-						DaemonCodeAnalyzer.getInstance(_project).restart();
-						updateLayoutImpl(false);
-						clear(event.getProjectStats());
-					}
-				});
-				break;
-			case ANALYSIS_ABORTED:
-				//noinspection ConstantConditions
-				_bugTreePanel.setBugCollection(event.getBugCollection());
-				EventDispatchThreadHelper.invokeLater(new Runnable() {
-					public void run() {
-						final String text = "Analysis aborted...";
-						BalloonTipFactory.showToolWindowInfoNotifier(_project, text);
-					}
-				});
-				break;
-			case ANALYSIS_FINISHED:
-				final BugCollection bugCollection = event.getBugCollection();
-				final AtomicReference<ProjectStats> projectStats = new AtomicReference<ProjectStats>();
-				if (bugCollection != null) {
-					_bugTreePanel.setBugCollection(bugCollection);
-					projectStats.set(bugCollection.getProjectStats());
-					_bugTreePanel.updateRootNode(projectStats.get());
-				}
 
-				EventDispatchThreadHelper.invokeLater(new Runnable() {
-					public void run() {
-						_bugTreePanel.getBugTree().validate();
-						final ProjectStats stats = projectStats.get();
-						final int numAnalysedClasses = stats != null ? stats.getNumClasses() : 0;
+	@Override
+	public void analysisAborted() {
+		_bugTreePanel.setBugCollection(null);
+		BalloonTipFactory.showToolWindowInfoNotifier(_project, "Analysis aborted...");
+	}
 
-						final StringBuilder message = new StringBuilder()
-								.append(VersionManager.getName())
-								.append(": <b>found ")
-								.append(_bugTreePanel.getGroupModel().getBugCount())
-								.append(" bugs in ")
-								.append(numAnalysedClasses)
-								.append(numAnalysedClasses > 1 ? " classes" : " class")
-								.append("</b>");
 
-						_bugsProject = event.getFindBugsProject();
+	@Override
+	public void analysisFinished(@NotNull final BugCollection bugCollection, @Nullable final FindBugsProject findBugsProject) {
+		_bugTreePanel.setBugCollection(bugCollection);
+		final ProjectStats stats = bugCollection.getProjectStats();
+		_bugTreePanel.updateRootNode(stats);
+		_bugTreePanel.getBugTree().validate();
+		final int numAnalysedClasses = stats != null ? stats.getNumClasses() : 0;
 
-						if (numAnalysedClasses == 0) {
-							message.append("&nbsp; (no class files found <a href='").append(A_HREF_MORE_ANCHOR).append("'>more...</a>)<br/>");
-							message.append("<font size='10px'>using ").append(VersionManager.getFullVersion()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font>");
-							BalloonTipFactory.showToolWindowWarnNotifier(_project, message.toString(), new NotifierHyperlinkListener(ToolWindowPanel.this, _bugsProject));
-						} else {
-							message.append("&nbsp;<a href='").append(A_HREF_MORE_ANCHOR).append("'>more...</a><br/>");
-							message.append("<font size='10px'>using ").append(VersionManager.getFullVersion()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font>");
-							BalloonTipFactory.showToolWindowInfoNotifier(_project, message.toString(), new NotifierHyperlinkListener(ToolWindowPanel.this, _bugsProject));
-						}
+		final StringBuilder message = new StringBuilder()
+				.append(VersionManager.getName())
+				.append(": <b>found ")
+				.append(_bugTreePanel.getGroupModel().getBugCount())
+				.append(" bugs in ")
+				.append(numAnalysedClasses)
+				.append(numAnalysedClasses > 1 ? " classes" : " class")
+				.append("</b>");
 
-						EditorFactory.getInstance().refreshAllEditors();
-						DaemonCodeAnalyzer.getInstance(_project).restart();
-					}
-				});
+		_bugsProject = findBugsProject;
 
-				break;
-			default:
+		if (numAnalysedClasses == 0) {
+			message.append("&nbsp; (no class files found <a href='").append(A_HREF_MORE_ANCHOR).append("'>more...</a>)<br/>");
+			message.append("<font size='10px'>using ").append(VersionManager.getFullVersion()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font>");
+			BalloonTipFactory.showToolWindowWarnNotifier(_project, message.toString(), new NotifierHyperlinkListener(ToolWindowPanel.this, _bugsProject));
+		} else {
+			message.append("&nbsp;<a href='").append(A_HREF_MORE_ANCHOR).append("'>more...</a><br/>");
+			message.append("<font size='10px'>using ").append(VersionManager.getFullVersion()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font>");
+			BalloonTipFactory.showToolWindowInfoNotifier(_project, message.toString(), new NotifierHyperlinkListener(ToolWindowPanel.this, _bugsProject));
 		}
+
+		EditorFactory.getInstance().refreshAllEditors();
+		DaemonCodeAnalyzer.getInstance(_project).restart();
 	}
 
 
@@ -392,9 +366,9 @@ public class ToolWindowPanel extends JPanel implements EventListener<BugReporter
 	}
 
 
-	private void clear(@Nullable final ProjectStats projectStats) {
+	private void clear() {
 		_bugTreePanel.clear();
-		_bugTreePanel.updateRootNode(projectStats);
+		_bugTreePanel.updateRootNode(null);
 	}
 
 

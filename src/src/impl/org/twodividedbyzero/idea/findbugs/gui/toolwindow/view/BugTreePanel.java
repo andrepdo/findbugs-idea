@@ -42,7 +42,6 @@ import edu.umd.cs.findbugs.ProjectStats;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
@@ -142,16 +141,11 @@ public class BugTreePanel extends JPanel {
 		_visibleRootNode.setBugCount(projectStats == null ? -1 : _treeModel.getBugCount());
 		_visibleRootNode.setClassesCount(numClasses);
 
-		EventDispatchThreadHelper.invokeLater(new Runnable() {
-			public void run() {
-				_treeModel.nodeChanged(_visibleRootNode);
-			}
-		});
+		_treeModel.nodeChanged(_visibleRootNode);
 	}
 
 
 	void clear() {
-		EventDispatchThreadHelper.checkEDT();
 		_bugCollection = null;
 		_treeModel.clear();
 	}
