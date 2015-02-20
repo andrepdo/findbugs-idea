@@ -22,7 +22,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import edu.umd.cs.findbugs.BugInstance;
-import org.twodividedbyzero.idea.findbugs.common.DoneCallback;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
@@ -113,15 +112,12 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 
 	@SuppressWarnings({"MethodMayBeStatic", "AnonymousInnerClass"})
 	private void addProblem(final BugInstanceNode leaf) {
-		leaf.getPsiFile(new DoneCallback<PsiFile>() {
-			public void onDone(final PsiFile value) {
-				_addProblem(value, leaf);
-			}
-		});
+		final PsiFile psiFile = leaf.findAndGetPsiFile();
+		_addProblem(psiFile, leaf);
 	}
 
 
-	private void _addProblem(final PsiFile value, final BugInstanceNode leaf) {
+	private void _addProblem(@Nullable final PsiFile value, final BugInstanceNode leaf) {
 		if (value != null) {
 			final ExtendedProblemDescriptor element = new ExtendedProblemDescriptor(value, leaf);
 			if (_problems.containsKey(value)) {
@@ -211,7 +207,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 
 
 	public void addToGroup(final int depth, final BugInstance member, final BugInstance parent) {
-		EventDispatchThreadHelper.assertInEDTorADT();
+		EventDispatchThreadHelper.checkEDT();
 
 		final String groupName = GroupBy.getGroupName(_groupBy[depth], member);
 		final BugInstanceGroupNode parentGroup = ((RootNode) _root).findChildNode(parent, depth, groupName);

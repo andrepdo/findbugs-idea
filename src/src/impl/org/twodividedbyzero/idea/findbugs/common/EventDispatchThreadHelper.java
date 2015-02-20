@@ -37,7 +37,7 @@ import java.lang.reflect.InvocationTargetException;
 public final class EventDispatchThreadHelper {
 
 	private static final Logger LOGGER = Logger.getInstance(EventDispatchThreadHelper.class.getName());
-	private static final boolean DEBUG_CHECK_EDT = true;
+	private static final boolean DEBUG_CHECK_EDT = true; // TODO
 
 	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	public static void invokeAndWait(@NotNull final Operation operation) {
@@ -70,27 +70,6 @@ public final class EventDispatchThreadHelper {
 	}
 
 
-	@SuppressWarnings({"ThrowableInstanceNeverThrown"})
-	public static void assertInEDT(final String message) {
-		if (!EventQueue.isDispatchThread()) {
-			final CallerStack caller = new CallerStack();
-			final Throwable e = new NotInEDTViolation(message);
-			CallerStack.initCallerStack(e, caller);
-			LOGGER.debug(e);
-		}
-	}
-
-
-	@SuppressWarnings({"ThrowableInstanceNeverThrown"})
-	public static void assertInADT(final String message) {
-		if (!ApplicationManager.getApplication().isDispatchThread()) {
-			final CallerStack caller = new CallerStack();
-			final Throwable e = new NotInADTViolation(message);
-			CallerStack.initCallerStack(e, caller);
-			LOGGER.debug(e);
-		}
-	}
-
 	public static void assertInEDTorADT() {
 		if (!EventQueue.isDispatchThread() && !ApplicationManager.getApplication().isDispatchThread()) {
 			final CallerStack caller = new CallerStack();
@@ -98,27 +77,6 @@ public final class EventDispatchThreadHelper {
 			CallerStack.initCallerStack(e, caller);
 			LOGGER.debug(e);
 		}
-	}
-
-
-	public static void assertInEDT() {
-		assertInEDT("Should run in EventDispatchThread.");
-	}
-
-
-	public static void assertInADT() {
-		assertInEDT("Should run in ApplcationtDispatchThread.");
-	}
-
-
-	public static boolean checkEDTViolation() {
-		for (final String propertyName : new String[] { "checkedtviolation"}) {
-			final String value = System.getProperty(propertyName);
-			if ((value != null) && ("1".equals(value) || "yes".equalsIgnoreCase(value) || Boolean.valueOf(value))) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 

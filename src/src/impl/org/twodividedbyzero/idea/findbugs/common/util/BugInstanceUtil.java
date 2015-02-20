@@ -30,9 +30,8 @@ import edu.umd.cs.findbugs.FieldAnnotation;
 import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.MethodAnnotation;
 import edu.umd.cs.findbugs.SourceLineAnnotation;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.DoneCallback;
-import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 
@@ -172,29 +171,23 @@ public class BugInstanceUtil {
 	}
 
 
-	public static void findPsiElement(final Project project, final BugInstanceNode node, final DoneCallback<PsiFile>... callback) {
-		EventDispatchThreadHelper.invokeLater(new Runnable() {
-			public void run() {
-				final PsiClass[] psiClass = new PsiClass[1];
-				psiClass[0] = IdeaUtilImpl.findJavaPsiClass(project, node.getSourcePath());
-				for (final DoneCallback<PsiFile> doneCallback : callback) {
-					doneCallback.onDone(IdeaUtilImpl.getPsiFile(psiClass[0]));
-				}
-			}
-		});
+	@Nullable
+	public static PsiFile findPsiElement(@NotNull final Project project, @NotNull final BugInstanceNode node) {
+		final PsiClass psiClass = IdeaUtilImpl.findJavaPsiClass(project, node.getSourcePath());
+		return IdeaUtilImpl.getPsiFile(psiClass);
 	}
 
 
 	/**
-	 * NOTE: use {@link #findPsiElement(com.intellij.openapi.project.Project, org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode, org.twodividedbyzero.idea.findbugs.common.DoneCallback[])}
+	 * NOTE: use {@link #findPsiElement(com.intellij.openapi.project.Project, org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode)}
 	 * instead of this method. this method is executed through ApplicationManager.getApplication().invokeAndWait so it's very deadlock prone.
 	 *
-	 * @deprecated use {@link #findPsiElement(com.intellij.openapi.project.Project, org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode, org.twodividedbyzero.idea.findbugs.common.DoneCallback[])}
+	 * @deprecated use {@link #findPsiElement(com.intellij.openapi.project.Project, org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode)}
 	 * instead of this method. this method is executed through ApplicationManager.getApplication().invokeAndWait so it's very deadlock prone.
 	 *
-	 * @param project
-	 * @param node
-	 * @return
+	 * @param project ..
+	 * @param node ..
+	 * @return ..
 	 */
 	@Deprecated
 	@Nullable
