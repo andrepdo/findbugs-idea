@@ -37,8 +37,6 @@ import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventFactory;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEventImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
@@ -69,7 +67,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"IS2_INCONSISTENT_SYNC"})
 @SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "HardcodedFileSeparator"})
-public class BugReporter extends AbstractBugReporter implements FindBugsProgress {
+public final class BugReporter extends AbstractBugReporter implements FindBugsProgress {
 
 	private static final Logger LOGGER = Logger.getInstance(BugReporter.class.getName());
 
@@ -87,18 +85,16 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 	@NonNls
 	private String _currentStageName;
 	private static final String ANALYZING_CLASSES_i18N = "Analyzing classes: ";
-	private final boolean _isInspectionRun;
 	private boolean _isRunning;
 	private final FindBugsPreferences _preferences;
 	private final FindBugsProject _findBugsProject;
 	private final TransferToEDTQueue<Runnable> _transferToEDTQueue;
 
 
-	public BugReporter(final Project project, final boolean isInspectionRun, final SortedBugCollection bugCollection, final FindBugsProject findBugsProject) {
+	public BugReporter(final Project project, final SortedBugCollection bugCollection, final FindBugsProject findBugsProject) {
 		_project = project;
 		final FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(project);
 		_preferences = pluginComponent.getPreferences();
-		_isInspectionRun = isInspectionRun;
 		_bugCollection = bugCollection;
 		_findBugsProject = findBugsProject;
 		_transferToEDTQueue = new TransferToEDTQueue<Runnable>("Add New Bug Instance", new Processor<Runnable>() {
@@ -136,24 +132,20 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 		_filteredBugCount++;
 		observeClass(bug.getPrimaryClass().getClassDescriptor());
 
-		if (_isInspectionRun) {
-			EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(BugReporterInspectionEvent.Operation.NEW_BUG_INSTANCE, bug, _filteredBugCount, getProjectStats(), _project.getName()));
-		} else {
+		/**
+		 * Guarantee thread visibility *one* time.
+		 */
+		final AtomicReference<BugInstance> bugRef = New.atomicRef(bug);
+		final AtomicReference<ProjectStats> projectStatsRef = New.atomicRef(getProjectStats());
+		_transferToEDTQueue.offer(new Runnable() {
 			/**
-			 * Guarantee thread visibility *one* time.
+			 * Invoked by EDT.
 			 */
-			final AtomicReference<BugInstance> bugRef = New.atomicRef(bug);
-			final AtomicReference<ProjectStats> projectStatsRef = New.atomicRef(getProjectStats());
-			_transferToEDTQueue.offer(new Runnable() {
-				/**
-				 * Invoked by EDT.
-				 */
-				@Override
-				public void run() {
-					MessageBusManager.publish(NewBugInstanceListener.TOPIC).newBugInstance(bugRef.get(), projectStatsRef.get());
-				}
-			});
-		}
+			@Override
+			public void run() {
+				MessageBusManager.publish(NewBugInstanceListener.TOPIC).newBugInstance(bugRef.get(), projectStatsRef.get());
+			}
+		});
 	}
 
 
@@ -235,12 +227,8 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 			progressIndicator.finishNonCancelableSection();
 		}
 
-		if (_isInspectionRun) {
-			EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent.Operation.ANALYSIS_FINISHED, null, getBugCollection(), _project.getName(), _findBugsProject));
-		} else {
-			MessageBusManager.publishAnalysisFinishedToEDT(getBugCollection(), _findBugsProject);
-			EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newFinished(getBugCollection(), _project, _findBugsProject));
-		}
+		MessageBusManager.publishAnalysisFinishedToEDT(getBugCollection(), _findBugsProject);
+		EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newFinished(getBugCollection(), _project, _findBugsProject));
 
 		setRunning(false);
 	}
@@ -271,10 +259,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 		if (progressIndicator != null && progressIndicator.isCanceled()) {
 			// causes break in FindBugs main loop
 			Thread.currentThread().interrupt();
-
-			if (_isInspectionRun) {
-				EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent.Operation.ANALYSIS_ABORTED, _project.getName()));
-			} else if (!isRunning()) {
+			if (!isRunning()) {
 				MessageBusManager.publishAnalysisAbortedToEDT();
 				EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(_project));
 			}
@@ -350,9 +335,7 @@ public class BugReporter extends AbstractBugReporter implements FindBugsProgress
 		//_findBugsTask.setIndicatorText("Analyzing classes: " + numClasses);
 		beginStage(ANALYZING_CLASSES_i18N, numClasses);
 
-		if (_isInspectionRun) {
-			EventManagerImpl.getInstance().fireEvent(new BugReporterInspectionEventImpl(org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterInspectionEvent.Operation.ANALYSIS_STARTED, null, 0, _project.getName()));
-		} else if (!isRunning()) {
+		if (!isRunning()) {
 			MessageBusManager.publishAnalysisStartedToEDT();
 			EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newStarted(_project));
 		}

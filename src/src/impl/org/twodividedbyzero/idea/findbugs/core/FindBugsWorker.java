@@ -74,7 +74,7 @@ import java.util.Map.Entry;
  * @since 0.0.1
  */
 @SuppressWarnings({"HardCodedStringLiteral"})
-public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileStatusNotification {
+public final class FindBugsWorker implements EventListener<BugReporterEvent>, CompileStatusNotification {
 
 	protected static final Logger LOGGER = Logger.getInstance(FindBugsWorker.class.getName());
 
@@ -234,7 +234,7 @@ public class FindBugsWorker implements EventListener<BugReporterEvent>, CompileS
 
 	protected IFindBugsEngine createFindBugsEngine() {
 		// Create BugReporter
-		_bugReporter = new BugReporter(_project, false, _bugCollection, _findBugsProject);
+		_bugReporter = new BugReporter(_project, _bugCollection, _findBugsProject);
 
 		//final ProjectFilterSettings projectFilterSettings = _userPrefs.getFilterSettings();
 		_bugReporter.setPriorityThreshold(_userPrefs.getUserDetectorThreshold());
