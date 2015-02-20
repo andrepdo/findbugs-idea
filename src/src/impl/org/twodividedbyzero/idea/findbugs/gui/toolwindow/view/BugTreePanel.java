@@ -42,6 +42,7 @@ import edu.umd.cs.findbugs.ProjectStats;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
@@ -113,21 +114,18 @@ public class BugTreePanel extends JPanel {
 
 
 	void addNode(final BugInstance bugInstance) {
-		synchronized(addNodeLock) {
-			if (bugInstance == null) {
-				return;
-			}
-			/*if(isHiddenBugGroup(bugInstance)) {
-				return;
-			}*/
+		if (bugInstance == null) {
+			return;
+		}
+		/*if(isHiddenBugGroup(bugInstance)) {
+			return;
+		}*/
 
-			if (_treeModel.getGroupBy() != _groupBy) {
-				_treeModel.setGroupBy(_groupBy);
-			}
-
-			_treeModel.addNode(bugInstance);
+		if (_treeModel.getGroupBy() != _groupBy) {
+			_treeModel.setGroupBy(_groupBy);
 		}
 
+		_treeModel.addNode(bugInstance);
 	}
 
 
@@ -334,6 +332,7 @@ public class BugTreePanel extends JPanel {
 
 
 	public void setGroupBy(final GroupBy[] groupBy) {
+		EventDispatchThreadHelper.checkEDT();
 		if (!Arrays.equals(getGroupBy(), groupBy)) {
 			_groupBy = groupBy.clone();
 			regroupTree();

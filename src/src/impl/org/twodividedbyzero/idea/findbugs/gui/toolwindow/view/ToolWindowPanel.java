@@ -179,15 +179,7 @@ public class ToolWindowPanel extends JPanel implements AnalysisStateListener {
 
 
 	private void updateLayout(final boolean enablePreviewLayout) {
-		EventDispatchThreadHelper.invokeLater(new Runnable() {
-			public void run() {
-				updateLayoutImpl(enablePreviewLayout);
-			}
-		});
-	}
-
-
-	private void updateLayoutImpl(final boolean enablePreviewLayout) {
+		EventDispatchThreadHelper.checkEDT();
 		if (!_isPreviewLayoutEnabled && enablePreviewLayout) {
 			_updateMultiSplitLayout(PREVIEW_LAYOUT_DEF);
 			getMultiSplitPane().add(getBugTreePanel(), "left");
@@ -284,7 +276,7 @@ public class ToolWindowPanel extends JPanel implements AnalysisStateListener {
 	public void analysisStarted() {
 		EditorFactory.getInstance().refreshAllEditors();
 		DaemonCodeAnalyzer.getInstance(_project).restart();
-		updateLayoutImpl(false);
+		updateLayout(false);
 		clear();
 	}
 

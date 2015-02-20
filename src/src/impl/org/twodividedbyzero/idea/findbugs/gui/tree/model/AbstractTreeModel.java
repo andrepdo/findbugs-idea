@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -19,6 +19,7 @@
 
 package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 
 import javax.swing.event.EventListenerList;
@@ -26,14 +27,9 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.lang.reflect.Array;
-import java.util.EventListener;
-import java.util.Vector;
 
 
 /**
@@ -47,14 +43,13 @@ import java.util.Vector;
  * @param <N> the type of objects that can be used as nodes.
  * @see DefaultTreeModel
  */
-public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
+public abstract class AbstractTreeModel<N extends TreeNode> implements TreeModel {
 
 	/** Root of the tree. */
 	protected N _root;
 
 	/** Listeners. */
 	protected final EventListenerList _treeModelListeners = new EventListenerList();
-	//protected ArrayList<TreeModelListener> _treeModelListener = new ArrayList<TreeModelListener>();
 
 
 	/**
@@ -62,17 +57,6 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 	 * root is set.
 	 */
 	public AbstractTreeModel() {
-		this(null);
-	}
-
-
-	/**
-	 * Creates a tree in which any node can have children.
-	 *
-	 * @param root a R object that is the root of the tree
-	 */
-	public AbstractTreeModel(final N root) {
-		setRoot(root);
 	}
 
 
@@ -92,7 +76,7 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 	 *
 	 * @param parent a node in the tree, obtained from this data source
 	 * @return the child of <I>parent</I> at index <I>index</I>
-	 * @see #getChildNode(Object, int)
+	 * @see #getChildNode(javax.swing.tree.TreeNode, int)
 	 */
 	@SuppressWarnings("unchecked")
 	public final N getChild(final Object parent, final int index) {
@@ -120,7 +104,7 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 	 * getChildCount(<i>parent</i>)).
 	 *
 	 * @param parent a node in the tree, obtained from this data source
-	 * @param index
+	 * @param index ..
 	 * @return the child of <I>parent</I> at index <I>index</I>
 	 */
 	public abstract N getChildNode(N parent, int index);
@@ -165,44 +149,6 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 
 
 	/**
-	 * Returns an array of all the objects currently registered as
-	 * <code><em>Foo</em>Listener</code>s upon this model.
-	 * <code><em>Foo</em>Listener</code>s are registered using the
-	 * <code>add<em>Foo</em>Listener</code> method.
-	 * <p/>
-	 * <p/>
-	 * <p/>
-	 * You can specify the <code>listenerType</code> argument with a class
-	 * literal, such as <code><em>Foo</em>Listener.class</code>. For
-	 * example, you can query a
-	 * <code>AbstractTreeModelFrom6</code> <code>m</code> for its tree model
-	 * listeners with the following code:
-	 * <p/>
-	 * <pre>
-	 * TreeModelListener[] tmls = (TreeModelListener[]) (m
-	 * 	.getListeners(TreeModelListener.class));
-	 * </pre>
-	 * <p/>
-	 * If no such listeners exist, this method returns an empty array.
-	 *
-	 * @param listenerType the type of listeners requested; this parameter should
-	 *                     specify an interface that descends from
-	 *                     <code>java.util.EventListener</code>
-	 * @return an array of all objects registered as
-	 *         <code><em>Foo</em>Listener</code>s on this component, or an
-	 *         empty array if no such listeners have been added
-	 * @throws ClassCastException if <code>listenerType</code> doesn't specify a class
-	 *                            or interface that implements
-	 *                            <code>java.util.EventListener</code>
-	 * @see #getTreeModelListeners
-	 * @since 1.3
-	 */
-	public final <T extends EventListener> T[] getListeners(final Class<T> listenerType) {
-		return _treeModelListeners.getListeners(listenerType);
-	}
-
-
-	/**
 	 * Obtain the parent of a node.
 	 *
 	 * @param child a node
@@ -217,7 +163,7 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 	 * the returned array gives the node's depth in the tree.
 	 *
 	 * @param aNode the R to get the path for
-	 * @return
+	 * @return ..
 	 */
 	public final N[] getPathToRoot(final N aNode) {
 		return getPathToRoot(aNode, 0);
@@ -235,20 +181,6 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 
 
 	/**
-	 * Returns an array of all the tree model listeners registered on this
-	 * model.
-	 *
-	 * @return all of this model's <code>TreeModelListener</code>s or an
-	 *         empty array if no tree model listeners are currently registered
-	 * @see #addTreeModelListener
-	 * @see #removeTreeModelListener
-	 */
-	public final TreeModelListener[] getTreeModelListeners() {
-		return _treeModelListeners.getListeners(TreeModelListener.class);
-	}
-
-
-	/**
 	 * Returns whether the specified node is a leaf node.
 	 *
 	 * @param node the node to check
@@ -260,19 +192,11 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 	}
 
 
-	/*public void valueForPathChanged(final TreePath path, final Object newValue) {
-		final MutableTreeNode node = (MutableTreeNode) path.getLastPathComponent();
-
-		node.setUserObject(newValue);
-		nodeChanged(path.getLastPathComponent());
-	}*/
-
-
 	/**
 	 * Invoke this method after you've changed how node is to be represented in
 	 * the tree.
 	 *
-	 * @param node
+	 * @param node ..
 	 */
 	public final void nodeChanged(final N node) {
 		if (_treeModelListeners != null && node != null) {
@@ -297,8 +221,8 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 	 * Invoke this method after you've changed how the children identified by
 	 * childIndicies are to be represented in the tree.
 	 *
-	 * @param node
-	 * @param childIndices
+	 * @param node ..
+	 * @param childIndices ..
 	 */
 	public final void nodesChanged(final N node, final int[] childIndices) {
 		if (node != null) {
@@ -321,81 +245,15 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 
 
 	/**
-	 * Message this to remove node from its parent. This will message
-	 * nodesWereRemoved to create the appropriate event. This is the
-	 * preferred way to remove a node as it handles the event creation
-	 * for you.
-	 */
-	/*public void removeNodeFromParent(final N node) {
-		final N parent = getParentNode(node);
-
-		if (parent == null) {
-			throw new IllegalArgumentException("node does not have a parent.");
-		}
-
-		final int[] childIndex = new int[1];
-		final Object[] removedArray = new Object[1];
-
-
-		childIndex[0] = getIndexOfChildNode(parent, node);
-		//parent.remove(childIndex[0]);
-
-		removedArray[0] = node;
-		nodesWereRemoved(parent, childIndex, removedArray);
-	}*/
-
-
-	/**
 	 * Invoke this method if you've totally changed the children of node and its
 	 * childrens children... This will post a treeStructureChanged event.
 	 *
-	 * @param node
+	 * @param node ..
 	 */
-	public final void nodeStructureChanged(final N node) {
+	public final void nodeStructureChanged(@Nullable final N node) {
+		EventDispatchThreadHelper.checkEDT();
 		if (node != null) {
-			EventDispatchThreadHelper.invokeLater(new Runnable() {
-				public void run() {
-					fireTreeStructureChanged(this, getPathToRoot(node), null, null);
-				}
-			});
-		}
-	}
-
-
-	/**
-	 * Invoke this method after you've inserted some TreeNodes into node.
-	 * childIndices should be the index of the new elements and must be sorted
-	 * in ascending order.
-	 *
-	 * @param node
-	 * @param childIndices
-	 */
-	public final void nodesWereInserted(final N node, final int[] childIndices) {
-		if (_treeModelListeners != null && node != null && childIndices != null && childIndices.length > 0) {
-			final int cCount = childIndices.length;
-			final Object[] newChildren = new Object[cCount];
-
-			for (int counter = 0; counter < cCount; counter++) {
-				newChildren[counter] = getChildNode(node, childIndices[counter]);
-			}
-			fireTreeNodesInserted(this, getPathToRoot(node), childIndices, newChildren);
-		}
-	}
-
-
-	/**
-	 * Invoke this method after you've removed some TreeNodes from node.
-	 * childIndices should be the index of the removed elements and must be
-	 * sorted in ascending order. And removedChildren should be the array of the
-	 * children objects that were removed.
-	 *
-	 * @param node
-	 * @param childIndices
-	 * @param removedChildren
-	 */
-	public final void nodesWereRemoved(final N node, final int[] childIndices, final Object[] removedChildren) {
-		if (node != null && childIndices != null) {
-			fireTreeNodesRemoved(this, getPathToRoot(node), childIndices, removedChildren);
+			fireTreeStructureChanged(this, getPathToRoot(node), null, null);
 		}
 	}
 
@@ -431,33 +289,9 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 	 * @param l the listener to remove
 	 * @see #addTreeModelListener
 	 */
+	@Override
 	public final void removeTreeModelListener(final TreeModelListener l) {
 		_treeModelListeners.remove(TreeModelListener.class, l);
-	}
-
-
-	/**
-	 * Sets the root to <code>root</code>. A null <code>root</code> implies
-	 * the tree is to display nothing, and is legal.
-	 *
-	 * @param newRoot
-	 */
-	public final void setRoot(final N newRoot) {
-		final N oldRoot = _root;
-		if (oldRoot != newRoot) {
-			if (oldRoot != null) {
-				deinstall(oldRoot);
-			}
-			_root = newRoot;
-			if (newRoot != null) {
-				install(newRoot);
-			}
-			if (newRoot == null && oldRoot != null) {
-				fireTreeStructureChanged(this, null);
-			} else {
-				nodeStructureChanged(newRoot);
-			}
-		}
 	}
 
 
@@ -494,45 +328,6 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 	}
 
 
-	@SuppressWarnings({"unchecked", "UseOfObsoleteCollectionType"})
-	private void readObject(final ObjectInputStream s) throws IOException, ClassNotFoundException {
-		s.defaultReadObject();
-
-		final Vector<?> values = (Vector<?>) s.readObject();
-		int indexCounter = 0;
-		final int maxCounter = values.size();
-
-		if (indexCounter < maxCounter && "root".equals(values.elementAt(indexCounter))) {
-			_root = (N) values.elementAt(++indexCounter);
-			//indexCounter++;
-		}
-	}
-
-
-	@SuppressWarnings({"unchecked", "UseOfObsoleteCollectionType"})
-	private void writeObject(final ObjectOutputStream s) throws IOException {
-		final Vector values = new Vector();
-
-		s.defaultWriteObject();
-		// Save the root, if its Serializable.
-		if (_root != null && _root instanceof Serializable) {
-			values.addElement("root");
-			values.addElement(_root);
-		}
-		s.writeObject(values);
-	}
-
-
-	/**
-	 * Will be called prior to removal of the current root node. Sub classes
-	 * must remove listeners that were added previously by <code>install</code>.
-	 *
-	 * @param root the root node that is about to be be removed.
-	 * @see #install(Object)
-	 */
-	protected abstract void deinstall(N root);
-
-
 	/**
 	 * Notifies all listeners that have registered interest for notification on
 	 * this event type. The event instance is lazily created using the
@@ -557,64 +352,6 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 					e = new TreeModelEvent(source, path, childIndices, children);
 				}
 				((TreeModelListener) listeners[i + 1]).treeNodesChanged(e);
-			}
-		}
-	}
-
-
-	/**
-	 * Notifies all listeners that have registered interest for notification on
-	 * this event type. The event instance is lazily created using the
-	 * parameters passed into the fire method.
-	 *
-	 * @param source	   the node where new elements are being inserted
-	 * @param path		 the path to the root node
-	 * @param childIndices the indices of the new elements
-	 * @param children	 the new elements
-	 * @see EventListenerList
-	 */
-	protected final void fireTreeNodesInserted(final Object source, final Object[] path, final int[] childIndices, final Object[] children) {
-		// Guaranteed to return a non-null array
-		final Object[] listeners = _treeModelListeners.getListenerList();
-		TreeModelEvent e = null;
-		// Process the listeners last to first, notifying
-		// those that are interested in this event
-		for (int i = listeners.length - 2; i >= 0; i -= 2) {
-			if (listeners[i] == TreeModelListener.class) {
-				// Lazily create the event:
-				if (e == null) {
-					e = new TreeModelEvent(source, path, childIndices, children);
-				}
-				((TreeModelListener) listeners[i + 1]).treeNodesInserted(e);
-			}
-		}
-	}
-
-
-	/**
-	 * Notifies all listeners that have registered interest for notification on
-	 * this event type. The event instance is lazily created using the
-	 * parameters passed into the fire method.
-	 *
-	 * @param source	   the node where elements are being removed
-	 * @param path		 the path to the root node
-	 * @param childIndices the indices of the removed elements
-	 * @param children	 the removed elements
-	 * @see EventListenerList
-	 */
-	protected final void fireTreeNodesRemoved(final Object source, final Object[] path, final int[] childIndices, final Object[] children) {
-		// Guaranteed to return a non-null array
-		final Object[] listeners = _treeModelListeners.getListenerList();
-		TreeModelEvent e = null;
-		// Process the listeners last to first, notifying
-		// those that are interested in this event
-		for (int i = listeners.length - 2; i >= 0; i -= 2) {
-			if (listeners[i] == TreeModelListener.class) {
-				// Lazily create the event:
-				if (e == null) {
-					e = new TreeModelEvent(source, path, childIndices, children);
-				}
-				((TreeModelListener) listeners[i + 1]).treeNodesRemoved(e);
 			}
 		}
 	}
@@ -697,17 +434,7 @@ public abstract class AbstractTreeModel<N> implements Serializable, TreeModel {
 	}
 
 
-	/**
-	 * Will be called immediately after setting of the root node. Sub classes
-	 * may add listeners to the root that enable them to monitor changes to the
-	 * tree and fire change events accordingly.
-	 *
-	 * @param root the root node that is just installed.
-	 * @see #deinstall(Object)
-	 */
-	protected abstract void install(N root);
-
-
+	@Override
 	public void valueForPathChanged(final TreePath path, final Object newValue) {
 		if (_treeModelListeners.getListenerCount() > 0 && !path.getLastPathComponent().equals(newValue)) {
 			final TreePath parentPath = path.getParentPath();

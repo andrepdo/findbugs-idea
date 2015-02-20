@@ -37,7 +37,7 @@ import java.lang.reflect.InvocationTargetException;
 public final class EventDispatchThreadHelper {
 
 	private static final Logger LOGGER = Logger.getInstance(EventDispatchThreadHelper.class.getName());
-
+	private static final boolean DEBUG_CHECK_EDT = true;
 
 	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	public static void invokeAndWait(@NotNull final Operation operation) {
@@ -57,14 +57,14 @@ public final class EventDispatchThreadHelper {
 
 
 	public static void checkNotEDT() {
-		if (EventQueue.isDispatchThread()) {
+		if (DEBUG_CHECK_EDT && EventQueue.isDispatchThread()) {
 			throw new IllegalStateException();
 		}
 	}
 
 
 	public static void checkEDT() {
-		if (!EventQueue.isDispatchThread()) {
+		if (DEBUG_CHECK_EDT && !EventQueue.isDispatchThread()) {
 			throw new IllegalStateException();
 		}
 	}

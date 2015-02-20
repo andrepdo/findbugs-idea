@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -50,7 +50,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> implements GrouperCallback<BugInstance> {
 
-	private static final long serialVersionUID = 0L;
 	private static final Logger LOGGER = Logger.getInstance(GroupTreeModel.class.getName());
 
 	private GroupBy[] _groupBy;
@@ -145,14 +144,6 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	public void addNode(final BugInstance bugInstance) {
 		/*if(isHiddenBugGroup(bugInstance)) {
 			return;
-		}*/
-		/*EventDispatchThreadHelper.assertInEDT();
-		EventDispatchThreadHelper.assertInADT();*/
-		EventDispatchThreadHelper.assertInEDTorADT();
-
-		//_lock.lock();
-		/*if (!ApplicationManager.getApplication().isDispatchThread() || !EventQueue.isDispatchThread()) {
-			_lock.lock();
 		}*/
 		_bugCount.getAndIncrement();
 		group(bugInstance);
@@ -323,7 +314,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	 * getChildCount(<i>parent</i>)).
 	 *
 	 * @param parent a node in the tree, obtained from this data source
-	 * @param index
+	 * @param index ..
 	 * @return the child of <I>parent</I> at index <I>index</I>
 	 */
 	@Override
@@ -374,20 +365,6 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 
 
 	/**
-	 * Will be called prior to removal of the current root node. Sub classes
-	 * must remove listeners that were added previously by <code>install</code>.
-	 *
-	 * @param root the root node that is about to be be removed.
-	 * @see #install(Object)
-	 */
-	@Override
-	protected void deinstall(final VisitableTreeNode root) {
-		EventDispatchThreadHelper.assertInEDT();
-		EventDispatchThreadHelper.assertInADT();
-	}
-
-
-	/**
 	 * Subclasses must implement this method and return a <code>Class</code>
 	 * object for the generic type.
 	 *
@@ -396,20 +373,5 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	@Override
 	protected Class<VisitableTreeNode> getNodeClass() {
 		return VisitableTreeNode.class;
-	}
-
-
-	/**
-	 * Will be called immediately after setting of the root node. Sub classes
-	 * may add listeners to the root that enable them to monitor changes to the
-	 * tree and fire change events accordingly.
-	 *
-	 * @param root the root node that is just installed.
-	 * @see #deinstall(Object)
-	 */
-	@Override
-	protected void install(final VisitableTreeNode root) {
-		EventDispatchThreadHelper.assertInEDT();
-		EventDispatchThreadHelper.assertInADT();
 	}
 }
