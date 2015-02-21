@@ -27,6 +27,7 @@ import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ShowSettingsUtil;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
@@ -40,7 +41,8 @@ import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsWorker;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import java.util.Collection;
@@ -127,26 +129,27 @@ public class AnalyzeScopeFiles extends BaseAnalyzeAction implements EventListene
 	@Override
 	protected void analyze(@NotNull final Project project, final AnalysisScope scope) {
 		final Module module = IdeaUtilImpl.getModule(_dataContext);
+		final FindBugsPreferences preferences = FindBugsPreferences.getPreferences(project, module);
+		new FindBugsStarter(project, "Running FindBugs analysis...", preferences) {
+			@Override
+			protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
 
-		final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
-		if (Boolean.valueOf(preferences.getProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT))) {
-			IdeaUtilImpl.activateToolWindow(getPluginInterface(project).getInternalToolWindowId(), _dataContext);
-		}
+				indicator.setText("Collect files for scanning...");
 
-		final FindBugsWorker worker = new FindBugsWorker(project, module);
+				// set aux classpath
+				final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(_dataContext);
+				findBugsProject.configureAuxClasspathEntries(files);
 
-		// set aux classpath
-		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(_dataContext);
-		worker.configureAuxClasspathEntries(files);
+				// set source dirs
+				final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(_dataContext);
+				findBugsProject.configureSourceDirectories(sourceRoots);
 
-		// set source dirs
-		final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(_dataContext);
-		worker.configureSourceDirectories(sourceRoots);
+				// set class files
+				final Collection<VirtualFile> classes = findClasses(project, scope);
+				findBugsProject.configureOutputFiles(project, classes);
 
-		// set class files
-		final Collection<VirtualFile> classes = findClasses(project, scope);
-		worker.configureOutputFiles(classes);
-		worker.work("Running FindBugs analysis...");
+			}
+		}.start();
 	}
 
 

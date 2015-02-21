@@ -29,6 +29,7 @@ import edu.umd.cs.findbugs.config.UserPreferences;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.StringUtil;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.AnnotationType;
 import org.twodividedbyzero.idea.findbugs.plugins.AbstractPluginLoader;
@@ -914,6 +915,15 @@ public class FindBugsPreferences extends Properties {
 
 	public void setFlattendAnnotationTypeSettings(final Map<String, String> annotationTypeSettings) {
 		_annotationTypeSettings = AnnotationType.complex(annotationTypeSettings);
+	}
+
+
+	public static FindBugsPreferences getPreferences(@NotNull final Project project, @Nullable final Module module) {
+		FindBugsPreferences ret = IdeaUtilImpl.getPluginComponent(project).getPreferences();
+		if (module != null && ret.isModuleConfigEnabled(module)) {
+			ret = IdeaUtilImpl.getModuleComponent(module).getPreferences();
+		}
+		return ret;
 	}
 
 

@@ -94,6 +94,12 @@ public final class MessageBusManager {
 	}
 
 
+	public static void publishAnalysisStarted() {
+		EventDispatchThreadHelper.checkEDT();
+		publish(AnalysisStartedListener.TOPIC).analysisStarted();
+	}
+
+
 	public static void publishAnalysisStartedToEDT() {
 		EventDispatchThreadHelper.checkNotEDT();
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
@@ -102,6 +108,12 @@ public final class MessageBusManager {
 				publish(AnalysisStartedListener.TOPIC).analysisStarted();
 			}
 		});
+	}
+
+
+	public static void publishAnalysisAborted() {
+		EventDispatchThreadHelper.checkEDT();
+		publish(AnalysisAbortedListener.TOPIC).analysisAborted();
 	}
 
 

@@ -124,10 +124,7 @@ public final class FindBugsWorker implements EventListener<BugReporterEvent>, Co
 	 */
 	private void configure() {
 
-		FindBugsPreferences preferences = IdeaUtilImpl.getPluginComponent(_project).getPreferences();
-		if (_module != null && preferences.isModuleConfigEnabled(_module)) {
-			preferences = IdeaUtilImpl.getModuleComponent(_module).getPreferences();
-		}
+		final FindBugsPreferences preferences = FindBugsPreferences.getPreferences(_project, _module);
 
 		//_startInBackground = preferences.getBooleanProperty(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND, false);
 
@@ -163,7 +160,7 @@ public final class FindBugsWorker implements EventListener<BugReporterEvent>, Co
 	}
 
 
-	private static void configureSelectedCategories(final FindBugsPreferences preferences, final ProjectFilterSettings projectFilterSettings) {
+	static void configureSelectedCategories(final FindBugsPreferences preferences, final ProjectFilterSettings projectFilterSettings) {
 		for (final Entry<String, String> category : preferences.getBugCategories().entrySet()) {
 			if ("true".equals(category.getValue())) {
 				projectFilterSettings.addCategory(category.getKey());
@@ -250,7 +247,7 @@ public final class FindBugsWorker implements EventListener<BugReporterEvent>, Co
 		//engine.setScanNestedArchives(true); // todo: prefrences Bean
 		//engine.setRelaxedReportingMode(true); // todo: prefrences Bean
 		//engine.setRankThreshold(99);
-		configureFilter(engine);
+		configureFilter(engine, _project, _userPrefs);
 
 
 		// add plugins to detector collection
@@ -264,27 +261,27 @@ public final class FindBugsWorker implements EventListener<BugReporterEvent>, Co
 	}
 
 
-	private void configureFilter(final IFindBugsEngine engine) {
-		final Map<String, Boolean> excludeFilterFiles = _userPrefs.getExcludeFilterFiles();
+	static void configureFilter(@NotNull final IFindBugsEngine engine, @NotNull final Project project, @NotNull final UserPreferences userPrefs) {
+		final Map<String, Boolean> excludeFilterFiles = userPrefs.getExcludeFilterFiles();
 		for (final Entry<String, Boolean> excludeFileName : excludeFilterFiles.entrySet()) {
 			try {
-				engine.addFilter(IdeaUtilImpl.expandPathMacro(_project, excludeFileName.getKey()), false);
+				engine.addFilter(IdeaUtilImpl.expandPathMacro(project, excludeFileName.getKey()), false);
 			} catch (final IOException e) {
 				LOGGER.error("ExcludeFilter configuration failed.", e);
 			}
 		}
-		final Map<String, Boolean> includeFilterFiles = _userPrefs.getIncludeFilterFiles();
+		final Map<String, Boolean> includeFilterFiles = userPrefs.getIncludeFilterFiles();
 		for (final Entry<String, Boolean> includeFileName : includeFilterFiles.entrySet()) {
 			try {
-				engine.addFilter(IdeaUtilImpl.expandPathMacro(_project, includeFileName.getKey()), true);
+				engine.addFilter(IdeaUtilImpl.expandPathMacro(project, includeFileName.getKey()), true);
 			} catch (final IOException e) {
 				LOGGER.error("IncludeFilter configuration failed.", e);
 			}
 		}
-		final Map<String, Boolean> excludeBugFiles = _userPrefs.getExcludeBugsFiles();
+		final Map<String, Boolean> excludeBugFiles = userPrefs.getExcludeBugsFiles();
 		for (final Entry<String, Boolean> excludeBugFile : excludeBugFiles.entrySet()) {
 			try {
-				engine.excludeBaselineBugs(IdeaUtilImpl.expandPathMacro(_project, excludeBugFile.getKey()));
+				engine.excludeBaselineBugs(IdeaUtilImpl.expandPathMacro(project, excludeBugFile.getKey()));
 			} catch (final IOException e) {
 				LOGGER.error("ExcludeBaseLineBug files configuration failed.", e);
 			} catch (final DocumentException e) {

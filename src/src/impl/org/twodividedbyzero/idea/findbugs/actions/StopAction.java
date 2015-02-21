@@ -48,17 +48,13 @@ public class StopAction extends BaseAction implements EventListener<BugReporterE
 	private static final Logger LOGGER = Logger.getInstance(StopAction.class.getName());
 
 	private boolean _enabled;
-	private AnActionEvent _actionEvent;
-	private DataContext _dataContext;
 
 
 	@Override
-	public void actionPerformed(final AnActionEvent e) {
-		_actionEvent = e;
-		_dataContext = e.getDataContext();
-		final com.intellij.openapi.project.Project project = DataKeys.PROJECT.getData(_dataContext);
+	public void actionPerformed(@NotNull final AnActionEvent e) {
+		final com.intellij.openapi.project.Project project = DataKeys.PROJECT.getData(e.getDataContext());
 		if (project != null) {
-			MessageBusManager.publishAnalysisAbortedToEDT();
+			MessageBusManager.publishAnalysisAborted();
 			EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 		} else {
 			LOGGER.error("No active project");
