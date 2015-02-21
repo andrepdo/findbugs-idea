@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.actions;
+
 
 import com.intellij.analysis.AnalysisScope;
 import com.intellij.analysis.AnalysisScopeBundle;
@@ -32,7 +32,6 @@ import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.application.Result;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.help.HelpManager;
 import com.intellij.openapi.module.Module;
@@ -47,19 +46,16 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.PsiRecursiveElementVisitor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 
 import javax.annotation.Nullable;
 import javax.swing.Action;
-import javax.swing.JComponent;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
+
 
 /**
  * Copy of {@link com.intellij.analysis.BaseAnalysisAction}
@@ -71,10 +67,8 @@ import java.util.Set;
  */
 public abstract class BaseAnalyzeAction extends BaseAction {
 
-	private static final Logger LOGGER = Logger.getInstance(BaseAction.class.getName());
-
 	@Override
-	public void actionPerformed(final AnActionEvent e) {
+	public void actionPerformed(@NotNull final AnActionEvent e) {
 		final DataContext dataContext = e.getDataContext();
 		final Project project = e.getData(PlatformDataKeys.PROJECT);
 		final Module module = e.getData(LangDataKeys.MODULE);
@@ -91,11 +85,6 @@ public abstract class BaseAnalyzeAction extends BaseAction {
 			scope,
 			module != null && scope.getScopeType() != AnalysisScope.MODULE ? getModuleNameInReadAction(module) : null,
 			rememberScope, AnalysisUIOptions.getInstance(project), element) {
-				@Override
-				@Nullable
-				protected JComponent getAdditionalActionSettings(final Project project) {
-					return BaseAnalyzeAction.this.getAdditionalActionSettings(project, this);
-				}
 
 				@Override
 				protected void doHelpAction() {
@@ -111,7 +100,6 @@ public abstract class BaseAnalyzeAction extends BaseAction {
 			};
 		dlg.show();
 		if (!dlg.isOK()) {
-			canceled();
 			return;
 		}
 		final int oldScopeType = uiOptions.SCOPE_TYPE;
@@ -127,37 +115,12 @@ public abstract class BaseAnalyzeAction extends BaseAction {
 
 
 	@NonNls
-	protected String getHelpTopic() {
+	private String getHelpTopic() {
 		return "reference.dialogs.analyzeDependencies.scope";
 	}
 
 
-	protected void canceled() {
-	}
-
-
 	protected abstract void analyze(@NotNull final Project project, final AnalysisScope scope);
-
-
-	@NotNull
-	protected final Collection<VirtualFile> findClasses(@NotNull final Project project, final AnalysisScope scope) {
-		final Collection<VirtualFile> ret = new LinkedList<VirtualFile>();
-		final PsiManager psiManager = PsiManager.getInstance(project);
-		psiManager.startBatchFilesProcessingMode();
-		try {
-			scope.accept(new PsiRecursiveElementVisitor() {
-				@Override
-				public void visitFile(final PsiFile file) {
-					if (IdeaUtilImpl.SUPPORTED_FILE_TYPES.contains(file.getFileType())) {
-						ret.add(file.getVirtualFile());
-					}
-				}
-			});
-		} finally {
-			psiManager.finishBatchFilesProcessingMode();
-		}
-		return ret;
-	}
 
 
 	@Nullable
@@ -233,14 +196,8 @@ public abstract class BaseAnalyzeAction extends BaseAction {
 	}
 
 
-	protected boolean acceptNonProjectDirectories() {
+	private boolean acceptNonProjectDirectories() {
 		return false;
-	}
-
-
-	@Nullable
-	protected JComponent getAdditionalActionSettings(final Project project, final BaseAnalysisActionDialog dialog) {
-		return null;
 	}
 
 
@@ -259,7 +216,7 @@ public abstract class BaseAnalyzeAction extends BaseAction {
 
 	private static String getModuleNameInReadAction(@NotNull final Module module) {
 		return new ReadAction<String>() {
-			protected void run(final Result<String> result) throws Throwable {
+			protected void run(@NotNull final Result<String> result) throws Throwable {
 				result.setResult(module.getName());
 			}
 		}.execute().getResultObject();

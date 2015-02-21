@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -67,7 +67,6 @@ public class AnalysisRunDetailsDialog implements Serializable {
 		final List<String> fileList = bugsProject.getFileList();
 		final List<String> auxClasspathEntries = bugsProject.getAuxClasspathEntryList();
 		final List<String> configuredOutputFiles = bugsProject.getConfiguredOutputFiles();
-		//bugsProject.get
 
 		final StringBuilder html = new StringBuilder();
 		html.append("<html><body>");

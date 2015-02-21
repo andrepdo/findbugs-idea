@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.actions;
+
 
 import com.intellij.analysis.AnalysisScope;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -33,30 +33,34 @@ import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiRecursiveElementVisitor;
+import edu.umd.cs.findbugs.BugCollection;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
-import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
-import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
+import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.collectors.StatelessClassAdder;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
+import org.twodividedbyzero.idea.findbugs.messages.AnalysisStateListener;
+import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
- * $Date$
- *
  * @author Reto Merz<reto.merz@gmail.com>
  * @version $Revision$
  * @since 0.9.99
  */
-public class AnalyzeScopeFiles extends BaseAnalyzeAction implements EventListener<BugReporterEvent> {
+public final class AnalyzeScopeFiles extends BaseAnalyzeAction implements AnalysisStateListener {
 
-	private static final Logger LOGGER = Logger.getInstance(AnalyzePackageFiles.class.getName());
+	private static final Logger LOGGER = Logger.getInstance(AnalyzeScopeFiles.class.getName());
 
 	private DataContext _dataContext;
 	private boolean _enabled;
@@ -64,7 +68,7 @@ public class AnalyzeScopeFiles extends BaseAnalyzeAction implements EventListene
 
 
 	@Override
-	public void actionPerformed(final AnActionEvent e) {
+	public void actionPerformed(@NotNull final AnActionEvent e) {
 		_dataContext = e.getDataContext();
 
 		final com.intellij.openapi.project.Project project = DataKeys.PROJECT.getData(_dataContext);
@@ -88,17 +92,15 @@ public class AnalyzeScopeFiles extends BaseAnalyzeAction implements EventListene
 
 
 	@Override
-	public void update(final AnActionEvent event) {
+	public void update(@NotNull final AnActionEvent event) {
 		try {
 			_dataContext = event.getDataContext();
 			final Project project = DataKeys.PROJECT.getData(_dataContext);
 			final Presentation presentation = event.getPresentation();
 
-			// check a project is loaded
 			if (isProjectNotLoaded(project, presentation)) {
 				return;
 			}
-
 			isPluginAccessible(project);
 
 			// check if tool window is registered
@@ -106,15 +108,13 @@ public class AnalyzeScopeFiles extends BaseAnalyzeAction implements EventListene
 			if (toolWindow == null) {
 				presentation.setEnabled(false);
 				presentation.setVisible(false);
-
 				return;
 			}
 
-			registerEventListener(project);
+			MessageBusManager.subscribeAnalysisState(project, this, this);
 
-			// enable ?
 			if (!_running) {
-				_enabled = project != null && project.isInitialized() && project.isOpen();
+				_enabled = project.isInitialized() && project.isOpen();
 			}
 			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
 			presentation.setVisible(true);
@@ -134,31 +134,19 @@ public class AnalyzeScopeFiles extends BaseAnalyzeAction implements EventListene
 			@Override
 			protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
 
-				indicator.setText("Collect files for scanning...");
-
-				// set aux classpath
+				indicator.setText("Collecting auxiliary classpath entries...");
 				final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(_dataContext);
 				findBugsProject.configureAuxClasspathEntries(files);
 
-				// set source dirs
+				indicator.setText("Configure source directories...");
 				final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(_dataContext);
 				findBugsProject.configureSourceDirectories(sourceRoots);
 
-				// set class files
-				final Collection<VirtualFile> classes = findClasses(project, scope);
-				findBugsProject.configureOutputFiles(project, classes);
+				indicator.setText("Collecting files for analysis...");
+				addClasses(indicator, project, scope, findBugsProject);
 
 			}
 		}.start();
-	}
-
-
-	private void registerEventListener(final Project project) {
-		final String projectName = project.getName();
-		if (!isRegistered(projectName)) {
-			EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(projectName), this);
-			addRegisteredProject(projectName);
-		}
 	}
 
 
@@ -192,17 +180,54 @@ public class AnalyzeScopeFiles extends BaseAnalyzeAction implements EventListene
 	}
 
 
-	public void onEvent(@NotNull final BugReporterEvent event) {
-		switch (event.getOperation()) {
-			case ANALYSIS_STARTED:
-				setEnabled(false);
-				setRunning(true);
-				break;
-			case ANALYSIS_ABORTED:
-			case ANALYSIS_FINISHED:
-				setEnabled(true);
-				setRunning(false);
-				break;
+	private void addClasses(
+			@NotNull final ProgressIndicator indicator,
+			@NotNull final Project project,
+			@NotNull final AnalysisScope scope,
+			@NotNull final FindBugsProject findBugsProject
+	) {
+
+		final List<String> outputFiles = new ArrayList<String>();
+		final StatelessClassAdder sca = new StatelessClassAdder(findBugsProject, project);
+		final PsiManager psiManager = PsiManager.getInstance(project);
+		psiManager.startBatchFilesProcessingMode();
+		final int[] count = new int[1];
+		try {
+			scope.accept(new PsiRecursiveElementVisitor() {
+				@Override
+				public void visitFile(final PsiFile file) {
+					if (IdeaUtilImpl.SUPPORTED_FILE_TYPES.contains(file.getFileType())) {
+						final VirtualFile vf = file.getVirtualFile();
+						outputFiles.add(vf.getPath());
+						sca.addContainingClasses(vf);
+						indicator.setText2("Files collected: " + ++count[0]);
+					}
+				}
+			});
+		} finally {
+			psiManager.finishBatchFilesProcessingMode();
 		}
+		findBugsProject.setConfiguredOutputFiles(outputFiles);
+	}
+
+
+	@Override
+	public void analysisStarted() {
+		setEnabled(false);
+		setRunning(true);
+	}
+
+
+	@Override
+	public void analysisAborted() {
+		setEnabled(true);
+		setRunning(false);
+	}
+
+
+	@Override
+	public void analysisFinished(@NotNull BugCollection bugCollection, @Nullable FindBugsProject findBugsProject) {
+		setEnabled(true);
+		setRunning(false);
 	}
 }

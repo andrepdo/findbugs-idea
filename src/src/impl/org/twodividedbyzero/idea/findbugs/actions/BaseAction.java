@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -18,6 +18,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.actions;
 
+
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -28,6 +29,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,7 +38,6 @@ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -57,7 +58,7 @@ public abstract class BaseAction extends AnAction {
 
 
 	@Override
-	public void update(final AnActionEvent event) {
+	public void update(@NotNull final AnActionEvent event) {
 		try {
 			final DataContext dataContext = event.getDataContext();
 			final Project project = DataKeys.PROJECT.getData(dataContext);
@@ -106,12 +107,12 @@ public abstract class BaseAction extends AnAction {
 	}
 
 
-	protected boolean isProjectNotLoaded(@Nullable final Project project, final Presentation presentation) {
+	@Contract("null, _ -> true")
+	protected final boolean isProjectNotLoaded(@Nullable final Project project, final Presentation presentation) {
 		// check a project is loaded
 		if (project == null) {
 			presentation.setEnabled(false);
 			presentation.setVisible(false);
-
 			return true;
 		}
 		return false;
@@ -120,11 +121,6 @@ public abstract class BaseAction extends AnAction {
 
 	protected FindBugsPlugin getPluginInterface(final Project project) {
 		return IdeaUtilImpl.getPluginComponent(project);
-	}
-
-
-	public Set<String> getRegisteredProjects() {
-		return Collections.unmodifiableSet(_registeredProjects);
 	}
 
 
@@ -140,11 +136,6 @@ public abstract class BaseAction extends AnAction {
 
 	public boolean isRegistered(final Project project) {
 		return isRegistered(project.getName());
-	}
-
-
-	public boolean isProjectEvent(final String projectName1, final String projectName2) {
-		return projectName1.equals(projectName2);
 	}
 
 

@@ -46,7 +46,6 @@ public class FindBugsProject extends Project {
 
 	private static final Logger LOGGER = Logger.getInstance(FindBugsProject.class.getName());
 	private List<String> _outputFiles;
-	//private RecurseCollectorTask _collectorTask;
 
 
 	public void configureSourceDirectories(final VirtualFile file) {
@@ -61,33 +60,17 @@ public class FindBugsProject extends Project {
 				final VirtualFile parent = file.getParent();
 				if (parent != null && parent.isDirectory()) {
 					addSourceDir(parent.getPresentableUrl());
-					LOGGER.debug("adding source dir: " + parent.getPresentableUrl());
-
-					/*ApplicationManager.getApplication().invokeLater(new Runnable() {
-						public void run() {*/
-					//_collectorTask.setIndicatorText("adding source dir: " + parent.getPresentableUrl());
-					/*}
-					});*/
 				}
 			} else if (file.isDirectory()) { // package dir
 				addSourceDir(file.getPresentableUrl());
-				LOGGER.debug("adding source dir: " + file.getPresentableUrl());
 			}
 		}
 	}
 
 
-	public void configureAuxClasspathEntries(final VirtualFile[] classpathFiles) {
+	public void configureAuxClasspathEntries(@NotNull final VirtualFile[] classpathFiles) {
 		for (final VirtualFile file : classpathFiles) {
 			addAuxClasspathEntry(file.getPresentableUrl());
-			//_findBugsTask.getProgressIndicator().setText("Collecting auxiliary classpath entires...");
-			LOGGER.debug("adding aux classpath entry: " + file.getPresentableUrl());
-
-			/*ApplicationManager.getApplication().invokeLater(new Runnable() {
-				public void run() {*/
-			//_collectorTask.setIndicatorText("adding aux classpath entry: " + file.getPresentableUrl());
-			/*}
-			});*/
 		}
 	}
 
@@ -153,7 +136,12 @@ public class FindBugsProject extends Project {
 
 	@NotNull
 	public List<String> getConfiguredOutputFiles() {
-		return _outputFiles != null ? new ArrayList<String>(_outputFiles) : Collections.<String>emptyList();
+		return _outputFiles != null ? _outputFiles : Collections.<String>emptyList();
+	}
+
+
+	public void setConfiguredOutputFiles(@NotNull final List<String> files) {
+		_outputFiles = files;
 	}
 
 
@@ -177,12 +165,4 @@ public class FindBugsProject extends Project {
 	}
 
 
-	/*public void setCollectorTask(final RecurseCollectorTask collectorTask) {
-		_collectorTask = collectorTask;
-	}
-
-
-	public RecurseCollectorTask getCollectorTask() {
-		return _collectorTask;
-	}*/
 }

@@ -94,6 +94,8 @@ public abstract class FindBugsStarter implements AnalysisAbortedListener {
 		new Task.Backgroundable(_project, _title, true) {
 			@Override
 			public void run(@NotNull final ProgressIndicator indicator) {
+				indicator.setIndeterminate(true);
+				indicator.setText("Configure FindBugs...");
 				asyncStart(indicator);
 			}
 			@Override
@@ -153,6 +155,7 @@ public abstract class FindBugsStarter implements AnalysisAbortedListener {
 			engine.setUserPreferences(userPrefs);
 		}
 
+		indicator.setText("Start FindBugs...");
 		try {
 			engine.execute();
 		} catch (final InterruptedException e) {
