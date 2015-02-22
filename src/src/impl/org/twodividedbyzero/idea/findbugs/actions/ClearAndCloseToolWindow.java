@@ -26,6 +26,7 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import edu.umd.cs.findbugs.BugCollection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.messages.AnalysisStateListener;
@@ -38,7 +39,7 @@ import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
  *
  * @version $Revision$
  */
-public final class CloseToolWindow extends BaseAction implements AnalysisStateListener {
+public final class ClearAndCloseToolWindow extends BaseAction implements AnalysisStateListener {
 
 	private boolean _enabled;
 
@@ -56,12 +57,14 @@ public final class CloseToolWindow extends BaseAction implements AnalysisStateLi
 			return;
 		}
 
-		final FindBugsPlugin findBugsPlugin = project.getComponent(FindBugsPlugin.class);
+		final FindBugsPlugin findBugsPlugin = IdeaUtilImpl.getPluginComponent(project);
 		if (findBugsPlugin == null) {
 			throw new IllegalStateException("Couldn't get findbugs plugin");
 		}
 
 		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(getPluginInterface(project).getInternalToolWindowId());
+		e.getPresentation().setEnabled(false);
+		setEnabled( false );
 		toolWindow.hide(null);
 
 		MessageBusManager.publish(ClearListener.TOPIC).clear();

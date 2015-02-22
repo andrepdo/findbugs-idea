@@ -425,9 +425,9 @@
                     icon="/actions/suspend.png"/>
 
             <action id="FindBugs.CloseAction"
-                    class="org.twodividedbyzero.idea.findbugs.actions.CloseToolWindow"
-                    text="Close FindBugs Tool Window"
-                    description="Close the FindBugs Tool Window Panel."
+                    class="org.twodividedbyzero.idea.findbugs.actions.ClearAndCloseToolWindow"
+                    text="Clear and close FindBugs Tool Window"
+                    description="Clear and close the FindBugs Tool Window Panel."
                     icon="/actions/cancel.png"/>
 
             <action id="FindBugs.HelpAction"
