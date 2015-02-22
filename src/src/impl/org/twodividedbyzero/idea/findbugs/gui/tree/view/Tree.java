@@ -46,6 +46,8 @@ public abstract class Tree extends JTree {
 
 	public Tree(final TreeModel treeModel) {
 		super(treeModel);
+		TreeQuickSearch.install(this);
+		ViewTooltips.register(this);
 	}
 
 
@@ -59,14 +61,6 @@ public abstract class Tree extends JTree {
 	public TreePath getNextMatch(String prefix, int startingRow, Position.Bias bias) {
 		return null;
 	}*/
-
-
-	@Override
-	public void addNotify() {
-		super.addNotify();
-		ViewTooltips.register(this);
-		TreeQuickSearch.install(this);
-	}
 
 
 	public TreePath getHighlightPath() {

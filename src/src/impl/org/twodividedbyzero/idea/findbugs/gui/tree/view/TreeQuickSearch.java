@@ -23,7 +23,6 @@ import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.AbstractTreeNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.VisitableTreeNode;
 
-import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -43,7 +42,6 @@ import java.util.List;
  */
 public class TreeQuickSearch extends QuickSearch<AbstractTreeNode<VisitableTreeNode>> implements TreeModelListener {
 
-	private static final TreeQuickSearch _instance = new TreeQuickSearch();
 	private JTree _tree;
 	private List<TreePath> _elementsCache;
 
@@ -53,8 +51,9 @@ public class TreeQuickSearch extends QuickSearch<AbstractTreeNode<VisitableTreeN
 
 
 	public static void install(@NotNull final JTree tree) {
-		_instance.install((JComponent) tree);
-		_instance.attachTo(tree);
+		final TreeQuickSearch treeSearch = new TreeQuickSearch();
+		treeSearch.installImpl(tree);
+		treeSearch.attachTo(tree);
 	}
 
 

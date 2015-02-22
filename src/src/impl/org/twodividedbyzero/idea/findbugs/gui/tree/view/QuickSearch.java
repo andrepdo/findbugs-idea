@@ -113,9 +113,8 @@ public abstract class QuickSearch<E> {
 	}
 
 
-	protected void install(@NotNull final JComponent component) {
+	protected final void installImpl(@NotNull final JComponent component) {
 		_component = component;
-		//_component.setFocusable(true);
 		installListeners();
 	}
 

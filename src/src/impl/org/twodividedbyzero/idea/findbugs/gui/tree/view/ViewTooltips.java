@@ -134,10 +134,12 @@ public final class ViewTooltips extends MouseAdapter implements MouseMotionListe
 	/**
 	 * Start listening to mouse motion on the passed component
 	 *
-	 * @param comp
+	 * @param comp ..
 	 */
 	private void attachTo(final JComponent comp) {
 		assert comp instanceof JTree || comp instanceof JList;
+		comp.removeMouseListener(this);
+		comp.removeMouseMotionListener(this);
 		comp.addMouseListener(this);
 		comp.addMouseMotionListener(this);
 		refcount++;
