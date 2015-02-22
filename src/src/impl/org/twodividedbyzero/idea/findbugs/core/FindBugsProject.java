@@ -55,6 +55,21 @@ public class FindBugsProject extends Project {
 	}
 
 
+	public void configureSourceDirectories(@NotNull final ProgressIndicator indicator, @NotNull final Collection<VirtualFile> sourceDirs) {
+		indicator.setText("Configure source directories...");
+		for (final VirtualFile file : sourceDirs) {
+			if (IdeaUtilImpl.isValidFileType(file.getFileType())) {
+				final VirtualFile parent = file.getParent();
+				if (parent != null && parent.isDirectory()) {
+					addSourceDir(parent.getPresentableUrl());
+				}
+			} else if (file.isDirectory()) { // package dir
+				addSourceDir(file.getPresentableUrl());
+			}
+		}
+	}
+
+
 	public void configureSourceDirectories(@NotNull final ProgressIndicator indicator, @NotNull final VirtualFile[] sourceDirs) {
 		indicator.setText("Configure source directories...");
 		configureSourceDirectories(sourceDirs);
@@ -127,7 +142,7 @@ public class FindBugsProject extends Project {
 	}
 
 
-	public void configureOutputFiles(final String path) {
+	public void configureOutputFiles(@NotNull final String path) {
 		final VirtualFile fileByPath = IdeaUtilImpl.findFileByPath(path);
 		if (fileByPath != null) {
 			_outputFiles = Arrays.asList(fileByPath.getPath());

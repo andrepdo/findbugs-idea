@@ -38,7 +38,6 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
-import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -55,7 +54,6 @@ import edu.umd.cs.findbugs.ba.AnalysisException;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.actions.AnalyzeChangelistFiles;
 import org.twodividedbyzero.idea.findbugs.actions.AnalyzeCurrentEditorFile;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
@@ -193,8 +191,6 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 		initToolWindow();
 		setActionGroupsIcon();
 		registerToolbarActions();
-		final AnalyzeChangelistFiles action = (AnalyzeChangelistFiles) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTIVE_CHANGELIST_ACTION);
-		ChangeListManager.getInstance(_project).removeChangeListListener(action.getChangelistAdapter());
 	}
 
 
@@ -209,8 +205,6 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 		LOGGER.debug("project is being closed: " + plugin.getName() + " project="  + getProject());
 		EventManagerImpl.getInstance().removeEventListener(_project);
 		MessageBusManager.dispose(_project);
-		final AnalyzeChangelistFiles action = (AnalyzeChangelistFiles) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTIVE_CHANGELIST_ACTION);
-		ChangeListManager.getInstance(_project).removeChangeListListener(action.getChangelistAdapter());
 		unregisterToolWindow();
 		disableToolbarActions();
 		FindBugsState.dispose(_project);

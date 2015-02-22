@@ -21,7 +21,6 @@ package org.twodividedbyzero.idea.findbugs.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
@@ -43,7 +42,7 @@ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
  * @version $Revision$
  * @since 0.0.1
  */
-public final class AnalyzePackageFiles extends AbstractAction {
+public final class AnalyzePackageFiles extends AbstractAnalyzeAction {
 
 	@Override
 	void updateImpl(
@@ -71,7 +70,7 @@ public final class AnalyzePackageFiles extends AbstractAction {
 
 
 	@Override
-	void actionPerformedImpl(
+	void analyze(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
@@ -81,40 +80,29 @@ public final class AnalyzePackageFiles extends AbstractAction {
 			@NotNull final FindBugsPreferences preferences
 	) {
 
-		if (preferences.getBugCategories().containsValue("true") && preferences.getDetectors().containsValue("true")) {
+		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
+		final VirtualFile[] selectedSourceFiles = IdeaUtilImpl.getVirtualFiles(e.getDataContext());
+		final VirtualFile packagePath = getPackagePath(selectedSourceFiles, project);
+		if (packagePath == null) {
+			throw new IllegalStateException("No package path"); // see updateImpl
+		}
+		final VirtualFile outPath = IdeaUtilImpl.getCompilerOutputPath(packagePath, project);
+		final String packageUrl = IdeaUtilImpl.getPackageAsPath(project, packagePath);
+		final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(e.getDataContext());
 
-			final VirtualFile[] selectedSourceFiles = IdeaUtilImpl.getVirtualFiles(e.getDataContext());
-			final VirtualFile packagePath = getPackagePath(selectedSourceFiles, project);
-			if (packagePath == null) {
-				throw new IllegalStateException("No package path"); // see updateImpl
-			}
-			final VirtualFile outPath = IdeaUtilImpl.getCompilerOutputPath(packagePath, project);
-			final String packageUrl = IdeaUtilImpl.getPackageAsPath(project, packagePath);
-
-			if (outPath != null) {
-				final String output = outPath.getPresentableUrl() + packageUrl;
-
-				new FindBugsStarter(project, "Running FindBugs analysis for directory '" + output + "'...", preferences) {
-					@Override
-					protected void configure(@NotNull ProgressIndicator indicator, @NotNull FindBugsProject findBugsProject) {
-
-						final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
-						findBugsProject.configureAuxClasspathEntries(indicator, files);
-
-						final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(e.getDataContext());
-						findBugsProject.configureSourceDirectories(indicator, sourceRoots);
-
-						findBugsProject.configureOutputFiles(output);
-					}
-				}.start();
-
-			} else {
-				FindBugsPluginImpl.showToolWindowNotifier(project, "No output path specified. Analysis aborted.", MessageType.WARNING);
-			}
+		if (outPath != null) {
+			final String output = outPath.getPresentableUrl() + packageUrl;
+			new FindBugsStarter(project, "Running FindBugs analysis for directory '" + output + "'...", preferences) {
+				@Override
+				protected void configure(@NotNull ProgressIndicator indicator, @NotNull FindBugsProject findBugsProject) {
+					findBugsProject.configureAuxClasspathEntries(indicator, files);
+					findBugsProject.configureSourceDirectories(indicator, sourceRoots);
+					findBugsProject.configureOutputFiles(output);
+				}
+			}.start();
 
 		} else {
-			FindBugsPluginImpl.showToolWindowNotifier(project, "No bug categories or bug pattern detectors selected. Analysis aborted.", MessageType.WARNING);
-			ShowSettingsUtil.getInstance().editConfigurable(project, plugin);
+			FindBugsPluginImpl.showToolWindowNotifier(project, "No output path specified. Analysis aborted.", MessageType.WARNING);
 		}
 	}
 
