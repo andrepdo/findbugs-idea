@@ -43,7 +43,6 @@ import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
-import org.twodividedbyzero.idea.findbugs.messages.NewBugInstanceListener;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.tasks.FindBugsTask;
 
@@ -143,7 +142,7 @@ public final class BugReporter extends AbstractBugReporter implements FindBugsPr
 			 */
 			@Override
 			public void run() {
-				MessageBusManager.publish(_project, NewBugInstanceListener.TOPIC).newBugInstance(bugRef.get(), projectStatsRef.get());
+				MessageBusManager.publishNewBugInstance(_project, bugRef.get(), projectStatsRef.get());
 			}
 		});
 	}

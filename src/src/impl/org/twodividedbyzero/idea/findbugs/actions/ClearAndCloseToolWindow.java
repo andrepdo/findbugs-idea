@@ -30,7 +30,6 @@ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.messages.AnalysisStateListener;
-import org.twodividedbyzero.idea.findbugs.messages.ClearListener;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
 
 
@@ -67,7 +66,7 @@ public final class ClearAndCloseToolWindow extends BaseAction implements Analysi
 		setEnabled( false );
 		toolWindow.hide(null);
 
-		MessageBusManager.publish(project, ClearListener.TOPIC).clear();
+		MessageBusManager.publishClear(project);
 	}
 
 

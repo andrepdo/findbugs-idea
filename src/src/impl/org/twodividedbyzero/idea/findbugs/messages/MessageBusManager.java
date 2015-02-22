@@ -22,6 +22,8 @@ package org.twodividedbyzero.idea.findbugs.messages;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.Topic;
 import edu.umd.cs.findbugs.BugCollection;
+import edu.umd.cs.findbugs.BugInstance;
+import edu.umd.cs.findbugs.ProjectStats;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
@@ -81,6 +83,18 @@ public final class MessageBusManager {
 	}
 
 
+	public static void publishClear(@NotNull final Project project) {
+		EventDispatchThreadHelper.checkEDT();
+		publish(project, ClearListener.TOPIC).clear();
+	}
+
+
+	public static void publishNewBugInstance(@NotNull final Project project, @NotNull final BugInstance bugInstance, @NotNull final ProjectStats projectStats) {
+		EventDispatchThreadHelper.checkEDT();
+		publish(project, NewBugInstanceListener.TOPIC).newBugInstance(bugInstance, projectStats);
+	}
+
+
 	public static void publishAnalysisStarted(@NotNull final Project project) {
 		EventDispatchThreadHelper.checkEDT();
 		publish(project, AnalysisStartedListener.TOPIC).analysisStarted();
@@ -132,7 +146,7 @@ public final class MessageBusManager {
 
 
 	@NotNull
-	public static <L> L publish(@NotNull final Project project, @NotNull final Topic<L> topic) {
+	private static <L> L publish(@NotNull final Project project, @NotNull final Topic<L> topic) {
 		EventDispatchThreadHelper.checkEDT();
 		return of(project).publisher(topic);
 	}

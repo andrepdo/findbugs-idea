@@ -39,7 +39,6 @@ import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventFactory;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
-import org.twodividedbyzero.idea.findbugs.messages.NewBugInstanceListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -129,7 +128,7 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 			 */
 			@Override
 			public void run() {
-				MessageBusManager.publish(_project, NewBugInstanceListener.TOPIC).newBugInstance(bugRef.get(), projectStatsRef.get());
+				MessageBusManager.publishNewBugInstance(_project, bugRef.get(), projectStatsRef.get());
 			}
 		});
 	}

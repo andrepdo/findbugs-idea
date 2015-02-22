@@ -55,7 +55,6 @@ import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
 import org.twodividedbyzero.idea.findbugs.gui.common.ImportFileDialog;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
-import org.twodividedbyzero.idea.findbugs.messages.NewBugInstanceListener;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.tasks.BackgroundableTask;
 
@@ -208,7 +207,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 							 */
 							@Override
 							public void run() {
-								MessageBusManager.publish(project, NewBugInstanceListener.TOPIC).newBugInstance(bugInstanceRef.get(), projectStatsRef.get());
+								MessageBusManager.publishNewBugInstance(project, bugInstanceRef.get(), projectStatsRef.get());
 							}
 						});
 					}
