@@ -158,6 +158,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 
 	@SuppressWarnings({"NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"})
+	@Override
 	public void initComponent() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
 		//noinspection ConstantConditions
@@ -166,6 +167,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 
 	@SuppressWarnings({"NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"})
+	@Override
 	public void disposeComponent() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
 		//noinspection ConstantConditions
@@ -173,6 +175,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
+	@Override
 	@NotNull
 	public String getComponentName() {
 		return FindBugsPluginConstants.PLUGIN_ID;
@@ -229,6 +232,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
+	@Override
 	public String getInternalToolWindowId() {
 		return FindBugsPluginConstants.TOOL_WINDOW_ID;
 		//return new StringBuilder(FindBugsPluginConstants.TOOL_WINDOW_ID).append("#").append(_project.getName()).toString();
@@ -241,21 +245,25 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
+	@Override
 	public Project getProject() {
 		return _project;
 	}
 
 
+	@Override
 	public Module getModule() {
 		return null;
 	}
 
 
+	@Override
 	public boolean isModuleComponent() {
 		return false;
 	}
 
 
+	@Override
 	public ToolWindowPanel getToolWindowPanel() {
 		final Content content = _toolWindow.getContentManager().getContent(0);
 		if (content != null) {
@@ -265,6 +273,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
+	@Override
 	public void activateToolWindow(final boolean activate) {
 		if (activate) {
 			_toolWindow.show(null);
@@ -274,11 +283,13 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
+	@Override
 	public BugCollection getBugCollection() {
 		return getToolWindowPanel().getBugCollection();
 	}
 
 
+	@Override
 	public Map<PsiFile, List<ExtendedProblemDescriptor>> getProblems() {
 		return getToolWindowPanel().getProblems();
 	}
@@ -364,6 +375,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
+	@Override
 	public FindBugsPreferences getPreferences() {
 		if (_preferences == null) {
 			_preferences = getEmptyPreferences(
@@ -386,6 +398,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	 */
 
 	@Nls
+	@Override
 	public String getDisplayName() {
 		return ResourcesLoader.getString("findbugs.plugin.configuration.name");
 	}
@@ -396,11 +409,13 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
+	@Override
 	public String getHelpTopic() {
 		return FindBugsPluginConstants.FINDBUGS_EXTERNAL_HELP_URI;
 	}
 
 
+	@Override
 	public JComponent createComponent() {
 		if (_configPanel == null) {
 			_configPanel = new ConfigurationPanel(this);
@@ -409,11 +424,13 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
+	@Override
 	public boolean isModified() {
 		return _preferences.isModified();
 	}
 
 
+	@Override
 	public void apply() throws ConfigurationException {
 
 		final PluginLoaderImpl pluginLoader = new PluginLoaderImpl();
@@ -428,11 +445,13 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
+	@Override
 	public void reset() {
 		//TODO: what??
 	}
 
 
+	@Override
 	public void disposeUIResources() {
 		if (_configPanel != null) {
 			_configPanel.setVisible(false);
@@ -467,6 +486,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
+	@Override
 	public void loadState(final PersistencePreferencesBean state) {
 		if (!state.isEmpty()) {
 			final Map<String, String> detectors = state.getDetectors();
@@ -518,6 +538,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
+	@Override
 	public PersistencePreferencesBean getState() {
 		final PersistencePreferencesBean preferencesBean = new PersistencePreferencesBean();
 		if (_preferences == null) {
@@ -555,11 +576,13 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 	@SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@NotNull
+	@Override
 	public String getId() {
 		return FindBugsPluginConstants.PLUGIN_ID;
 	}
 
 
+	@Override
 	public Runnable enableSearch(final String option) {
 		return new Runnable(){
 			public void run() {

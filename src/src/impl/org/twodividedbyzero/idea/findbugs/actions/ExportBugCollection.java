@@ -21,16 +21,14 @@ package org.twodividedbyzero.idea.findbugs.actions;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataKeys;
-import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.MessageType;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.BugInstance;
@@ -42,17 +40,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
-import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
-import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
-import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
-import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.IoUtil;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.gui.common.ExportFileDialog;
-import org.twodividedbyzero.idea.findbugs.messages.ClearListener;
-import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.tasks.BackgroundableTask;
 
@@ -77,7 +70,6 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
 
@@ -90,7 +82,7 @@ import java.util.regex.Pattern;
  * @since 0.9.95
  */
 @SuppressWarnings({"HardCodedStringLiteral"})
-public class ExportBugCollection extends BaseAction implements EventListener<BugReporterEvent>, ClearListener {
+public final class ExportBugCollection extends AbstractAction {
 
 	private static final Logger LOGGER = Logger.getInstance(ExportBugCollection.class.getName());
 
@@ -98,43 +90,47 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 	private static final String FINDBUGS_RESULT_PREFIX = "FindBugsResult_";
 	private static final String FINDBUGS_RESULT_HTML_SUFFIX = ".html";
 	private static final String FINDBUGS_RESULT_RAW_SUFFIX = ".xml";
-
-	private boolean _enabled;
-	private BugCollection _bugCollection;
-	private boolean _running;
 	private static final Pattern PATTERN = Pattern.compile("[/ :]");
 
 
 	@Override
-	protected boolean isEnabled() {
-		return _enabled;
-	}
+	void updateImpl(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project,
+			@Nullable final Module module,
+			@NotNull final FindBugsPlugin plugin,
+			@NotNull final ToolWindow toolWindow,
+			@NotNull final FindBugsState state,
+			@NotNull final FindBugsPreferences preferences
+	) {
 
-
-	@Override
-	protected boolean setEnabled(final boolean enabled) {
-		final boolean was = _enabled;
-		if (_enabled != enabled) {
-			_enabled = enabled;
+		boolean enable = false;
+		if (state.isIdle()) {
+			final BugCollection bugCollection = IdeaUtilImpl.getPluginComponent(project).getBugCollection();
+			enable = bugCollection != null && bugCollection.iterator().hasNext();
 		}
-		return was;
+
+		e.getPresentation().setEnabled(enable);
+		e.getPresentation().setVisible(true);
 	}
 
-
-	@SuppressWarnings({"AssignmentToStaticFieldFromInstanceMethod"})
 	@Override
-	public void actionPerformed(final AnActionEvent e) {
-		final Project project = IdeaUtilImpl.getProject(e.getDataContext());
-		assert project != null;
-		final Presentation presentation = e.getPresentation();
+	void actionPerformedImpl(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project,
+			@Nullable final Module module,
+			@NotNull final FindBugsPlugin plugin,
+			@NotNull final ToolWindow toolWindow,
+			@NotNull final FindBugsState state,
+			@NotNull final FindBugsPreferences preferences
+	) {
 
-		// check a project is loaded
-		if (isProjectNotLoaded(project, presentation)) {
-			Messages.showWarningDialog("Project not loaded.", "FindBugs");  // NON-NLS
+		final BugCollection bugCollection = IdeaUtilImpl.getPluginComponent(project).getBugCollection();
+		if (bugCollection == null) {
+			FindBugsPluginImpl.showToolWindowNotifier(project, "No bug collection", MessageType.WARNING);
 			return;
 		}
 
-		final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
 		String exportDir = preferences.getProperty(FindBugsPreferences.EXPORT_BASE_DIR, FindBugsPluginConstants.DEFAULT_EXPORT_DIR);
 		boolean exportXml = preferences.getBooleanProperty(FindBugsPreferences.EXPORT_AS_XML, true);
 		boolean exportHtml = preferences.getBooleanProperty(FindBugsPreferences.EXPORT_AS_HTML, true);
@@ -173,7 +169,7 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 		final String finalExportDir = exportDir + File.separatorChar + project.getName();
 
 		//Create a task to export the bug collection to html
-		final AtomicReference<Task> exportTask = new AtomicReference<Task>(new BackgroundableTask(project, "Exporting Findbugs Result", false) {
+		final Task exportTask = new BackgroundableTask(project, "Exporting Findbugs Result", false) {
 			private ProgressIndicator _indicator;
 
 
@@ -193,24 +189,23 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 						createDirIfAbsent(project, exportDir);
 					}
 
-					if (_bugCollection != null) {
-						_bugCollection.setWithMessages(true);
-						final String exportDirAndFilenameWithoutSuffix = exportDir + fileName;
-						if (finalExportXml && !finalExportBoth) {
-							exportXml(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_RAW_SUFFIX);
-						} else if (finalExportBoth) {
-							exportXml(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_RAW_SUFFIX);
-							writer = exportHtml(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_HTML_SUFFIX);
-						} else if (finalExportHtml) {
-							writer = exportHtml(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_HTML_SUFFIX);
-						}
-						_bugCollection.setWithMessages(false);
-
-						showToolWindowNotifier(project, "Exported bug collection to " + exportDir + '.', MessageType.INFO);
-						if((!finalExportXml || finalExportBoth) && preferences.getBooleanProperty(FindBugsPreferences.EXPORT_OPEN_BROWSER, true)) {
-							BrowserUtil.launchBrowser(new File(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_HTML_SUFFIX).getAbsolutePath());
-						}
+					bugCollection.setWithMessages(true);
+					final String exportDirAndFilenameWithoutSuffix = exportDir + fileName;
+					if (finalExportXml && !finalExportBoth) {
+						exportXml(bugCollection, exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_RAW_SUFFIX);
+					} else if (finalExportBoth) {
+						exportXml(bugCollection, exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_RAW_SUFFIX);
+						writer = exportHtml(bugCollection, exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_HTML_SUFFIX);
+					} else if (finalExportHtml) {
+						writer = exportHtml(bugCollection, exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_HTML_SUFFIX);
 					}
+					bugCollection.setWithMessages(false);
+
+					showToolWindowNotifier(project, "Exported bug collection to " + exportDir + '.', MessageType.INFO);
+					if((!finalExportXml || finalExportBoth) && preferences.getBooleanProperty(FindBugsPreferences.EXPORT_OPEN_BROWSER, true)) {
+						BrowserUtil.launchBrowser(new File(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_HTML_SUFFIX).getAbsolutePath());
+					}
+
 				} catch (final IOException e1) {
 					final String message = "Export failed";
 					showToolWindowNotifier(project, message, MessageType.ERROR);
@@ -243,34 +238,34 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 			public ProgressIndicator getProgressIndicator() {
 				return _indicator;
 			}
-		});
+		};
 
 		final File file = new File(exportDir + fileName);
 		if (file.getParentFile() == null) {
 			showToolWindowNotifier(project, "Exporting bug collection failed. not a directory. " + exportDir + fileName + '.', MessageType.ERROR);
 		} else {
-			exportTask.get().queue();
+			exportTask.queue();
 		}
 	}
 
 
-	private void exportXml(final String fileName) throws IOException {
+	private void exportXml(@NotNull final BugCollection bugCollection, final String fileName) throws IOException {
 		// Issue 77: workaround internal FindBugs NPE
 		// As of my point of view, the NPE is a FindBugs bug
-		for (final BugInstance bugInstance : _bugCollection) {
+		for (final BugInstance bugInstance : bugCollection) {
 			if (bugInstance.hasXmlProps()) {
 				if (null == bugInstance.getXmlProps().getConsensus()) {
 					bugInstance.getXmlProps().setConsensus(Cloud.UserDesignation.UNCLASSIFIED.toString());
 				}
 			}
 		}
-		_bugCollection.writeXML(fileName);
+		bugCollection.writeXML(fileName);
 	}
 
 
 	@Nullable
-	private Writer exportHtml(final String fileName) throws IOException, TransformerException {
-		final Document document = _bugCollection.toDocument();
+	private Writer exportHtml(@NotNull final BugCollection bugCollection, final String fileName) throws IOException, TransformerException {
+		final Document document = bugCollection.toDocument();
 		final Source xsl = new StreamSource(getStylesheetStream(FINDBUGS_PLAIN_XSL));
 		xsl.setSystemId(FINDBUGS_PLAIN_XSL);
 
@@ -327,97 +322,5 @@ public class ExportBugCollection extends BaseAction implements EventListener<Bug
 			throw new IOException("Could not load HTML generation stylesheet " + stylesheet);
 		}
 		return xslInputStream;
-	}
-
-
-	@Override
-	public void update(final AnActionEvent event) {
-		try {
-			final Project project = DataKeys.PROJECT.getData(event.getDataContext());
-			final Presentation presentation = event.getPresentation();
-
-			// check a project is loaded
-			if (isProjectNotLoaded(project, presentation)) {
-				return;
-			}
-
-			isPluginAccessible(project);
-
-			// check if tool window is registered
-			final ToolWindow toolWindow = isToolWindowRegistered(project);
-			if (toolWindow == null) {
-				presentation.setEnabled(false);
-				presentation.setVisible(false);
-
-				return;
-			}
-
-			registerEventListener(project);
-
-			if (!_running) {
-				_enabled = _bugCollection != null && _bugCollection.iterator().hasNext();
-			}
-
-			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
-			presentation.setVisible(true);
-
-		} catch (final Throwable e) {
-			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
-			LOGGER.error("Action update failed", processed);
-		}
-	}
-
-
-	@SuppressWarnings({"AssignmentToNull"})
-	public void onEvent(@NotNull final BugReporterEvent event) {
-		switch (event.getOperation()) {
-			case ANALYSIS_STARTED:
-				_bugCollection = null;
-				setEnabled(false);
-				setRunning(true);
-				break;
-			case ANALYSIS_ABORTED:
-				_bugCollection = null;
-				setEnabled(true);
-				setRunning(false);
-				break;
-			case ANALYSIS_FINISHED:
-				_bugCollection = event.getBugCollection();
-				setEnabled(true);
-				setRunning(false);
-				break;
-			default:
-		}
-	}
-
-
-	private void registerEventListener(@NotNull final Project project) {
-		final String projectName = project.getName();
-		if (!isRegistered(projectName)) {
-			EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(projectName), this);
-			addRegisteredProject(projectName);
-		}
-		MessageBusManager.subscribe(project, this, ClearListener.TOPIC, this);
-	}
-
-
-	protected boolean isRunning() {
-		return _running;
-	}
-
-
-	boolean setRunning(final boolean running) {
-		final boolean was = _running;
-		if (_running != running) {
-			_running = running;
-		}
-		return was;
-	}
-
-
-	@Override
-	public void clear() {
-		_bugCollection = null;
-		setEnabled(false);
 	}
 }

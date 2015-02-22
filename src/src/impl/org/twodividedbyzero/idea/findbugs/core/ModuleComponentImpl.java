@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -31,6 +31,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.content.Content;
+import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.DetectorFactory;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -82,37 +83,44 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 	}
 
 
+	@Override
 	public void projectOpened() {
 		LOGGER.debug("project is opened");
 	}
 
 
+	@Override
 	public void projectClosed() {
 		LOGGER.debug("project is being closed");
 	}
 
 
+	@Override
 	public void moduleAdded() {
 		LOGGER.debug("module added");
 	}
 
 
+	@Override
 	@NotNull
 	public String getComponentName() {
 		return FindBugsPluginConstants.MODULE_ID;
 	}
 
 
+	@Override
 	public void initComponent() {
 		LOGGER.debug("initComponent");
 	}
 
 
+	@Override
 	public void disposeComponent() {
 		LOGGER.debug("disposeComponent");
 	}
 
 
+	@Override
 	@Nls
 	public String getDisplayName() {
 		return ResourcesLoader.getString("findbugs.plugin.configuration.name");
@@ -124,11 +132,13 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 	}
 
 
+	@Override
 	public String getHelpTopic() {
 		return FindBugsPluginConstants.FINDBUGS_EXTERNAL_HELP_URI;
 	}
 
 
+	@Override
 	public ToolWindowPanel getToolWindowPanel() {
 		final ToolWindow toolWindow = IdeaUtilImpl.getToolWindowById(FindBugsPluginConstants.TOOL_WINDOW_ID, _project);
 		final Content content = toolWindow.getContentManager().getContent(0);
@@ -139,6 +149,13 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 	}
 
 
+	@Override
+	public BugCollection getBugCollection() {
+		return getToolWindowPanel().getBugCollection();
+	}
+
+
+	@Override
 	public void activateToolWindow(final boolean activate) {
 		if (activate) {
 			IdeaUtilImpl.getToolWindowById(FindBugsPluginConstants.TOOL_WINDOW_ID, _project).show(null);
@@ -148,6 +165,7 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 	}
 
 
+	@Override
 	public String getInternalToolWindowId() {
 		return FindBugsPluginConstants.TOOL_WINDOW_ID;
 	}
@@ -158,32 +176,38 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 	}
 
 
+	@Override
 	public FindBugsPreferences getPreferences() {
 		//noinspection ReturnOfCollectionOrArrayField
 		return _preferences;
 	}
 
 
+	@Override
 	public Map<PsiFile, List<ExtendedProblemDescriptor>> getProblems() {
 		return getToolWindowPanel().getProblems();
 	}
 
 
+	@Override
 	public Project getProject() {
 		return _project;
 	}
 
 
+	@Override
 	public Module getModule() {
 		return _module;
 	}
 
 
+	@Override
 	public boolean isModuleComponent() {
 		return true;
 	}
 
 
+	@Override
 	public JComponent createComponent() {
 		if (_configPanel == null) {
 			_configPanel = new ModuleConfigurationPanel(this);
@@ -192,21 +216,25 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 	}
 
 
+	@Override
 	public boolean isModified() {
 		return _preferences.isModified();
 	}
 
 
+	@Override
 	public void apply() throws ConfigurationException {
 		_preferences.setModified(false);
 	}
 
 
+	@Override
 	public void reset() {
 
 	}
 
 
+	@Override
 	public void disposeUIResources() {
 		if (_configPanel != null) {
 			_configPanel.setVisible(false);
@@ -216,6 +244,7 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 	}
 
 
+	@Override
 	public PersistencePreferencesBean getState() {
 		final PersistencePreferencesBean preferencesBean = new PersistencePreferencesBean();
 		//noinspection ForLoopWithMissingComponent
@@ -234,6 +263,7 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 	}
 
 
+	@Override
 	public void loadState(final PersistencePreferencesBean state) {
 		_preferences.clear();
 

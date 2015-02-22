@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -23,6 +23,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
+import edu.umd.cs.findbugs.BugCollection;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
@@ -63,4 +64,6 @@ public interface FindBugsPlugin extends Configurable, PersistentStateComponent<P
 	boolean isModuleComponent();
 
 	Map<PsiFile, List<ExtendedProblemDescriptor>> getProblems();
+
+	BugCollection getBugCollection();
 }
