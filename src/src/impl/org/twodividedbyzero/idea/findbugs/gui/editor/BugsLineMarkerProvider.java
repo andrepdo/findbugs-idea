@@ -18,10 +18,12 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.editor;
 
+
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.psi.PsiAnonymousClass;
@@ -32,14 +34,11 @@ import com.intellij.util.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
-import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
-import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
-import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.gui.intentions.GroupBugIntentionListPopupStep;
 import org.twodividedbyzero.idea.findbugs.gui.intentions.RootGroupBugIntentionListPopupStep;
 import org.twodividedbyzero.idea.findbugs.intentions.ClearAndSuppressBugIntentionAction;
@@ -62,41 +61,31 @@ import java.util.regex.Pattern;
  * @version $Revision$
  * @since 0.9.92
  */
-public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener<BugReporterEvent>/*, DumbAware*/ {
-
-	private Map<PsiFile, List<ExtendedProblemDescriptor>> _problemCache;
-	private boolean _analysisRunning;
-	private boolean _isRegistered;
-
+public final class BugsLineMarkerProvider implements LineMarkerProvider {
 
 	public BugsLineMarkerProvider() {
-		_analysisRunning = false;
-		_isRegistered = false;
 	}
 
 
 	@Override
 	@Nullable
 	public LineMarkerInfo<?> getLineMarkerInfo(@NotNull final PsiElement psiElement) {
-		final FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(psiElement.getProject());
+		final Project project = psiElement.getProject();
+
+		final FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(project);
 		if (! pluginComponent.getPreferences().isAnnotationGutterIconEnabled()) {
 			return null;
 		}
-
-		if(!_isRegistered) {
-			EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(psiElement.getProject().getName()), this);
-			_isRegistered = true;
-		}
-		if(_analysisRunning) {
+		if(FindBugsState.get(project).isStarted()) {
 			return null;
 		}
 
 		final PsiFile psiFile = IdeaUtilImpl.getPsiFile(psiElement);
-		_problemCache = pluginComponent.getProblems();
+		final Map<PsiFile, List<ExtendedProblemDescriptor>> problemCache = pluginComponent.getProblems();
 
-		if (_problemCache.containsKey(psiFile)) {
+		if (problemCache.containsKey(psiFile)) {
 			final List<ExtendedProblemDescriptor> matchingDescriptors = new ArrayList<ExtendedProblemDescriptor>();
-			final List<ExtendedProblemDescriptor> problemDescriptors = _problemCache.get(psiFile);
+			final List<ExtendedProblemDescriptor> problemDescriptors = problemCache.get(psiFile);
 			if (problemDescriptors == null) {
 				return null;
 			}
@@ -124,21 +113,6 @@ public class BugsLineMarkerProvider implements LineMarkerProvider, EventListener
 
 
 	public void collectSlowLineMarkers(@NotNull final List<PsiElement> elements, @NotNull final Collection<LineMarkerInfo> result) {
-	}
-
-
-	public void onEvent(@NotNull final BugReporterEvent event) {
-		switch (event.getOperation()) {
-
-			case ANALYSIS_STARTED:
-				_analysisRunning = true;
-				break;
-			case ANALYSIS_ABORTED:
-			case ANALYSIS_FINISHED:
-				_analysisRunning = false;
-				break;
-			default:
-		}
 	}
 
 

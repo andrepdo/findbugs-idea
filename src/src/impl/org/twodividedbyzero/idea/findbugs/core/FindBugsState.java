@@ -22,7 +22,6 @@ package org.twodividedbyzero.idea.findbugs.core;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 
 import java.util.Map;
@@ -40,7 +39,7 @@ public enum FindBugsState {
 	Aborted,
 	Finished;
 
-	private static final Map<Project, FindBugsState> _stateByProject = New.map();
+	private static final Map<Project, FindBugsState> _stateByProject = New.concurrentMap();
 
 
 	public boolean isCleared() {
@@ -69,14 +68,12 @@ public enum FindBugsState {
 
 
 	public static void set(@NotNull final Project project, @NotNull final FindBugsState state) {
-		EventDispatchThreadHelper.checkEDT();
 		_stateByProject.put(project, state);
 	}
 
 
 	@NotNull
 	public static FindBugsState get(@NotNull final Project project) {
-		EventDispatchThreadHelper.checkEDT();
 		FindBugsState ret = _stateByProject.get(project);
 		if (ret == null) {
 			ret = Cleared;

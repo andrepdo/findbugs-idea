@@ -34,18 +34,15 @@ import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.Detector;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
-import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
-import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
-import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.StringUtil;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.intentions.ClearAndSuppressBugIntentionAction;
 import org.twodividedbyzero.idea.findbugs.intentions.ClearBugIntentionAction;
 import org.twodividedbyzero.idea.findbugs.intentions.SuppressReportBugForClassIntentionAction;
 import org.twodividedbyzero.idea.findbugs.intentions.SuppressReportBugIntentionAction;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import java.awt.Font;
@@ -61,41 +58,24 @@ import java.util.Map;
  * @version $Revision$
  * @since 0.9.94
  */
-public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> {
-
-	private boolean _analysisRunning;
-	private boolean _isRegistered;
-	private FindBugsPreferences _preferences;
+public final class BugAnnotator implements Annotator {
 
 
 	public BugAnnotator() {
-		_analysisRunning = false;
-		_isRegistered = false;
-	}
-
-
-	private FindBugsPreferences getPreferences(final PsiElement psiElement) {
-		if (_preferences == null) {
-			_preferences = IdeaUtilImpl.getPluginComponent(psiElement.getProject()).getPreferences();
-		}
-		return _preferences;
 	}
 
 
 	@Override
 	public void annotate(@NotNull final PsiElement psiElement, @NotNull final AnnotationHolder annotationHolder) {
-		if (! getPreferences(psiElement).isAnnotationTextRangeMarkupEnabled()) {
-			return;
-		}
-		if (_analysisRunning) {
-			return;
-		}
-		if (!_isRegistered) {
-			EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(psiElement.getProject().getName()), this);
-			_isRegistered = true;
-		}
 		final Project project = psiElement.getProject();
-		final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = IdeaUtilImpl.getPluginComponent(project).getProblems();
+		final FindBugsPlugin plugin = IdeaUtilImpl.getPluginComponent(project);
+		if (!plugin.getPreferences().isAnnotationTextRangeMarkupEnabled()) {
+			return;
+		}
+		if (FindBugsState.get(project).isStarted()) {
+			return;
+		}
+		final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = plugin.getProblems();
 
 		final PsiFile psiFile = psiElement.getContainingFile();
 		if (problems.containsKey(psiFile)) {
@@ -243,21 +223,6 @@ public class BugAnnotator implements Annotator, EventListener<BugReporterEvent> 
 		}
 
 		return StringUtil.addLineSeparatorAt(buffer, 250).toString();
-	}
-
-
-	public void onEvent(@NotNull final BugReporterEvent event) {
-		switch (event.getOperation()) {
-
-			case ANALYSIS_STARTED:
-				_analysisRunning = true;
-				break;
-			case ANALYSIS_ABORTED:
-			case ANALYSIS_FINISHED:
-				_analysisRunning = false;
-				break;
-			default:
-		}
 	}
 
 

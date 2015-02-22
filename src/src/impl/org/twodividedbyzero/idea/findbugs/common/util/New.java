@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 
@@ -50,6 +52,12 @@ public final class New {
 	@NotNull
 	public static <K, V> Map<K, V> map() {
 		return new HashMap<K, V>();
+	}
+
+
+	@NotNull
+	public static <K, V> ConcurrentMap<K, V> concurrentMap() {
+		return new ConcurrentHashMap<K, V>();
 	}
 
 
