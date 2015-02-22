@@ -28,11 +28,12 @@ import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.openapi.wm.ToolWindow;
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -89,7 +90,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 						ApplicationManager.getApplication().runReadAction(new Runnable() {
 							@Override
 							public void run() {
-								initWorkerForAutoMake(project, changed.toArray( new VirtualFile[changed.size()]));
+								initWorkerForAutoMake(project, changed);
 							}
 						});
 					}
@@ -192,15 +193,6 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 
 		final CompileScope compileScope = compileContext.getCompileScope();
 		final VirtualFile[] affectedFiles = getAffectedFiles(compileScope);
-
-		if (Boolean.valueOf(preferences.getProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT))) {
-			final ToolWindow toolWindow = IdeaUtilImpl.getToolWindowById(findBugsPlugin.getInternalToolWindowId(), project);
-			IdeaUtilImpl.activateToolWindow(toolWindow);
-		}
-
-		final FindBugsWorker worker = new FindBugsWorker(project, true);
-
-		// set aux classpath
 		final Collection<VirtualFile> auxFiles = new ArrayList<VirtualFile>();
 		for (final VirtualFile affectedFile : affectedFiles) {
 			final Module module = compileContext.getModuleByFile(affectedFile);
@@ -208,14 +200,14 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 			auxFiles.addAll(Arrays.asList(files));
 		}
 
-		worker.configureAuxClasspathEntries(auxFiles.toArray(new VirtualFile[auxFiles.size()]));
-
-		// set source dirs
-		worker.configureSourceDirectories(affectedFiles);
-
-		// set class files
-		worker.configureOutputFiles(affectedFiles);
-		worker.work("Running FindBugs analysis for affectes files...");
+		new FindBugsStarter(project, "Running FindBugs analysis for affected files...", preferences, true) {
+			@Override
+			protected void configure(@NotNull ProgressIndicator indicator, @NotNull FindBugsProject findBugsProject) {
+				findBugsProject.configureAuxClasspathEntries(indicator, auxFiles);
+				findBugsProject.configureSourceDirectories(indicator, affectedFiles);
+				findBugsProject.configureOutputFiles(project, affectedFiles);
+			}
+		}.start();
 	}
 
 
@@ -251,22 +243,27 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 	}
 
 
-	private static void initWorkerForAutoMake(@NotNull final Project project, @NotNull final VirtualFile[] changed) {
-		final FindBugsWorker worker = new FindBugsWorker(project);
+	private static void initWorkerForAutoMake(@NotNull final Project project, @NotNull final Collection<VirtualFile> changed) {
 
-		// set aux classpath
+		final FindBugsPreferences preferences = FindBugsPreferences.getPreferences(project, null);
 		final Module[] modules = ModuleManager.getInstance(project).getModules();
-		final List<VirtualFile> classpaths = new LinkedList<VirtualFile>();
+		final List<VirtualFile> classPaths = new LinkedList<VirtualFile>();
 		for (final Module module : modules) {
-			IdeaUtilImpl.addProjectClasspath(module, classpaths);
+			IdeaUtilImpl.addProjectClasspath(module, classPaths);
 		}
-		worker.configureAuxClasspathEntries(classpaths.toArray(new VirtualFile[classpaths.size()]));
 
-		// set source files
-		worker.configureSourceDirectories(changed);
-
-		// set class files
-		worker.configureOutputFiles(changed);
-		worker.work("Running FindBugs analysis for project '" + project.getName() + "'...");
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new FindBugsStarter(project, "Running FindBugs analysis for affected files...", preferences, true) {
+					@Override
+					protected void configure(@NotNull ProgressIndicator indicator, @NotNull FindBugsProject findBugsProject) {
+						findBugsProject.configureAuxClasspathEntries(indicator, classPaths);
+						findBugsProject.configureSourceDirectories(indicator, changed);
+						findBugsProject.configureOutputFiles(project, changed);
+					}
+				}.start();
+			}
+		});
 	}
 }

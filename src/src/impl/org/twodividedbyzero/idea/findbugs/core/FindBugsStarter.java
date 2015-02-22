@@ -28,11 +28,11 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import edu.umd.cs.findbugs.FindBugs2;
-import edu.umd.cs.findbugs.IFindBugsEngine;
 import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import edu.umd.cs.findbugs.config.UserPreferences;
+import org.dom4j.DocumentException;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
@@ -69,11 +69,16 @@ public abstract class FindBugsStarter implements AnalysisAbortedListener {
 
 
 	public FindBugsStarter(@NotNull final Project project, @NotNull final String title, @NotNull final FindBugsPreferences preferences) {
+		this(project, title, preferences, false);
+	}
+
+
+	public FindBugsStarter(@NotNull final Project project, @NotNull final String title, @NotNull final FindBugsPreferences preferences, boolean forceStartInBackground) {
 		_project = project;
 		_title = title;
 		_preferences = preferences;
 		_bugCategories = new HashMap<String, String>(preferences.getBugCategories());
-		_startInBackground = preferences.getBooleanProperty(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND, false);
+		_startInBackground = preferences.getBooleanProperty(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND, false) || forceStartInBackground;
 		_findBugsPlugin = IdeaUtilImpl.getPluginComponent(_project);
 		_cancellingByUser = new AtomicBoolean();
 		MessageBusManager.subscribe(project, this, AnalysisAbortedListener.TOPIC, this);
@@ -113,7 +118,7 @@ public abstract class FindBugsStarter implements AnalysisAbortedListener {
 			userPrefs.setEffort(_preferences.getProperty(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL, AnalysisEffort.DEFAULT.getEffortLevel()));
 			final ProjectFilterSettings projectFilterSettings = userPrefs.getFilterSettings();
 			projectFilterSettings.setMinPriority(_preferences.getProperty(FindBugsPreferences.MIN_PRIORITY_TO_REPORT));
-			FindBugsWorker.configureSelectedCategories(_preferences, projectFilterSettings);
+			configureSelectedCategories(_preferences, projectFilterSettings);
 			userPrefs.setIncludeFilterFiles(_preferences.getIncludeFiltersMap());
 			userPrefs.setExcludeBugsFiles(_preferences.getExcludeBaselineBugsMap());
 			userPrefs.setExcludeFilterFiles(_preferences.getExcludeFiltersMap());
@@ -141,14 +146,14 @@ public abstract class FindBugsStarter implements AnalysisAbortedListener {
 		final Reporter reporter = new Reporter(_project, bugCollection, findBugsProject, _bugCategories, indicator, _cancellingByUser);
 		reporter.setPriorityThreshold(userPrefs.getUserDetectorThreshold());
 
-		final IFindBugsEngine engine = new FindBugs2();
+		final FindBugs2 engine = new FindBugs2();
 		{
 			engine.setNoClassOk(true);
 			engine.setMergeSimilarWarnings(false);
 			engine.setBugReporter(reporter);
 			engine.setProject(findBugsProject);
 			engine.setProgressCallback(reporter);
-			FindBugsWorker.configureFilter(engine, _project, userPrefs);
+			configureFilter(engine, _project, userPrefs);
 
 			final DetectorFactoryCollection factoryCollection = FindBugsPreferences.getDetectorFactorCollection();
 			engine.setDetectorFactoryCollection(factoryCollection);
@@ -163,7 +168,7 @@ public abstract class FindBugsStarter implements AnalysisAbortedListener {
 		} catch (final IOException e) {
 			LOGGER.error("Error performing FindBugs analysis", e);
 		} finally {
-			((FindBugs2)engine).dispose();
+			engine.dispose();
 		}
 
 		bugCollection.setDoNotUseCloud(false);
@@ -178,5 +183,46 @@ public abstract class FindBugsStarter implements AnalysisAbortedListener {
 	@Override
 	public void analysisAborted() {
 		_cancellingByUser.set(true);
+	}
+
+
+	private static void configureSelectedCategories(@NotNull final FindBugsPreferences preferences, @NotNull final ProjectFilterSettings filterSettings) {
+		for (final Map.Entry<String, String> category : preferences.getBugCategories().entrySet()) {
+			if ("true".equals(category.getValue())) {
+				filterSettings.addCategory(category.getKey());
+			} else {
+				filterSettings.removeCategory(category.getKey());
+			}
+		}
+	}
+
+
+	private static void configureFilter(@NotNull final FindBugs2 engine, @NotNull final Project project, @NotNull final UserPreferences userPrefs) {
+		final Map<String, Boolean> excludeFilterFiles = userPrefs.getExcludeFilterFiles();
+		for (final Map.Entry<String, Boolean> excludeFileName : excludeFilterFiles.entrySet()) {
+			try {
+				engine.addFilter(IdeaUtilImpl.expandPathMacro(project, excludeFileName.getKey()), false);
+			} catch (final IOException e) {
+				LOGGER.error("ExcludeFilter configuration failed.", e);
+			}
+		}
+		final Map<String, Boolean> includeFilterFiles = userPrefs.getIncludeFilterFiles();
+		for (final Map.Entry<String, Boolean> includeFileName : includeFilterFiles.entrySet()) {
+			try {
+				engine.addFilter(IdeaUtilImpl.expandPathMacro(project, includeFileName.getKey()), true);
+			} catch (final IOException e) {
+				LOGGER.error("IncludeFilter configuration failed.", e);
+			}
+		}
+		final Map<String, Boolean> excludeBugFiles = userPrefs.getExcludeBugsFiles();
+		for (final Map.Entry<String, Boolean> excludeBugFile : excludeBugFiles.entrySet()) {
+			try {
+				engine.excludeBaselineBugs(IdeaUtilImpl.expandPathMacro(project, excludeBugFile.getKey()));
+			} catch (final IOException e) {
+				LOGGER.error("ExcludeBaseLineBug files configuration failed.", e);
+			} catch (final DocumentException e) {
+				LOGGER.error("ExcludeBaseLineBug files configuration failed.", e);
+			}
+		}
 	}
 }

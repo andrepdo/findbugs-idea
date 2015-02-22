@@ -90,6 +90,14 @@ public class FindBugsProject extends Project {
 	}
 
 
+	public void configureAuxClasspathEntries(@NotNull final ProgressIndicator indicator, @NotNull final Collection<VirtualFile> classpathFiles) {
+		indicator.setText("Collecting auxiliary classpath entries...");
+		for (final VirtualFile file : classpathFiles) {
+			addAuxClasspathEntry(file.getPresentableUrl());
+		}
+	}
+
+
 	public void configureAuxClasspathEntries(@NotNull final ProgressIndicator indicator, @NotNull final VirtualFile[] classpathFiles) {
 		indicator.setText("Collecting auxiliary classpath entries...");
 		configureAuxClasspathEntries(classpathFiles);
