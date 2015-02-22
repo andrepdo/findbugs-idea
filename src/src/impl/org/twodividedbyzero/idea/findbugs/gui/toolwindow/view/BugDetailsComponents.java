@@ -33,6 +33,7 @@ import edu.umd.cs.findbugs.SortedBugCollection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import edu.umd.cs.findbugs.cloud.Cloud;
 import edu.umd.cs.findbugs.cloud.Cloud.UserDesignation;
+import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.gui.common.CustomLineBorder;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitLayout;
@@ -40,7 +41,6 @@ import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitPane;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.gui.common.VerticalTextIcon;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.DetectorConfiguration;
-import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.BugTree;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
@@ -56,7 +56,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.tree.TreePath;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -92,7 +91,6 @@ public class BugDetailsComponents {
 	private JPanel _explanationPanel;
 	private JPanel _cloudCommentsPanel;
 	private final ToolWindowPanel _parent;
-	private TreePath _currentTreePath;
 	private double _splitPaneHorizontalWeight = 0.6;
 	private SortedBugCollection _lastBugCollection;
 	private BugInstance _lastBugInstance;
@@ -288,10 +286,8 @@ public class BugDetailsComponents {
 
 	@SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@SuppressWarnings({"HardCodedStringLiteral"})
-	public void setBugsDetails(final BugInstanceNode bugInstanceNode, final TreePath treePath) {
-		_currentTreePath = treePath;
-		final BugInstance bugInstance = bugInstanceNode.getBugInstance();
-		final int[] lines = BugInstanceUtil.getSourceLines(bugInstanceNode);
+	public void setBugsDetails(@NotNull final BugInstance bugInstance) {
+		final int[] lines = BugInstanceUtil.getSourceLines(bugInstance);
 		final MethodAnnotation methodAnnotation = BugInstanceUtil.getPrimaryMethod(bugInstance);
 		final FieldAnnotation fieldAnnotation = BugInstanceUtil.getPrimaryField(bugInstance);
 
@@ -509,6 +505,16 @@ public class BugDetailsComponents {
 
 	public void setSplitPaneHorizontalWeight(final double splitPaneHorizontalWeight) {
 		_splitPaneHorizontalWeight = splitPaneHorizontalWeight;
+	}
+
+
+	public void clear() {
+		if (_bugDetailsPane != null) {
+			_bugDetailsPane.setText(null);
+		}
+		if (_explanationPane != null) {
+			_explanationPane.setText(null);
+		}
 	}
 
 

@@ -90,10 +90,9 @@ public class BugTreePanel extends JPanel {
 	private double _splitPaneVerticalWeight = 1.0;
 	private final double _splitPaneHorizontalWeight = 0.4;
 	private boolean _bugPreviewEnabled;
-	private final Object addNodeLock = new Object();
 
 
-	public BugTreePanel(final ToolWindowPanel parent, final Project project) {
+	public BugTreePanel(@NotNull final ToolWindowPanel parent, @NotNull final Project project) {
 		setLayout(new BorderLayout());
 
 		_parent = parent;
@@ -187,26 +186,25 @@ public class BugTreePanel extends JPanel {
 	}
 
 
-	public void setPreview(final TreePath treePath) {
+	public void setPreview(@Nullable final TreePath treePath) {
+		boolean clear = true;
 		if (treePath != null && treePath.getLastPathComponent() instanceof BugInstanceNode) {
 			final BugInstanceNode bugInstanceNode = (BugInstanceNode) getTreeNodeFromPath(treePath);
-			if (bugInstanceNode == null) {
-				return;
-			}
-
-			if (bugInstanceNode.getPsiFile() == null) {
-				return; // no problem here
-			}
-
-			final PsiFile psiFile = bugInstanceNode.getPsiFile();
-			if (psiFile != null) {
-				final Document document = PsiDocumentManager.getInstance(_project).getDocument(psiFile);
-				if (document != null) {
-					final Editor editor = createEditor(bugInstanceNode, psiFile, document);
-					_parent.setPreviewEditor(editor, psiFile);
-					scrollToPreviewSource(bugInstanceNode, editor);
+			if (bugInstanceNode != null) {
+				final PsiFile psiFile = bugInstanceNode.getPsiFile();
+				if (psiFile != null) {
+					final Document document = PsiDocumentManager.getInstance(_project).getDocument(psiFile);
+					if (document != null) {
+						final Editor editor = createEditor(bugInstanceNode, psiFile, document);
+						_parent.setPreviewEditor(editor, psiFile);
+						scrollToPreviewSource(bugInstanceNode, editor);
+						clear = false;
+					}
 				}
 			}
+		}
+		if (clear) {
+			_parent.setPreviewEditor(null, null);
 		}
 	}
 
@@ -257,29 +255,20 @@ public class BugTreePanel extends JPanel {
 	}
 
 
-	public void setDetailHtml(final TreePath treePath) {
-		final TreeNode treeNode = getTreeNodeFromPath(treePath);
-
-		if (treeNode instanceof BugInstanceNode) {
-			final BugInstanceNode bugNode = (BugInstanceNode) treeNode;
-			final BugInstance bugInstance = bugNode.getBugInstance();
-
-			if (_parent != null) {
+	public void setDetails(@Nullable final TreePath treePath) {
+		boolean clear = true;
+		if (treePath != null) {
+			final TreeNode treeNode = getTreeNodeFromPath(treePath);
+			if (treeNode instanceof BugInstanceNode) {
+				final BugInstanceNode bugNode = (BugInstanceNode) treeNode;
+				final BugInstance bugInstance = bugNode.getBugInstance();
 				_parent.getBugDetailsComponents().setBugExplanation(_bugCollection, bugInstance);
+				_parent.getBugDetailsComponents().setBugsDetails(bugInstance);
+				clear = false;
 			}
 		}
-	}
-
-
-	public void setDetailText(final TreePath treePath) {
-		final TreeNode treeNode = getTreeNodeFromPath(treePath);
-
-		if (treeNode instanceof BugInstanceNode) {
-			final BugInstanceNode bugNode = (BugInstanceNode) treeNode;
-
-			if (_parent != null) {
-				_parent.getBugDetailsComponents().setBugsDetails(bugNode, treePath);
-			}
+		if (clear) {
+			_parent.getBugDetailsComponents().clear();
 		}
 	}
 

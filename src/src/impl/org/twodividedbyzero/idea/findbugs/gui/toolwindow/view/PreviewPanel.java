@@ -89,14 +89,7 @@ class PreviewPanel {
 		
 		closeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
-				release();
-				_delegate.add(NO_BUG_SELECTED_LABEL, BorderLayout.CENTER);
-				final Dimension preferredSize = NO_BUG_SELECTED_LABEL.getPreferredSize();
-				preferredSize.width = _delegate.getPreferredSize().width;
-				NO_BUG_SELECTED_LABEL.setPreferredSize(preferredSize);
-				_delegate.setVisible(true);
-				_delegate.revalidate();
-				_delegate.repaint();
+				clear();
 			}
 		});
 		_labelPanel.add(closeButton, "5, 1, 5, 1, R, T");
@@ -165,5 +158,17 @@ class PreviewPanel {
 
 	public JComponent getComponent() {
 		return _delegate;
+	}
+
+
+	public void clear() {
+		release();
+		_delegate.add(NO_BUG_SELECTED_LABEL, BorderLayout.CENTER);
+		final Dimension preferredSize = NO_BUG_SELECTED_LABEL.getPreferredSize();
+		preferredSize.width = _delegate.getPreferredSize().width;
+		NO_BUG_SELECTED_LABEL.setPreferredSize(preferredSize);
+		_delegate.setVisible(true);
+		_delegate.revalidate();
+		_delegate.repaint();
 	}
 }

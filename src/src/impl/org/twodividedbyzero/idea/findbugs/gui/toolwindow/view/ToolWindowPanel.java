@@ -215,11 +215,13 @@ public class ToolWindowPanel extends JPanel implements AnalysisStateListener {
 
 
 	public void setPreviewEditor(@Nullable final Editor editor, final PsiFile psiFile) {
+		updateLayout(true);
 		if (editor != null) {
-			updateLayout(true);
 			getPreviewPanel().add(editor, psiFile);
-			resizeSplitNodes(this);
+		} else {
+			getPreviewPanel().clear();
 		}
+		resizeSplitNodes(this);
 	}
 
 
