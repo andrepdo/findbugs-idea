@@ -165,7 +165,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 			@Override
 			public void run(@NotNull final ProgressIndicator indicator) {
 
-				MessageBusManager.publishAnalysisStartedToEDT();
+				MessageBusManager.publishAnalysisStartedToEDT(project);
 				EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newStarted(project));
 				setProgressIndicator(indicator);
 				indicator.setFraction(0.0);
@@ -188,7 +188,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 					for (final BugInstance bugInstance : _importBugCollection) {
 						if (indicator.isCanceled()) {
 							taskCanceled.set(true);
-							MessageBusManager.publishAnalysisAbortedToEDT();
+							MessageBusManager.publishAnalysisAbortedToEDT(project);
 							EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 							Thread.currentThread().interrupt();
 							return;
@@ -208,7 +208,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 							 */
 							@Override
 							public void run() {
-								MessageBusManager.publish(NewBugInstanceListener.TOPIC).newBugInstance(bugInstanceRef.get(), projectStatsRef.get());
+								MessageBusManager.publish(project, NewBugInstanceListener.TOPIC).newBugInstance(bugInstanceRef.get(), projectStatsRef.get());
 							}
 						});
 					}
@@ -224,21 +224,21 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 					_importBugCollection.setTimestamp(System.currentTimeMillis());
 					_importBugCollection.reinitializeCloud();
 				} catch (final IOException e1) {
-					MessageBusManager.publishAnalysisAbortedToEDT();
+					MessageBusManager.publishAnalysisAbortedToEDT(project);
 					EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 					final String message = "Import failed";
 					showToolWindowNotifier(project, message, MessageType.ERROR);
 					LOGGER.error(message, e1);
 
 				} catch (final DocumentException e1) {
-					MessageBusManager.publishAnalysisAbortedToEDT();
+					MessageBusManager.publishAnalysisAbortedToEDT(project);
 					EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 					final String message = "Import failed";
 					showToolWindowNotifier(project, message, MessageType.ERROR);
 					LOGGER.error(message, e1);
 
 				} finally {
-					MessageBusManager.publishAnalysisFinishedToEDT(_importBugCollection, null);
+					MessageBusManager.publishAnalysisFinishedToEDT(project, _importBugCollection, null);
 					EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newFinished(_importBugCollection, project, null));
 					_importBugCollection = null;
 					Thread.currentThread().interrupt();

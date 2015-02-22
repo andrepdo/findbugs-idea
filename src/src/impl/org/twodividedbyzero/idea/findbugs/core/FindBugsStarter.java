@@ -82,7 +82,7 @@ public abstract class FindBugsStarter implements AnalysisAbortedListener {
 
 	public void start() {
 		EventDispatchThreadHelper.checkEDT();
-		MessageBusManager.publishAnalysisStarted();
+		MessageBusManager.publishAnalysisStarted(_project);
 		EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newStarted(_project));
 
 		if (Boolean.valueOf(_preferences.getProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT))) {

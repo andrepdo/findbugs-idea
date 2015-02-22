@@ -67,7 +67,7 @@ public final class ClearAndCloseToolWindow extends BaseAction implements Analysi
 		setEnabled( false );
 		toolWindow.hide(null);
 
-		MessageBusManager.publish(ClearListener.TOPIC).clear();
+		MessageBusManager.publish(project, ClearListener.TOPIC).clear();
 	}
 
 
@@ -94,7 +94,7 @@ public final class ClearAndCloseToolWindow extends BaseAction implements Analysi
 
 
 	@Override
-	public void analysisFinished( @NotNull BugCollection bugCollection, @Nullable FindBugsProject findBugsProject ) {
+	public void analysisFinished(@NotNull BugCollection bugCollection, @Nullable FindBugsProject findBugsProject) {
 		setEnabled(true);
 	}
 

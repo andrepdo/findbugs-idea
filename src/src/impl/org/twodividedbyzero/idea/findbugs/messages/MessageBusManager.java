@@ -19,11 +19,7 @@
 package org.twodividedbyzero.idea.findbugs.messages;
 
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Disposer;
-import com.intellij.openapi.util.Pair;
-import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.messages.Topic;
 import edu.umd.cs.findbugs.BugCollection;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +29,6 @@ import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 
@@ -45,10 +40,21 @@ import java.util.concurrent.atomic.AtomicReference;
 public final class MessageBusManager {
 
 
-	private static final Map<Project, Map<Object, Pair<MessageBusConnection, Set<Topic<?>>>>> _connections = New.map();
+	private static final Map<Project, MessageBus> _busByProject = New.map();
 
 
 	private MessageBusManager() {
+	}
+
+
+	@NotNull
+	private static MessageBus of(@NotNull final Project project) {
+		MessageBus ret = _busByProject.get(project);
+		if (ret == null) {
+			ret = new MessageBus(project);
+			_busByProject.put(project, ret);
+		}
+		return ret;
 	}
 
 
@@ -71,64 +77,45 @@ public final class MessageBusManager {
 	 */
 	public static <L> void subscribe(@NotNull final Project project, @NotNull final Object subscriber, @NotNull final Topic<L> topic, @NotNull final L handler) {
 		EventDispatchThreadHelper.checkEDT();
-		Map<Object, Pair<MessageBusConnection, Set<Topic<?>>>> perProject = _connections.get(project);
-		if (perProject == null) {
-			perProject = New.map();
-			_connections.put(project, perProject);
-		}
-		final Pair<MessageBusConnection, Set<Topic<?>>> subscriberPair = perProject.get(subscriber);
-		Set<Topic<?>> topics;
-		if (subscriberPair == null) {
-			final MessageBusConnection newConnection =  ApplicationManager.getApplication().getMessageBus().connect();
-			topics = New.set();
-			topics.add(topic);
-			newConnection.subscribe(topic, handler);
-			perProject.put(subscriber, Pair.create(newConnection, topics));
-		} else {
-			topics = subscriberPair.getSecond();
-			if (!topics.contains(topic)) {
-				topics.add(topic);
-				subscriberPair.getFirst().subscribe(topic, handler);
-			} // else do nothing ; topic already subscriber has already subscribed this topic
-		}
+		of(project).subscribe(subscriber, topic, handler);
 	}
 
 
-	public static void publishAnalysisStarted() {
+	public static void publishAnalysisStarted(@NotNull final Project project) {
 		EventDispatchThreadHelper.checkEDT();
-		publish(AnalysisStartedListener.TOPIC).analysisStarted();
+		publish(project, AnalysisStartedListener.TOPIC).analysisStarted();
 	}
 
 
-	public static void publishAnalysisStartedToEDT() {
+	public static void publishAnalysisStartedToEDT(@NotNull final Project project) {
 		EventDispatchThreadHelper.checkNotEDT();
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				publish(AnalysisStartedListener.TOPIC).analysisStarted();
+				publish(project, AnalysisStartedListener.TOPIC).analysisStarted();
 			}
 		});
 	}
 
 
-	public static void publishAnalysisAborted() {
+	public static void publishAnalysisAborted(@NotNull final Project project) {
 		EventDispatchThreadHelper.checkEDT();
-		publish(AnalysisAbortedListener.TOPIC).analysisAborted();
+		publish(project, AnalysisAbortedListener.TOPIC).analysisAborted();
 	}
 
 
-	public static void publishAnalysisAbortedToEDT() {
+	public static void publishAnalysisAbortedToEDT(@NotNull final Project project) {
 		EventDispatchThreadHelper.checkNotEDT();
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				publish(AnalysisAbortedListener.TOPIC).analysisAborted();
+				publish(project, AnalysisAbortedListener.TOPIC).analysisAborted();
 			}
 		});
 	}
 
 
-	public static void publishAnalysisFinishedToEDT(@NotNull final BugCollection bugCollection, @Nullable final FindBugsProject findBugsProject) {
+	public static void publishAnalysisFinishedToEDT(@NotNull final Project project, @NotNull final BugCollection bugCollection, @Nullable final FindBugsProject findBugsProject) {
 		EventDispatchThreadHelper.checkNotEDT();
 		/**
 		 * Guarantee thread visibility *one* time.
@@ -138,26 +125,21 @@ public final class MessageBusManager {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				publish(AnalysisFinishedListener.TOPIC).analysisFinished(bugCollectionRef.get(), findBugsProjectRef.get());
+				publish(project, AnalysisFinishedListener.TOPIC).analysisFinished(bugCollectionRef.get(), findBugsProjectRef.get());
 			}
 		});
 	}
 
 
 	@NotNull
-	public static <L> L publish(@NotNull final Topic<L> topic) {
+	public static <L> L publish(@NotNull final Project project, @NotNull final Topic<L> topic) {
 		EventDispatchThreadHelper.checkEDT();
-		return ApplicationManager.getApplication().getMessageBus().syncPublisher(topic);
+		return of(project).publisher(topic);
 	}
 
 
 	public static void dispose(@NotNull final Project project) {
 		EventDispatchThreadHelper.checkEDT();
-		final Map<Object, Pair<MessageBusConnection, Set<Topic<?>>>> perProject = _connections.remove(project);
-		if (perProject != null) {
-			for (Pair<MessageBusConnection, ?> subscriberPair : perProject.values()) {
-				Disposer.dispose(subscriberPair.getFirst());
-			}
-		}
+		_busByProject.remove(project);
 	}
 }

@@ -54,7 +54,7 @@ public class StopAction extends BaseAction implements EventListener<BugReporterE
 	public void actionPerformed(@NotNull final AnActionEvent e) {
 		final com.intellij.openapi.project.Project project = DataKeys.PROJECT.getData(e.getDataContext());
 		if (project != null) {
-			MessageBusManager.publishAnalysisAborted();
+			MessageBusManager.publishAnalysisAborted(project);
 			EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 		} else {
 			LOGGER.error("No active project");

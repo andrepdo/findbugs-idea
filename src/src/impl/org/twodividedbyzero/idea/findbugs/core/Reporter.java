@@ -129,7 +129,7 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 			 */
 			@Override
 			public void run() {
-				MessageBusManager.publish(NewBugInstanceListener.TOPIC).newBugInstance(bugRef.get(), projectStatsRef.get());
+				MessageBusManager.publish(_project, NewBugInstanceListener.TOPIC).newBugInstance(bugRef.get(), projectStatsRef.get());
 			}
 		});
 	}
@@ -199,7 +199,7 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 		_indicator.setText("Finished: Found " + _filteredBugCount + " bugs.");
 		_indicator.finishNonCancelableSection();
 
-		MessageBusManager.publishAnalysisFinishedToEDT(getBugCollection(), _findBugsProject);
+		MessageBusManager.publishAnalysisFinishedToEDT(_project, getBugCollection(), _findBugsProject);
 		EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newFinished(getBugCollection(), _project, _findBugsProject));
 	}
 
@@ -218,7 +218,7 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 
 		if (_indicator.isCanceled()) {
 			cancelFindBugs();
-			MessageBusManager.publishAnalysisAbortedToEDT();
+			MessageBusManager.publishAnalysisAbortedToEDT(_project);
 			EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(_project));
 		} else if (_cancellingByUser.get()) {
 			cancelFindBugs();

@@ -143,7 +143,7 @@ public final class BugReporter extends AbstractBugReporter implements FindBugsPr
 			 */
 			@Override
 			public void run() {
-				MessageBusManager.publish(NewBugInstanceListener.TOPIC).newBugInstance(bugRef.get(), projectStatsRef.get());
+				MessageBusManager.publish(_project, NewBugInstanceListener.TOPIC).newBugInstance(bugRef.get(), projectStatsRef.get());
 			}
 		});
 	}
@@ -227,7 +227,7 @@ public final class BugReporter extends AbstractBugReporter implements FindBugsPr
 			progressIndicator.finishNonCancelableSection();
 		}
 
-		MessageBusManager.publishAnalysisFinishedToEDT(getBugCollection(), _findBugsProject);
+		MessageBusManager.publishAnalysisFinishedToEDT(_project, getBugCollection(), _findBugsProject);
 		EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newFinished(getBugCollection(), _project, _findBugsProject));
 
 		setRunning(false);
@@ -260,7 +260,7 @@ public final class BugReporter extends AbstractBugReporter implements FindBugsPr
 			// causes break in FindBugs main loop
 			Thread.currentThread().interrupt();
 			if (!isRunning()) {
-				MessageBusManager.publishAnalysisAbortedToEDT();
+				MessageBusManager.publishAnalysisAbortedToEDT(_project);
 				EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(_project));
 			}
 		}
@@ -336,7 +336,7 @@ public final class BugReporter extends AbstractBugReporter implements FindBugsPr
 		beginStage(ANALYZING_CLASSES_i18N, numClasses);
 
 		if (!isRunning()) {
-			MessageBusManager.publishAnalysisStartedToEDT();
+			MessageBusManager.publishAnalysisStartedToEDT(_project);
 			EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newStarted(_project));
 		}
 	}
