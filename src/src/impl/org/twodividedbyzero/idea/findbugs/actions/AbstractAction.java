@@ -57,7 +57,7 @@ abstract class AbstractAction extends AnAction {
 			return;
 		}
 		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(plugin.getInternalToolWindowId());
-		if (toolWindow == null) {
+		if (toolWindow == null || !toolWindow.isAvailable()) {
 			e.getPresentation().setEnabled(false);
 			e.getPresentation().setVisible(false);
 			return;
@@ -102,7 +102,7 @@ abstract class AbstractAction extends AnAction {
 			return;
 		}
 		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(plugin.getInternalToolWindowId());
-		if (toolWindow == null) {
+		if (toolWindow == null || !toolWindow.isAvailable()) {
 			e.getPresentation().setEnabled(false);
 			e.getPresentation().setVisible(false);
 			return;

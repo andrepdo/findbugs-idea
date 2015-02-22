@@ -43,8 +43,28 @@ public enum FindBugsState {
 	private static final Map<Project, FindBugsState> _stateByProject = New.map();
 
 
+	public boolean isCleared() {
+		return Cleared.equals(this);
+	}
+
+
+	public boolean isStarted() {
+		return Started.equals(this);
+	}
+
+
+	public boolean isAborted() {
+		return Aborted.equals(this);
+	}
+
+
+	public boolean isFinished() {
+		return Finished.equals(this);
+	}
+
+
 	public boolean isIdle() {
-		return !Started.equals(this);
+		return !isStarted();
 	}
 
 

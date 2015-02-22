@@ -19,18 +19,15 @@
 package org.twodividedbyzero.idea.findbugs.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
-import edu.umd.cs.findbugs.BugCollection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
-import org.twodividedbyzero.idea.findbugs.messages.AnalysisStateListener;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
+import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 
 /**
@@ -38,68 +35,35 @@ import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
  *
  * @version $Revision$
  */
-public final class ClearAndCloseToolWindow extends BaseAction implements AnalysisStateListener {
-
-	private boolean _enabled;
-
+public final class ClearAndCloseToolWindow extends AbstractAction {
 
 	@Override
-	protected void updateImpl(final @NotNull Project project) {
-		MessageBusManager.subscribeAnalysisState(project, this, this);
+	void updateImpl(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project,
+			@Nullable final Module module,
+			@NotNull final FindBugsPlugin plugin,
+			@NotNull final ToolWindow toolWindow,
+			@NotNull final FindBugsState state,
+			@NotNull final FindBugsPreferences preferences
+	) {
+
+		e.getPresentation().setEnabled(state.isFinished() || state.isAborted());
+		e.getPresentation().setVisible(true);
 	}
 
-
 	@Override
-	public void actionPerformed(final AnActionEvent e) {
-		final Project project = DataKeys.PROJECT.getData(e.getDataContext());
-		if (project == null) {
-			return;
-		}
+	void actionPerformedImpl(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project,
+			@Nullable final Module module,
+			@NotNull final FindBugsPlugin plugin,
+			@NotNull final ToolWindow toolWindow,
+			@NotNull final FindBugsState state,
+			@NotNull final FindBugsPreferences preferences
+	) {
 
-		final FindBugsPlugin findBugsPlugin = IdeaUtilImpl.getPluginComponent(project);
-		if (findBugsPlugin == null) {
-			throw new IllegalStateException("Couldn't get findbugs plugin");
-		}
-
-		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(getPluginInterface(project).getInternalToolWindowId());
-		e.getPresentation().setEnabled(false);
-		setEnabled( false );
 		toolWindow.hide(null);
-
 		MessageBusManager.publishClear(project);
-	}
-
-
-	@Override
-	protected boolean isEnabled() {
-		return _enabled;
-	}
-
-
-	@Override
-	protected boolean setEnabled(final boolean enabled) {
-		final boolean was = _enabled;
-		if (_enabled != enabled) {
-			_enabled = enabled;
-		}
-		return was;
-	}
-
-
-	@Override
-	public void analysisAborted() {
-		setEnabled(true);
-	}
-
-
-	@Override
-	public void analysisFinished(@NotNull BugCollection bugCollection, @Nullable FindBugsProject findBugsProject) {
-		setEnabled(true);
-	}
-
-
-	@Override
-	public void analysisStarted() {
-		setEnabled(false);
 	}
 }

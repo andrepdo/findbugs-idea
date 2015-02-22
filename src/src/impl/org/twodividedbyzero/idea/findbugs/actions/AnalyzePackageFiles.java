@@ -65,7 +65,7 @@ public final class AnalyzePackageFiles extends AbstractAction {
 					null != getPackagePath(selectedSourceFiles, project);
 		}
 
-		e.getPresentation().setEnabled(toolWindow.isAvailable() && enable);
+		e.getPresentation().setEnabled(enable);
 		e.getPresentation().setVisible(true);
 	}
 
