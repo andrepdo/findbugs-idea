@@ -45,7 +45,7 @@ abstract class AbstractAction extends AnAction {
 	@Override
 	public final void update(@NotNull final AnActionEvent e) {
 		final Project project = IdeaUtilImpl.getProject(e.getDataContext());
-		if (project == null) {
+		if (project == null || !project.isInitialized() || !project.isOpen()) {
 			e.getPresentation().setEnabled(false);
 			e.getPresentation().setVisible(false);
 			return;
