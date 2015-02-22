@@ -134,13 +134,11 @@ public final class AnalyzeScopeFiles extends BaseAnalyzeAction implements Analys
 			@Override
 			protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
 
-				indicator.setText("Collecting auxiliary classpath entries...");
 				final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(_dataContext);
-				findBugsProject.configureAuxClasspathEntries(files);
+				findBugsProject.configureAuxClasspathEntries(indicator, files);
 
-				indicator.setText("Configure source directories...");
 				final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(_dataContext);
-				findBugsProject.configureSourceDirectories(sourceRoots);
+				findBugsProject.configureSourceDirectories(indicator, sourceRoots);
 
 				indicator.setText("Collecting files for analysis...");
 				addClasses(indicator, project, scope, findBugsProject);

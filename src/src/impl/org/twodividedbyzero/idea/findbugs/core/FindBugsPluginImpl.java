@@ -213,6 +213,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 		ChangeListManager.getInstance(_project).removeChangeListListener(action.getChangelistAdapter());
 		unregisterToolWindow();
 		disableToolbarActions();
+		FindBugsState.dispose(_project);
 	}
 
 

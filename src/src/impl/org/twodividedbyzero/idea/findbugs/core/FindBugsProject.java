@@ -19,6 +19,7 @@
 package org.twodividedbyzero.idea.findbugs.core;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import edu.umd.cs.findbugs.Project;
@@ -54,8 +55,14 @@ public class FindBugsProject extends Project {
 	}
 
 
-	public void configureSourceDirectories(final VirtualFile[] selectedSourceFiles) {
-		for (final VirtualFile file : selectedSourceFiles) {
+	public void configureSourceDirectories(@NotNull final ProgressIndicator indicator, @NotNull final VirtualFile[] sourceDirs) {
+		indicator.setText("Configure source directories...");
+		configureSourceDirectories(sourceDirs);
+	}
+
+
+	public void configureSourceDirectories(@NotNull final VirtualFile[] sourceDirs) {
+		for (final VirtualFile file : sourceDirs) {
 			if (IdeaUtilImpl.isValidFileType(file.getFileType())) {
 				final VirtualFile parent = file.getParent();
 				if (parent != null && parent.isDirectory()) {
@@ -65,6 +72,12 @@ public class FindBugsProject extends Project {
 				addSourceDir(file.getPresentableUrl());
 			}
 		}
+	}
+
+
+	public void configureAuxClasspathEntries(@NotNull final ProgressIndicator indicator, @NotNull final VirtualFile[] classpathFiles) {
+		indicator.setText("Collecting auxiliary classpath entries...");
+		configureAuxClasspathEntries(classpathFiles);
 	}
 
 

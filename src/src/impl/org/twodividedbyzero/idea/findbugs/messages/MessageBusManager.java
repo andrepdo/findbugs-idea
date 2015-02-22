@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -85,6 +86,7 @@ public final class MessageBusManager {
 
 	public static void publishClear(@NotNull final Project project) {
 		EventDispatchThreadHelper.checkEDT();
+		FindBugsState.set(project, FindBugsState.Cleared);
 		publish(project, ClearListener.TOPIC).clear();
 	}
 
@@ -97,6 +99,7 @@ public final class MessageBusManager {
 
 	public static void publishAnalysisStarted(@NotNull final Project project) {
 		EventDispatchThreadHelper.checkEDT();
+		FindBugsState.set(project, FindBugsState.Started);
 		publish(project, AnalysisStartedListener.TOPIC).analysisStarted();
 	}
 
@@ -106,6 +109,7 @@ public final class MessageBusManager {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				FindBugsState.set(project, FindBugsState.Started);
 				publish(project, AnalysisStartedListener.TOPIC).analysisStarted();
 			}
 		});
@@ -114,6 +118,7 @@ public final class MessageBusManager {
 
 	public static void publishAnalysisAborted(@NotNull final Project project) {
 		EventDispatchThreadHelper.checkEDT();
+		FindBugsState.set(project, FindBugsState.Aborted);
 		publish(project, AnalysisAbortedListener.TOPIC).analysisAborted();
 	}
 
@@ -123,6 +128,7 @@ public final class MessageBusManager {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				FindBugsState.set(project, FindBugsState.Aborted);
 				publish(project, AnalysisAbortedListener.TOPIC).analysisAborted();
 			}
 		});
@@ -139,6 +145,7 @@ public final class MessageBusManager {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				FindBugsState.set(project, FindBugsState.Finished);
 				publish(project, AnalysisFinishedListener.TOPIC).analysisFinished(bugCollectionRef.get(), findBugsProjectRef.get());
 			}
 		});
