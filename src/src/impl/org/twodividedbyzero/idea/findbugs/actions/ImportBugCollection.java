@@ -19,10 +19,10 @@
 
 package org.twodividedbyzero.idea.findbugs.actions;
 
+
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataKeys;
-import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogBuilder;
@@ -40,18 +40,16 @@ import edu.umd.cs.findbugs.ProjectStats;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import org.dom4j.DocumentException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
-import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
 import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
-import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
 import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventFactory;
-import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
 import org.twodividedbyzero.idea.findbugs.gui.common.ImportFileDialog;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
@@ -71,53 +69,41 @@ import java.util.concurrent.atomic.AtomicReference;
  * @version $Revision$
  * @since 0.9.96
  */
-@SuppressWarnings({"HardCodedStringLiteral"})
-public class ImportBugCollection extends BaseAction implements EventListener<BugReporterEvent> {
+public final class ImportBugCollection extends AbstractAction {
 
 	private static final Logger LOGGER = Logger.getInstance(ImportBugCollection.class.getName());
 
-	private boolean _enabled;
-	private SortedBugCollection _bugCollection;
-	private boolean _running;
-	private SortedBugCollection _importBugCollection;
-
-
 	@Override
-	protected boolean isEnabled() {
-		return _enabled;
+	void updateImpl(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project,
+			@Nullable final Module module,
+			@NotNull final FindBugsPlugin plugin,
+			@NotNull final ToolWindow toolWindow,
+			@NotNull final FindBugsState state,
+			@NotNull final FindBugsPreferences preferences
+	) {
+
+		e.getPresentation().setEnabled(state.isIdle());
+		e.getPresentation().setVisible(true);
 	}
 
-
 	@Override
-	protected boolean setEnabled(final boolean enabled) {
-		final boolean was = _enabled;
-		if (_enabled != enabled) {
-			_enabled = enabled;
-		}
-		return was;
-	}
+	void actionPerformedImpl(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project,
+			@Nullable final Module module,
+			@NotNull final FindBugsPlugin plugin,
+			@NotNull final ToolWindow toolWindow,
+			@NotNull final FindBugsState state,
+			@NotNull final FindBugsPreferences preferences
+	) {
 
-
-	@SuppressWarnings({"AssignmentToStaticFieldFromInstanceMethod"})
-	@Override
-	public void actionPerformed(final AnActionEvent e) {
-		final Project project = IdeaUtilImpl.getProject(e.getDataContext());
-		assert project != null;
-		final Presentation presentation = e.getPresentation();
-
-		// check a project is loaded
-		if (isProjectNotLoaded(project, presentation)) {
-			Messages.showWarningDialog("Project not loaded.", "FindBugs");
-			return;
-		}
-
-		//Ask the user for a export directory
 		final DialogBuilder dialogBuilder = new DialogBuilder(project);
 		dialogBuilder.addOkAction();
 		dialogBuilder.addCancelAction();
 		dialogBuilder.setTitle("Import previous saved bug collection xml");
 
-		final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
 		final String exportDir = preferences.getProperty(FindBugsPreferences.EXPORT_BASE_DIR, FindBugsPluginConstants.DEFAULT_EXPORT_DIR) + File.separatorChar + project.getName();
 
 		final ImportFileDialog importFileDialog = new ImportFileDialog(exportDir, dialogBuilder);
@@ -131,8 +117,7 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 		}
 
 
-		final FindBugsPlugin findBugsPlugin = getPluginInterface(project);
-		final BugCollection bugCollection = findBugsPlugin.getToolWindowPanel().getBugCollection();
+		final BugCollection bugCollection = plugin.getToolWindowPanel().getBugCollection();
 		if (bugCollection != null && !bugCollection.getCollection().isEmpty()) {
 			//noinspection DialogTitleCapitalization
 			final int result = Messages.showYesNoDialog(project, "Current result in the 'Found bugs view' will be deleted. Continue ?", "Delete found bugs?", Messages.getQuestionIcon());
@@ -170,21 +155,22 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 				indicator.setFraction(0.0);
 				indicator.setIndeterminate(false);
 				indicator.setText(fileToImport);
+				SortedBugCollection importBugCollection = null;
 				try {
-					_bugCollection = new SortedBugCollection();
+					final SortedBugCollection bugCollection = new SortedBugCollection();
 					final FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(project);
-					_importBugCollection = _bugCollection.createEmptyCollectionWithMetadata();
-					final edu.umd.cs.findbugs.Project importProject = _importBugCollection.getProject();
+					importBugCollection = bugCollection.createEmptyCollectionWithMetadata();
+					final edu.umd.cs.findbugs.Project importProject = importBugCollection.getProject();
 					importProject.setGuiCallback(new PluginGuiCallback(pluginComponent));
-					_importBugCollection.setDoNotUseCloud(true);
+					importBugCollection.setDoNotUseCloud(true);
 					for (final Plugin plugin : Plugin.getAllPlugins()) {
 						importProject.setPluginStatusTrinary(plugin.getPluginId(), !preferences.isPluginDisabled(plugin.getPluginId()));
 					}
-					_importBugCollection.readXML(fileToImport);
+					importBugCollection.readXML(fileToImport);
 
-					final ProjectStats projectStats = _importBugCollection.getProjectStats();
+					final ProjectStats projectStats = importBugCollection.getProjectStats();
 					int bugCount = 0;
-					for (final BugInstance bugInstance : _importBugCollection) {
+					for (final BugInstance bugInstance : importBugCollection) {
 						if (indicator.isCanceled()) {
 							taskCanceled.set(true);
 							MessageBusManager.publishAnalysisAbortedToEDT(project);
@@ -219,9 +205,9 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 						}
 					});
 
-					_importBugCollection.setDoNotUseCloud(false);
-					_importBugCollection.setTimestamp(System.currentTimeMillis());
-					_importBugCollection.reinitializeCloud();
+					importBugCollection.setDoNotUseCloud(false);
+					importBugCollection.setTimestamp(System.currentTimeMillis());
+					importBugCollection.reinitializeCloud();
 				} catch (final IOException e1) {
 					MessageBusManager.publishAnalysisAbortedToEDT(project);
 					EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
@@ -237,9 +223,8 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 					LOGGER.error(message, e1);
 
 				} finally {
-					MessageBusManager.publishAnalysisFinishedToEDT(project, _importBugCollection, null);
-					EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newFinished(_importBugCollection, project, null));
-					_importBugCollection = null;
+					MessageBusManager.publishAnalysisFinishedToEDT(project, importBugCollection, null);
+					EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newFinished(importBugCollection, project, null));
 					Thread.currentThread().interrupt();
 				}
 			}
@@ -269,89 +254,5 @@ public class ImportBugCollection extends BaseAction implements EventListener<Bug
 				FindBugsPluginImpl.showToolWindowNotifier(project, message, type);
 			}
 		});
-	}
-
-
-	@Override
-	public void update(final AnActionEvent event) {
-		try {
-			final com.intellij.openapi.project.Project project = DataKeys.PROJECT.getData(event.getDataContext());
-			final Presentation presentation = event.getPresentation();
-
-			// check a project is loaded
-			if (isProjectNotLoaded(project, presentation)) {
-				return;
-			}
-
-			isPluginAccessible(project);
-
-			// check if tool window is registered
-			final ToolWindow toolWindow = isToolWindowRegistered(project);
-			if (toolWindow == null) {
-				presentation.setEnabled(false);
-				presentation.setVisible(false);
-
-				return;
-			}
-
-			registerEventListener(project);
-
-			if (!_running) {
-				_enabled = _importBugCollection == null;
-			}
-
-			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
-			presentation.setVisible(true);
-
-		} catch (final Throwable e) {
-			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
-			LOGGER.error("Action update failed", processed);
-		}
-	}
-
-
-	@SuppressWarnings({"AssignmentToNull"})
-	public void onEvent(@NotNull final BugReporterEvent event) {
-		switch (event.getOperation()) {
-			case ANALYSIS_STARTED:
-				_bugCollection = null;
-				setEnabled(false);
-				setRunning(true);
-				break;
-			case ANALYSIS_ABORTED:
-				_bugCollection = null;
-				setEnabled(true);
-				setRunning(false);
-				break;
-			case ANALYSIS_FINISHED:
-				_bugCollection = (SortedBugCollection) event.getBugCollection();
-				setEnabled(true);
-				setRunning(false);
-				break;
-			default:
-		}
-	}
-
-
-	private void registerEventListener(final Project project) {
-		final String projectName = project.getName();
-		if (!isRegistered(projectName)) {
-			EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(projectName), this);
-			addRegisteredProject(projectName);
-		}
-	}
-
-
-	protected boolean isRunning() {
-		return _running;
-	}
-
-
-	boolean setRunning(final boolean running) {
-		final boolean was = _running;
-		if (_running != running) {
-			_running = running;
-		}
-		return was;
 	}
 }
