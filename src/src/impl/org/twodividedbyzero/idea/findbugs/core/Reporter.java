@@ -35,8 +35,6 @@ import edu.umd.cs.findbugs.classfile.ClassDescriptor;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
-import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventFactory;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
 
@@ -199,7 +197,6 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 		_indicator.finishNonCancelableSection();
 
 		MessageBusManager.publishAnalysisFinishedToEDT(_project, getBugCollection(), _findBugsProject);
-		EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newFinished(getBugCollection(), _project, _findBugsProject));
 	}
 
 
@@ -218,7 +215,6 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 		if (_indicator.isCanceled()) {
 			cancelFindBugs();
 			MessageBusManager.publishAnalysisAbortedToEDT(_project);
-			EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(_project));
 		} else if (_cancellingByUser.get()) {
 			cancelFindBugs();
 			_indicator.cancel();

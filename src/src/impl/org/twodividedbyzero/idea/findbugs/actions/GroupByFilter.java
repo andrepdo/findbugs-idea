@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -18,26 +18,21 @@
  */
 package org.twodividedbyzero.idea.findbugs.actions;
 
+
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.wm.ToolWindow;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.common.event.EventListener;
-import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
-import org.twodividedbyzero.idea.findbugs.common.event.filters.BugReporterEventFilter;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEvent;
-import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
+import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
+import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import java.awt.Component;
 import java.awt.event.InputEvent;
@@ -50,30 +45,34 @@ import java.awt.event.InputEvent;
  * @version $Revision$
  * @since 0.0.1
  */
-public class GroupByFilter extends BaseAction implements EventListener<BugReporterEvent>/*, CustomComponentAction*/ {
-
-	private static final Logger LOGGER = Logger.getInstance(GroupByFilter.class.getName());
-
-	private AnActionEvent _actionEvent;
-	private DataContext _dataContext;
-	private boolean _enabled;
-	private boolean _running;
+public final class GroupByFilter extends AbstractAction {
 
 
 	@Override
-	public void actionPerformed(final AnActionEvent e) {
-		_actionEvent = e;
-		_dataContext = e.getDataContext();
+	void updateImpl(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project,
+			@Nullable final Module module,
+			@NotNull final FindBugsPlugin plugin,
+			@NotNull final ToolWindow toolWindow,
+			@NotNull final FindBugsState state,
+			@NotNull final FindBugsPreferences preferences
+	) {
 
-		final com.intellij.openapi.project.Project project = DataKeys.PROJECT.getData(_dataContext);
-		final Presentation presentation = e.getPresentation();
+		e.getPresentation().setEnabled(state.isIdle());
+		e.getPresentation().setVisible(true);
+	}
 
-		// check a project is loaded
-		if (isProjectNotLoaded(project, presentation)) {
-			Messages.showWarningDialog("Project not loaded.", "FindBugs");
-			return;
-		}
-
+	@Override
+	void actionPerformedImpl(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project,
+			@Nullable final Module module,
+			@NotNull final FindBugsPlugin plugin,
+			@NotNull final ToolWindow toolWindow,
+			@NotNull final FindBugsState state,
+			@NotNull final FindBugsPreferences preferences
+	) {
 
 		/*_actionEvent.getPresentation().putClientProperty("button", _actionEvent.getPresentation());
 		final JComponent jcomponent = (JComponent) presentation.getClientProperty("button");
@@ -89,7 +88,6 @@ public class GroupByFilter extends BaseAction implements EventListener<BugReport
 		//ActionManager.getInstance().getAction("FindBugs.GroupByFilter").getTemplatePresentation().
 		//actionpopupmenu.getComponent().setVisible(true);
 		actionpopupmenu.getComponent().show(component, component.getWidth(), 0);
-
 	}
 
 
@@ -109,98 +107,6 @@ public class GroupByFilter extends BaseAction implements EventListener<BugReport
 		final DefaultActionGroup group = new DefaultActionGroup("FindBugs.GroupByFilter.PopupGroup", true);
 		group.add(new FilterApplyAction());
 		return group;
-	}
-
-
-	@Override
-	public void update(final AnActionEvent event) {
-		try {
-			_actionEvent = event;
-			_dataContext = event.getDataContext();
-			final com.intellij.openapi.project.Project project = DataKeys.PROJECT.getData(_dataContext);
-			final Presentation presentation = event.getPresentation();
-
-			// check a project is loaded
-			if (isProjectNotLoaded(project, presentation)) {
-				return;
-			}
-
-			isPluginAccessible(project);
-
-			// check if tool window is registered
-			final ToolWindow toolWindow = isToolWindowRegistered(project);
-			if (toolWindow == null) {
-				presentation.setEnabled(false);
-				presentation.setVisible(false);
-
-				return;
-			}
-
-			registerEventListener(project);
-
-			_enabled = !isRunning();
-
-			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
-			presentation.setVisible(true);
-
-		} catch (final Throwable e) {
-			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
-			LOGGER.error("Action update failed", processed);
-		}
-	}
-
-
-	private void registerEventListener(final Project project) {
-		final String projectName = project.getName();
-		if (!isRegistered(projectName)) {
-			EventManagerImpl.getInstance().addEventListener(new BugReporterEventFilter(projectName), this);
-			addRegisteredProject(projectName);
-		}
-	}
-
-
-	@Override
-	protected boolean isEnabled() {
-		return _enabled;
-	}
-
-
-	@Override
-	protected boolean setEnabled(final boolean enabled) {
-		final boolean was = _enabled;
-		if (_enabled != enabled) {
-			_enabled = enabled;
-		}
-		return was;
-	}
-
-
-	protected boolean isRunning() {
-		return _running;
-	}
-
-
-	protected boolean setRunning(final boolean running) {
-		final boolean was = _running;
-		if (_running != running) {
-			_running = running;
-		}
-		return was;
-	}
-
-
-	public void onEvent(@NotNull final BugReporterEvent event) {
-		switch (event.getOperation()) {
-			case ANALYSIS_STARTED:
-				setEnabled(false);
-				setRunning(true);
-				break;
-			case ANALYSIS_ABORTED:
-			case ANALYSIS_FINISHED:
-				setEnabled(true);
-				setRunning(false);
-				break;
-		}
 	}
 
 

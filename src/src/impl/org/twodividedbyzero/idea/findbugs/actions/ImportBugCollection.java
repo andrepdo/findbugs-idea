@@ -43,8 +43,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
-import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventFactory;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
@@ -150,7 +148,6 @@ public final class ImportBugCollection extends AbstractAction {
 			public void run(@NotNull final ProgressIndicator indicator) {
 
 				MessageBusManager.publishAnalysisStartedToEDT(project);
-				EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newStarted(project));
 				setProgressIndicator(indicator);
 				indicator.setFraction(0.0);
 				indicator.setIndeterminate(false);
@@ -174,7 +171,6 @@ public final class ImportBugCollection extends AbstractAction {
 						if (indicator.isCanceled()) {
 							taskCanceled.set(true);
 							MessageBusManager.publishAnalysisAbortedToEDT(project);
-							EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 							Thread.currentThread().interrupt();
 							return;
 						}
@@ -210,21 +206,18 @@ public final class ImportBugCollection extends AbstractAction {
 					importBugCollection.reinitializeCloud();
 				} catch (final IOException e1) {
 					MessageBusManager.publishAnalysisAbortedToEDT(project);
-					EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 					final String message = "Import failed";
 					showToolWindowNotifier(project, message, MessageType.ERROR);
 					LOGGER.error(message, e1);
 
 				} catch (final DocumentException e1) {
 					MessageBusManager.publishAnalysisAbortedToEDT(project);
-					EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 					final String message = "Import failed";
 					showToolWindowNotifier(project, message, MessageType.ERROR);
 					LOGGER.error(message, e1);
 
 				} finally {
 					MessageBusManager.publishAnalysisFinishedToEDT(project, importBugCollection, null);
-					EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newFinished(importBugCollection, project, null));
 					Thread.currentThread().interrupt();
 				}
 			}

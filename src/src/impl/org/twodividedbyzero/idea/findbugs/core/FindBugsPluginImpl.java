@@ -59,7 +59,6 @@ import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
-import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
@@ -206,7 +205,6 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
 		//noinspection ConstantConditions
 		LOGGER.debug("project is being closed: " + plugin.getName() + " project="  + getProject());
-		EventManagerImpl.getInstance().removeEventListener(_project);
 		MessageBusManager.dispose(_project);
 		unregisterToolWindow();
 		disableToolbarActions();

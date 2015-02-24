@@ -25,8 +25,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.event.EventManagerImpl;
-import org.twodividedbyzero.idea.findbugs.common.event.types.BugReporterEventFactory;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
@@ -69,6 +67,5 @@ public final class StopAction extends AbstractAction {
 	) {
 
 		MessageBusManager.publishAnalysisAborted(project);
-		EventManagerImpl.getInstance().fireEvent(BugReporterEventFactory.newAborted(project));
 	}
 }
