@@ -163,8 +163,15 @@ public final class BugsLineMarkerProvider implements LineMarkerProvider {
 		}
 
 
+		@Override
 		public void navigate(final MouseEvent e, final PsiElement psiElement) {
-			// todo: goto tree node - fb result panel view
+			final FindBugsPlugin plugin = IdeaUtilImpl.getPluginComponent(psiElement.getProject());
+			for (final ExtendedProblemDescriptor descriptor : _descriptors) {
+				if (descriptor.getPsiElement() == psiElement) {
+					plugin.getToolWindowPanel().getBugTreePanel().getBugTree().gotoNode(descriptor.getBugInstance());
+					break;
+				}
+			}
 			buildPopupMenu().show(new RelativePoint(e));
 		}
 
