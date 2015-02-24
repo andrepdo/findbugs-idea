@@ -88,7 +88,7 @@ import java.util.regex.PatternSyntaxException;
  */
 @SuppressWarnings({"HardCodedStringLiteral", "MagicCharacter", "AnonymousInnerClass", "AnonymousInnerClass"})
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SE_BAD_FIELD_INNER_CLASS"})
-public abstract class QuickSearch<E> {
+abstract class QuickSearch<E> {
 
 	private static final Logger LOGGER = Logger.getInstance(QuickSearch.class.getName());
 
@@ -108,12 +108,12 @@ public abstract class QuickSearch<E> {
 	private final Stack<String> _recentSearches;
 
 
-	protected QuickSearch() {
+	QuickSearch() {
 		_recentSearches = new Stack<String>();
 	}
 
 
-	protected final void installImpl(@NotNull final JComponent component) {
+	final void installImpl(@NotNull final JComponent component) {
 		_component = component;
 		installListeners();
 	}
@@ -137,36 +137,36 @@ public abstract class QuickSearch<E> {
 	}
 
 
-	protected abstract void uninstallListeners();
+	abstract void uninstallListeners();
 
 
-	protected abstract int getElementCount();
+	abstract int getElementCount();
 
 
-	protected abstract String convertElementToString(final E element);
+	abstract String convertElementToString(final E element);
 
 
-	protected abstract List<?> getElementsCache();
+	abstract List<?> getElementsCache();
 
 
 	@Nullable
-	protected abstract E getElementAt(int index);
+	abstract E getElementAt(int index);
 
 
-	protected abstract void setSelectedElement(final int index);
+	abstract void setSelectedElement(final int index);
 
 
-	protected void setComponent(final JComponent component) {
+	final void setComponent(final JComponent component) {
 		_component = component;
 	}
 
 
-	protected SearchPopup createSearchPopup(final String searchText) {
+	private SearchPopup createSearchPopup(final String searchText) {
 		return new SearchPopup(searchText);
 	}
 
 
-	protected KeyListener createKeyListener() {
+	private KeyListener createKeyListener() {
 		return new KeyAdapter() {
 			@Override
 			public void keyTyped(final KeyEvent e) {
@@ -182,7 +182,7 @@ public abstract class QuickSearch<E> {
 	}
 
 
-	protected FocusListener createFocusListener() {
+	private FocusListener createFocusListener() {
 		return new FocusAdapter() {
 			@Override
 			public void focusGained(final FocusEvent e) {
@@ -212,7 +212,7 @@ public abstract class QuickSearch<E> {
 	}
 
 
-	protected ComponentListener createComponentListener() {
+	private ComponentListener createComponentListener() {
 		return new ComponentAdapter() {
 			@Override
 			public void componentHidden(final ComponentEvent e) {
@@ -237,7 +237,7 @@ public abstract class QuickSearch<E> {
 	}
 
 
-	protected void keyTypedOrPressed(final KeyEvent e) {
+	private void keyTypedOrPressed(final KeyEvent e) {
 		if (e != null && (isActivationKey(e) || _searchActivated) && !isDeactivationKey(e)) {
 			String searchingText = "";
 			if (e.getID() == KeyEvent.KEY_TYPED) {
@@ -264,7 +264,7 @@ public abstract class QuickSearch<E> {
 	}
 
 
-	private void showPopup(final String text) {
+	final void showPopup(final String text) {
 		//final JRootPane rootPane = _component.getRootPane();
 		final JComponent component = (JComponent) GuiUtil.getScrollPane(_component);
 		if (component != null) {
@@ -336,28 +336,28 @@ public abstract class QuickSearch<E> {
 	}
 
 
-	protected static boolean isNavigationKey(final KeyEvent e) {
+	private static boolean isNavigationKey(final KeyEvent e) {
 		return isFindNextOccurenceKey(e) || isFindPreviousOccurenceKey(e);
 	}
 
 
-	protected static boolean isFindNextOccurenceKey(final KeyEvent e) {
+	private static boolean isFindNextOccurenceKey(final KeyEvent e) {
 		return e.getKeyCode() == KeyEvent.VK_F3;
 	}
 
 
-	protected static boolean isFindPreviousOccurenceKey(final KeyEvent e) {
+	private static boolean isFindPreviousOccurenceKey(final KeyEvent e) {
 		return e.getKeyCode() == KeyEvent.VK_F3 && e.getModifiersEx() == InputEvent.SHIFT_DOWN_MASK;
 	}
 
 
-	protected static boolean isActivationKey(final KeyEvent e) {
+	private static boolean isActivationKey(final KeyEvent e) {
 		final char keyChar = e.getKeyChar();
 		return e.getID() == KeyEvent.KEY_TYPED && e.getKeyCode() != KeyEvent.VK_F4 && e.getModifiersEx() != InputEvent.ALT_MASK && e.getModifiersEx() != InputEvent.ALT_DOWN_MASK && (Character.isLetterOrDigit(keyChar) || keyChar == '*' || keyChar == '?');
 	}
 
 
-	protected static boolean isDeactivationKey(final KeyEvent e) {
+	private static boolean isDeactivationKey(final KeyEvent e) {
 		final int keyCode = e.getKeyCode();
 		return keyCode == KeyEvent.VK_ESCAPE || keyCode == KeyEvent.VK_ENTER || keyCode == KeyEvent.VK_PAGE_UP || keyCode == KeyEvent.VK_PAGE_DOWN || keyCode == KeyEvent.VK_HOME || keyCode == KeyEvent.VK_END || keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_UP || keyCode == KeyEvent.VK_DOWN;
 	}

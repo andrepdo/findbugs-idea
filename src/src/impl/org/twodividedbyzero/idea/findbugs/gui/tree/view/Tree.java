@@ -39,6 +39,7 @@ import java.awt.Rectangle;
  */
 public abstract class Tree extends JTree {
 
+	private final TreeQuickSearch _quickSearch;
 	private TreePath _highlightPath;
 	public static final Color NON_HIGHLIGHT_COLOR = UIManager.getColor("Tree.textBackground");
 	private TreePath _lastHighlightPath;
@@ -46,7 +47,7 @@ public abstract class Tree extends JTree {
 
 	public Tree(final TreeModel treeModel) {
 		super(treeModel);
-		TreeQuickSearch.install(this);
+		_quickSearch = TreeQuickSearch.install(this);
 		ViewTooltips.register(this);
 	}
 
@@ -121,5 +122,10 @@ public abstract class Tree extends JTree {
 			final Rectangle toBounds = getRowBounds(toRow - 1);
 			g.fillRect(0, fromBounds.y, getWidth(), toBounds.y - fromBounds.y + toBounds.height);
 		}
+	}
+
+
+	public final void showQuickSearchPopup(final String text) {
+		_quickSearch.showPopup(text);
 	}
 }

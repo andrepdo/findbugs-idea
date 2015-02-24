@@ -32,8 +32,6 @@ import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.BugTree;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
-import java.awt.event.KeyEvent;
-
 
 /**
  * $Date$
@@ -77,7 +75,7 @@ public final class ShowQuickSearch extends AbstractAction {
 			final BugTree tree = panel.getBugTreePanel().getBugTree();
 			tree.setSelectionRow(0);
 			tree.requestFocusInWindow();
-			tree.dispatchEvent(new KeyEvent(tree, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), KeyEvent.CTRL_DOWN_MASK, KeyEvent.VK_F, 'F'));
+			tree.showQuickSearchPopup("");
 		}
 	}
 }

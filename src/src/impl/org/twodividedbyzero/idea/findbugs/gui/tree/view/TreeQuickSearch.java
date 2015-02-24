@@ -40,7 +40,7 @@ import java.util.List;
  * @version $Revision$
  * @since 0.9.29-dev
  */
-public class TreeQuickSearch extends QuickSearch<AbstractTreeNode<VisitableTreeNode>> implements TreeModelListener {
+final class TreeQuickSearch extends QuickSearch<AbstractTreeNode<VisitableTreeNode>> implements TreeModelListener {
 
 	private JTree _tree;
 	private List<TreePath> _elementsCache;
@@ -50,10 +50,12 @@ public class TreeQuickSearch extends QuickSearch<AbstractTreeNode<VisitableTreeN
 	}
 
 
-	public static void install(@NotNull final JTree tree) {
-		final TreeQuickSearch treeSearch = new TreeQuickSearch();
-		treeSearch.installImpl(tree);
-		treeSearch.attachTo(tree);
+	@NotNull
+	static TreeQuickSearch install(@NotNull final JTree tree) {
+		final TreeQuickSearch ret = new TreeQuickSearch();
+		ret.installImpl(tree);
+		ret.attachTo(tree);
+		return ret;
 	}
 
 
@@ -149,24 +151,28 @@ public class TreeQuickSearch extends QuickSearch<AbstractTreeNode<VisitableTreeN
 	}
 
 
+	@Override
 	public void treeNodesChanged(final TreeModelEvent e) {
 		hidePopup();
 		clearElementsCache();
 	}
 
 
+	@Override
 	public void treeNodesInserted(final TreeModelEvent e) {
 		hidePopup();
 		clearElementsCache();
 	}
 
 
+	@Override
 	public void treeNodesRemoved(final TreeModelEvent e) {
 		hidePopup();
 		clearElementsCache();
 	}
 
 
+	@Override
 	public void treeStructureChanged(final TreeModelEvent e) {
 		hidePopup();
 		clearElementsCache();
