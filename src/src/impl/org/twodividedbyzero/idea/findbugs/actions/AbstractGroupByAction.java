@@ -24,7 +24,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.ui.content.Content;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
@@ -57,21 +56,17 @@ abstract class AbstractGroupByAction extends AbstractToggleAction {
 			@Nullable final Module module,
 			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
+			@NotNull final ToolWindowPanel panel,
 			@NotNull final FindBugsState state,
 			@NotNull final FindBugsPreferences preferences) {
 
-		final Content content = toolWindow.getContentManager().getContent(0);
-		if (content != null) {
-			final String groupByProperty = preferences.getProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, GroupBy.BugCategory.name());
-			final boolean equals = _groupBy.name().equals(groupByProperty);
-			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
-			final GroupBy[] sortOrderGroup = GroupBy.getSortOrderGroup(_groupBy);
-			if(equals && !Arrays.equals(panel.getBugTreePanel().getGroupBy(), sortOrderGroup)) {
-				panel.getBugTreePanel().setGroupBy(sortOrderGroup);
-			}
-			return equals;
+		final String groupByProperty = preferences.getProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, GroupBy.BugCategory.name());
+		final boolean equals = _groupBy.name().equals(groupByProperty);
+		final GroupBy[] sortOrderGroup = GroupBy.getSortOrderGroup(_groupBy);
+		if(equals && !Arrays.equals(panel.getBugTreePanel().getGroupBy(), sortOrderGroup)) {
+			panel.getBugTreePanel().setGroupBy(sortOrderGroup);
 		}
-		return false;
+		return equals;
 	}
 
 
@@ -82,17 +77,14 @@ abstract class AbstractGroupByAction extends AbstractToggleAction {
 			@Nullable final Module module,
 			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
+			@NotNull final ToolWindowPanel panel,
 			@NotNull final FindBugsState state,
 			@NotNull final FindBugsPreferences preferences,
 			final boolean select) {
 
-		final Content content = toolWindow.getContentManager().getContent(0);
-		if (content != null) {
-			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
-			if (select) {
-				preferences.setProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, _groupBy.name());
-				panel.getBugTreePanel().setGroupBy(GroupBy.getSortOrderGroup(_groupBy));
-			}
+		if (select) {
+			preferences.setProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, _groupBy.name());
+			panel.getBugTreePanel().setGroupBy(GroupBy.getSortOrderGroup(_groupBy));
 		}
 	}
 }

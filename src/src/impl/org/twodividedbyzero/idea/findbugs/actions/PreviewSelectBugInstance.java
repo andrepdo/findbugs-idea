@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -19,13 +19,15 @@
 
 package org.twodividedbyzero.idea.findbugs.actions;
 
+
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.ui.content.Content;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
@@ -37,62 +39,40 @@ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
  * @version $Revision$
  * @since 0.9.96
  */
-public class PreviewSelectBugInstance extends BaseToggleAction {
-
+public final class PreviewSelectBugInstance extends AbstractToggleAction {
 
 	@Override
-	public boolean isSelected(final AnActionEvent event) {
-		final Project project = DataKeys.PROJECT.getData(event.getDataContext());
-		if (project == null) {
-			return false;
+	boolean isSelectedImpl(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project,
+			@Nullable final Module module,
+			@NotNull final FindBugsPlugin plugin,
+			@NotNull final ToolWindow toolWindow,
+			@NotNull final ToolWindowPanel panel,
+			@NotNull final FindBugsState state,
+			@NotNull final FindBugsPreferences preferences) {
+
+		final boolean enabled = preferences.getBooleanProperty(FindBugsPreferences.TOOLWINDOW_EDITOR_PREVIEW, panel.isPreviewEnabled());
+		if(enabled != panel.isPreviewEnabled()) {
+			panel.setPreviewEnabled(enabled);
 		}
-
-		final FindBugsPlugin findBugsPlugin = project.getComponent(FindBugsPlugin.class);
-		if (findBugsPlugin == null) {
-			throw new IllegalStateException("Couldn't get findbugs plugin");
-		}
-
-		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(getPluginInterface(project).getInternalToolWindowId());
-
-		// toggle value
-		final Content content = toolWindow.getContentManager().getContent(0);
-		if (content != null) {
-			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
-			//return panel.isPreviewEnabled();
-			final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
-			final boolean enabled = preferences.getBooleanProperty(FindBugsPreferences.TOOLWINDOW_EDITOR_PREVIEW, panel.isPreviewEnabled());
-			if(enabled != panel.isPreviewEnabled()) {
-				panel.setPreviewEnabled(enabled);
-			}
-			return enabled;
-		}
-
-		return false;
+		return enabled;
 	}
 
 
 	@Override
-	public void setSelected(final AnActionEvent event, final boolean selected) {
-		final Project project = DataKeys.PROJECT.getData(event.getDataContext());
-		if (project == null) {
-			return;
-		}
+	void setSelectedImpl(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project,
+			@Nullable final Module module,
+			@NotNull final FindBugsPlugin plugin,
+			@NotNull final ToolWindow toolWindow,
+			@NotNull final ToolWindowPanel panel,
+			@NotNull final FindBugsState state,
+			@NotNull final FindBugsPreferences preferences,
+			final boolean select) {
 
-		final FindBugsPlugin findBugsPlugin = project.getComponent(FindBugsPlugin.class);
-		if (findBugsPlugin == null) {
-			throw new IllegalStateException("Couldn't get findbugs plugin");
-		}
-
-		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(getPluginInterface(project).getInternalToolWindowId());
-
-		// toggle value
-		final Content content = toolWindow.getContentManager().getContent(0);
-		if (content != null) {
-			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
-			final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
-			preferences.setProperty(FindBugsPreferences.TOOLWINDOW_EDITOR_PREVIEW, selected);
-			panel.setPreviewEnabled(selected);
-		}
+		preferences.setProperty(FindBugsPreferences.TOOLWINDOW_EDITOR_PREVIEW, select);
+		panel.setPreviewEnabled(select);
 	}
-
 }
