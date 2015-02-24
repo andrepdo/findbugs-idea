@@ -20,19 +20,17 @@
 package org.twodividedbyzero.idea.findbugs.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.DataKeys;
-import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
-import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.BugTree;
+import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import java.awt.event.KeyEvent;
 
@@ -44,31 +42,35 @@ import java.awt.event.KeyEvent;
  * @version $Revision$
  * @since 0.9.97
  */
-public class ShowQuickSearch extends BaseAction {
+public final class ShowQuickSearch extends AbstractAction {
 
-	private static final Logger LOGGER = Logger.getInstance(ShowQuickSearch.class.getName());
+	@Override
+	void updateImpl(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project,
+			@Nullable final Module module,
+			@NotNull final FindBugsPlugin plugin,
+			@NotNull final ToolWindow toolWindow,
+			@NotNull final FindBugsState state,
+			@NotNull final FindBugsPreferences preferences
+	) {
 
-	private DataContext _dataContext;
-	private AnActionEvent _actionEvent;
-	private boolean _enabled;
-	private boolean _running;
+		e.getPresentation().setEnabled(state.isIdle());
+		e.getPresentation().setVisible(true);
+	}
 
 
 	@Override
-	public void actionPerformed(final AnActionEvent e) {
-		_actionEvent = e;
-		_dataContext = e.getDataContext();
+	void actionPerformedImpl(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project,
+			@Nullable final Module module,
+			@NotNull final FindBugsPlugin plugin,
+			@NotNull final ToolWindow toolWindow,
+			@NotNull final FindBugsState state,
+			@NotNull final FindBugsPreferences preferences
+	) {
 
-		final com.intellij.openapi.project.Project project = DataKeys.PROJECT.getData(_dataContext);
-		final Presentation presentation = e.getPresentation();
-
-		// check a project is loaded
-		if (isProjectNotLoaded(project, presentation)) {
-			Messages.showWarningDialog("Project not loaded.", "FindBugs");
-			return;
-		}
-
-		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(getPluginInterface(project).getInternalToolWindowId());
 		final Content content = toolWindow.getContentManager().getContent(0);
 		if (content != null) {
 			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
@@ -77,71 +79,5 @@ public class ShowQuickSearch extends BaseAction {
 			tree.requestFocusInWindow();
 			tree.dispatchEvent(new KeyEvent(tree, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), KeyEvent.CTRL_DOWN_MASK, KeyEvent.VK_F, 'F'));
 		}
-
-	}
-
-
-	@Override
-	public void update(final AnActionEvent event) {
-		try {
-			_actionEvent = event;
-			_dataContext = event.getDataContext();
-			final Project project = DataKeys.PROJECT.getData(_dataContext);
-			final Presentation presentation = event.getPresentation();
-
-			// check a project is loaded
-			if (isProjectNotLoaded(project, presentation)) {
-				return;
-			}
-
-			isPluginAccessible(project);
-
-			// check if tool window is registered
-			final ToolWindow toolWindow = isToolWindowRegistered(project);
-			if (toolWindow == null) {
-				presentation.setEnabled(false);
-				presentation.setVisible(false);
-
-				return;
-			}
-
-			_enabled = !_running;
-			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
-			presentation.setVisible(true);
-
-		} catch (final Throwable e) {
-			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
-			LOGGER.error("Action update failed", processed);
-		}
-	}
-
-
-	@Override
-	protected boolean isEnabled() {
-		return _enabled;
-	}
-
-
-	@Override
-	protected boolean setEnabled(final boolean enabled) {
-		final boolean was = _enabled;
-		if (_enabled != enabled) {
-			_enabled = enabled;
-		}
-		return was;
-	}
-
-
-	protected boolean isRunning() {
-		return _running;
-	}
-
-
-	protected boolean setRunning(final boolean running) {
-		final boolean was = _running;
-		if (_running != running) {
-			_running = running;
-		}
-		return was;
 	}
 }

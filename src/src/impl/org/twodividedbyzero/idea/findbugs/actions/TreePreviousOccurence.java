@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -18,20 +18,19 @@
  */
 package org.twodividedbyzero.idea.findbugs.actions;
 
+
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.DataKeys;
-import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
-import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.BugTree;
+import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 
 /**
@@ -41,95 +40,48 @@ import org.twodividedbyzero.idea.findbugs.gui.tree.view.BugTree;
  * @version $Revision$
  * @since 0.9.82-dev
  */
-public class TreePreviousOccurence extends BaseAction {
+public final class TreePreviousOccurence extends AbstractAction {
 
-	private static final Logger LOGGER = Logger.getInstance(TreePreviousOccurence.class.getName());
+	@Override
+	void updateImpl(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project,
+			@Nullable final Module module,
+			@NotNull final FindBugsPlugin plugin,
+			@NotNull final ToolWindow toolWindow,
+			@NotNull final FindBugsState state,
+			@NotNull final FindBugsPreferences preferences
+	) {
 
-	private boolean _enabled;
-	private AnActionEvent _actionEvent;
-	private DataContext _dataContext;
+		final Content content = toolWindow.getContentManager().getContent(0);
+		if (content == null) {
+			e.getPresentation().setEnabled(false);
+			e.getPresentation().setVisible(false);
+			return;
+		}
+		final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
+		final BugTree tree = panel.getBugTreePanel().getBugTree();
+		final boolean enabled = tree.hasPreviousOccurence();
+		e.getPresentation().setEnabled(enabled);
+		e.getPresentation().setVisible(true);
+	}
 
 
 	@Override
-	public void actionPerformed(final AnActionEvent e) {
-		_actionEvent = e;
-		_dataContext = e.getDataContext();
+	void actionPerformedImpl(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project,
+			@Nullable final Module module,
+			@NotNull final FindBugsPlugin plugin,
+			@NotNull final ToolWindow toolWindow,
+			@NotNull final FindBugsState state,
+			@NotNull final FindBugsPreferences preferences
+	) {
 
-		final Project project = DataKeys.PROJECT.getData(_actionEvent.getDataContext());
-		if (project == null) {
-			return;
-		}
-
-		final FindBugsPlugin findBugsPlugin = project.getComponent(FindBugsPlugin.class);
-		if (findBugsPlugin == null) {
-			throw new IllegalStateException("Couldn't get findbugs plugin");
-		}
-
-		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(getPluginInterface(project).getInternalToolWindowId());
 		final Content content = toolWindow.getContentManager().getContent(0);
-
 		if (content != null) {
 			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
 			panel.getBugTreePanel().getBugTree().goPreviousOccurence();
 		}
-
-	}
-
-
-	@Override
-	public void update(final AnActionEvent event) {
-		try {
-			_actionEvent = event;
-			_dataContext = event.getDataContext();
-
-			final Project project = DataKeys.PROJECT.getData(_dataContext);
-			final Presentation presentation = event.getPresentation();
-
-			// check a project is loaded
-			if (isProjectNotLoaded(project, presentation)) {
-				return;
-			}
-
-			isPluginAccessible(project);
-
-			// check if tool window is registered
-			final ToolWindow toolWindow = isToolWindowRegistered(project);
-			if (toolWindow == null) {
-				presentation.setEnabled(false);
-				presentation.setVisible(false);
-
-				return;
-			}
-
-			// enable ?
-			final Content content = toolWindow.getContentManager().getContent(0);
-
-			if (content != null) {
-				final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
-				final BugTree tree = panel.getBugTreePanel().getBugTree();
-				_enabled = tree.hasPreviousOccurence();
-				presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
-				presentation.setVisible(true);
-			}
-		} catch (final Throwable e) {
-			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
-			LOGGER.error("Action update failed", processed);
-		}
-	}
-
-
-	@Override
-	protected boolean isEnabled() {
-		return _enabled;
-	}
-
-
-	@Override
-	protected boolean setEnabled(final boolean enabled) {
-		final boolean was = _enabled;
-		if (_enabled != enabled) {
-			_enabled = enabled;
-		}
-		return was;
 	}
 }
