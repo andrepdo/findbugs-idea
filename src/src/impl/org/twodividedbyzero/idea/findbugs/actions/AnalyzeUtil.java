@@ -21,7 +21,6 @@ package org.twodividedbyzero.idea.findbugs.actions;
 
 import com.intellij.analysis.AnalysisScope;
 import com.intellij.openapi.actionSystem.DataKey;
-import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
@@ -31,13 +30,12 @@ import java.lang.reflect.Field;
  * @version $Revision$
  * @since 0.9.99
  */
-public final class AnalyzeUtil {
+final class AnalyzeUtil {
 
 	private AnalyzeUtil() {
 	}
 
-	private static final Logger LOGGER = Logger.getInstance(BaseAnalyzeAction.class.getName());
-	public static final DataKey<AnalysisScope> KEY;
+	static final DataKey<AnalysisScope> KEY;
 
 	static {
 		DataKey<AnalysisScope> _key = null;

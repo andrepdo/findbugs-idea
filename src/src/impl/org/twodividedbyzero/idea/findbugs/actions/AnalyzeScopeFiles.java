@@ -20,37 +20,53 @@ package org.twodividedbyzero.idea.findbugs.actions;
 
 
 import com.intellij.analysis.AnalysisScope;
+import com.intellij.analysis.AnalysisScopeBundle;
+import com.intellij.analysis.AnalysisUIOptions;
+import com.intellij.analysis.BaseAnalysisActionDialog;
+import com.intellij.ide.highlighter.ArchiveFileType;
+import com.intellij.injected.editor.VirtualFileWindow;
+import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.DataKeys;
-import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.actionSystem.LangDataKeys;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.application.Result;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.help.HelpManager;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.MessageType;
-import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.vfs.JarFileSystem;
+import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiRecursiveElementVisitor;
-import edu.umd.cs.findbugs.BugCollection;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.collectors.StatelessClassAdder;
-import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
-import org.twodividedbyzero.idea.findbugs.messages.AnalysisStateListener;
-import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
+import javax.swing.Action;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -58,123 +74,94 @@ import java.util.List;
  * @version $Revision$
  * @since 0.9.99
  */
-public final class AnalyzeScopeFiles extends BaseAnalyzeAction implements AnalysisStateListener {
+public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 
-	private static final Logger LOGGER = Logger.getInstance(AnalyzeScopeFiles.class.getName());
+	@Override
+	void updateImpl(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project,
+			@Nullable final Module module,
+			@NotNull final FindBugsPlugin plugin,
+			@NotNull final ToolWindow toolWindow,
+			@NotNull final FindBugsState state,
+			@NotNull final FindBugsPreferences preferences
+	) {
 
-	private DataContext _dataContext;
-	private boolean _enabled;
-	private boolean _running;
+		e.getPresentation().setEnabled(state.isIdle());
+		e.getPresentation().setVisible(true);
+	}
 
 
 	@Override
-	public void actionPerformed(@NotNull final AnActionEvent e) {
-		_dataContext = e.getDataContext();
+	void analyze(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project,
+			@Nullable final Module module,
+			@NotNull final FindBugsPlugin plugin,
+			@NotNull final ToolWindow toolWindow,
+			@NotNull final FindBugsState state,
+			@NotNull final FindBugsPreferences preferences
+	) {
 
-		final com.intellij.openapi.project.Project project = DataKeys.PROJECT.getData(_dataContext);
-		assert project != null;
-		final Presentation presentation = e.getPresentation();
+		final DataContext dataContext = e.getDataContext();
+		AnalysisScope scope = getInspectionScope(dataContext);
+		final boolean rememberScope = e.getPlace().equals(ActionPlaces.MAIN_MENU);
+		final AnalysisUIOptions uiOptions = AnalysisUIOptions.getInstance(project);
+		final PsiElement element = LangDataKeys.PSI_ELEMENT.getData(dataContext);
+		final BaseAnalysisActionDialog dlg = new BaseAnalysisActionDialog(AnalysisScopeBundle.message("specify.analysis.scope", "FindBugs Analyze"),
+				AnalysisScopeBundle.message("analysis.scope.title", "Analyze"),
+				project,
+				scope,
+				module != null && scope.getScopeType() != AnalysisScope.MODULE ? getModuleNameInReadAction(module) : null,
+				rememberScope, AnalysisUIOptions.getInstance(project), element) {
 
-		// check a project is loaded
-		if (isProjectNotLoaded(project, presentation)) {
-			Messages.showWarningDialog("Project not loaded.", "FindBugs");
+			@Override
+			protected void doHelpAction() {
+				HelpManager.getInstance().invokeHelp(getHelpTopic());
+			}
+
+			@SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+			@NotNull
+			@Override
+			protected Action[] createActions() {
+				return new Action[]{getOKAction(), getCancelAction(), getHelpAction()};
+			}
+		};
+		dlg.show();
+		if (!dlg.isOK()) {
 			return;
 		}
-
-		final FindBugsPreferences preferences = getPluginInterface(project).getPreferences();
-		if (preferences.getBugCategories().containsValue("true") && preferences.getDetectors().containsValue("true")) {
-			super.actionPerformed(e);
-		} else {
-			FindBugsPluginImpl.showToolWindowNotifier(project, "No bug categories or bug pattern detectors selected. analysis aborted.", MessageType.WARNING);
-			ShowSettingsUtil.getInstance().editConfigurable(project, IdeaUtilImpl.getPluginComponent(project));
+		final int oldScopeType = uiOptions.SCOPE_TYPE;
+		scope = dlg.getScope(uiOptions, scope, project, module);
+		if (!rememberScope) {
+			uiOptions.SCOPE_TYPE = oldScopeType;
 		}
+		uiOptions.ANALYZE_TEST_SOURCES = dlg.isInspectTestSources();
+		FileDocumentManager.getInstance().saveAllDocuments();
+
+		analyzeImpl(e, project, scope, preferences);
 	}
 
 
-	@Override
-	public void update(@NotNull final AnActionEvent event) {
-		try {
-			_dataContext = event.getDataContext();
-			final Project project = DataKeys.PROJECT.getData(_dataContext);
-			final Presentation presentation = event.getPresentation();
+	private void analyzeImpl(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project,
+			@NotNull final AnalysisScope scope,
+			@NotNull final FindBugsPreferences preferences
+	) {
 
-			if (isProjectNotLoaded(project, presentation)) {
-				return;
-			}
-			isPluginAccessible(project);
+		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
+		final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(e.getDataContext());
 
-			// check if tool window is registered
-			final ToolWindow toolWindow = isToolWindowRegistered(project);
-			if (toolWindow == null) {
-				presentation.setEnabled(false);
-				presentation.setVisible(false);
-				return;
-			}
-
-			MessageBusManager.subscribeAnalysisState(project, this, this);
-
-			if (!_running) {
-				_enabled = project.isInitialized() && project.isOpen();
-			}
-			presentation.setEnabled(toolWindow.isAvailable() && isEnabled());
-			presentation.setVisible(true);
-
-		} catch (final Throwable e) {
-			final FindBugsPluginException processed = FindBugsPluginImpl.processError("Action update failed", e);
-			LOGGER.error("Action update failed", processed);
-		}
-	}
-
-
-	@Override
-	protected void analyze(@NotNull final Project project, final AnalysisScope scope) {
-		final Module module = IdeaUtilImpl.getModule(_dataContext);
-		final FindBugsPreferences preferences = FindBugsPreferences.getPreferences(project, module);
 		new FindBugsStarter(project, "Running FindBugs analysis...", preferences) {
 			@Override
 			protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
-
-				final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(_dataContext);
 				findBugsProject.configureAuxClasspathEntries(indicator, files);
-
-				final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(_dataContext);
 				findBugsProject.configureSourceDirectories(indicator, sourceRoots);
-
 				indicator.setText("Collecting files for analysis...");
 				addClasses(indicator, project, scope, findBugsProject);
-
 			}
 		}.start();
-	}
-
-
-	protected boolean isRunning() {
-		return _running;
-	}
-
-
-	protected boolean setRunning(final boolean running) {
-		final boolean was = _running;
-		if (_running != running) {
-			_running = running;
-		}
-		return was;
-	}
-
-
-	@Override
-	protected boolean isEnabled() {
-		return _enabled;
-	}
-
-
-	@Override
-	protected boolean setEnabled(final boolean enabled) {
-		final boolean was = _enabled;
-		if (_enabled != enabled) {
-			_enabled = enabled;
-		}
-		return was;
 	}
 
 
@@ -209,23 +196,108 @@ public final class AnalyzeScopeFiles extends BaseAnalyzeAction implements Analys
 	}
 
 
-	@Override
-	public void analysisStarted() {
-		setEnabled(false);
-		setRunning(true);
+	@NonNls
+	private String getHelpTopic() {
+		return "reference.dialogs.analyzeDependencies.scope";
 	}
 
 
-	@Override
-	public void analysisAborted() {
-		setEnabled(true);
-		setRunning(false);
+	@Nullable
+	private AnalysisScope getInspectionScope(@NotNull final DataContext dataContext) {
+		if (PlatformDataKeys.PROJECT.getData(dataContext) == null) return null;
+
+		final AnalysisScope scope = getInspectionScopeImpl(dataContext);
+
+		return scope != null && scope.getScopeType() != AnalysisScope.INVALID ? scope : null;
 	}
 
 
-	@Override
-	public void analysisFinished(@NotNull BugCollection bugCollection, @Nullable FindBugsProject findBugsProject) {
-		setEnabled(true);
-		setRunning(false);
+	@Nullable
+	private AnalysisScope getInspectionScopeImpl(@NotNull final DataContext dataContext) {
+		//Possible scopes: file, directory, package, project, module.
+		final Project projectContext = PlatformDataKeys.PROJECT_CONTEXT.getData(dataContext);
+		if (projectContext != null) {
+			return new AnalysisScope(projectContext);
+		}
+
+		final AnalysisScope analysisScope = AnalyzeUtil.KEY.getData(dataContext);
+		if (analysisScope != null) {
+			return analysisScope;
+		}
+
+		final Module moduleContext = LangDataKeys.MODULE_CONTEXT.getData(dataContext);
+		if (moduleContext != null) {
+			return new AnalysisScope(moduleContext);
+		}
+
+		final Module [] modulesArray = LangDataKeys.MODULE_CONTEXT_ARRAY.getData(dataContext);
+		if (modulesArray != null) {
+			return new AnalysisScope(modulesArray);
+		}
+		final PsiFile psiFile = LangDataKeys.PSI_FILE.getData(dataContext);
+		if (psiFile != null && psiFile.getManager().isInProject(psiFile)) {
+			final VirtualFile file = psiFile.getVirtualFile();
+			if (file != null && file.isValid() && file.getFileType() instanceof ArchiveFileType && acceptNonProjectDirectories()) {
+				final VirtualFile jarRoot = JarFileSystem.getInstance().getJarRootForLocalFile(file);
+				if (jarRoot != null) {
+					final PsiDirectory psiDirectory = psiFile.getManager().findDirectory(jarRoot);
+					if (psiDirectory != null) {
+						return new AnalysisScope(psiDirectory);
+					}
+				}
+			}
+			return new AnalysisScope(psiFile);
+		}
+
+		final VirtualFile[] virtualFiles = PlatformDataKeys.VIRTUAL_FILE_ARRAY.getData(dataContext);
+		final Project project = PlatformDataKeys.PROJECT.getData(dataContext);
+		if (virtualFiles != null && project != null) { //analyze on selection
+			final ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
+			if (virtualFiles.length == 1) {
+				final PsiDirectory psiDirectory = PsiManager.getInstance(project).findDirectory(virtualFiles[0]);
+				if (psiDirectory != null && (acceptNonProjectDirectories() || psiDirectory.getManager().isInProject(psiDirectory))) {
+					return new AnalysisScope(psiDirectory);
+				}
+			}
+			final Set<VirtualFile> files = new HashSet<VirtualFile>();
+			for (VirtualFile vFile : virtualFiles) {
+				if (fileIndex.isInContent(vFile)) {
+					if (vFile instanceof VirtualFileWindow) {
+						files.add(vFile);
+						vFile = ((VirtualFileWindow)vFile).getDelegate();
+					}
+					collectFilesUnder(vFile, files);
+				}
+			}
+			return new AnalysisScope(project, files);
+		}
+		return project == null ? null : new AnalysisScope(project);
+	}
+
+
+	private boolean acceptNonProjectDirectories() {
+		return false;
+	}
+
+
+	private static void collectFilesUnder(@NotNull final VirtualFile vFile, @NotNull final Collection<VirtualFile> files) {
+		VfsUtilCore.visitChildrenRecursively(vFile, new VirtualFileVisitor() {
+			@Override
+			public boolean visitFile(@NotNull final VirtualFile file) {
+				if (!file.isDirectory()) {
+					files.add(file);
+				}
+				return true;
+			}
+		});
+	}
+
+
+	private static String getModuleNameInReadAction(@NotNull final Module module) {
+		return new ReadAction<String>() {
+			protected void run(@NotNull final Result<String> result) throws Throwable {
+				result.setResult(module.getName());
+			}
+		}.execute().getResultObject();
 	}
 }
