@@ -66,6 +66,6 @@ public final class StopAction extends AbstractAction {
 			@NotNull final FindBugsPreferences preferences
 	) {
 
-		MessageBusManager.publishAnalysisAborted(project);
+		MessageBusManager.publishAnalysisAborting(project);
 	}
 }

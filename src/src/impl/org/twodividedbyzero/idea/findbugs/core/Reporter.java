@@ -105,6 +105,23 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 	}
 
 
+	private boolean checkCancel() {
+		if (_canceled) {
+			return true;
+		}
+		if (_indicator.isCanceled()) {
+			cancelFindBugs();
+			return true;
+		}
+		if (_cancellingByUser.get()) {
+			cancelFindBugs();
+			_indicator.cancel();
+			return true;
+		}
+		return false;
+	}
+
+
 	@Override
 	protected void doReportBug(@NotNull final BugInstance bug) {
 		_bugCollection.add(bug);
@@ -196,7 +213,11 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 		_indicator.setText("Finished: Found " + _filteredBugCount + " bugs.");
 		_indicator.finishNonCancelableSection();
 
-		MessageBusManager.publishAnalysisFinishedToEDT(_project, getBugCollection(), _findBugsProject);
+		if (_canceled) {
+			MessageBusManager.publishAnalysisAbortedToEDT(_project);
+		} else {
+			MessageBusManager.publishAnalysisFinishedToEDT(_project, getBugCollection(), _findBugsProject);
+		}
 	}
 
 
@@ -208,16 +229,8 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 
 	@Override
 	public void observeClass(@NotNull final ClassDescriptor classDescriptor) {
-		if (_canceled) {
+		if (checkCancel()) {
 			return;
-		}
-
-		if (_indicator.isCanceled()) {
-			cancelFindBugs();
-			MessageBusManager.publishAnalysisAbortedToEDT(_project);
-		} else if (_cancellingByUser.get()) {
-			cancelFindBugs();
-			_indicator.cancel();
 		}
 
 		final String className = classDescriptor.getDottedClassName();
@@ -267,6 +280,7 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 	@Override
 	public void reportNumberOfArchives(final int numArchives) {
 		beginStage("Scanning archives: ", numArchives);
+		checkCancel(); // interrupt here has no effect, this is a FindBugs bug... bad for jumbo projects.
 	}
 
 

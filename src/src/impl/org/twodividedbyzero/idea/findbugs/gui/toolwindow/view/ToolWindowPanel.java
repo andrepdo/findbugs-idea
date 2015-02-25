@@ -75,7 +75,7 @@ import java.util.Map;
  */
 @SuppressWarnings({"HardCodedStringLiteral", "AnonymousInnerClass", "AnonymousInnerClassMayBeStatic"})
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SE_BAD_FIELD"})
-public class ToolWindowPanel extends JPanel implements AnalysisStateListener {
+public final class ToolWindowPanel extends JPanel implements AnalysisStateListener {
 
 	private static final Logger LOGGER = Logger.getInstance(ToolWindowPanel.class.getName());
 
@@ -284,9 +284,14 @@ public class ToolWindowPanel extends JPanel implements AnalysisStateListener {
 
 
 	@Override
+	public void analysisAborting() {
+	}
+
+
+	@Override
 	public void analysisAborted() {
 		_bugTreePanel.setBugCollection(null);
-		BalloonTipFactory.showToolWindowInfoNotifier(_project, "Analysis aborted...");
+		BalloonTipFactory.showToolWindowInfoNotifier(_project, "Analysis aborted");
 	}
 
 

@@ -24,5 +24,9 @@ package org.twodividedbyzero.idea.findbugs.messages;
  * @version $Revision: 364 $
  * @since 0.9.995
  */
-public interface AnalysisStateListener extends AnalysisStartedListener, AnalysisAbortedListener, AnalysisFinishedListener {
+public interface AnalysisStateListener extends
+		AnalysisStartedListener,
+		AnalysisAbortingListener,
+		AnalysisAbortedListener,
+		AnalysisFinishedListener {
 }

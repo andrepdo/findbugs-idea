@@ -35,6 +35,7 @@ import com.intellij.openapi.application.Result;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.help.HelpManager;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
@@ -181,6 +182,9 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 			scope.accept(new PsiRecursiveElementVisitor() {
 				@Override
 				public void visitFile(final PsiFile file) {
+					if (indicator.isCanceled() || FindBugsState.get(project).isAborting()) {
+						throw new ProcessCanceledException();
+					}
 					if (IdeaUtilImpl.SUPPORTED_FILE_TYPES.contains(file.getFileType())) {
 						final VirtualFile vf = file.getVirtualFile();
 						outputFiles.add(vf.getPath());

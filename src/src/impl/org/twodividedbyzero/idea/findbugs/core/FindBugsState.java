@@ -36,19 +36,20 @@ public enum FindBugsState {
 
 	Cleared,
 	Started,
+	Aborting,
 	Aborted,
 	Finished;
 
 	private static final Map<Project, FindBugsState> _stateByProject = New.concurrentMap();
 
 
-	public boolean isCleared() {
-		return Cleared.equals(this);
+	public boolean isStarted() {
+		return Started.equals(this);
 	}
 
 
-	public boolean isStarted() {
-		return Started.equals(this);
+	public boolean isAborting() {
+		return Aborting.equals(this);
 	}
 
 
@@ -63,7 +64,7 @@ public enum FindBugsState {
 
 
 	public boolean isIdle() {
-		return !isStarted();
+		return !isStarted() && !isAborting();
 	}
 
 

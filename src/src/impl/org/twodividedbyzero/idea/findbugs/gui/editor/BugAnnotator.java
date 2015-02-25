@@ -72,7 +72,7 @@ public final class BugAnnotator implements Annotator {
 		if (!plugin.getPreferences().isAnnotationTextRangeMarkupEnabled()) {
 			return;
 		}
-		if (FindBugsState.get(project).isStarted()) {
+		if (!FindBugsState.get(project).isIdle()) {
 			return;
 		}
 		final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = plugin.getProblems();

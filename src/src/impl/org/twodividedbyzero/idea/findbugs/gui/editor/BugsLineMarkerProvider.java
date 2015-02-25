@@ -76,7 +76,7 @@ public final class BugsLineMarkerProvider implements LineMarkerProvider {
 		if (! pluginComponent.getPreferences().isAnnotationGutterIconEnabled()) {
 			return null;
 		}
-		if(FindBugsState.get(project).isStarted()) {
+		if(!FindBugsState.get(project).isIdle()) {
 			return null;
 		}
 

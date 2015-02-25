@@ -21,6 +21,7 @@ package org.twodividedbyzero.idea.findbugs.core;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
@@ -37,7 +38,7 @@ import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
-import org.twodividedbyzero.idea.findbugs.messages.AnalysisAbortedListener;
+import org.twodividedbyzero.idea.findbugs.messages.AnalysisAbortingListener;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -53,7 +54,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @version $Revision: 369 $
  * @since 0.9.995
  */
-public abstract class FindBugsStarter implements AnalysisAbortedListener {
+public abstract class FindBugsStarter implements AnalysisAbortingListener {
 
 	private static final Logger LOGGER = Logger.getInstance(FindBugsStarter.class.getName());
 
@@ -79,7 +80,7 @@ public abstract class FindBugsStarter implements AnalysisAbortedListener {
 		_startInBackground = preferences.getBooleanProperty(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND, false) || forceStartInBackground;
 		_findBugsPlugin = IdeaUtilImpl.getPluginComponent(_project);
 		_cancellingByUser = new AtomicBoolean();
-		MessageBusManager.subscribe(project, this, AnalysisAbortedListener.TOPIC, this);
+		MessageBusManager.subscribe(project, this, AnalysisAbortingListener.TOPIC, this);
 	}
 
 
@@ -98,7 +99,11 @@ public abstract class FindBugsStarter implements AnalysisAbortedListener {
 			public void run(@NotNull final ProgressIndicator indicator) {
 				indicator.setIndeterminate(true);
 				indicator.setText("Configure FindBugs...");
-				asyncStart(indicator);
+				try {
+					asyncStart(indicator);
+				} catch (ProcessCanceledException e) {
+					MessageBusManager.publishAnalysisAbortedToEDT(_project);
+				}
 			}
 			@Override
 			public boolean shouldStartInBackground() {
@@ -178,7 +183,7 @@ public abstract class FindBugsStarter implements AnalysisAbortedListener {
 
 
 	@Override
-	public void analysisAborted() {
+	public void analysisAborting() {
 		_cancellingByUser.set(true);
 	}
 

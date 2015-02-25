@@ -63,6 +63,7 @@ public final class MessageBusManager {
 
 	public static <L extends AnalysisStateListener> void subscribeAnalysisState(@NotNull final Project project, @NotNull final Object subscriber, @NotNull final L handler) {
 		subscribe(project, subscriber, AnalysisStartedListener.TOPIC, handler);
+		subscribe(project, subscriber, AnalysisAbortingListener.TOPIC, handler);
 		subscribe(project, subscriber, AnalysisAbortedListener.TOPIC, handler);
 		subscribe(project, subscriber, AnalysisFinishedListener.TOPIC, handler);
 	}
@@ -116,10 +117,10 @@ public final class MessageBusManager {
 	}
 
 
-	public static void publishAnalysisAborted(@NotNull final Project project) {
+	public static void publishAnalysisAborting(@NotNull final Project project) {
 		EventDispatchThreadHelper.checkEDT();
-		FindBugsState.set(project, FindBugsState.Aborted);
-		publish(project, AnalysisAbortedListener.TOPIC).analysisAborted();
+		FindBugsState.set(project, FindBugsState.Aborting);
+		publish(project, AnalysisAbortingListener.TOPIC).analysisAborting();
 	}
 
 
