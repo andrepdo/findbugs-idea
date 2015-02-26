@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -19,14 +19,18 @@
 
 package org.twodividedbyzero.idea.findbugs.collectors;
 
-import com.intellij.openapi.diagnostic.Logger;
+
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.progress.ProcessCanceledException;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.Set;
 
 
 /**
@@ -36,52 +40,57 @@ import java.util.Set;
  * @version $Revision$
  * @since 0.0.1
  */
-public class RecurseFileCollector implements FileFilter {
+public final class RecurseFileCollector implements FileFilter {
 
-	private static final Logger LOGGER = Logger.getInstance(RecurseFileCollector.class.getName());
-
+	private final Project _project;
+	private final ProgressIndicator _indicator;
 	private final FindBugsProject _findBugsProject;
-	private Set<String> _classes;
+	private final int[] _count;
 
 
-	private RecurseFileCollector(final FindBugsProject findBugsProject) {
+	private RecurseFileCollector(
+			@NotNull final Project project,
+			@NotNull final ProgressIndicator indicator,
+			@NotNull final FindBugsProject findBugsProject,
+			@NotNull int[] count
+	) {
+		_project = project;
+		_indicator = indicator;
 		_findBugsProject = findBugsProject;
+		_count = count;
 	}
 
-
-	public boolean accept(final File file) {
-		if (file.isDirectory()) {
-			addFiles(_findBugsProject, file);
+	@Override
+	public boolean accept(final File path) {
+		if (path.isDirectory()) {
+			if (_indicator.isCanceled() || FindBugsState.get(_project).isAborting()) {
+				throw new ProcessCanceledException();
+			}
+			//noinspection ResultOfMethodCallIgnored
+			path.listFiles(this);
 		} else {
 			// add the classes to the list of files to be analysed
-			final FileType type = IdeaUtilImpl.getFileTypeByName(file.getName());
+			final FileType type = IdeaUtilImpl.getFileTypeByName(path.getName());
 			if (IdeaUtilImpl.isValidFileType(type)) {
-				final String filePath = file.getAbsolutePath();
+				final String filePath = path.getAbsolutePath();
+				_indicator.setText2("Files collected: " + ++_count[0]);
 				_findBugsProject.addFile(filePath);
-				LOGGER.debug("adding class file: " + filePath);
 			}
 		}
 		return false;
 	}
 
 
-	/**
-	 * recurse add all the files matching given name pattern inside the given directory
-	 * and all subdirectories
-	 *
-	 * @param findBugsProject
-	 * @param classesDir
-	 */
-	// TODO: STARTING POINT
-	public static void addFiles(final FindBugsProject findBugsProject, final File classesDir) {
+	public static void addFiles(
+			@NotNull final Project project,
+			@NotNull final ProgressIndicator indicator,
+			@NotNull final FindBugsProject findBugsProject,
+			@NotNull final File classesDir,
+			@NotNull final int[] count
+	) {
 		if (classesDir.isDirectory()) {
-			classesDir.listFiles(new RecurseFileCollector(findBugsProject));
+			//noinspection ResultOfMethodCallIgnored
+			classesDir.listFiles(new RecurseFileCollector(project, indicator, findBugsProject, count));
 		}
-	}
-
-
-	@SuppressWarnings({"ReturnOfCollectionOrArrayField"})
-	public Set<String> getResult() {
-		return _classes;
 	}
 }

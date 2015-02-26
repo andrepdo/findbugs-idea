@@ -49,12 +49,6 @@ public class FindBugsProject extends Project {
 	private List<String> _outputFiles;
 
 
-	public void configureSourceDirectories(final VirtualFile file) {
-		final VirtualFile[] files = {file};
-		configureSourceDirectories(files);
-	}
-
-
 	public void configureSourceDirectories(@NotNull final ProgressIndicator indicator, @NotNull final Collection<VirtualFile> sourceDirs) {
 		indicator.setText("Configure source directories...");
 		for (final VirtualFile file : sourceDirs) {
@@ -72,11 +66,6 @@ public class FindBugsProject extends Project {
 
 	public void configureSourceDirectories(@NotNull final ProgressIndicator indicator, @NotNull final VirtualFile[] sourceDirs) {
 		indicator.setText("Configure source directories...");
-		configureSourceDirectories(sourceDirs);
-	}
-
-
-	public void configureSourceDirectories(@NotNull final VirtualFile[] sourceDirs) {
 		for (final VirtualFile file : sourceDirs) {
 			if (IdeaUtilImpl.isValidFileType(file.getFileType())) {
 				final VirtualFile parent = file.getParent();
@@ -142,30 +131,26 @@ public class FindBugsProject extends Project {
 	}
 
 
-	public void configureOutputFiles(final VirtualFile selectedPackage, final com.intellij.openapi.project.Project project) {
-		final VirtualFile path = IdeaUtilImpl.getCompilerOutputPath(selectedPackage, project);
-		assert path != null;
-		_outputFiles = Arrays.asList(path.getPath());
-		RecurseFileCollector.addFiles(this, new File(selectedPackage.getPath()));
-	}
-
-
-	public void configureOutputFiles(@NotNull final String path) {
+	public void configureOutputFiles(@NotNull final com.intellij.openapi.project.Project project, @NotNull ProgressIndicator indicator, @NotNull final String path) {
 		final VirtualFile fileByPath = IdeaUtilImpl.findFileByPath(path);
 		if (fileByPath != null) {
 			_outputFiles = Arrays.asList(fileByPath.getPath());
 		} else {
 			LOGGER.error("Could not configure outputFiles! path=" + path);
 		}
-		RecurseFileCollector.addFiles(this, new File(path));
+		indicator.setText("Collecting files for analysis...");
+		final int[] count = new int[1];
+		RecurseFileCollector.addFiles(project, indicator, this, new File(path), count);
 	}
 
 
-	public void configureOutputFiles(@NotNull final Iterable<String> paths) {
+	public void configureOutputFiles(@NotNull final com.intellij.openapi.project.Project project, @NotNull ProgressIndicator indicator, @NotNull final String[] paths) {
 		_outputFiles = new ArrayList<String>();
+		indicator.setText("Collecting files for analysis...");
+		final int[] count = new int[1];
 		for (final String path : paths) {
 			_outputFiles.add(path);
-			addFile(path);
+			RecurseFileCollector.addFiles(project, indicator, this, new File(path), count);
 		}
 	}
 

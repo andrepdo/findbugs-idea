@@ -97,7 +97,7 @@ public final class AnalyzePackageFiles extends AbstractAnalyzeAction {
 				protected void configure(@NotNull ProgressIndicator indicator, @NotNull FindBugsProject findBugsProject) {
 					findBugsProject.configureAuxClasspathEntries(indicator, files);
 					findBugsProject.configureSourceDirectories(indicator, sourceRoots);
-					findBugsProject.configureOutputFiles(output);
+					findBugsProject.configureOutputFiles(project, indicator, output);
 				}
 			}.start();
 
