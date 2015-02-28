@@ -41,7 +41,7 @@ public class VersionManager {
 
 	private static final long _major = 0;
 	private static final long _minor = 9;
-	private static final long _build = 994;
+	private static final long _build = 995;
 
 	private static final String _branch = "trunk";
 	private static final String rev = "$Revision$";

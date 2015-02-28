@@ -87,15 +87,16 @@
         <![CDATA[<html>
         <h3>0.9.995</h3>
         <ul>
-            <li>Bundle with FindBugs 3.0.1-rc1 compiled with JDK 6</li>
+            <li>Bundle with FindBugs 3.0.1-rc2 compiled with JDK 6</li>
             <li>Issue 31: X-button should clear UI</li>
             <li>Issue 78: avoid assertion error</li>
             <li>Issue 87: support -Didea.is.internal=true</li>
             <li>Support analyze after auto make (replacement for the inspection)</li>
             <li>Basic Scala, Groovy and AspectJ support</li>
             <li>Update bundled custom plugin find-sec-bugs 1.3.0</li>
-            <li>Plugin compatibility: IDEA 13.0 (133.193) until the latest IDEA 14 release (140.2285)</li>
+            <li>Plugin compatibility: IDEA 13.0 (133.193) until the latest IDEA 14 release (140.2683.2)</li>
             <li>Note that IDEA 12.x is no longer supported</li>
+            <li>Minor fixes, cleanups and improvements</li>
         </ul>
         <h3>0.9.994</h3>
         <ul>
