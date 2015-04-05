@@ -694,8 +694,12 @@ public final class IdeaUtilImpl {
 
 	@Nullable
 	public static Module getModule(@NotNull final DataContext dataContext) {
-		final Project project = getProject(dataContext);
-		//final VirtualFile file = getVirtualFile(dataContext);
+		return getModule(dataContext, getProject(dataContext));
+	}
+
+
+	@Nullable
+	public static Module getModule(@NotNull final DataContext dataContext, @NotNull final Project project) {
 		final VirtualFile selectedFile = getSelectedFile(dataContext);
 		Module module = null;
 		if (selectedFile != null) {
@@ -708,15 +712,12 @@ public final class IdeaUtilImpl {
 
 		if (module == null) {
 			final Module[] modules = getModules(project);
-			if (modules.length < 1) {
-				throw new FindBugsPluginException("You have no modules configured inside your project (" + project + ')');
+			if (modules.length > 0) {
+				module = modules[0];
 			}
-			module = modules[0];
 		}
 
 		return module;
-		//return com.intellij.openapi.vfs.VfsUtil.getModuleForFile(project, file);
-		//PsiClass.getContainingFile().getVirtualFile()
 	}
 
 

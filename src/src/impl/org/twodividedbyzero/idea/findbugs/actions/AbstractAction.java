@@ -62,7 +62,7 @@ abstract class AbstractAction extends AnAction {
 			e.getPresentation().setVisible(false);
 			return;
 		}
-		final Module module = IdeaUtilImpl.getModule(e.getDataContext());
+		final Module module = IdeaUtilImpl.getModule(e.getDataContext(), project);
 		final FindBugsPreferences preferences = FindBugsPreferences.getPreferences(project, module);
 		updateImpl(
 				e,

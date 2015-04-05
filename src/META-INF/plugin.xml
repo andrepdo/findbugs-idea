@@ -85,6 +85,10 @@
     </description>
     <change-notes>
         <![CDATA[<html>
+        <h3>0.9.996</h3>
+        <ul>
+            <li>Issue 90: fix open maven project (POM file)</li>
+        </ul>
         <h3>0.9.995</h3>
         <ul>
             <li>Bundle with FindBugs 3.0.1-rc2 compiled with JDK 6</li>
