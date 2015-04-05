@@ -93,6 +93,7 @@
             <li>Issue 91: make BugInstance.writeXML more robust (patched FindBugs)</li>
             <li>Issue 92: fix possible NPE on regroup while analysis is running</li>
             <li>Issue 95: fix error caused by TypeQualifier detector (patched FindBugs)</li>
+            <li>Update bundled custom plugin find-sec-bugs 1.4.0</li>
         </ul>
         <h3>0.9.995</h3>
         <ul>
