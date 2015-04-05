@@ -19,6 +19,7 @@
 package org.twodividedbyzero.idea.findbugs.gui.tree.view;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -97,6 +98,7 @@ abstract class QuickSearch<E> {
 	private JLayeredPane _layerPane;
 	private SearchPopup _popup;
 	private RecentSearchesPopup _recentSearchesPopup;
+	private JComponent _owner;
 	private JComponent _component;
 	private Color _noMatchForeground;
 	private KeyListener _keyListener;
@@ -115,6 +117,7 @@ abstract class QuickSearch<E> {
 
 	final void installImpl(@NotNull final JComponent component) {
 		_component = component;
+		_owner = component;
 		installListeners();
 	}
 
@@ -156,11 +159,6 @@ abstract class QuickSearch<E> {
 	abstract void setSelectedElement(final int index);
 
 
-	final void setComponent(final JComponent component) {
-		_component = component;
-	}
-
-
 	private SearchPopup createSearchPopup(final String searchText) {
 		return new SearchPopup(searchText);
 	}
@@ -192,21 +190,7 @@ abstract class QuickSearch<E> {
 
 			@Override
 			public void focusLost(final FocusEvent focusevent) {
-				//final Component component = focusevent.getOppositeComponent();
-
-				/*if(component != null) {
-					final Container parent = component.getParent();
-					if(parent != null && QuickSearch.NavigationToolBar.class.isInstance(parent)) {
-						_component.requestFocus();
-						focusevent.setSource(_component);
-						focusGained(focusevent);
-						return;
-					}
-				}*/
-
-				_searchActivated = false;
 				hidePopup();
-
 			}
 		};
 	}
@@ -257,15 +241,23 @@ abstract class QuickSearch<E> {
 
 			if (e.getKeyCode() != KeyEvent.VK_ENTER) {
 				_popup.processKeyEvent(e);
-				//_popup.getSearchField().processKeyEvent(e);
 				e.consume();
 			}
+		} else if (isDeactivationKey(e)) {
+			hidePopup();
+			IdeFocusManager.findInstance().doWhenFocusSettlesDown(new Runnable() {
+				@Override
+				public void run() {
+					IdeFocusManager.findInstance().requestFocus(_owner, true);
+				}
+			});
 		}
 	}
 
 
 	final void showPopup(final String text) {
-		//final JRootPane rootPane = _component.getRootPane();
+		hidePopup();
+		_searchActivated = true;
 		final JComponent component = (JComponent) GuiUtil.getScrollPane(_component);
 		if (component != null) {
 			_component = component;
@@ -295,17 +287,15 @@ abstract class QuickSearch<E> {
 
 	@SuppressWarnings({"AssignmentToNull"})
 	protected void hidePopup() {
+		_searchActivated = false;
 		if (_layerPane != null && _popup != null) {
 			hideRecentSearchesPopup();
-			//final Rectangle bounds = _popup.getBounds();
 			_layerPane.remove(_popup);
-			//_layerPane.repaint(bounds.x, bounds.y, bounds.width, bounds.height);
 			_layerPane.validate();
 			_layerPane.repaint();
 			_layerPane = null;
 			_popup = null;
 			setCursor(-1);
-			//_component.requestFocusInWindow();
 		}
 	}
 
@@ -337,16 +327,16 @@ abstract class QuickSearch<E> {
 
 
 	private static boolean isNavigationKey(final KeyEvent e) {
-		return isFindNextOccurenceKey(e) || isFindPreviousOccurenceKey(e);
+		return isFindNextOccurrenceKey(e) || isFindPreviousOccurrenceKey(e);
 	}
 
 
-	private static boolean isFindNextOccurenceKey(final KeyEvent e) {
+	private static boolean isFindNextOccurrenceKey(final KeyEvent e) {
 		return e.getKeyCode() == KeyEvent.VK_F3;
 	}
 
 
-	private static boolean isFindPreviousOccurenceKey(final KeyEvent e) {
+	private static boolean isFindPreviousOccurrenceKey(final KeyEvent e) {
 		return e.getKeyCode() == KeyEvent.VK_F3 && e.getModifiersEx() == InputEvent.SHIFT_DOWN_MASK;
 	}
 
@@ -462,7 +452,7 @@ abstract class QuickSearch<E> {
 	}
 
 
-	public int findNextOccurence(final String text) {
+	private int findNextOccurrence(final String text) {
 		final int count = getElementCount();
 		if (count == 0) {
 			return !text.isEmpty() ? -1 : 0;
@@ -479,7 +469,7 @@ abstract class QuickSearch<E> {
 	}
 
 
-	public int findPreviousOccurence(final String text) {
+	private int findPreviousOccurrence(final String text) {
 		final int count = getElementCount();
 		if (count == 0) {
 			return !text.isEmpty() ? -1 : 0;
@@ -562,30 +552,16 @@ abstract class QuickSearch<E> {
 
 			if (isDeactivationKey(e) && !isNavigationKey) {
 				hidePopup();
-				//_component.setRequestFocusEnabled(true);
-				//_component.requestFocusInWindow();
 				e.consume();
 				return;
 			}
 
-			if (keyCode == KeyEvent.VK_BACK_SPACE || isNavigationKey) {
+			if (isNavigationKey) {
 				e.consume();
 			}
 
 			super.processKeyEvent(e);
 		}
-
-
-		/*private void handleBackspace() {
-			final int caretPos = getCaretPosition();
-			final String temp = getText();
-			if (caretPos > 1) {
-				setText(temp.substring(0, caretPos - 1) + (caretPos < temp.length() ? temp.substring(caretPos, temp.length()) : ""));
-			} else {
-				setText("" + (caretPos < temp.length() ? temp.substring(caretPos, temp.length()) : ""));
-			}
-			setCaretPosition(caretPos - 1);
-		}*/
 	}
 
 
@@ -743,11 +719,11 @@ abstract class QuickSearch<E> {
 				boolean foundPrev = true;
 				boolean foundNext = true;
 
-				if (isFindNextOccurenceKey(e) && !isFindPreviousOccurenceKey(e)) {
-					found = findNextOccurence(text);
+				if (isFindNextOccurrenceKey(e) && !isFindPreviousOccurrenceKey(e)) {
+					found = findNextOccurrence(text);
 					foundNext = found > 1;
-				} else if (isFindPreviousOccurenceKey(e)) {
-					found = findPreviousOccurence(text);
+				} else if (isFindPreviousOccurrenceKey(e)) {
+					found = findPreviousOccurrence(text);
 					foundPrev = found > -1;
 				}
 
@@ -820,7 +796,7 @@ abstract class QuickSearch<E> {
 			setRollover(false);
 			setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
-			final AbstractBar.AbstractComponentAction prevAction = new AbstractComponentAction("Previous Occurence", "Previous Occurence (Ctrl+F3)", KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK, KeyEvent.VK_F3) {
+			final AbstractBar.AbstractComponentAction prevAction = new AbstractComponentAction("Previous Occurrence", "Previous Occurrence (Ctrl+F3)", KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK, KeyEvent.VK_F3) {
 				private static final long serialVersionUID = 0L;
 
 
@@ -832,7 +808,7 @@ abstract class QuickSearch<E> {
 			add(_prevButton);
 
 
-			final AbstractBar.AbstractComponentAction nextAction = new AbstractComponentAction("Next Occurence", "Next Occurence (Ctrl+F3)", KeyEvent.VK_F3, 0, KeyEvent.VK_F3) {
+			final AbstractBar.AbstractComponentAction nextAction = new AbstractComponentAction("Next Occurrence", "Next Occurrence (F3)", KeyEvent.VK_F3, 0, KeyEvent.VK_F3) {
 				private static final long serialVersionUID = 0L;
 
 
@@ -1012,7 +988,6 @@ abstract class QuickSearch<E> {
 
 
 	private void showRecentSearchesPopup() {
-		//final JRootPane rootPane = _component.getRootPane();
 		final JComponent component = (JComponent) GuiUtil.getScrollPane(_component);
 		if (component != null) {
 			_component = component;
