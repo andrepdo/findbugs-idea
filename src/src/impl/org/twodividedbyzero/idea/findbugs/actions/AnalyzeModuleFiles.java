@@ -86,7 +86,7 @@ public final class AnalyzeModuleFiles extends AbstractAnalyzeAction {
 		final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(e.getDataContext());
 		final VirtualFile compilerOutputPath = IdeaUtilImpl.getCompilerOutputPath(module);
 		if (compilerOutputPath == null) {
-			FindBugsPluginImpl.showToolWindowNotifier(project, "No compiler output path for current module. Check your module/project settings", MessageType.WARNING);
+			FindBugsPluginImpl.showToolWindowNotifier(project, "Module not yet compiled", MessageType.INFO);
 			return;
 		}
 		final String outPath = compilerOutputPath.getPresentableUrl();
