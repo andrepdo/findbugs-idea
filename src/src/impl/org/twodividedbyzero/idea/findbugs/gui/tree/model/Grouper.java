@@ -83,7 +83,7 @@ class Grouper<T> {
 	 * @see org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator
 	 * @see Grouper.GrouperCallback
 	 */
-	public synchronized void group(final T comparable, final List<Comparator<T>> comparators) {
+	public void group(final T comparable, final List<Comparator<T>> comparators) {
 
 		int depth = -1;
 		int index = -1;

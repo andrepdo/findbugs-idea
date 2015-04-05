@@ -22,6 +22,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import edu.umd.cs.findbugs.BugInstance;
+import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
@@ -32,12 +33,14 @@ import org.twodividedbyzero.idea.findbugs.gui.tree.model.Grouper.GrouperCallback
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ConcurrentMap;
 
 
 /**
@@ -47,24 +50,23 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @version $Revision$
  * @since 0.0.1
  */
-public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> implements GrouperCallback<BugInstance> {
+public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode, RootNode> implements GrouperCallback<BugInstance> {
 
 	private static final Logger LOGGER = Logger.getInstance(GroupTreeModel.class.getName());
 
 	private GroupBy[] _groupBy;
 	private final transient Map<String, Map<Integer, List<BugInstanceGroupNode>>> _groups;
 	private transient Grouper<BugInstance> _grouper;
-	private final AtomicInteger _bugCount;
-	private final transient Map<PsiFile, List<ExtendedProblemDescriptor>> _problems;
+	private int _bugCount;
+	private final transient ConcurrentMap<PsiFile, List<ExtendedProblemDescriptor>> _problems;
 	private final transient Project _project;
 
 
-	public GroupTreeModel(final VisitableTreeNode root, final GroupBy[] groupBy, final Project project) {
+	public GroupTreeModel(@NotNull final RootNode root, final GroupBy[] groupBy, final Project project) {
 		_root = root;
 		_project = project;
-		_bugCount = new AtomicInteger(0);
 		_groupBy = groupBy.clone();
-		_groups = new ConcurrentHashMap<String, Map<Integer, List<BugInstanceGroupNode>>>();
+		_groups = new HashMap<String, Map<Integer, List<BugInstanceGroupNode>>>();
 		_problems = new ConcurrentHashMap<PsiFile, List<ExtendedProblemDescriptor>>();
 	}
 
@@ -76,17 +78,18 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 
 	private void addGroupIfAbsent(final String groupNameKey, final int depth, final BugInstanceGroupNode groupNode) {
 		if (!_groups.containsKey(groupNameKey)) {
-			final Map<Integer, List<BugInstanceGroupNode>> map = new ConcurrentHashMap<Integer, List<BugInstanceGroupNode>>();
+			final Map<Integer, List<BugInstanceGroupNode>> map = new HashMap<Integer, List<BugInstanceGroupNode>>();
 			_groups.put(groupNameKey, map);
-			final List<BugInstanceGroupNode> groupNodes = _addGroupIfAbsent(groupNameKey, depth, groupNode);
+			final List<BugInstanceGroupNode> groupNodes = addGroupIfAbsentImpl(groupNameKey, depth, groupNode);
 			map.put(depth, groupNodes);
 		} else {
-			_addGroupIfAbsent(groupNameKey, depth, groupNode);
+			addGroupIfAbsentImpl(groupNameKey, depth, groupNode);
 		}
 	}
 
 
-	private List<BugInstanceGroupNode> _addGroupIfAbsent(final String groupNameKey, final int depth, final BugInstanceGroupNode groupNode) {
+	@NotNull
+	private List<BugInstanceGroupNode> addGroupIfAbsentImpl(final String groupNameKey, final int depth, final BugInstanceGroupNode groupNode) {
 		final Map<Integer, List<BugInstanceGroupNode>> map = _groups.get(groupNameKey);
 
 		if (map.containsKey(depth)) {
@@ -132,7 +135,8 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 
 
 	public int getBugCount() {
-		return _bugCount.get();
+		EventDispatchThreadHelper.checkEDT();
+		return _bugCount;
 	}
 
 
@@ -141,7 +145,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 		/*if(isHiddenBugGroup(bugInstance)) {
 			return;
 		}*/
-		_bugCount.getAndIncrement();
+		_bugCount++;
 		group(bugInstance);
 	}
 
@@ -164,7 +168,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 
 		addGroupIfAbsent(Arrays.toString(BugInstanceUtil.getGroupPath(member, depth, _groupBy)), depth, groupNode);
 
-		((AbstractTreeNode<VisitableTreeNode>) _root).addChild(groupNode);
+		_root.addChild(groupNode);
 		nodeStructureChanged(_root);
 
 		startSubGroup(depth + 1, member, member);
@@ -175,7 +179,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 		EventDispatchThreadHelper.assertInEDTorADT();
 
 		String groupName = GroupBy.getGroupName(_groupBy[depth - 1], member);
-		final BugInstanceGroupNode parentGroup = ((RootNode) _root).findChildNode(parent, depth - 1, groupName);
+		final BugInstanceGroupNode parentGroup = _root.findChildNode(parent, depth - 1, groupName);
 
 		//final BugInstanceGroupNode parentGroup = ((RootNode) _root).getChildByBugInstance(parent, depth - 1);
 		//final BugInstanceGroupNode parentGroup = ((RootNode) _root).getChildByGroupName(GroupBy.getGroupName(_groupBy[depth - 1], parent), depth - 1);
@@ -210,7 +214,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 		EventDispatchThreadHelper.checkEDT();
 
 		final String groupName = GroupBy.getGroupName(_groupBy[depth], member);
-		final BugInstanceGroupNode parentGroup = ((RootNode) _root).findChildNode(parent, depth, groupName);
+		final BugInstanceGroupNode parentGroup = _root.findChildNode(parent, depth, groupName);
 
 		if (parentGroup != null) {
 			final BugInstanceNode childNode = new BugInstanceNode(member, parentGroup, _project);
@@ -229,6 +233,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 	}
 
 
+	@Override
 	public List<BugInstance> availableGroups(final int depth, final BugInstance bugInstance) {
 		final List<BugInstance> result = new ArrayList<BugInstance>();
 
@@ -263,13 +268,13 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 
 
 	public void clear() {
-		EventDispatchThreadHelper.assertInEDTorADT();
+		EventDispatchThreadHelper.checkEDT();
 
 		//_sortedCollection.clear();
-		_bugCount.set(0);
+		_bugCount = 0;
 		_groups.clear();
 		_problems.clear();
-		((AbstractTreeNode<VisitableTreeNode>) _root).removeAllChilds();
+		_root.removeAllChilds();
 		nodeStructureChanged(_root);
 		reload();
 
@@ -299,6 +304,12 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode> impleme
 
 
 		return null;
+	}
+
+
+	@NotNull
+	public Collection<BugInstance> getBugInstances() {
+		return _root.getAllChildBugInstances();
 	}
 
 

@@ -21,6 +21,7 @@ package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 
 import com.intellij.ui.JBColor;
 import edu.umd.cs.findbugs.BugInstance;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.gui.tree.NodeVisitor;
 import org.twodividedbyzero.idea.findbugs.gui.tree.RecurseNodeVisitor;
@@ -170,6 +171,7 @@ public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements Vis
 	}
 
 
+	@NotNull
 	public List<BugInstance> getChildBugInstances() {
 		final List<BugInstance> list = new ArrayList<BugInstance>();
 
@@ -184,6 +186,7 @@ public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements Vis
 	}
 
 
+	@NotNull
 	public List<BugInstance> getAllChildBugInstances() {
 		final List<BugInstance> list = new ArrayList<BugInstance>();
 

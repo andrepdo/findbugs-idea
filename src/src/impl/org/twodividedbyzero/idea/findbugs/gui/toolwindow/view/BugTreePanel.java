@@ -112,10 +112,7 @@ public class BugTreePanel extends JPanel {
 	}
 
 
-	void addNode(final BugInstance bugInstance) {
-		if (bugInstance == null) {
-			return;
-		}
+	void addNode(@NotNull final BugInstance bugInstance) {
 		/*if(isHiddenBugGroup(bugInstance)) {
 			return;
 		}*/
@@ -335,13 +332,23 @@ public class BugTreePanel extends JPanel {
 
 
 	private void regroupTree() {
+		EventDispatchThreadHelper.checkEDT();
 		if (_bugCollection != null) {
 			final Collection<BugInstance> instanceCollection = _bugCollection.getCollection();
 			if (instanceCollection != null && !instanceCollection.isEmpty()) {
 				_treeModel.clear();
 				for (final BugInstance bugInstance : instanceCollection) {
-					addNode(bugInstance);
+					if (bugInstance != null) {
+						addNode(bugInstance);
+					}
 				}
+			}
+		} else {
+			// may be a analysis is running, we need to regroup existing nodes
+			final Collection<BugInstance> existing = _treeModel.getBugInstances();
+			_treeModel.clear();
+			for (final BugInstance bugInstance : existing) {
+				addNode(bugInstance);
 			}
 		}
 	}

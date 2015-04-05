@@ -43,10 +43,10 @@ import java.lang.reflect.Array;
  * @param <N> the type of objects that can be used as nodes.
  * @see DefaultTreeModel
  */
-public abstract class AbstractTreeModel<N extends TreeNode> implements TreeModel {
+public abstract class AbstractTreeModel<N extends TreeNode, R extends N> implements TreeModel {
 
 	/** Root of the tree. */
-	protected N _root;
+	protected R _root;
 
 	/** Listeners. */
 	protected final EventListenerList _treeModelListeners = new EventListenerList();
