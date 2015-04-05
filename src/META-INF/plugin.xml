@@ -94,6 +94,7 @@
             <li>Issue 92: fix possible NPE on regroup while analysis is running</li>
             <li>Issue 95: fix error caused by TypeQualifier detector (patched FindBugs)</li>
             <li>Update bundled custom plugin find-sec-bugs 1.4.0</li>
+            <li>Plugin compatibility: IDEA 13.0 (133.193) until the latest IDEA 14 EA (141.498.1)</li>
             <li>Minor fixes, cleanups and improvements</li>
         </ul>
         <h3>0.9.995</h3>
