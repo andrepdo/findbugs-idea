@@ -87,7 +87,10 @@
         <![CDATA[<html>
         <h3>0.9.996</h3>
         <ul>
+            <li>Bundle with patched FindBugs 3.0.1 (compiled with JDK 6)</li>
             <li>Issue 90: fix open maven project (POM file)</li>
+            <li>Issue 91: make BugInstance.writeXML more robust (patched FindBugs)</li>
+            <li>Issue 95: fix error caused by TypeQualifier detector (patched FindBugs)</li>
         </ul>
         <h3>0.9.995</h3>
         <ul>
