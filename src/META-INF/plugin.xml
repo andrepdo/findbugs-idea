@@ -88,6 +88,7 @@
         <h3>0.9.996</h3>
         <ul>
             <li>Bundle with patched FindBugs 3.0.1 (compiled with JDK 6)</li>
+            <li>Issue 79: fix possible AE on "Suppress for class"</li>
             <li>Issue 90: fix open maven project (POM file)</li>
             <li>Issue 91: make BugInstance.writeXML more robust (patched FindBugs)</li>
             <li>Issue 92: fix possible NPE on regroup while analysis is running</li>

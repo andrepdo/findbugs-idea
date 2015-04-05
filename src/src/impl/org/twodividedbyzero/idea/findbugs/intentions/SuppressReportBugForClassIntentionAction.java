@@ -46,7 +46,7 @@ public class SuppressReportBugForClassIntentionAction extends SuppressReportBugI
 	@Nullable
 	protected PsiDocCommentOwner getContainer(final PsiElement element) {
 		PsiDocCommentOwner container = super.getContainer(element);
-		if (container == null || container instanceof PsiClass) {
+		if (container == null) {
 			return null;
 		}
 		while (container != null) {
