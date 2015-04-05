@@ -1,0 +1,6 @@
+findbugs-3.0.1 (138e1a1024d1fc5b8070824059b194f8df44ebcc) patched:
+- compiled with JDK 6
+- updated FB version info
+- update check disabled (can be enabled with env. "FB_UPDATE_CHECKS")
+- set edu.umd.cs.findbugs.SystemProperties#RUNNING_IN_ECLIPSE to TRUE (https://code.google.com/p/findbugs-idea/issues/detail?id=95)
+- make edu.umd.cs.findbugs.cloud.Cloud more robust (https://code.google.com/p/findbugs-idea/issues/detail?id=91)

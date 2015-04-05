@@ -1,0 +1,2026 @@
+Index: plugins/jira/build.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- plugins/jira/build.xml	(revision 23880)
++++ plugins/jira/build.xml	(revision )
+@@ -1,3 +1,5 @@
++        <!-- <ant dir="eclipsePlugin"                 target="site" /> -->
++        <!-- <ant dir="findbugsTestCases"             target="classes" /> -->
+ <project name="jira" default="test">
+ 
+     <property file="local.properties"/>
+Index: findbugs/src/java/edu/umd/cs/findbugs/classfile/impl/ZipFileCodeBase.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/classfile/impl/ZipFileCodeBase.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/classfile/impl/ZipFileCodeBase.java	(revision )
+@@ -78,10 +78,13 @@
+                 throw ioException;
+             }
+             int magicBytes;
+-            try (DataInputStream in = new DataInputStream(new FileInputStream(file))){
++            DataInputStream in = new DataInputStream(new FileInputStream(file));
++            try {
+                 magicBytes = in.readInt();
+             } catch (IOException e3) {
+                 throw new IOException(String.format("Unable read first 4 bytes of zip file %s of %d bytes", file, file.length()));
++            } finally {
++                in.close();
+             }
+             if (magicBytes != 0x504b0304) {
+                 throw new IOException(String.format("Wrong magic bytes of %x for zip file %s of %d bytes", magicBytes, file,
+Index: findbugs/src/tools/edu/umd/cs/findbugs/tools/CheckClassfileVersion.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/tools/edu/umd/cs/findbugs/tools/CheckClassfileVersion.java	(revision 23880)
++++ findbugs/src/tools/edu/umd/cs/findbugs/tools/CheckClassfileVersion.java	(revision )
+@@ -61,7 +61,8 @@
+         for (File jarFile : s) {
+             String jarFileName = jarFile.getName();
+             System.out.println("Checking " + jarFileName);
+-            try(JarFile z = new JarFile(jarFile)){
++            JarFile z = new JarFile(jarFile);
++            try {
+                 for (Enumeration<JarEntry> e = z.entries(); e.hasMoreElements();) {
+                     JarEntry ze = e.nextElement();
+                     if (ze.isDirectory()) {
+@@ -87,6 +88,8 @@
+                     }
+                     zipIn.close();
+                 }
++            } finally {
++                z.close();
+             }
+         }
+         if (fail) {
+Index: findbugs/src/java/edu/umd/cs/findbugs/detect/DumbMethods.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/detect/DumbMethods.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/detect/DumbMethods.java	(revision )
+@@ -311,17 +311,17 @@
+                     if(constantLength instanceof Number) {
+                         int length1 = Integer.MAX_VALUE;
+                         if(src.getConstant() instanceof Integer) {
+-                            length1 = (int) src.getConstant();
++                            length1 = (Integer) src.getConstant();
+                         }
+                         if(srcPos.getConstant() instanceof Integer) {
+-                            length1 -= (int) srcPos.getConstant();
++                            length1 -= (Integer) srcPos.getConstant();
+                         }
+                         int length2 = Integer.MAX_VALUE;
+                         if(dest.getConstant() instanceof Integer) {
+-                            length2 = (int) stack.getStackItem(2).getConstant();
++                            length2 = (Integer) stack.getStackItem(2).getConstant();
+                         }
+                         if(destPos.getConstant() instanceof Integer) {
+-                            length2 -= (int) stack.getStackItem(1).getConstant();
++                            length2 -= (Integer) stack.getStackItem(1).getConstant();
+                         }
+                         checkRange(length, 0, Math.min(length1, length2), "RANGE_ARRAY_LENGTH");
+                     }
+@@ -358,11 +358,11 @@
+                     Item lengthArg = stack.getStackItem(0);
+                     int length = Integer.MAX_VALUE;
+                     if(arrayArg.getConstant() instanceof Integer) {
+-                        length = (int) arrayArg.getConstant();
++                        length = (Integer) arrayArg.getConstant();
+                     }
+                     if(offsetArg.getConstant() instanceof Integer) {
+                         checkRange(offsetArg, 0, saturatingIncrement(length), "RANGE_ARRAY_OFFSET");
+-                        length -= (int) offsetArg.getConstant();
++                        length -= (Integer) offsetArg.getConstant();
+                     }
+                     checkRange(lengthArg, 0, saturatingIncrement(length), "RANGE_ARRAY_LENGTH");
+                 }
+Index: findbugs/src/java/edu/umd/cs/findbugs/detect/RedundantConditions.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/detect/RedundantConditions.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/detect/RedundantConditions.java	(revision )
+@@ -105,27 +105,21 @@
+         if(condition.isByType()) {
+             // Skip reports which should be reported by another detector
+             long number = condition.getNumber().longValue();
+-            switch(condition.getSignature()) {
+-            case "I":
++            if ("I".equals(condition.getSignature())) {
+                 if(number == Integer.MIN_VALUE || number == Integer.MAX_VALUE) {
+                     // Will be reported as INT_VACUOUS_COMPARISON
+                     return IGNORE_PRIORITY;
+                 }
+-                break;
+-            case "C":
++            } else if ("C".equals(condition.getSignature())) {
+                 if(number <= 0) {
+                     // Will be reported as INT_BAD_COMPARISON_WITH_NONNEGATIVE_VALUE
+                     return IGNORE_PRIORITY;
+                 }
+-                break;
+-            case "B":
++            } else if ("B".equals(condition.getSignature())) {
+                 if(number < Byte.MIN_VALUE || number >= Byte.MAX_VALUE) {
+                     // Will be reported as INT_BAD_COMPARISON_WITH_SIGNED_BYTE
+                     return IGNORE_PRIORITY;
+                 }
+-                break;
+-            default:
+-                break;
+             }
+         }
+         int priority = condition.isDeadCodeUnreachable() ? HIGH_PRIORITY : condition.isBorder()
+Index: findbugs/src/gui/edu/umd/cs/findbugs/gui2/SourceDirectoryWizard.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/gui/edu/umd/cs/findbugs/gui2/SourceDirectoryWizard.java	(revision 23880)
++++ findbugs/src/gui/edu/umd/cs/findbugs/gui2/SourceDirectoryWizard.java	(revision )
+@@ -73,14 +73,14 @@
+     // desc="Generated Code">//GEN-BEGIN:initComponents
+     private void initComponents() {
+ 
+-        foundModel = new DefaultListModel<String>();
+-        progressModel = new DefaultListModel<String>();
++        foundModel = new DefaultListModel();
++        progressModel = new DefaultListModel();
+         contentPanel = new javax.swing.JPanel();
+         secondPanel = new javax.swing.JPanel();
+         jScrollPane1 = new javax.swing.JScrollPane();
+         jScrollPane2 = new javax.swing.JScrollPane();
+-        jList1 = new javax.swing.JList<>();
+-        jList2 = new javax.swing.JList<>();
++        jList1 = new javax.swing.JList();
++        jList2 = new javax.swing.JList();
+         jLabel1 = new javax.swing.JLabel();
+         jLabel2 = new javax.swing.JLabel();
+         jLabel3 = new javax.swing.JLabel();
+@@ -387,11 +387,11 @@
+ 
+     private final NewProjectWizard parentGUI;
+ 
+-    private DefaultListModel<String> foundModel;
++    private DefaultListModel foundModel;
+ 
+-    private DefaultListModel<String> progressModel;
++    private DefaultListModel progressModel;
+ 
+-    private JList<String> jList2;
++    private JList jList2;
+ 
+     public Thread discover;
+ 
+@@ -420,7 +420,7 @@
+ 
+     private javax.swing.JLabel jLabel3;
+ 
+-    private javax.swing.JList<String> jList1;
++    private javax.swing.JList jList1;
+ 
+     private javax.swing.JScrollPane jScrollPane1;
+ 
+Index: findbugs/src/antTask/edu/umd/cs/findbugs/anttask/UnionBugs.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/antTask/edu/umd/cs/findbugs/anttask/UnionBugs.java	(revision 23880)
++++ findbugs/src/antTask/edu/umd/cs/findbugs/anttask/UnionBugs.java	(revision )
+@@ -145,10 +145,17 @@
+      * @throws IOException
+      */
+     private static void copyFile(File in, File out) throws IOException {
+-        try (FileInputStream inStream = new FileInputStream(in);
+-                FileOutputStream outStream = new FileOutputStream(out);) {
++        FileInputStream inStream = new FileInputStream(in);
++        try {
++            FileOutputStream outStream = new FileOutputStream(out);
++            try {
+-            FileChannel inChannel = inStream.getChannel();
+-            inChannel.transferTo(0, inChannel.size(), outStream.getChannel());
++                FileChannel inChannel = inStream.getChannel();
++                inChannel.transferTo(0, inChannel.size(), outStream.getChannel());
++            } finally {
++                outStream.close();
++            }
++        } finally {
++            inStream.close();
+         }
+     }
+ 
+Index: findbugs/src/java/edu/umd/cs/findbugs/detect/NumberConstructor.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/detect/NumberConstructor.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/detect/NumberConstructor.java	(revision )
+@@ -65,7 +65,7 @@
+     }
+     private final Map<String, Pair> boxClasses = new HashMap<String, Pair>();
+ 
+-    private final List<MethodDescriptor> methods = new ArrayList<>();
++    private final List<MethodDescriptor> methods = new ArrayList<MethodDescriptor>();
+ 
+     private final BugAccumulator bugAccumulator;
+ 
+Index: findbugs/src/gui/edu/umd/cs/findbugs/gui2/BugLoader.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/gui/edu/umd/cs/findbugs/gui2/BugLoader.java	(revision 23880)
++++ findbugs/src/gui/edu/umd/cs/findbugs/gui2/BugLoader.java	(revision )
+@@ -19,7 +19,7 @@
+ 
+ package edu.umd.cs.findbugs.gui2;
+ 
+-import static java.util.Objects.requireNonNull;
++import static edu.umd.cs.findbugs.FBObjects.requireNonNull;
+ 
+ import java.awt.Dimension;
+ import java.io.File;
+Index: findbugs/src/java/edu/umd/cs/findbugs/OpcodeStack.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/OpcodeStack.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/OpcodeStack.java	(revision )
+@@ -2388,8 +2388,14 @@
+             try {
+                 primitiveType = (Class<?>) c.getField("TYPE").get(null);
+                 boxedTypes.put(ClassName.toSlashedClassName(c.getName()), primitiveType.getName());
+-            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
++            } catch (IllegalArgumentException e) {
+                 throw new AssertionError(e);
++            } catch (IllegalAccessException e) {
++                throw new AssertionError(e);
++            } catch (NoSuchFieldException e) {
++                throw new AssertionError(e);
++            } catch (SecurityException e) {
++                throw new AssertionError(e);
+             }
+         }
+     }
+@@ -2636,20 +2642,13 @@
+             push(i);
+         } else if("java/lang/String".equals(clsName) && numberArguments == 0 && topItem.getConstant() instanceof String) {
+             String input = (String) topItem.getConstant();
+-            Object result;
+-            switch(methodName) {
+-            case "length":
++            Object result = null;
++            if ("length".equals(methodName)) {
+                 result = input.length();
+-                break;
+-            case "trim":
++            } else if("trim".equals(methodName)) {
+                 result = input.trim();
+-                break;
+-            case "toString":
+-            case "intern":
++            } else if("toString".equals(methodName) ||"intern".equals(methodName)) {
+                 result = input;
+-                break;
+-            default:
+-                result = null;
+             }
+             if(result != null) {
+                 Item i = new Item(pop());
+Index: findbugs/src/java/edu/umd/cs/findbugs/detect/InefficientInitializationInsideLoop.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/detect/InefficientInitializationInsideLoop.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/detect/InefficientInitializationInsideLoop.java	(revision )
+@@ -54,10 +54,10 @@
+     private static final MethodDescriptor STRING_SPLIT = new MethodDescriptor("java/lang/String", "split", "(Ljava/lang/String;)[Ljava/lang/String;");
+     private static final MethodDescriptor STRING_SPLIT_2 = new MethodDescriptor("java/lang/String", "split", "(Ljava/lang/String;I)[Ljava/lang/String;");
+ 
+-    private static final Set<MethodDescriptor> implicitPatternMethods = new HashSet<>(Arrays.asList(PATTERN_MATCHES,
++    private static final Set<MethodDescriptor> implicitPatternMethods = new HashSet<MethodDescriptor>(Arrays.asList(PATTERN_MATCHES,
+             STRING_MATCHES, STRING_REPLACEALL, STRING_REPLACEFIRST, STRING_SPLIT, STRING_SPLIT_2));
+ 
+-    private static final List<MethodDescriptor> methods = new ArrayList<>();
++    private static final List<MethodDescriptor> methods = new ArrayList<MethodDescriptor>();
+ 
+     static {
+         methods.add(NODELIST_GET_LENGTH);
+@@ -89,9 +89,9 @@
+ 
+     @Override
+     public void visitMethod(Method obj) {
+-        matched = new TreeMap<>();
+-        conditions = new TreeMap<>();
+-        sources = new TreeMap<>();
++        matched = new TreeMap<Integer, BugInstance>();
++        conditions = new TreeMap<Integer, Integer>();
++        sources = new TreeMap<Integer, Integer>();
+         super.visitMethod(obj);
+     }
+ 
+Index: findbugs/src/java/edu/umd/cs/findbugs/SourceLineAnnotation.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/SourceLineAnnotation.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/SourceLineAnnotation.java	(revision )
+@@ -21,7 +21,6 @@
+ 
+ import java.io.File;
+ import java.io.IOException;
+-import java.util.Objects;
+ 
+ import javax.annotation.CheckForNull;
+ import javax.annotation.Nonnull;
+@@ -135,8 +134,8 @@
+      */
+     public SourceLineAnnotation(@Nonnull @DottedClassName String className, @Nonnull String sourceFile, int startLine, int endLine,
+             int startBytecode, int endBytecode) {
+-        Objects.requireNonNull(className, "class name is null");
+-        Objects.requireNonNull(sourceFile, "source file is null");
++        FBObjects.requireNonNull(className, "class name is null");
++        FBObjects.requireNonNull(sourceFile, "source file is null");
+         this.description = DEFAULT_ROLE;
+         this.className = className;
+         this.sourceFile = sourceFile;
+Index: findbugs/src/java/edu/umd/cs/findbugs/ba/AnalysisContext.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/ba/AnalysisContext.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/ba/AnalysisContext.java	(revision )
+@@ -18,7 +18,7 @@
+  */
+ 
+ package edu.umd.cs.findbugs.ba;
+-import static java.util.Objects.requireNonNull;
++import static edu.umd.cs.findbugs.FBObjects.requireNonNull;
+ 
+ import java.io.File;
+ import java.io.IOException;
+@@ -178,12 +178,12 @@
+         this.project = project;
+         this.boolPropertySet = new BitSet();
+         this.lookupFailureCallback = new DelegatingRepositoryLookupFailureCallback();
+-        skippedDueToInvokeDynamic = new HashSet<>();
++        skippedDueToInvokeDynamic = new HashSet<MethodDescriptor>();
+         equalsKindSummary = new EqualsKindSummary();
+         unreadFieldsData = new UnreadFieldsData();
+         suppressionMatcher = new SuppressionMatcher();
+-        bridgeTo = new IdentityHashMap<>();
+-        bridgeFrom = new IdentityHashMap<>();
++        bridgeTo = new IdentityHashMap<MethodInfo, MethodInfo>();
++        bridgeFrom = new IdentityHashMap<MethodInfo, MethodInfo>();
+     }
+ 
+     private void clear() {
+@@ -721,12 +721,15 @@
+                 System.out.println("Loading default " + description + " from " + resourceName + " @ "
+                         + database.getClass().getResource(resourceName) + " ... ");
+             }
+-            try(InputStream in = database.getClass().getResourceAsStream(resourceName)){
++            InputStream in = database.getClass().getResourceAsStream(resourceName);
++            try {
+                 if (in == null) {
+                     AnalysisContext.logError("Unable to load " + description + " from resource " + resourceName);
+                 } else {
+                     database.read(in);
+                 }
++            } finally {
++                in.close();
+             }
+             return database;
+         } catch (IOException e) {
+Index: findbugs/src/java/edu/umd/cs/findbugs/visitclass/PrintClass.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/visitclass/PrintClass.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/visitclass/PrintClass.java	(revision )
+@@ -105,7 +105,8 @@
+             for (int i = 0; i < files; i++) {
+                 file_name[i] = file_name[i].replace('.', '/');
+             }
+-            try(ZipFile z = new ZipFile(zip_file)){
++            ZipFile z = new ZipFile(zip_file);
++            try {
+                 TreeSet<ZipEntry> zipEntries = new TreeSet<ZipEntry>(new ZipEntryComparator());
+                 for (Enumeration<? extends ZipEntry> e = z.entries(); e.hasMoreElements();) {
+                     zipEntries.add(e.nextElement());
+@@ -127,6 +128,8 @@
+                     printClass(new ClassParser(z.getInputStream(ze), name));
+ 
+                 }
++            } finally {
++                z.close();
+             }
+         } else {
+             for (int i = 0; i < files; i++) {
+Index: findbugs/src/java/edu/umd/cs/findbugs/BugInstance.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/BugInstance.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/BugInstance.java	(revision )
+@@ -19,7 +19,7 @@
+ 
+ package edu.umd.cs.findbugs;
+ 
+-import static java.util.Objects.requireNonNull;
++import static edu.umd.cs.findbugs.FBObjects.requireNonNull;
+ 
+ import java.io.IOException;
+ import java.io.Serializable;
+@@ -2298,7 +2298,14 @@
+                     attributeList.addAttribute("isInCloud", "false");
+                 }
+                 if (addMessages) {
+-                    UserDesignation consesus = UserDesignation.valueOf(props.consensus);
++                    // https://code.google.com/p/findbugs-idea/issues/detail?id=91
++                    UserDesignation consesus = UserDesignation.UNCLASSIFIED;
++                    for (UserDesignation d : UserDesignation.values()) {
++                        if (d.toString().equals(props.consensus)) {
++                            consesus = d;
++                            break;
++                        }
++                    }
+                     if (consesus.shouldFix()) {
+                         attributeList.addAttribute("shouldFix", "true");
+                     } else if (consesus.notAProblem()) {
+@@ -2362,7 +2369,7 @@
+         }
+ 
+         if (propertyListHead != null) {
+-            List<BugProperty> props = new ArrayList<>();
++            List<BugProperty> props = new ArrayList<BugProperty>();
+             for(BugProperty prop = propertyListHead; prop != null; prop = prop.getNext()) {
+                 props.add(prop);
+             }
+Index: findbugs/build.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- findbugs/build.xml	(revision 23880)
++++ findbugs/build.xml	(revision )
+@@ -107,8 +107,8 @@
+     <target name="errorprone" depends="clean,init">
+         <javac
+                         destdir="${classes.dir}"
+-                        source="1.7"
+-                        target="1.7"
++                        source="1.6"
++                        target="1.6"
+                         includeantruntime="false"
+                         encoding="ISO-8859-1"
+                         deprecation="off"
+@@ -133,8 +133,8 @@
+         <echo level="info" message="compiling findbugs"/>
+         <javac
+                         destdir="${classes.dir}"
+-                        source="1.7"
+-                        target="1.7"
++                        source="1.6"
++                        target="1.6"
+                         includeantruntime="false"
+                         encoding="ISO-8859-1"
+                         deprecation="off"
+@@ -166,8 +166,8 @@
+         <echo level="info" message="compiling junit test cases"/>
+         <javac srcdir="${junitsrc.dir}"
+                 destdir="${junitclasses.dir}"
+-                source="1.7"
+-                target="1.7"
++                source="1.6"
++                target="1.6"
+                                 includeantruntime="false"
+                                 encoding="ISO-8859-1"
+                 deprecation="off"
+@@ -178,8 +178,8 @@
+         <echo level="info" message="compiling tools"/>
+         <javac srcdir="${toolsrc.dir}"
+                 destdir="${classes.dir}"
+-                source="1.7"
+-                target="1.7"
++                source="1.6"
++                target="1.6"
+                                 includeantruntime="false"
+                                 encoding="ISO-8859-1"
+                 debug="on"
+@@ -192,8 +192,8 @@
+         <echo level="info" message="compiling ant task"/>
+         <javac srcdir="${anttasksrc.dir}"
+             destdir="${classes.dir}"
+-            source="1.7"
+-            target="1.7"
++            source="1.6"
++            target="1.6"
+                         includeantruntime="false"
+             encoding="ISO-8859-1"
+             deprecation="off"
+Index: findbugs/src/java/edu/umd/cs/findbugs/PluginLoader.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/PluginLoader.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/PluginLoader.java	(revision )
+@@ -1313,7 +1313,9 @@
+                     stream.close();
+                 }
+                 messageCollectionList.add(messageCollection);
+-            } catch (IOException | DocumentException e) {
++            } catch (IOException e) {
++                throw new PluginException("Couldn't parse \"" + messageURL + "\"", e);
++            } catch (DocumentException e) {
+                 throw new PluginException("Couldn't parse \"" + messageURL + "\"", e);
+             }
+         }
+Index: findbugs/src/java/edu/umd/cs/findbugs/SystemProperties.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/SystemProperties.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/SystemProperties.java	(revision )
+@@ -42,8 +42,7 @@
+ 
+     public final static boolean ASSERTIONS_ENABLED;
+ 
+-    public final static boolean RUNNING_IN_ECLIPSE = SystemProperties.class.getClassLoader().getClass().getCanonicalName()
+-            .startsWith("org.eclipse.osgi");
++    public final static boolean RUNNING_IN_ECLIPSE = true; // https://code.google.com/p/findbugs-idea/issues/detail?id=95
+ 
+     final static String OS_NAME;
+     static {
+Index: findbugs/src/java/edu/umd/cs/findbugs/updates/UpdateChecker.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/updates/UpdateChecker.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/updates/UpdateChecker.java	(revision )
+@@ -51,7 +51,7 @@
+     private static final Logger LOGGER = Logger.getLogger(UpdateChecker.class.getName());
+     private static final String KEY_DISABLE_ALL_UPDATE_CHECKS = "noUpdateChecks";
+     private static final String KEY_REDIRECT_ALL_UPDATE_CHECKS = "redirectUpdateChecks";
+-    private static final boolean ENV_FB_NO_UPDATE_CHECKS = System.getenv("FB_NO_UPDATE_CHECKS") != null;
++    private static final boolean ENV_FB_NO_UPDATE_CHECKS = System.getenv("FB_UPDATE_CHECKS") == null;
+ 
+     private final UpdateCheckCallback dfc;
+     private final List<PluginUpdate> pluginUpdates = new CopyOnWriteArrayList<PluginUpdate>();
+Index: findbugs/src/java/edu/umd/cs/findbugs/detect/FindSqlInjection.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/detect/FindSqlInjection.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/detect/FindSqlInjection.java	(revision )
+@@ -187,7 +187,7 @@
+ 
+     final Map<MethodDescriptor, int[]> preparedStatementMethods;
+     final Map<MethodDescriptor, int[]> executeMethods;
+-    final Set<MethodDescriptor> allMethods = new HashSet<>();
++    final Set<MethodDescriptor> allMethods = new HashSet<MethodDescriptor>();
+ 
+     private final boolean testingEnabled;
+ 
+@@ -195,12 +195,12 @@
+         this.bugReporter = bugReporter;
+         this.bugAccumulator = new BugAccumulator(bugReporter);
+         testingEnabled = SystemProperties.getBoolean("report_TESTING_pattern_in_standard_detectors");
+-        Set<MethodParameter> baseExecuteMethods = new HashSet<>();
++        Set<MethodParameter> baseExecuteMethods = new HashSet<MethodParameter>();
+         for(MethodDescriptor executeMethod : EXECUTE_METHODS) {
+             baseExecuteMethods.add(new MethodParameter(executeMethod, 0));
+         }
+         executeMethods = Global.getAnalysisCache().getDatabase(StringPassthruDatabase.class).findLinkedMethods(baseExecuteMethods);
+-        Set<MethodParameter> basePrepareMethods = new HashSet<>();
++        Set<MethodParameter> basePrepareMethods = new HashSet<MethodParameter>();
+         for(String signature : PREPARE_STATEMENT_SIGNATURES) {
+             basePrepareMethods.add(new MethodParameter(new MethodDescriptor("java/sql/Connection", "prepareStatement", signature), 0));
+         }
+Index: findbugs/src/tools/edu/umd/cs/findbugs/tools/junit/JUnitJarRunner.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/tools/edu/umd/cs/findbugs/tools/junit/JUnitJarRunner.java	(revision 23880)
++++ findbugs/src/tools/edu/umd/cs/findbugs/tools/junit/JUnitJarRunner.java	(revision )
+@@ -94,7 +94,8 @@
+ 
+         Class<junit.framework.TestCase> testCaseClass = getTestCase(cl);
+ 
+-        try(JarFile jarFile = new JarFile(jarFileName)){
++        JarFile jarFile = new JarFile(jarFileName);
++        try {
+             Enumeration<JarEntry> e = jarFile.entries();
+             while (e.hasMoreElements()) {
+                 JarEntry entry = e.nextElement();
+@@ -112,6 +113,8 @@
+                     }
+                 }
+             }
++        } finally {
++            jarFile.close();
+         }
+ 
+         return suite;
+Index: findbugs/src/java/edu/umd/cs/findbugs/classfile/engine/bcel/FinallyDuplicatesInfoFactory.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/classfile/engine/bcel/FinallyDuplicatesInfoFactory.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/classfile/engine/bcel/FinallyDuplicatesInfoFactory.java	(revision )
+@@ -111,7 +111,7 @@
+             if(duplicates.isEmpty()) {
+                 return Collections.emptyList();
+             }
+-            List<Edge> result = new ArrayList<>();
++            List<Edge> result = new ArrayList<Edge>();
+             for(Iterator<Edge> edgeIterator = cfg.edgeIterator(); edgeIterator.hasNext(); ) {
+                 Edge next = edgeIterator.next();
+                 if(next.getType() != edge.getType()) {
+@@ -147,8 +147,8 @@
+         boolean incorrect = false;
+         final int catchAnyAddress;
+         InstructionHandle firstInstruction;
+-        SortedMap<Integer, Integer> normalBlocks = new TreeMap<>();
+-        SortedMap<Integer, Integer> duplicates = new TreeMap<>();
++        SortedMap<Integer, Integer> normalBlocks = new TreeMap<Integer, Integer>();
++        SortedMap<Integer, Integer> duplicates = new TreeMap<Integer, Integer>();
+ 
+         public TryBlock(int catchAnyAddress) {
+             this.catchAnyAddress = catchAnyAddress;
+@@ -240,7 +240,7 @@
+             int start2 = ih2.getPosition();
+             int startNum1 = getInstructionNumber(positions, start1);
+             int startNum2 = getInstructionNumber(positions, start2);
+-            Map<Integer, Integer> lvMap = new HashMap<>();
++            Map<Integer, Integer> lvMap = new HashMap<Integer, Integer>();
+             while(true) {
+                 if(ih1 == null || ih2 == null) {
+                     return -1;
+@@ -307,7 +307,7 @@
+             return NONE_FINALLY_INFO;
+         }
+         BitSet exceptionTargets = new BitSet();
+-        Map<Integer, TryBlock> finallyTargets = new LinkedHashMap<>();
++        Map<Integer, TryBlock> finallyTargets = new LinkedHashMap<Integer, TryBlock>();
+         for(CodeException codeException : method.getCode().getExceptionTable()) {
+             if(codeException.getCatchType() == 0) {
+                 TryBlock block = finallyTargets.get(codeException.getHandlerPC());
+@@ -337,7 +337,7 @@
+             }
+         }
+         BitSet usedTargets = new BitSet();
+-        List<SortedMap<Integer, Integer>> duplicates = new ArrayList<>();
++        List<SortedMap<Integer, Integer>> duplicates = new ArrayList<SortedMap<Integer, Integer>>();
+         for(TryBlock block : finallyTargets.values()) {
+             if(usedTargets.get(block.catchAnyAddress)) {
+                 continue;
+Index: findbugs/src/java/edu/umd/cs/findbugs/detect/FindComparatorProblems.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/detect/FindComparatorProblems.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/detect/FindComparatorProblems.java	(revision )
+@@ -71,7 +71,7 @@
+ 
+     @Override
+     public void visit(Code obj) {
+-        this.twoDoublesInStack = new ArrayList<>();
++        this.twoDoublesInStack = new ArrayList<int[]>();
+         this.lastEmptyStackPC = 0;
+         super.visit(obj);
+         this.accumulator.reportAccumulatedBugs();
+Index: findbugs/src/gui/edu/umd/cs/findbugs/gui2/AbstractSwingGuiCallback.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/gui/edu/umd/cs/findbugs/gui2/AbstractSwingGuiCallback.java	(revision 23880)
++++ findbugs/src/gui/edu/umd/cs/findbugs/gui2/AbstractSwingGuiCallback.java	(revision )
+@@ -146,7 +146,7 @@
+ 
+             } else if (field instanceof JComboBox) {
+                 @SuppressWarnings("unchecked")
+-                JComboBox<String> box = (JComboBox<String>) field;
++                JComboBox box = (JComboBox) field;
+                 String value = (String) box.getSelectedItem();
+                 item.setCurrentValue(value);
+             }
+@@ -160,10 +160,10 @@
+             JComponent field = item.getField();
+             if (field instanceof JComboBox) {
+                 @SuppressWarnings("unchecked")
+-                JComboBox<String> box = (JComboBox<String>) field;
++                JComboBox box = (JComboBox) field;
+                 List<String> newPossibleValues = item.getPossibleValues();
+                 if (!boxModelIsSame(box, newPossibleValues)) {
+-                    MutableComboBoxModel<String> mmodel = (MutableComboBoxModel<String>) box.getModel();
++                    MutableComboBoxModel mmodel = (MutableComboBoxModel) box.getModel();
+                     replaceBoxModelValues(mmodel, newPossibleValues);
+                     mmodel.setSelectedItem(item.getCurrentValue());
+                 }
+@@ -171,7 +171,7 @@
+         }
+     }
+ 
+-    private void replaceBoxModelValues(MutableComboBoxModel<String> mmodel, List<String> newPossibleValues) {
++    private void replaceBoxModelValues(MutableComboBoxModel mmodel, List<String> newPossibleValues) {
+         try {
+             while (mmodel.getSize() > 0) {
+                 mmodel.removeElementAt(0);
+@@ -184,7 +184,7 @@
+         }
+     }
+ 
+-    private boolean boxModelIsSame(JComboBox<String> box, List<String> newPossibleValues) {
++    private boolean boxModelIsSame(JComboBox box, List<String> newPossibleValues) {
+         boolean same = true;
+         if (box.getModel().getSize() != newPossibleValues.size()) {
+             same = false;
+@@ -218,7 +218,7 @@
+             panel.add(new JLabel(item.getLabel()), gbc);
+             String defaultValue = item.getDefaultValue();
+             if (item.getPossibleValues() != null) {
+-                JComboBox<?> box = createComboBox(items, item);
++                JComboBox box = createComboBox(items, item);
+                 panel.add(box, gbc);
+ 
+             } else {
+@@ -260,9 +260,9 @@
+         return field;
+     }
+ 
+-    private JComboBox<String> createComboBox(final List<FormItem> items, FormItem item) {
+-        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+-        JComboBox<String> box = new JComboBox<>(model);
++    private JComboBox createComboBox(final List<FormItem> items, FormItem item) {
++        DefaultComboBoxModel model = new DefaultComboBoxModel();
++        JComboBox box = new JComboBox(model);
+         item.setField(box);
+         for (String possibleValue : item.getPossibleValues()) {
+             model.addElement(possibleValue);
+Index: findbugs/src/java/edu/umd/cs/findbugs/detect/MutableStaticFields.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/detect/MutableStaticFields.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/detect/MutableStaticFields.java	(revision )
+@@ -45,11 +45,11 @@
+ import edu.umd.cs.findbugs.classfile.Global;
+ 
+ public class MutableStaticFields extends BytecodeScanningDetector {
+-    private static final Set<String> COLLECTION_SUPERCLASSES = new HashSet<>(Arrays.asList("java/util/Collection",
++    private static final Set<String> COLLECTION_SUPERCLASSES = new HashSet<String>(Arrays.asList("java/util/Collection",
+             "java/util/List", "java/util/Set", "java/util/Map", "java/util/AbstractList", "java/util/SortedSet",
+             "java/util/SortedMap", "java/util/NavigableMap", "java/util/Dictionary"));
+ 
+-    private static final Set<String> MUTABLE_COLLECTION_CLASSES = new HashSet<>(Arrays.asList("java/util/ArrayList",
++    private static final Set<String> MUTABLE_COLLECTION_CLASSES = new HashSet<String>(Arrays.asList("java/util/ArrayList",
+             "java/util/HashSet", "java/util/HashMap", "java/util/Hashtable", "java/util/IdentityHashMap",
+             "java/util/LinkedHashSet", "java/util/LinkedList", "java/util/LinkedHashMap", "java/util/TreeSet",
+             "java/util/TreeMap", "java/util/Properties"));
+@@ -58,14 +58,14 @@
+         NONE, EMPTY_ARRAY
+     }
+ 
+-    private static final Map<String, Map<String, AllowedParameter>> MUTABLE_COLLECTION_METHODS = new HashMap<>();
++    private static final Map<String, Map<String, AllowedParameter>> MUTABLE_COLLECTION_METHODS = new HashMap<String, Map<String, AllowedParameter>>();
+     static {
+         MUTABLE_COLLECTION_METHODS.put("java/util/Arrays", Collections.singletonMap("asList", AllowedParameter.EMPTY_ARRAY));
+-        Map<String, AllowedParameter> listsMap = new HashMap<>();
++        Map<String, AllowedParameter> listsMap = new HashMap<String, AllowedParameter>();
+         listsMap.put("newArrayList", AllowedParameter.NONE);
+         listsMap.put("newLinkedList", AllowedParameter.NONE);
+         MUTABLE_COLLECTION_METHODS.put("com/google/common/collect/Lists", listsMap);
+-        Map<String, AllowedParameter> setsMap = new HashMap<>();
++        Map<String, AllowedParameter> setsMap = new HashMap<String, AllowedParameter>();
+         setsMap.put("newHashSet", AllowedParameter.NONE);
+         setsMap.put("newTreeSet", AllowedParameter.NONE);
+         MUTABLE_COLLECTION_METHODS.put("com/google/common/collect/Sets", setsMap);
+Index: findbugs/src/java/edu/umd/cs/findbugs/classfile/engine/bcel/ValueRangeAnalysisFactory.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/classfile/engine/bcel/ValueRangeAnalysisFactory.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/classfile/engine/bcel/ValueRangeAnalysisFactory.java	(revision )
+@@ -111,7 +111,7 @@
+     private static final Map<String, TypeLongRange> typeRanges;
+ 
+     static {
+-        typeRanges = new HashMap<>();
++        typeRanges = new HashMap<String, TypeLongRange>();
+         typeRanges.put("Z", new TypeLongRange(0, 1, "Z"));
+         typeRanges.put("B", new TypeLongRange(Byte.MIN_VALUE, Byte.MAX_VALUE, "B"));
+         typeRanges.put("S", new TypeLongRange(Short.MIN_VALUE, Short.MAX_VALUE, "S"));
+@@ -121,7 +121,7 @@
+     }
+ 
+     public static class LongRangeSet implements Iterable<LongRangeSet> {
+-        private final SortedMap<Long, Long> map = new TreeMap<>();
++        private final SortedMap<Long, Long> map = new TreeMap<Long, Long>();
+         private final TypeLongRange range;
+ 
+         public LongRangeSet(String type) {
+@@ -335,7 +335,7 @@
+         final LongRangeSet trueReachedSet, falseReachedSet;
+         final String trueCondition, falseCondition;
+         final Number number;
+-        final Set<Long> numbers = new HashSet<>();
++        final Set<Long> numbers = new HashSet<Long>();
+         final String varName;
+ 
+         public Branch(String varName, String trueCondition, String falseCondition, LongRangeSet trueSet, Number number) {
+@@ -560,7 +560,7 @@
+ 
+     private static class VariableData {
+         final LongRangeSet splitSet;
+-        final Map<Edge, Branch> edges = new IdentityHashMap<>();
++        final Map<Edge, Branch> edges = new IdentityHashMap<Edge, Branch>();
+         final BitSet reachableBlocks = new BitSet();
+ 
+         public VariableData(String type) {
+@@ -634,7 +634,7 @@
+     }
+ 
+     public static class ValueRangeAnalysis {
+-        private List<RedundantCondition> redundantConditions = new ArrayList<>();
++        private List<RedundantCondition> redundantConditions = new ArrayList<RedundantCondition>();
+ 
+         public ValueRangeAnalysis(List<RedundantCondition> redundantConditions) {
+             this.redundantConditions = redundantConditions;
+@@ -664,8 +664,8 @@
+         Method method = analysisCache.getMethodAnalysis(Method.class, descriptor);
+         Context context = new Context(cfg.getMethodGen().getConstantPool().getConstantPool(), method.getCode().getLocalVariableTable(),
+                 getParameterTypes(descriptor), classContext.getValueNumberDataflow(method));
+-        Map<ValueNumber, VariableData> analyzedArguments = new HashMap<>();
+-        Map<Edge, Branch> allEdges = new IdentityHashMap<>();
++        Map<ValueNumber, VariableData> analyzedArguments = new HashMap<ValueNumber, VariableData>();
++        Map<Edge, Branch> allEdges = new IdentityHashMap<Edge, Branch>();
+         for (Iterator<Edge> edgeIterator = cfg.edgeIterator(); edgeIterator.hasNext();) {
+             Edge edge = edgeIterator.next();
+             if (edge.getType() == EdgeTypes.IFCMP_EDGE) {
+@@ -723,7 +723,7 @@
+             }
+         }
+         FinallyDuplicatesInfo fi = null;
+-        List<RedundantCondition> redundantConditions = new ArrayList<>();
++        List<RedundantCondition> redundantConditions = new ArrayList<RedundantCondition>();
+         for (VariableData data : analyzedArguments.values()) {
+             for (LongRangeSet subRange : data.splitSet) {
+                 BitSet reachedBlocks = new BitSet();
+@@ -793,7 +793,7 @@
+                 }
+             }
+             if(!assertionBlocks.isEmpty()) {
+-                List<RedundantCondition> filtered = new ArrayList<>();
++                List<RedundantCondition> filtered = new ArrayList<RedundantCondition>();
+                 for(RedundantCondition condition : redundantConditions) {
+                     if(!(assertionBlocks.get(condition.getLocation().getHandle().getPosition()))) {
+                         // TODO: do not filter out failed asserts
+@@ -823,13 +823,12 @@
+ 
+     private static String convertNumber(String signature, Number number) {
+         long val = number.longValue();
+-        switch (signature) {
+-        case "Z":
++        if ("Z".equals(signature)) {
+             if (val == 0) {
+                 return "false";
+             }
+             return "true";
+-        case "C":
++        } else if ("C".equals(signature)) {
+             if (val == '\n') {
+                 return "'\\n'";
+             }
+@@ -852,12 +851,12 @@
+                 return "'" + ((char) val) + "'";
+             }
+             return convertNumber(val);
+-        case "I":
++        } else if ("I".equals(signature)) {
+             if(val >= 32 && val < 128) {
+                 return val+" ('" + ((char) val) + "')";
+             }
+             return convertNumber(val);
+-        default:
++        } else {
+             return convertNumber(val);
+         }
+     }
+@@ -882,7 +881,7 @@
+     private static Map<Integer, Value> getParameterTypes(MethodDescriptor descriptor) {
+         Type[] argumentTypes = Type.getArgumentTypes(descriptor.getSignature());
+         int j = 0;
+-        Map<Integer, Value> result = new HashMap<>();
++        Map<Integer, Value> result = new HashMap<Integer, Value>();
+         if(!descriptor.isStatic()) {
+             result.put(j++, new Value("this", null, "L"+descriptor.getSlashedClassName()+";"));
+         }
+@@ -900,7 +899,7 @@
+             Branch branch = edges.get(edge);
+             if (branch != null) {
+                 branch.numbers.addAll(numbers);
+-                numbers = new HashSet<>(numbers);
++                numbers = new HashSet<Long>(numbers);
+                 numbers.add(branch.number.longValue());
+                 if (branch.trueSet.intersects(subRange)) {
+                     branch.trueReachedSet.add(subRange);
+Index: findbugs/src/gui/edu/umd/cs/findbugs/gui2/WideComboBox.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/gui/edu/umd/cs/findbugs/gui2/WideComboBox.java	(revision 23880)
++++ findbugs/src/gui/edu/umd/cs/findbugs/gui2/WideComboBox.java	(revision )
+@@ -6,7 +6,7 @@
+ import javax.swing.ComboBoxModel;
+ import javax.swing.JComboBox;
+ 
+-public class WideComboBox<E> extends JComboBox<E> {
++public class WideComboBox<E> extends JComboBox {
+ 
+     public WideComboBox() {
+     }
+@@ -19,7 +19,7 @@
+         super(items);
+     }
+ 
+-    public WideComboBox(ComboBoxModel<E> aModel) {
++    public WideComboBox(ComboBoxModel aModel) {
+         super(aModel);
+     }
+ 
+Index: findbugs/src/gui/edu/umd/cs/findbugs/gui2/CloudCommentsPane.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/gui/edu/umd/cs/findbugs/gui2/CloudCommentsPane.java	(revision 23880)
++++ findbugs/src/gui/edu/umd/cs/findbugs/gui2/CloudCommentsPane.java	(revision )
+@@ -76,13 +76,14 @@
+ import edu.umd.cs.findbugs.DetectorFactoryCollection;
+ import edu.umd.cs.findbugs.I18N;
+ import edu.umd.cs.findbugs.L10N;
++import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+ import edu.umd.cs.findbugs.cloud.Cloud;
+ import edu.umd.cs.findbugs.cloud.Cloud.SigninState;
+ import edu.umd.cs.findbugs.cloud.Cloud.UserDesignation;
+ import edu.umd.cs.findbugs.cloud.CloudPlugin;
+ import edu.umd.cs.findbugs.util.Util;
+ 
+-@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED", "SE_BAD_FIELD", "SE_BAD_FIELD_STORE"})
++@SuppressFBWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED", "SE_BAD_FIELD", "SE_BAD_FIELD_STORE"})
+ public abstract class CloudCommentsPane extends JPanel {
+ 
+     private static final String MSG_REVIEW = L10N.getLocalString("dlg.cloud.add_review", "Click to add review...");
+@@ -176,7 +177,7 @@
+         designationCombo.setRenderer(new DefaultListCellRenderer() {
+             @Override
+             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+-                    boolean cellHasFocus) {
++                                                          boolean cellHasFocus) {
+                 Component real = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                 if (value == null) {
+                     return real;
+@@ -307,7 +308,7 @@
+         submitCommentButton.setEnabled(changed);
+         submitCommentButton.setText(changed
+                 ? L10N.getLocalString("dlg.save_btn", "Save")
+-                        : L10N.getLocalString("dlg.saved_btn", "Saved"));
++                : L10N.getLocalString("dlg.saved_btn", "Saved"));
+         cancelLink.setEnabled(false/*changed*/);
+     }
+ 
+@@ -357,7 +358,7 @@
+                         JOptionPane.showMessageDialog(CloudCommentsPane.this,
+                                 "Error while submitting cloud reviews:\n"
+                                         + e.getClass().getSimpleName() + ": " + e.getMessage(),
+-                                        "Review Submission Error", JOptionPane.ERROR_MESSAGE);
++                                "Review Submission Error", JOptionPane.ERROR_MESSAGE);
+                     }
+                 }
+             });
+@@ -388,11 +389,11 @@
+                             cloud.signIn();
+                         } catch (Exception e) {
+                             _bugCollection
+-                            .getProject()
+-                            .getGuiCallback()
+-                            .showMessageDialog(
+-                                    "The FindBugs Cloud could not be contacted at this time.\n\n"
+-                                            + Util.getNetworkErrorMessage(e));
++                                    .getProject()
++                                    .getGuiCallback()
++                                    .showMessageDialog(
++                                            "The FindBugs Cloud could not be contacted at this time.\n\n"
++                                                    + Util.getNetworkErrorMessage(e));
+                         }
+                         refresh();
+                     }
+@@ -446,7 +447,7 @@
+         if (plugin == null) {
+             return false;
+         }
+-        for(BugInstance b : bugs) {
++        for (BugInstance b : bugs) {
+             if (plugin.canStoreUserAnnotation(b)) {
+                 return true;
+             }
+@@ -481,7 +482,7 @@
+                                         + claimedBy + " has already said they will fix this issue\n"
+                                         + "Do you want to also be listed as fixing this issue?\n"
+                                         + "If so, please coordinate with " + claimedBy,
+-                                        "Issue already claimed", JOptionPane.YES_NO_CANCEL_OPTION);
++                                "Issue already claimed", JOptionPane.YES_NO_CANCEL_OPTION);
+                         if (result == JOptionPane.CANCEL_OPTION) {
+                             stop.set(true);
+                             return;
+@@ -801,8 +802,8 @@
+             setCanAddComments(false, false);
+         }
+ 
+-        final Cloud.SigninState state = cloud.getSigninState();
+-        final String stateStr = state == Cloud.SigninState.NO_SIGNIN_REQUIRED ? "" : "" + state;
++        final SigninState state = cloud.getSigninState();
++        final String stateStr = state == SigninState.NO_SIGNIN_REQUIRED ? "" : "" + state;
+         final String userStr = cloud.getUser() == null ? "" : cloud.getUser();
+         if ("edu.umd.cs.findbugs.cloud.doNothingCloud".equals(plugin.getId())) {
+             titleLabel.setText("<html><b>No cloud selected");
+@@ -812,20 +813,20 @@
+                     + (userStr.length() > 0 ? " - " + userStr : ""));
+         }
+         switch (state) {
+-        case NO_SIGNIN_REQUIRED:
+-        case SIGNING_IN:
+-            signInOutLink.setVisible(false);
+-            break;
+-        case SIGNED_IN:
+-            setSignInOutText("sign out");
+-            signInOutLink.setVisible(true);
+-            break;
+-        default:
+-            if (state.couldSignIn()) {
+-                setSignInOutText("sign in");
+-                signInOutLink.setVisible(true);
+-            }
+-            break;
++            case NO_SIGNIN_REQUIRED:
++            case SIGNING_IN:
++                signInOutLink.setVisible(false);
++                break;
++            case SIGNED_IN:
++                setSignInOutText("sign out");
++                signInOutLink.setVisible(true);
++                break;
++            default:
++                if (state.couldSignIn()) {
++                    setSignInOutText("sign in");
++                    signInOutLink.setVisible(true);
++                }
++                break;
+         }
+         if ("edu.umd.cs.findbugs.cloud.doNothingCloud".equals(cloud.getPlugin().getId())) {
+             setSignInOutText("enable cloud plugin...");
+@@ -957,7 +958,7 @@
+         final JPanel panel4 = new JPanel();
+         panel4.setLayout(new GridBagLayout());
+         cards.add(panel4, "COMMENTS");
+-        designationCombo = new WideComboBox<>();
++        designationCombo = new WideComboBox();
+         gbc = new GridBagConstraints();
+         gbc.gridx = 4;
+         gbc.gridy = 0;
+@@ -1037,7 +1038,7 @@
+ 
+ 
+         @Override
+-        public void handleStateChange(final Cloud.SigninState oldState, final Cloud.SigninState state) {
++        public void handleStateChange(final SigninState oldState, final SigninState state) {
+             updateHeader();
+             refresh();
+         }
+Index: findbugs/src/java/edu/umd/cs/findbugs/ba/Location.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/ba/Location.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/ba/Location.java	(revision )
+@@ -19,10 +19,9 @@
+ 
+ package edu.umd.cs.findbugs.ba;
+ 
+-import java.util.Objects;
+-
+ import javax.annotation.Nonnull;
+ 
++import edu.umd.cs.findbugs.FBObjects;
+ import org.apache.bcel.generic.InstructionHandle;
+ 
+ 
+@@ -57,8 +56,8 @@
+      *            the basic block containing the instruction
+      */
+     public Location(@Nonnull InstructionHandle handle, @Nonnull BasicBlock basicBlock) {
+-        Objects.requireNonNull(handle, "handle cannot be null");
+-        Objects.requireNonNull(basicBlock, "basicBlock cannot be null");
++        FBObjects.requireNonNull(handle, "handle cannot be null");
++        FBObjects.requireNonNull(basicBlock, "basicBlock cannot be null");
+         this.handle = handle;
+         this.basicBlock = basicBlock;
+     }
+Index: findbugs/src/gui/edu/umd/cs/findbugs/gui2/SorterDialog.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/gui/edu/umd/cs/findbugs/gui2/SorterDialog.java	(revision 23880)
++++ findbugs/src/gui/edu/umd/cs/findbugs/gui2/SorterDialog.java	(revision )
+@@ -122,7 +122,7 @@
+         gbc.gridx = 1;
+         gbc.insets = new Insets(2,5,2,5);
+         insidePanel.add(new JLabel("<html><h2>1. Choose bug properties"), gbc);
+-        insidePanel.add(new CheckBoxList<>(checkBoxSortList.toArray(new JCheckBox[checkBoxSortList.size()])), gbc);
++        insidePanel.add(new CheckBoxList(checkBoxSortList.toArray(new JCheckBox[checkBoxSortList.size()])), gbc);
+ 
+         JTable t = new JTable(new DefaultTableModel(0, sortables.length));
+         t.setTableHeader(preview);
+Index: findbugs/src/java/edu/umd/cs/findbugs/detect/BuildStringPassthruGraph.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/detect/BuildStringPassthruGraph.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/detect/BuildStringPassthruGraph.java	(revision )
+@@ -129,7 +129,7 @@
+                 new MethodDescriptor("java/io/PrintWriter", "<init>", "(Ljava/lang/String;Ljava/lang/String;)V")
+                 );
+ 
+-        private final Map<MethodParameter, Set<MethodParameter>> graph = new HashMap<>();
++        private final Map<MethodParameter, Set<MethodParameter>> graph = new HashMap<MethodParameter, Set<MethodParameter>>();
+ 
+         /**
+          * Adds edge to the string passthru graph
+@@ -139,15 +139,15 @@
+         void addEdge(MethodParameter in, MethodParameter out) {
+             Set<MethodParameter> outs = graph.get(in);
+             if (outs == null) {
+-                outs = new HashSet<>();
++                outs = new HashSet<MethodParameter>();
+                 graph.put(in, outs);
+             }
+             outs.add(out);
+         }
+ 
+         Set<MethodParameter> findLinked(Set<MethodParameter> inputs) {
+-            Set<MethodParameter> result = new HashSet<>(inputs);
+-            Queue<MethodParameter> toCheck = new ArrayDeque<>(inputs);
++            Set<MethodParameter> result = new HashSet<MethodParameter>(inputs);
++            Queue<MethodParameter> toCheck = new ArrayDeque<MethodParameter>(inputs);
+             while (!toCheck.isEmpty()) {
+                 MethodParameter in = toCheck.poll();
+                 Set<MethodParameter> outs = graph.get(in);
+@@ -172,7 +172,7 @@
+          * @return Map where keys are methods and values are parameter indexes which can be passed to requested methods unchanged
+          */
+         public Map<MethodDescriptor, int[]> findLinkedMethods(Set<MethodParameter> inputs) {
+-            Map<MethodDescriptor, int[]> result = new HashMap<>();
++            Map<MethodDescriptor, int[]> result = new HashMap<MethodDescriptor, int[]>();
+             for (MethodParameter found : findLinked(inputs)) {
+                 int[] params = result.get(found.getMethodDescriptor());
+                 if(params == null) {
+@@ -193,7 +193,7 @@
+          * @return Map where keys are methods and values are parameter indexes which are used as file names
+          */
+         public Map<MethodDescriptor, int[]> getFileNameStringMethods() {
+-            Set<MethodParameter> fileNameStringMethods = new HashSet<>();
++            Set<MethodParameter> fileNameStringMethods = new HashSet<MethodParameter>();
+             for(MethodDescriptor md : FILENAME_STRING_METHODS) {
+                 fileNameStringMethods.add(new MethodParameter(md, 0));
+             }
+@@ -280,7 +280,7 @@
+                 if (param >= 0 && param < nArgs && argEnabled[param]) {
+                     List<MethodParameter> list = passedParameters[param];
+                     if (list == null) {
+-                        passedParameters[param] = list = new ArrayList<>();
++                        passedParameters[param] = list = new ArrayList<MethodParameter>();
+                     }
+                     list.add(new MethodParameter(md, i));
+                 }
+Index: findbugs/src/java/edu/umd/cs/findbugs/model/RegenerateClassFeatures.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/model/RegenerateClassFeatures.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/model/RegenerateClassFeatures.java	(revision )
+@@ -54,7 +54,8 @@
+ 
+         ArrayList<JavaClass> classList = new ArrayList<JavaClass>();
+ 
+-        try (ZipFile zipFile = new ZipFile(jarFile)){
++        ZipFile zipFile = new ZipFile(jarFile);
++        try {
+ 
+             // Add all classes to repository (for hierarchy queries)
+             Enumeration<? extends ZipEntry> entries = zipFile.entries();
+@@ -71,6 +72,8 @@
+                 Repository.addClass(javaClass);
+                 classList.add(javaClass);
+             }
++        } finally {
++            zipFile.close();
+         }
+ 
+         for (JavaClass javaClass : classList) {
+Index: findbugs/src/java/edu/umd/cs/findbugs/bugReporter/SuppressionDecorator.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/bugReporter/SuppressionDecorator.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/bugReporter/SuppressionDecorator.java	(revision )
+@@ -91,26 +91,31 @@
+      * @throws IOException
+      */
+     private void processPackageList(@WillClose Reader rawIn) throws IOException {
+-        try (BufferedReader in = new BufferedReader(rawIn)) {
++        BufferedReader in = new BufferedReader(rawIn);
++        try {
++            try {
+-            String s;
+-            while ((s = in.readLine()) != null) {
+-                s = s.trim();
+-                if (s.length() == 0) {
+-                    continue;
+-                }
+-                String packageName = s.substring(1).trim();
+-                if (s.charAt(0) == '+') {
+-                    check.add(packageName);
+-                    dontCheck.remove(packageName);
+-                } else if (s.charAt(0) == '-') {
+-                    dontCheck.add(packageName);
+-                    check.remove(packageName);
+-                } else {
+-                    throw new IllegalArgumentException("Can't parse " + category + " filter line: " + s);
+-                }
+-            }
+-        } finally {
+-            rawIn.close();
++                String s;
++                while ((s = in.readLine()) != null) {
++                    s = s.trim();
++                    if (s.length() == 0) {
++                        continue;
++                    }
++                    String packageName = s.substring(1).trim();
++                    if (s.charAt(0) == '+') {
++                        check.add(packageName);
++                        dontCheck.remove(packageName);
++                    } else if (s.charAt(0) == '-') {
++                        dontCheck.add(packageName);
++                        check.remove(packageName);
++                    } else {
++                        throw new IllegalArgumentException("Can't parse " + category + " filter line: " + s);
++                    }
++                }
++            } finally {
++                rawIn.close();
++            }
++        } finally {
++            in.close();
+         }
+     }
+ 
+Index: findbugs/src/gui/edu/umd/cs/findbugs/gui2/NewProjectWizard.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/gui/edu/umd/cs/findbugs/gui2/NewProjectWizard.java	(revision 23880)
++++ findbugs/src/gui/edu/umd/cs/findbugs/gui2/NewProjectWizard.java	(revision )
+@@ -98,25 +98,25 @@
+         }
+     };
+ 
+-    private final JList<String> analyzeList = new JList<String>();
++    private final JList analyzeList = new JList();
+ 
+-    private final DefaultListModel<String> analyzeModel = new DefaultListModel<String>();
++    private final DefaultListModel analyzeModel = new DefaultListModel();
+ 
+     private final JTextField projectName = new JTextField();
+ 
+-    private final JList<String> auxList = new JList<String>();
++    private final JList auxList = new JList();
+ 
+-    private final DefaultListModel<String> auxModel = new DefaultListModel<String>();
++    private final DefaultListModel auxModel = new DefaultListModel();
+ 
+-    private final JList<String> sourceList = new JList<String>();
++    private final JList sourceList = new JList();
+ 
+-    private final DefaultListModel<String> sourceModel = new DefaultListModel<String>();
++    private final DefaultListModel sourceModel = new DefaultListModel();
+ 
+     private final JButton finishButton = new JButton();
+ 
+     private final JButton cancelButton = new JButton(edu.umd.cs.findbugs.L10N.getLocalString("dlg.cancel_btn", "Cancel"));
+ 
+-    private final JComboBox<CloudPlugin> cloudSelector = new JComboBox<CloudPlugin>();
++    private final JComboBox cloudSelector = new JComboBox();
+ 
+     private final JComponent[] wizardComponents = new JComponent[4];
+ 
+@@ -201,7 +201,7 @@
+ 
+         wizardComponents[3] = cloudPanel;
+         @SuppressWarnings("unchecked")
+-        ListCellRenderer<CloudPlugin>  aRenderer = new CloudComboBoxRenderer();
++        ListCellRenderer  aRenderer = new CloudComboBoxRenderer();
+         cloudSelector.setRenderer(aRenderer);
+         cloudSelector.addItem(null);
+         String cloudId = project.getCloudId();
+@@ -267,13 +267,13 @@
+ 
+                 // Now that p is cleared, we can add in all the correct files.
+                 for (int i = 0; i < analyzeModel.getSize(); i++) {
+-                    p.addFile(analyzeModel.get(i));
++                    p.addFile((String)analyzeModel.get(i));
+                 }
+                 for (int i = 0; i < auxModel.getSize(); i++) {
+-                    p.addAuxClasspathEntry(auxModel.get(i));
++                    p.addAuxClasspathEntry((String)auxModel.get(i));
+                 }
+                 for (int i = 0; i < sourceModel.getSize(); i++) {
+-                    p.addSourceDir(sourceModel.get(i));
++                    p.addSourceDir((String)sourceModel.get(i));
+                 }
+                 p.setProjectName(projectName.getText());
+                 CloudPlugin cloudPlugin = (CloudPlugin) cloudSelector.getSelectedItem();
+@@ -328,7 +328,7 @@
+ 
+             private boolean displayWarnings() {
+                 for (int i = 0; i < analyzeModel.getSize(); i++) {
+-                    File temp = new File(analyzeModel.get(i));
++                    File temp = new File((String)analyzeModel.get(i));
+                     if (!temp.exists() && directoryOrArchive.accept(temp)) {
+                         if (!displayWarningAndAskIfWeShouldContinue(
+                                 temp.getName() + " " + edu.umd.cs.findbugs.L10N.getLocalString("dlg.invalid_txt", " is invalid."),
+@@ -340,7 +340,7 @@
+                 }
+ 
+                 for (int i = 0; i < sourceModel.getSize(); i++) {
+-                    File temp = new File(sourceModel.get(i));
++                    File temp = new File((String)sourceModel.get(i));
+                     if (!temp.exists() && directoryOrArchive.accept(temp)) {
+                         if (!displayWarningAndAskIfWeShouldContinue(
+                                 temp.getName() + " " + edu.umd.cs.findbugs.L10N.getLocalString("dlg.invalid_txt", " is invalid."),
+@@ -350,7 +350,7 @@
+                     }
+                 }
+                 for (int i = 0; i < auxModel.getSize(); i++) {
+-                    File temp = new File(auxModel.get(i));
++                    File temp = new File((String)auxModel.get(i));
+                     if (!temp.exists() && directoryOrArchive.accept(temp)) {
+                         if (!displayWarningAndAskIfWeShouldContinue(
+                                 temp.getName() + " " + edu.umd.cs.findbugs.L10N.getLocalString("dlg.invalid_txt", " is invalid."),
+@@ -447,7 +447,7 @@
+         return myPanel;
+     }
+ 
+-    private JPanel createFilePanel(final String label, final JList<String> list, final DefaultListModel<String> listModel,
++    private JPanel createFilePanel(final String label, final JList list, final DefaultListModel listModel,
+             final int fileSelectionMode, final FileFilter filter, final String dialogTitle,
+             boolean wizard, final String helpUrl) {
+         JPanel myPanel = new JPanel(new GridBagLayout());
+@@ -521,10 +521,10 @@
+                 public void actionPerformed(ActionEvent evt) {
+                     final Project tempProject = new Project();
+                     for (int i = 0; i < analyzeModel.getSize(); i++) {
+-                        tempProject.addFile(analyzeModel.get(i));
++                        tempProject.addFile((String)analyzeModel.get(i));
+                     }
+                     for (int i = 0; i < auxModel.getSize(); i++) {
+-                        tempProject.addAuxClasspathEntry(auxModel.get(i));
++                        tempProject.addAuxClasspathEntry((String)auxModel.get(i));
+                     }
+ 
+                     java.awt.EventQueue.invokeLater(new Runnable() {
+@@ -647,7 +647,7 @@
+     /**
+      * @param foundModel
+      */
+-    public void setSourceDirecs(DefaultListModel<String> foundModel) {
++    public void setSourceDirecs(DefaultListModel foundModel) {
+         for (int i = 0; i < foundModel.size(); i++) {
+             this.sourceModel.addElement(foundModel.getElementAt(i));
+         }
+Index: findbugs/src/java/edu/umd/cs/findbugs/classfile/impl/AnalysisCache.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/classfile/impl/AnalysisCache.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/classfile/impl/AnalysisCache.java	(revision )
+@@ -19,7 +19,7 @@
+ 
+ package edu.umd.cs.findbugs.classfile.impl;
+ 
+-import static java.util.Objects.requireNonNull;
++import static edu.umd.cs.findbugs.FBObjects.requireNonNull;
+ 
+ import java.util.Collection;
+ import java.util.Collections;
+Index: findbugs/src/gui/edu/umd/cs/findbugs/gui2/PreferencesFrame.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/gui/edu/umd/cs/findbugs/gui2/PreferencesFrame.java	(revision 23880)
++++ findbugs/src/gui/edu/umd/cs/findbugs/gui2/PreferencesFrame.java	(revision )
+@@ -48,7 +48,6 @@
+ import java.util.HashMap;
+ import java.util.List;
+ import java.util.Map;
+-import java.util.Objects;
+ import java.util.logging.Level;
+ import java.util.logging.Logger;
+ 
+@@ -77,10 +76,7 @@
+ import javax.swing.filechooser.FileFilter;
+ import javax.swing.tree.TreeModel;
+ 
+-import edu.umd.cs.findbugs.BugCollection;
+-import edu.umd.cs.findbugs.Plugin;
+-import edu.umd.cs.findbugs.PluginException;
+-import edu.umd.cs.findbugs.Project;
++import edu.umd.cs.findbugs.*;
+ import edu.umd.cs.findbugs.cloud.CloudPlugin;
+ import edu.umd.cs.findbugs.filter.Filter;
+ import edu.umd.cs.findbugs.filter.Matcher;
+@@ -98,7 +94,7 @@
+ 
+     private static PreferencesFrame instance;
+ 
+-    private final CheckBoxList<MatchBox> filterCheckBoxList = new CheckBoxList<>();
++    private final CheckBoxList filterCheckBoxList = new CheckBoxList();
+ 
+     // Variables for Properties tab.
+     private JTextField tabTextField;
+@@ -208,7 +204,7 @@
+             if (project != null) {
+                 Boolean newSetting = enabled.project;
+                 Boolean existingSetting = project.getPluginStatus(plugin);
+-                boolean sameSettings = Objects.equals(existingSetting, newSetting);
++                boolean sameSettings = FBObjects.equals(existingSetting, newSetting);
+                 if (!sameSettings) {
+                     project.setPluginStatusTrinary(plugin.getPluginId(), newSetting);
+                     changed = true;
+@@ -299,12 +295,18 @@
+                         pluginsAdded = true;
+                         rebuildPluginCheckboxes();
+ 
+-                    } catch (PluginException | MalformedURLException e1) {
++                    } catch (PluginException e1) {
+                         LOGGER.log(Level.WARNING, "Could not load " + f.getPath(), e1);
+                         JOptionPane.showMessageDialog(PreferencesFrame.this, "Could not load " + f.getPath()
+                                 + "\n\n"
+                                 + e1.getClass().getSimpleName() + ": " + e1.getMessage(),
+                                 "Error Loading Plugin", JOptionPane.ERROR_MESSAGE);
++                    } catch (MalformedURLException e1) {
++                        LOGGER.log(Level.WARNING, "Could not load " + f.getPath(), e1);
++                        JOptionPane.showMessageDialog(PreferencesFrame.this, "Could not load " + f.getPath()
++                                + "\n\n"
++                                + e1.getClass().getSimpleName() + ": " + e1.getMessage(),
++                                "Error Loading Plugin", JOptionPane.ERROR_MESSAGE);
+                     }
+                 }
+             }
+@@ -404,7 +406,7 @@
+             pluginPanelCenter.add(checkGlobal, gbc);
+ 
+             if (currentProject != null && !cannotDisable) {
+-                final JComboBox<String> combo = new WideComboBox<>(new String[]{"DEFAULT", "DISABLED", "ENABLED"});
++                final JComboBox combo = new WideComboBox(new String[]{"DEFAULT", "DISABLED", "ENABLED"});
+                 if (enabled.project == null) {
+                     combo.setSelectedIndex(0);
+                 } else {
+Index: findbugs/src/gui/edu/umd/cs/findbugs/gui2/NewFilterFrame.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/gui/edu/umd/cs/findbugs/gui2/NewFilterFrame.java	(revision 23880)
++++ findbugs/src/gui/edu/umd/cs/findbugs/gui2/NewFilterFrame.java	(revision )
+@@ -52,7 +52,7 @@
+ @SuppressWarnings("serial")
+ public class NewFilterFrame extends FBDialog {
+ 
+-    private final JList<String> list = new JList<>();
++    private final JList list = new JList();
+ 
+     private static NewFilterFrame instance = null;
+ 
+@@ -98,12 +98,12 @@
+             }
+         }
+ 
+-        final JComboBox<Sortables> comboBox = new JComboBox<>(valuesWithoutDivider);
+-        comboBox.setRenderer(new ListCellRenderer<Sortables>() {
++        final JComboBox comboBox = new JComboBox(valuesWithoutDivider);
++        comboBox.setRenderer(new ListCellRenderer() {
+             final Color SELECTED_BACKGROUND = new Color(183, 184, 204);
+ 
+             @Override
+-            public Component getListCellRendererComponent(JList<? extends Sortables> list, Sortables value, int index, boolean isSelected,
++            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+                     boolean cellHasFocus) {
+                 JLabel result = new JLabel();
+                 result.setFont(result.getFont().deriveFont(Driver.getFontSize()));
+@@ -133,7 +133,7 @@
+         String[] filterModes = { edu.umd.cs.findbugs.L10N.getLocalString("mode.equal_to", "equal to"),
+                 edu.umd.cs.findbugs.L10N.getLocalString("mode.at_or_after", "at or after"),
+                 edu.umd.cs.findbugs.L10N.getLocalString("mode.at_or_before", "at or before") };
+-        final JComboBox<String> filterModeComboBox = new JComboBox<>(filterModes);
++        final JComboBox filterModeComboBox = new JComboBox(filterModes);
+         north.add(filterModeComboBox);
+         north.add(new JLabel(":"));
+         north.add(Box.createHorizontalGlue());
+Index: findbugs/src/java/edu/umd/cs/findbugs/detect/FindUselessObjects.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/detect/FindUselessObjects.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/detect/FindUselessObjects.java	(revision )
+@@ -108,7 +108,7 @@
+         TypeAnalysis ta;
+         CFG cfg;
+         int count;
+-        Map<Integer, ValueInfo> observedValues = new HashMap<>();
++        Map<Integer, ValueInfo> observedValues = new HashMap<Integer, ValueInfo>();
+         ConstantPoolGen cpg;
+         Map<Integer, Set<ValueInfo>> values;
+         ValueNumber thisValue;
+@@ -156,7 +156,7 @@
+         }
+ 
+         void enhanceViaMergeTree() {
+-            values = new HashMap<>();
++            values = new HashMap<Integer, Set<ValueInfo>>();
+             for (Entry<Integer, ValueInfo> entry : observedValues.entrySet()) {
+                 BitSet outputSet = vna.getMergeTree().getTransitiveOutputSet(entry.getKey());
+                 outputSet.set(entry.getKey());
+@@ -164,7 +164,7 @@
+                 for (int i = outputSet.nextSetBit(0); i >= 0; i = outputSet.nextSetBit(i+1)) {
+                     Set<ValueInfo> list = values.get(i);
+                     if(list == null) {
+-                        list = new HashSet<>();
++                        list = new HashSet<ValueInfo>();
+                         values.put(i, list);
+                     }
+                     list.add(entry.getValue());
+@@ -233,7 +233,7 @@
+             }
+             Set<ValueInfo> list = values.get(number);
+             if(list == null) {
+-                list = new HashSet<>();
++                list = new HashSet<ValueInfo>();
+                 values.put(number, list);
+             }
+             result |= list.addAll(vals);
+@@ -241,7 +241,7 @@
+             for (int i = outputSet.nextSetBit(0); i >= 0; i = outputSet.nextSetBit(i+1)) {
+                 list = values.get(i);
+                 if(list == null) {
+-                    list = new HashSet<>();
++                    list = new HashSet<ValueInfo>();
+                     values.put(i, list);
+                 }
+                 result |= list.addAll(vals);
+@@ -334,7 +334,7 @@
+             if(vals.size() == 1) {
+                 return vals.iterator().next().escaped ? null : vals;
+             }
+-            Set<ValueInfo> result = new HashSet<>();
++            Set<ValueInfo> result = new HashSet<ValueInfo>();
+             for(ValueInfo vi : vals) {
+                 if(!vi.escaped) {
+                     result.add(vi);
+Index: findbugs/src/java/edu/umd/cs/findbugs/asm/ClassNodeDetector.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/asm/ClassNodeDetector.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/asm/ClassNodeDetector.java	(revision )
+@@ -29,6 +29,9 @@
+ import edu.umd.cs.findbugs.classfile.ClassDescriptor;
+ import edu.umd.cs.findbugs.classfile.Global;
+ import edu.umd.cs.findbugs.classfile.engine.asm.FindBugsASM;
++import org.objectweb.asm.tree.FieldNode;
++import org.objectweb.asm.tree.InnerClassNode;
++import org.objectweb.asm.tree.MethodNode;
+ 
+ /**
+  * Abstract base class to to reduce boilerplate needed for writing ASM-based
+@@ -62,10 +65,10 @@
+     public void visitClass(ClassDescriptor classDescriptor) throws CheckedAnalysisException {
+ 
+         FBClassReader cr = Global.getAnalysisCache().getClassAnalysis(FBClassReader.class, classDescriptor);
+-        this.interfaces = new ArrayList<>();
+-        this.innerClasses = new ArrayList<>();
+-        this.fields = new ArrayList<>();
+-        this.methods = new ArrayList<>();
++        this.interfaces = new ArrayList<String>();
++        this.innerClasses = new ArrayList<InnerClassNode>();
++        this.fields = new ArrayList<FieldNode>();
++        this.methods = new ArrayList<MethodNode>();
+         cr.accept(this, 0);
+     }
+ 
+Index: findbugs/src/java/edu/umd/cs/findbugs/detect/FindNoSideEffectMethods.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/detect/FindNoSideEffectMethods.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/detect/FindNoSideEffectMethods.java	(revision )
+@@ -75,20 +75,20 @@
+     private static final FieldDescriptor TARGET_NEW = new FieldDescriptor("java/lang/Stub", "new", "V", false);
+     private static final FieldDescriptor TARGET_OTHER = new FieldDescriptor("java/lang/Stub", "other", "V", false);
+ 
+-    private static final Set<String> NUMBER_CLASSES = new HashSet<>(Arrays.asList("java/lang/Integer", "java/lang/Long",
++    private static final Set<String> NUMBER_CLASSES = new HashSet<String>(Arrays.asList("java/lang/Integer", "java/lang/Long",
+             "java/lang/Double", "java/lang/Float", "java/lang/Byte", "java/lang/Short", "java/math/BigInteger",
+             "java/math/BigDecimal"));
+ 
+-    private static final Set<String> ALLOWED_EXCEPTIONS = new HashSet<>(Arrays.asList("java.lang.InternalError",
++    private static final Set<String> ALLOWED_EXCEPTIONS = new HashSet<String>(Arrays.asList("java.lang.InternalError",
+             "java.lang.ArrayIndexOutOfBoundsException", "java.lang.StringIndexOutOfBoundsException",
+             "java.lang.IndexOutOfBoundsException"));
+ 
+-    private static final Set<String> NO_SIDE_EFFECT_COLLECTION_METHODS = new HashSet<>(Arrays.asList("contains", "containsKey",
++    private static final Set<String> NO_SIDE_EFFECT_COLLECTION_METHODS = new HashSet<String>(Arrays.asList("contains", "containsKey",
+             "containsValue", "get", "indexOf", "lastIndexOf", "iterator", "listIterator", "isEmpty", "size", "getOrDefault",
+             "subList", "keys", "elements", "keySet", "entrySet", "values", "stream", "firstKey", "lastKey", "headMap", "tailMap",
+             "subMap", "peek", "mappingCount"));
+ 
+-    private static final Set<String> OBJECT_ONLY_CLASSES = new HashSet<>(Arrays.asList("java/lang/StringBuffer",
++    private static final Set<String> OBJECT_ONLY_CLASSES = new HashSet<String>(Arrays.asList("java/lang/StringBuffer",
+             "java/lang/StringBuilder", "java/util/regex/Matcher", "java/io/ByteArrayOutputStream",
+             "java/util/concurrent/atomic/AtomicBoolean", "java/util/concurrent/atomic/AtomicInteger",
+             "java/util/concurrent/atomic/AtomicLong", "java/awt/Point"));
+@@ -110,7 +110,7 @@
+     /**
+      * Known methods which change only this object
+      */
+-    private static final Set<MethodDescriptor> OBJECT_ONLY_METHODS = new HashSet<>(Arrays.asList(
++    private static final Set<MethodDescriptor> OBJECT_ONLY_METHODS = new HashSet<MethodDescriptor>(Arrays.asList(
+             ARRAY_STORE_STUB_METHOD, FIELD_STORE_STUB_METHOD,
+             new MethodDescriptor("java/util/Iterator", "next", "()Ljava/lang/Object;"),
+             new MethodDescriptor("java/util/Enumeration", "nextElement", "()Ljava/lang/Object;"),
+@@ -120,7 +120,7 @@
+     /**
+      * Known methods which have no side-effect
+      */
+-    private static final Set<MethodDescriptor> NO_SIDE_EFFECT_METHODS = new HashSet<>(Arrays.asList(
++    private static final Set<MethodDescriptor> NO_SIDE_EFFECT_METHODS = new HashSet<MethodDescriptor>(Arrays.asList(
+             GET_CLASS, CLASS_GET_NAME, HASH_CODE,
+             new MethodDescriptor("java/lang/reflect/Array", "newInstance", "(Ljava/lang/Class;I)Ljava/lang/Object;"),
+             new MethodDescriptor("java/lang/Class", "getResource", "(Ljava/lang/String;)Ljava/net/URL;"),
+@@ -140,7 +140,7 @@
+             new MethodDescriptor("org/apache/log4j/LogManager", "getLogger", "(Ljava/lang/String;)Lorg/apache/log4j/Logger;", true)
+             ));
+ 
+-    private static final Set<MethodDescriptor> NEW_OBJECT_RETURNING_METHODS = new HashSet<>(Arrays.asList(
++    private static final Set<MethodDescriptor> NEW_OBJECT_RETURNING_METHODS = new HashSet<MethodDescriptor>(Arrays.asList(
+             new MethodDescriptor("java/util/Vector", "elements", "()Ljava/util/Enumeration;"),
+             new MethodDescriptor("java/util/Hashtable", "elements", "()Ljava/util/Enumeration;"),
+             new MethodDescriptor("java/util/Hashtable", "keys", "()Ljava/util/Enumeration;"),
+@@ -247,7 +247,7 @@
+     }
+ 
+     public static class NoSideEffectMethodsDatabase {
+-        private final Map<MethodDescriptor, MethodSideEffectStatus> map = new HashMap<>();
++        private final Map<MethodDescriptor, MethodSideEffectStatus> map = new HashMap<MethodDescriptor, MethodSideEffectStatus>();
+ 
+         void add(MethodDescriptor m, MethodSideEffectStatus s) {
+             map.put(m, s);
+@@ -289,10 +289,10 @@
+     static class EarlyExitException extends RuntimeException {
+     }
+ 
+-    private final Map<MethodDescriptor, SideEffectStatus> statusMap = new HashMap<>();
+-    private final Map<MethodDescriptor, List<MethodCall>> callGraph = new HashMap<>();
+-    private final Set<MethodDescriptor> getStaticMethods = new HashSet<>();
+-    private final Set<MethodDescriptor> uselessVoidCandidates = new HashSet<>();
++    private final Map<MethodDescriptor, SideEffectStatus> statusMap = new HashMap<MethodDescriptor, SideEffectStatus>();
++    private final Map<MethodDescriptor, List<MethodCall>> callGraph = new HashMap<MethodDescriptor, List<MethodCall>>();
++    private final Set<MethodDescriptor> getStaticMethods = new HashSet<MethodDescriptor>();
++    private final Set<MethodDescriptor> uselessVoidCandidates = new HashSet<MethodDescriptor>();
+ 
+     private SideEffectStatus status;
+     private ArrayList<MethodCall> calledMethods;
+@@ -316,13 +316,13 @@
+     @Override
+     public void visit(JavaClass obj) {
+         super.visit(obj);
+-        allowedFields = new HashSet<>();
+-        fieldsModifyingMethods = new HashSet<>();
++        allowedFields = new HashSet<FieldDescriptor>();
++        fieldsModifyingMethods = new HashSet<MethodDescriptor>();
+         subtypes = null;
+         if (!obj.isFinal() && !obj.isEnum()) {
+             try {
+                 Subtypes2 subtypes2 = AnalysisContext.currentAnalysisContext().getSubtypes2();
+-                subtypes = new HashSet<>(subtypes2.getSubtypes(getClassDescriptor()));
++                subtypes = new HashSet<ClassDescriptor>(subtypes2.getSubtypes(getClassDescriptor()));
+                 subtypes.remove(getClassDescriptor());
+             } catch (ClassNotFoundException e) {
+             }
+@@ -333,7 +333,7 @@
+     public void visit(Method method) {
+         constructor = method.getName().equals("<init>");
+         classInit = method.getName().equals("<clinit>");
+-        calledMethods = new ArrayList<>();
++        calledMethods = new ArrayList<MethodCall>();
+         status = SideEffectStatus.NO_SIDE_EFFECT;
+         if (hasNoSideEffect(getMethodDescriptor())) {
+             handleStatus();
+@@ -400,7 +400,7 @@
+             List<MethodCall> calls = callGraph.get(method);
+             SideEffectStatus prevStatus = statusMap.get(method);
+             status = prevStatus.toSure();
+-            calledMethods = new ArrayList<>();
++            calledMethods = new ArrayList<MethodCall>();
+             for(MethodCall methodCall : calls) {
+                 FieldDescriptor target = methodCall.getTarget();
+                 if(target != TARGET_NEW && target != TARGET_OTHER && target != TARGET_THIS) {
+@@ -428,7 +428,7 @@
+         MethodDescriptor clinit = new MethodDescriptor(getClassName(), "<clinit>", "()V", true);
+         if(!statusMap.containsKey(clinit)) {
+             status = SideEffectStatus.NO_SIDE_EFFECT;
+-            calledMethods = new ArrayList<>();
++            calledMethods = new ArrayList<MethodCall>();
+             superClinitCall();
+             statusMap.put(clinit, status);
+             if(status == SideEffectStatus.UNSURE || status == SideEffectStatus.UNSURE_OBJECT_ONLY) {
+@@ -480,13 +480,13 @@
+         if (statusMap.containsKey(getMethodDescriptor())) {
+             return;
+         }
+-        finallyTargets = new HashSet<>();
++        finallyTargets = new HashSet<Integer>();
+         for(CodeException ex : getCode().getExceptionTable()) {
+             if(ex.getCatchType() == 0) {
+                 finallyTargets.add(ex.getHandlerPC());
+             }
+         }
+-        finallyExceptionRegisters = new HashSet<>();
++        finallyExceptionRegisters = new HashSet<Integer>();
+         try {
+             super.visit(obj);
+         } catch (EarlyExitException e) {
+@@ -882,7 +882,7 @@
+     @Override
+     public void report() {
+         computeFinalStatus();
+-        Set<String> sideEffectClinit = new HashSet<>();
++        Set<String> sideEffectClinit = new HashSet<String>();
+         for(Entry<MethodDescriptor, SideEffectStatus> entry : statusMap.entrySet()) {
+             if (entry.getValue() == SideEffectStatus.SIDE_EFFECT && entry.getKey().isStatic() && entry.getKey().getName().equals("<clinit>")) {
+                 sideEffectClinit.add(entry.getKey().getSlashedClassName());
+@@ -975,7 +975,7 @@
+         Set<XMethod> superMethods = Hierarchy2.findSuperMethods(xMethod);
+         superMethods.add(xMethod);
+         Subtypes2 subtypes2 = AnalysisContext.currentAnalysisContext().getSubtypes2();
+-        Set<ClassDescriptor> subtypes = new HashSet<>();
++        Set<ClassDescriptor> subtypes = new HashSet<ClassDescriptor>();
+         for(XMethod superMethod : superMethods) {
+             try {
+                 subtypes.addAll(subtypes2.getSubtypes(superMethod.getClassDescriptor()));
+@@ -1011,7 +1011,7 @@
+                 uselessVoidCandidate = uselessVoidCandidates.contains(method);
+                 SideEffectStatus prevStatus = statusMap.get(method);
+                 status = prevStatus.toSure();
+-                calledMethods = new ArrayList<>();
++                calledMethods = new ArrayList<MethodCall>();
+                 for(MethodCall methodCall : entry.getValue()) {
+                     sawCall(methodCall, true);
+                     if(status == SideEffectStatus.SIDE_EFFECT) {
+Index: findbugs/src/java/edu/umd/cs/findbugs/Version.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/Version.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/Version.java	(revision )
+@@ -106,18 +106,7 @@
+ 
+     private static final String RELEASE_SUFFIX_WORD;
+     static {
+-        String suffix;
+-        if (RELEASE_CANDIDATE > 0) {
+-            suffix = "rc" + RELEASE_CANDIDATE;
+-        } else if (PREVIEW > 0) {
+-            suffix = "preview" + PREVIEW;
+-        } else {
+-            suffix = "dev-" + COMPUTED_ECLIPSE_DATE;
+-            if (!"Unknown".equals(GIT_REVISION)) {
+-                suffix += "-" + GIT_REVISION;
+-            }
+-        }
+-        RELEASE_SUFFIX_WORD = suffix;
++        RELEASE_SUFFIX_WORD = "-jre6";
+     }
+ 
+     public static final String RELEASE_BASE = MAJOR + "." + MINOR + "." + PATCHLEVEL;
+Index: findbugs/src/java/edu/umd/cs/findbugs/FBObjects.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/FBObjects.java	(revision )
++++ findbugs/src/java/edu/umd/cs/findbugs/FBObjects.java	(revision )
+@@ -0,0 +1,51 @@
++package edu.umd.cs.findbugs;
++
++/**
++ * Created by merz on 17.02.2015.
++ */
++
++import java.util.Arrays;
++import java.util.Comparator;
++
++public final class FBObjects {
++
++    private FBObjects() {
++        throw new AssertionError("No java.util.Objects instances for you!");
++    }
++
++    public static boolean equals(Object a, Object b) {
++        return (a == b) || (a != null && a.equals(b));
++    }
++
++    public static int hashCode(Object o) {
++        return o != null ? o.hashCode() : 0;
++    }
++
++    public static int hash(Object... values) {
++        return Arrays.hashCode(values);
++    }
++
++    public static String toString(Object o) {
++        return String.valueOf(o);
++    }
++
++    public static String toString(Object o, String nullDefault) {
++        return (o != null) ? o.toString() : nullDefault;
++    }
++
++    public static <T> int compare(T a, T b, Comparator<? super T> c) {
++        return (a == b) ? 0 : c.compare(a, b);
++    }
++
++    public static <T> T requireNonNull(T obj) {
++        if (obj == null)
++            throw new NullPointerException();
++        return obj;
++    }
++
++    public static <T> T requireNonNull(T obj, String message) {
++        if (obj == null)
++            throw new NullPointerException(message);
++        return obj;
++    }
++}
+\ No newline at end of file
+Index: findbugs/src/java/edu/umd/cs/findbugs/ba/vna/ValueNumberFrame.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/ba/vna/ValueNumberFrame.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/ba/vna/ValueNumberFrame.java	(revision )
+@@ -28,12 +28,12 @@
+ import java.util.Iterator;
+ import java.util.Map;
+ import java.util.Map.Entry;
+-import java.util.Objects;
+ import java.util.Set;
+ 
+ import javax.annotation.CheckForNull;
+ import javax.annotation.Nonnull;
+ 
++import edu.umd.cs.findbugs.FBObjects;
+ import edu.umd.cs.findbugs.ba.AnalysisContext;
+ import edu.umd.cs.findbugs.ba.FieldSummary;
+ import edu.umd.cs.findbugs.ba.Frame;
+@@ -152,7 +152,7 @@
+      *            the value(s) loaded
+      */
+     public void addAvailableLoad(AvailableLoad availableLoad, @Nonnull ValueNumber[] value) {
+-        Objects.requireNonNull(value);
++        FBObjects.requireNonNull(value);
+         getUpdateableAvailableLoadMap().put(availableLoad, value);
+ 
+         for (ValueNumber v : value) {
+Index: findbugs/src/gui/edu/umd/cs/findbugs/gui2/CheckBoxList.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/gui/edu/umd/cs/findbugs/gui2/CheckBoxList.java	(revision 23880)
++++ findbugs/src/gui/edu/umd/cs/findbugs/gui2/CheckBoxList.java	(revision )
+@@ -39,7 +39,7 @@
+  * @author Trevor Harmon
+  */
+ @SuppressWarnings("serial")
+-public class CheckBoxList<E> extends JList<E> {
++public class CheckBoxList<E> extends JList {
+     private static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
+ 
+     public CheckBoxList() {
+@@ -75,9 +75,9 @@
+         }
+     }
+ 
+-    protected class CellRenderer implements ListCellRenderer<E> {
++    protected class CellRenderer implements ListCellRenderer {
+         @Override
+-        public Component getListCellRendererComponent(JList<? extends E> list, E value, int index, boolean isSelected,
++        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
+                 boolean cellHasFocus) {
+             JCheckBox checkbox = (JCheckBox) value;
+             checkbox.setBackground(isSelected ? getSelectionBackground() : getBackground());
+Index: findbugs/src/java/edu/umd/cs/findbugs/workflow/CountClassVersions.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/workflow/CountClassVersions.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/workflow/CountClassVersions.java	(revision )
+@@ -124,7 +124,8 @@
+             }
+             System.err.println("Opening " + f);
+ 
+-            try (ZipFile zipInputFile = new ZipFile(f)){
++            ZipFile zipInputFile = new ZipFile(f);
++            try {
+                 for (Enumeration<? extends ZipEntry> e = zipInputFile.entries(); e.hasMoreElements();) {
+                     ZipEntry ze = e.nextElement();
+ 
+@@ -159,6 +160,8 @@
+             } catch (IOException e) {
+                 e.printStackTrace();
+                 continue;
++            } finally {
++                zipInputFile.close();
+             }
+         }
+         for (String s : map.keySet()) {
+Index: findbugs/src/java/edu/umd/cs/findbugs/Project.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>windows-1252
+===================================================================
+--- findbugs/src/java/edu/umd/cs/findbugs/Project.java	(revision 23880)
++++ findbugs/src/java/edu/umd/cs/findbugs/Project.java	(revision )
+@@ -25,7 +25,7 @@
+ 
+ package edu.umd.cs.findbugs;
+ import static edu.umd.cs.findbugs.xml.XMLOutputUtil.writeElementList;
+-import static java.util.Objects.requireNonNull;
++import static edu.umd.cs.findbugs.FBObjects.requireNonNull;
+ 
+ import java.io.BufferedInputStream;
+ import java.io.File;
