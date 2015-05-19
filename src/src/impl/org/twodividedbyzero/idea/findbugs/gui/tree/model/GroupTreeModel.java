@@ -287,16 +287,18 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode, RootNod
 		final String[] groupNameKey = BugInstanceUtil.getGroupPath(bugInstance, fullGroupPath.length - 1, _groupBy);
 
 		final Map<Integer, List<BugInstanceGroupNode>> map = _groups.get(Arrays.toString(groupNameKey));
-		for (final Entry<Integer, List<BugInstanceGroupNode>> entry : map.entrySet()) {
+		if (map != null) {
+			for (final Entry<Integer, List<BugInstanceGroupNode>> entry : map.entrySet()) {
 
-			final List<BugInstanceGroupNode> groupNodes = entry.getValue();
-			for (final BugInstanceGroupNode groupNode : groupNodes) {
+				final List<BugInstanceGroupNode> groupNodes = entry.getValue();
+				for (final BugInstanceGroupNode groupNode : groupNodes) {
 
-				final List<VisitableTreeNode> bugInstanceNodes = groupNode.getChildsList();
-				for (final VisitableTreeNode node : bugInstanceNodes) {
-					final BugInstance bug = ((BugInstanceNode) node).getBugInstance();
-					if (bug.equals(bugInstance)) {
-						return (BugInstanceNode) node;
+					final List<VisitableTreeNode> bugInstanceNodes = groupNode.getChildsList();
+					for (final VisitableTreeNode node : bugInstanceNodes) {
+						final BugInstance bug = ((BugInstanceNode) node).getBugInstance();
+						if (bug.equals(bugInstance)) {
+							return (BugInstanceNode) node;
+						}
 					}
 				}
 			}

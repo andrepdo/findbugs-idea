@@ -89,6 +89,7 @@
         <h3>0.9.997</h3>
         <ul>
             <li>Issue 97: HiDPI improvements (incomplete, icons)</li>
+            <li>Issue 99: fix possible NPE</li>
         </ul>
         <h3>0.9.996</h3>
         <ul>
