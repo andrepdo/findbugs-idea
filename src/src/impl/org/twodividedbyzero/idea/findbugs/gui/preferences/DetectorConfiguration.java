@@ -26,6 +26,7 @@ import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import info.clearthought.layout.TableLayout;
+import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.gui.common.TableFacade;
 import org.twodividedbyzero.idea.findbugs.gui.common.TableSorter;
@@ -107,9 +108,9 @@ public class DetectorConfiguration implements ConfigurationPage {
 	public Component getComponent() {
 		if (_component == null) {
 
-			final double border = 5;
-			final double rowsGap = 5;
-			final double colsGap = 10;
+			final double border = GuiUtil.SCALE_FACTOR*5;
+			final double rowsGap = GuiUtil.SCALE_FACTOR*5;
+			final double colsGap = GuiUtil.SCALE_FACTOR*10;
 			final double[][] size = {{border, TableLayout.FILL, border}, // Columns
 									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, rowsGap, TableLayout.FILL, 15, 0, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
@@ -135,7 +136,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 			final JComponent scrollPane = ScrollPaneFacade.createScrollPane(getTextArea(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			getDetectorTextPanel().add(scrollPane, BorderLayout.CENTER);
 			final Dimension preferredSize = getDetectorTextPanel().getPreferredSize();
-			preferredSize.height = 150;
+			preferredSize.height = GuiUtil.SCALE_FACTOR*150;
 			getDetectorTextPanel().setPreferredSize(preferredSize);
 			scrollPane.setBorder(null);
 			//mainPanel.add(getDetectorTextPanel(), "1, 9, 1, 9");

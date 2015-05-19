@@ -21,6 +21,7 @@ package org.twodividedbyzero.idea.findbugs.gui.preferences;
 import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import info.clearthought.layout.TableLayout;
+import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.gui.common.AaComboBox;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.gui.common.TableFacade;
@@ -74,9 +75,9 @@ public class ReportConfiguration implements ConfigurationPage {
 	public Component getComponent() {
 		if (_component == null) {
 
-			final double border = 5;
-			final double rowsGap = 5;
-			final double colsGap = 10;
+			final double border = GuiUtil.SCALE_FACTOR*5;
+			final double rowsGap = GuiUtil.SCALE_FACTOR*5;
+			final double colsGap = GuiUtil.SCALE_FACTOR*10;
 			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED}, // Columns
 									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
@@ -141,7 +142,7 @@ public class ReportConfiguration implements ConfigurationPage {
 			_categoryTable.setShowGrid(false);
 			_categoryTable.setShowHorizontalLines(false);
 			_categoryTable.setShowVerticalLines(false);
-			_categoryTable.setRowHeight(25);
+			_categoryTable.setRowHeight(GuiUtil.SCALE_FACTOR*25);
 			_categoryTable.setTableHeader(null);
 			_categoryTable.setCellSelectionEnabled(false);
 			_categoryTable.setRowSelectionAllowed(true);

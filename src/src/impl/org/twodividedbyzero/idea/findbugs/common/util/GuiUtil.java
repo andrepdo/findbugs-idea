@@ -20,6 +20,8 @@ package org.twodividedbyzero.idea.findbugs.common.util;
 
 import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiElement;
+import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.Detector;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +49,8 @@ import java.util.Map;
 public final class GuiUtil {
 
 	public static final String DESKTOP_PROPERTY_AWT_FONT_DESKTOP_HINTS = "awt.font.desktophints";
-	
+	public static final boolean HiDPI  = UIUtil.isRetina() || JBUI.isHiDPI();
+	public static final int SCALE_FACTOR = HiDPI ? 2 : 1;;
 
 	private GuiUtil() {
 		throw new UnsupportedOperationException();

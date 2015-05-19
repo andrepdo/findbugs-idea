@@ -21,6 +21,7 @@ package org.twodividedbyzero.idea.findbugs.gui.tree.view;
 import com.intellij.ui.JBColor;
 import info.clearthought.layout.TableLayout;
 import info.clearthought.layout.TableLayoutConstants;
+import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceGroupNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.RootNode;
@@ -67,7 +68,7 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer/*, 
 	private Color _backgroundNonSelectionColor;
 	private Color _borderSelectionColor;
 	private Color _hitsForegroundColor;
-	private final int _hGap = 4;
+	private final int _hGapUnscaled = 4;
 
 	private final JLabel _icon;
 	private final ValueLabel _title;
@@ -89,7 +90,7 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer/*, 
 
 		final double border = 0;
 		final double rowsGap = 0;
-		final double colsGap = _hGap;
+		final double colsGap = (GuiUtil.SCALE_FACTOR*_hGapUnscaled);
 		final double[][] size = {{border, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.PREFERRED, border}, // Columns
 								 {border, TableLayoutConstants.PREFERRED, border}};// Rows
 		final LayoutManager tbl = new TableLayout(size);
@@ -340,14 +341,20 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer/*, 
 
 
 	private void updateBounds() {
-		final Dimension size = _icon.getPreferredSize();
+		final Dimension size;
+		if (GuiUtil.HiDPI) {
+			// fixed size because tree contains scaled (idea) and unscaled (findbugs) icons
+			size = new Dimension(32, 32);
+		} else {
+			size = _icon.getPreferredSize();
+		}
 		size.width += _title.getPreferredSize().width;
 		size.width += _hits.getPreferredSize().width;
 		if (!_link.getText().isEmpty()) {
-			size.width += 50; //_link
+			size.width += (GuiUtil.SCALE_FACTOR*50); //_link
 		}
-		size.width += _hGap; // BorderLayout hGap
-		size.height += 2;
+		size.width += (GuiUtil.SCALE_FACTOR*_hGapUnscaled); // BorderLayout hGap
+		size.height += (GuiUtil.SCALE_FACTOR*2);
 
 		setSize(size);
 		setPreferredSize(size);
@@ -358,7 +365,7 @@ public class TreeNodeCellRenderer extends JPanel implements TreeCellRenderer/*, 
 
 
 	private int getIconLabelStart() {
-		return _icon.getWidth() + _hGap - 2; // _icon.getX();
+		return _icon.getWidth() + (GuiUtil.SCALE_FACTOR*_hGapUnscaled) - (GuiUtil.SCALE_FACTOR*2); // _icon.getX();
 	}
 
 

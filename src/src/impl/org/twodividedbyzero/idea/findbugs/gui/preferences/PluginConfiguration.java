@@ -107,13 +107,14 @@ public class PluginConfiguration implements ConfigurationPage {
 
 	public Component getComponent() {
 		if (_component == null) {
-			final double border = 5;
+			final double border = GuiUtil.SCALE_FACTOR*5;
+			final int iBorder = GuiUtil.SCALE_FACTOR*5;
 			final double[][] size = {{border, TableLayoutConstants.FILL, border}, // Columns
 									 {border, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 
 			final JComponent mainPanel = new JPanel(tbl);
-			mainPanel.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(5, 5, 5, 5), BorderFactory.createTitledBorder("Installed Plugins")));
+			mainPanel.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(iBorder, iBorder, iBorder, iBorder), BorderFactory.createTitledBorder("Installed Plugins")));
 			_component = mainPanel;
 			mainPanel.add(getPluginPanel(), "1, 1, 1, 1");
 
@@ -154,8 +155,8 @@ public class PluginConfiguration implements ConfigurationPage {
 	JPanel getPluginPanel() {
 		if (_pluginsPanel == null) {
 
-			final double border = 5;
-			final double colsGap = 10;
+			final double border = GuiUtil.SCALE_FACTOR*5;
+			final double colsGap = GuiUtil.SCALE_FACTOR*10;
 			final double[][] size = {{border, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.PREFERRED, border}, // Columns
 									 {border, TableLayoutConstants.FILL, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
@@ -169,7 +170,7 @@ public class PluginConfiguration implements ConfigurationPage {
 			_pluginsPanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
 
 
-			final double rowsGap = 5;
+			final double rowsGap = GuiUtil.SCALE_FACTOR*5;
 			final double[][] bPanelSize = {{border, TableLayoutConstants.PREFERRED}, // Columns
 										   {border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tableLayout = new TableLayout(bPanelSize);
@@ -339,12 +340,12 @@ public class PluginConfiguration implements ConfigurationPage {
 
 
 		void init(@Nullable final Project currentProject, final Plugin plugin, final boolean userPlugin) {
-			final double border = 5;
+			final double border = GuiUtil.SCALE_FACTOR*5;
 			final double[][] size = {{border, TableLayoutConstants.PREFERRED, 5, TableLayoutConstants.FILL, border}, // Columns
 									 {border, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_component = new JPanel(tbl);
-			_component.setBorder(new CustomLineBorder(JBColor.GRAY, 0, 0, 1, 0));
+			_component.setBorder(new CustomLineBorder(JBColor.GRAY, 0, 0, GuiUtil.SCALE_FACTOR*1, 0));
 			_component.setBackground(PLUGIN_DESCRIPTION_BG_COLOR);
 
 			String text = plugin.getShortDescription();
@@ -405,8 +406,8 @@ public class PluginConfiguration implements ConfigurationPage {
 
 			final String website = plugin.getWebsite();
 			final StringBuilder html = new StringBuilder("<html><body width='300px'>");
-			html.append("<p><b>").append(text).append("</b> <font style='color:gray; font-size: 8px'>(").append(pluginId).append(")</font> </p>");
-			html.append("<p><font style='color: gray; font-weight: normal; font-style:italic'>");
+			html.append("<p><b>").append(text).append("</b> <font style='color:gray; font-size: x-small'>(").append(pluginId).append(")</font> </p>");
+			html.append("<p><font style='color: gray; font-weight: normal; font-style:italic; font-size: x-small'>");
 			html.append(pluginUrl);
 			html.append("</font>");
 			html.append(longText);
@@ -414,7 +415,7 @@ public class PluginConfiguration implements ConfigurationPage {
 
 			if (website != null && !website.isEmpty()) {
 				html.append("<br><p>");
-				html.append("<font style='font-weight: bold; color:gray; font-size: 8px'>Website: ").append(website).append("</font>");
+				html.append("<font style='font-weight: bold; color:gray; font-size: small'>Website: ").append(website).append("</font>");
 				html.append("</p>");
 			}
 			html.append("</html></body>");
