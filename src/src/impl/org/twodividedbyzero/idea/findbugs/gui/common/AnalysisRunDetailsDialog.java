@@ -27,20 +27,10 @@ import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JEditorPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.html.HTMLEditorKit;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.io.Serializable;
 import java.util.List;
 
@@ -71,7 +61,7 @@ public class AnalysisRunDetailsDialog implements Serializable {
 		final StringBuilder html = new StringBuilder();
 		html.append("<html><body>");
 		html.append("<p><h2>").append(VersionManager.getName()).append(": <b>found ").append(bugCount).append(" bugs in ").append(numAnalysedClasses).append(numAnalysedClasses > 1 ? " classes" : " class").append("</b>").append("</h2></p>");
-		html.append("<p>").append("<font size='10px'>using ").append(VersionManager.getFullVersionInternal()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font>").append("</p>");
+		html.append("<p>").append("<font size='10px'>using ").append(VersionManager.getFullVersion()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font>").append("</p>");
 
 		if (!configuredOutputFiles.isEmpty()) {
 			html.append("<p><h3>Configured Output Files/Paths - the analysis entry point").append(" <font color='gray'>(").append(configuredOutputFiles.size()).append(")</h3></p>");

@@ -44,8 +44,6 @@ public class VersionManager {
 	private static final long _build = 996;
 
 	private static final String _branch = "trunk";
-	private static final String rev = "$Revision$";
-	private static final long _revision = Long.parseLong(rev.substring(11, rev.lastIndexOf(' ')));
 
 
 	private static final String NAME = FindBugsPluginConstants.PLUGIN_NAME;
@@ -58,12 +56,9 @@ public class VersionManager {
 
 	private static final long REVISION;
 
-	private static final String FULL_VERSION_INTERNAL;
 	private static final String FULL_VERSION;
 
 	private static final String MAJOR_MINOR_BUILD = _major + "." + _minor + '.' + _build;
-
-	private static final String MAJOR_MINOR_BUILD_REVISION;
 
 
 	static {
@@ -78,9 +73,7 @@ public class VersionManager {
 			}
 		}
 		REVISION = parsedRevision;
-		MAJOR_MINOR_BUILD_REVISION = MAJOR_MINOR_BUILD + (REVISION == -1 ? "." + _revision : "." + REVISION);
 		//noinspection StringEqualsEmptyString,SingleCharacterStringConcatenation
-		FULL_VERSION_INTERNAL = NAME + ' ' + MAJOR_MINOR_BUILD_REVISION + ("".equals(_branch) ? "" : "-" + _branch);
 		FULL_VERSION = NAME + ' ' + MAJOR_MINOR_BUILD;
 	}
 
@@ -92,23 +85,8 @@ public class VersionManager {
 	}
 
 
-	/** e.g. "0.9.21.26427" if revision is available, else "0.9.21".
-	 * @return*/
-	public static String getVersionWithRevision() {
-		return MAJOR_MINOR_BUILD_REVISION;
-	}
-
-
 	public static String getBranch() {
 		return _branch;
-	}
-
-
-	/* e.g. "FindBugs-IDEA 0.9.21.26427". */
-
-
-	public static String getFullVersionInternal() {
-		return FULL_VERSION_INTERNAL;
 	}
 
 
@@ -160,9 +138,6 @@ public class VersionManager {
 			}
 
 		}
-		System.out.println("$Id$");
 		System.out.println(getVersion());
-		System.out.println(getFullVersionInternal());
-		System.out.println(getVersionWithRevision());
 	}
 }

@@ -5,12 +5,8 @@
     <property file="./build.properties"/>
 
     <path id="component.classpath">
-        <pathelement path="${src.dir}/api"/>
-        <pathelement path="${src.dir}/dev"/>
         <pathelement path="${src.dir}/impl"/>
 
-        <pathelement path="${target.dir}/api"/>
-        <pathelement path="${target.dir}/dev"/>
         <pathelement path="${target.dir}/impl"/>
 
         <fileset id="libs" dir="${lib.dir}">
@@ -38,18 +34,6 @@
         <pathelement path="${src.dir}/test"/>
         <pathelement path="${target.dir}/test"/>
     </path>
-
-    <fileset id="component.classes.api" dir="${target.dir}/api">
-        <include name="**/**.class"/>
-        <include name="**/**.png"/>
-        <include name="**/**.properties"/>
-    </fileset>
-
-    <fileset id="component.classes.dev" dir="${target.dir}/dev">
-        <include name="**/**.class"/>
-        <include name="**/**.png"/>
-        <include name="**/**.properties"/>
-    </fileset>
 
     <fileset id="component.classes.impl" dir="${target.dir}/impl">
         <include name="**/**.class"/>
@@ -114,48 +98,8 @@
     <target name="build" depends="compile.all, assemble-all" description="Build entire ${component.name}"/>
 
     <target name="compile.all" depends="clean, init" description="Compile ${component.name} sources">
-        <ant target="compile.api"/>
-        <ant target="compile.dev"/>
         <ant target="compile.impl"/>
         <ant target="compile.test"/>
-    </target>
-
-    <target name="compile.api" depends="init" description="Compile ${component.name} sources">
-        <javac srcdir="${src.dir}/api"
-               destdir="${target.dir}/api"
-               debug="${javac.debug}"
-               optimize="${javac.optimize}"
-               source="${javac.source}"
-               target="${javac.target}"
-               deprecation="${javac.deprecation}"
-               failonerror="true"
-               fork="true"
-               memoryMaximumSize="256m"
-               encoding="${javac.encoding}"
-               listfiles="${javac.listfiles}">
-            <compilerarg value="${javac.compilerarg}"/>
-            <classpath refid="component.classpath"/>
-            <include name="**/*.java"/>
-        </javac>
-    </target>
-
-    <target name="compile.dev" depends="init" description="Compile ${component.name} sources">
-        <javac srcdir="${src.dir}/dev"
-               destdir="${target.dir}/dev"
-               debug="${javac.debug}"
-               optimize="${javac.optimize}"
-               source="${javac.source}"
-               target="${javac.target}"
-               deprecation="${javac.deprecation}"
-               failonerror="true"
-               fork="true"
-               memoryMaximumSize="256m"
-               encoding="${javac.encoding}"
-               listfiles="${javac.listfiles}">
-            <compilerarg value="${javac.compilerarg}"/>
-            <classpath refid="component.classpath"/>
-            <include name="**/*.java"/>
-        </javac>
     </target>
 
     <target name="compile.impl" depends="init" description="Compile ${component.name} sources">
@@ -242,8 +186,6 @@
             <!--<indexjars>
              <fileset dir="${lib.dir}"/>
          </indexjars>-->
-            <fileset refid="component.classes.api"/>
-            <fileset refid="component.classes.dev"/>
             <fileset refid="component.classes.impl"/>
             <!--<fileset refid="libs"/>-->
         </jar>
@@ -336,22 +278,13 @@
     </target>
 
     <target name="clean" description="Clean ${component.name} target directories">
-        <delete dir="${target.dir}/api"/>
-        <delete dir="${target.dir}/impl"/>
-        <delete dir="${target.dir}/dev"/>
-        <delete dir="${target.dir}/test"/>
-        <delete dir="${target.dir}/jar"/>
-        <delete dir="${target.dir}/tmp"/>
-        <delete dir="${target.dir}/zip"/>
         <delete dir="${target.dir}"/>
     </target>
 
 
     <target name="mktargetdirs" description="Create ${component.name} nessesarry target directoryies">
         <mkdir dir="${target.dir}"/>
-        <mkdir dir="${target.dir}/api"/>
         <mkdir dir="${target.dir}/impl"/>
-        <mkdir dir="${target.dir}/dev"/>
         <mkdir dir="${target.dir}/test"/>
         <mkdir dir="${target.dir}/jar"/>
         <mkdir dir="${target.dir}/tmp"/>
