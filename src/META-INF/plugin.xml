@@ -386,7 +386,7 @@
 
             <action id="FindBugs.ProjectFilesAction"
                     class="org.twodividedbyzero.idea.findbugs.actions.AnalyzeProjectFiles"
-                    text="Anaylze Project Files"
+                    text="Analyze Project Files"
                     description="Run FindBugs analysis on all project files."
                     icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeProject.png">
 
