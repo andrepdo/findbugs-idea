@@ -72,6 +72,12 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		 * As a workaround, {@link ChangeCollector} will collect the changes.
 		 */
 		ApplicationManager.getApplication().getMessageBus().connect().subscribe(BuildManagerListener.TOPIC, new BuildManagerListener() {
+
+			//@Override // introduced with IDEA 15 EA
+			public void beforeBuildProcessStarted(Project project, UUID sessionId) {
+			}
+
+			@Override
 			public void buildStarted(final Project project, final UUID sessionId, final boolean isAutomake) {
 				if (isAutomake && isAfterAutoMakeEnabled(project)) {
 					final Set<VirtualFile> changed = Changes.INSTANCE.getAndRemoveChanged(project);

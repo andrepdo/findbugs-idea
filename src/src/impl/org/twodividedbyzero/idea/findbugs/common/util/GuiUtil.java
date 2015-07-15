@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -20,7 +20,6 @@ package org.twodividedbyzero.idea.findbugs.common.util;
 
 import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiElement;
-import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.Detector;
@@ -36,6 +35,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 
@@ -49,8 +50,28 @@ import java.util.Map;
 public final class GuiUtil {
 
 	public static final String DESKTOP_PROPERTY_AWT_FONT_DESKTOP_HINTS = "awt.font.desktophints";
-	public static final boolean HiDPI  = UIUtil.isRetina() || JBUI.isHiDPI();
-	public static final int SCALE_FACTOR = HiDPI ? 2 : 1;;
+	public static final boolean HiDPI;
+	public static final int SCALE_FACTOR;
+
+    static {
+        if (UIUtil.isRetina()) {
+            HiDPI = true;
+        } else {
+            boolean isHiDPI = false;
+            try {
+                // JBUI was introduced with IDEA 14
+                final Class<?> class_JBUI = Class.forName("com.intellij.util.ui.JBUI");
+                final Method method_isHiDPI = class_JBUI.getDeclaredMethod("isHiDPI");
+                isHiDPI = (Boolean)method_isHiDPI.invoke(null);
+            } catch (ClassNotFoundException e) { // ; ignore
+            } catch (NoSuchMethodException e) { // ; ignore
+            } catch (InvocationTargetException e) { // ; ignore
+            } catch (IllegalAccessException e) { // ; ignore
+            }
+            HiDPI = isHiDPI;
+        }
+        SCALE_FACTOR = HiDPI ? 2 : 1;
+    }
 
 	private GuiUtil() {
 		throw new UnsupportedOperationException();
