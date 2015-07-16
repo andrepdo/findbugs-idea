@@ -29,6 +29,7 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
@@ -57,7 +58,7 @@ abstract class AbstractToggleAction extends ToggleAction {
 			e.getPresentation().setVisible(false);
 			return;
 		}
-		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(plugin.getInternalToolWindowId());
+		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
 		if (toolWindow == null || !toolWindow.isAvailable()) {
 			e.getPresentation().setEnabled(false);
 			e.getPresentation().setVisible(false);
@@ -103,7 +104,7 @@ abstract class AbstractToggleAction extends ToggleAction {
 			e.getPresentation().setVisible(false);
 			return false;
 		}
-		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(plugin.getInternalToolWindowId());
+		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
 		if (toolWindow == null || !toolWindow.isAvailable()) {
 			e.getPresentation().setEnabled(false);
 			e.getPresentation().setVisible(false);
@@ -157,7 +158,7 @@ abstract class AbstractToggleAction extends ToggleAction {
 			e.getPresentation().setVisible(false);
 			return;
 		}
-		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(plugin.getInternalToolWindowId());
+		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
 		if (toolWindow == null || !toolWindow.isAvailable()) {
 			e.getPresentation().setEnabled(false);
 			e.getPresentation().setVisible(false);

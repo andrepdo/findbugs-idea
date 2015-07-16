@@ -28,6 +28,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
@@ -56,7 +57,7 @@ abstract class AbstractAction extends AnAction {
 			e.getPresentation().setVisible(false);
 			return;
 		}
-		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(plugin.getInternalToolWindowId());
+		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
 		if (toolWindow == null || !toolWindow.isAvailable()) {
 			e.getPresentation().setEnabled(false);
 			e.getPresentation().setVisible(false);
@@ -101,7 +102,7 @@ abstract class AbstractAction extends AnAction {
 			e.getPresentation().setVisible(false);
 			return;
 		}
-		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(plugin.getInternalToolWindowId());
+		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
 		if (toolWindow == null || !toolWindow.isAvailable()) {
 			e.getPresentation().setEnabled(false);
 			e.getPresentation().setVisible(false);

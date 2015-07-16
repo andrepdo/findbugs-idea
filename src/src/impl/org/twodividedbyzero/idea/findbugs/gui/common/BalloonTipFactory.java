@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -26,7 +26,7 @@ import com.intellij.openapi.ui.popup.BalloonBuilder;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.awt.RelativePoint;
-import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 
 import javax.annotation.Nullable;
 import javax.swing.Icon;
@@ -82,7 +82,7 @@ public class BalloonTipFactory {
 		if (manager == null) { // this should never happen.
 			return;
 		}
-		manager.notifyByBalloon(IdeaUtilImpl.getPluginComponent(project).getInternalToolWindowId(), MessageType.INFO, html, null, hyperlinkListener);
+		manager.notifyByBalloon(FindBugsPluginConstants.TOOL_WINDOW_ID, MessageType.INFO, html, null, hyperlinkListener);
 	}
 
 
@@ -96,7 +96,7 @@ public class BalloonTipFactory {
 		if (manager == null) { // this should never happen.
 			return;
 		}
-		manager.notifyByBalloon(IdeaUtilImpl.getPluginComponent(project).getInternalToolWindowId(), MessageType.WARNING, html, null, hyperlinkListener);
+		manager.notifyByBalloon(FindBugsPluginConstants.TOOL_WINDOW_ID, MessageType.WARNING, html, null, hyperlinkListener);
 	}
 
 
@@ -110,7 +110,7 @@ public class BalloonTipFactory {
 		if (manager == null) { // this should never happen.
 			return;
 		}
-		manager.notifyByBalloon(IdeaUtilImpl.getPluginComponent(project).getInternalToolWindowId(), MessageType.ERROR, html, null, hyperlinkListener);
+		manager.notifyByBalloon(FindBugsPluginConstants.TOOL_WINDOW_ID, MessageType.ERROR, html, null, hyperlinkListener);
 	}
 
 

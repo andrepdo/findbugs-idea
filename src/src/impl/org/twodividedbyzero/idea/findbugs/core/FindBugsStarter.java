@@ -36,6 +36,7 @@ import edu.umd.cs.findbugs.config.UserPreferences;
 import org.dom4j.DocumentException;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
+import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
 import org.twodividedbyzero.idea.findbugs.messages.AnalysisAbortingListener;
@@ -89,8 +90,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		MessageBusManager.publishAnalysisStarted(_project);
 
 		if (Boolean.valueOf(_preferences.getProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT))) {
-			final String toolWindowId = _findBugsPlugin.getInternalToolWindowId();
-			final ToolWindow toolWindow = ToolWindowManager.getInstance(_project).getToolWindow(toolWindowId);
+			final ToolWindow toolWindow = ToolWindowManager.getInstance(_project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
 			IdeaUtilImpl.activateToolWindow(toolWindow);
 		}
 

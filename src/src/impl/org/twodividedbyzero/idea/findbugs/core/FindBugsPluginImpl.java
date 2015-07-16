@@ -219,7 +219,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	private void initToolWindow() {
 		final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(_project);
 
-		_toolWindow = toolWindowManager.registerToolWindow(getInternalToolWindowId(), false, ToolWindowAnchor.BOTTOM);
+		_toolWindow = toolWindowManager.registerToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID, false, ToolWindowAnchor.BOTTOM);
 		_toolWindow.setTitle(FindBugsPluginConstants.TOOL_WINDOW_ID);
 		_toolWindow.setType(ToolWindowType.DOCKED, null);
 
@@ -234,16 +234,9 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
-	@Override
-	public String getInternalToolWindowId() {
-		return FindBugsPluginConstants.TOOL_WINDOW_ID;
-		//return new StringBuilder(FindBugsPluginConstants.TOOL_WINDOW_ID).append("#").append(_project.getName()).toString();
-	}
-
-
 	private void unregisterToolWindow() {
 		final ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(_project);
-		toolWindowManager.unregisterToolWindow( getInternalToolWindowId() );
+		toolWindowManager.unregisterToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
 	}
 
 

@@ -142,16 +142,16 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		//final DefaultActionGroup actionGroupLeft = new DefaultActionGroup();
 		//actionGroupLeft.add(new AnalyzeCurrentEditorFile());
 		final ActionGroup actionGroupLeft = (ActionGroup) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTION_GROUP_LEFT);
-		final ActionToolbar toolbarLeft1 = ActionManager.getInstance().createActionToolbar(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId(), actionGroupLeft, false);
+		final ActionToolbar toolbarLeft1 = ActionManager.getInstance().createActionToolbar(FindBugsPluginConstants.TOOL_WINDOW_ID, actionGroupLeft, false);
 
 		final ActionGroup actionGroupRight = (ActionGroup) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTION_GROUP_RIGHT);
-		final ActionToolbar toolbarRight1 = ActionManager.getInstance().createActionToolbar(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId(), actionGroupRight, false);
+		final ActionToolbar toolbarRight1 = ActionManager.getInstance().createActionToolbar(FindBugsPluginConstants.TOOL_WINDOW_ID, actionGroupRight, false);
 
 		final ActionGroup actionGroupNavigation = (ActionGroup) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTION_GROUP_NAVIGATION);
-		final ActionToolbar toolbarNavigation1 = ActionManager.getInstance().createActionToolbar(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId(), actionGroupNavigation, false);
+		final ActionToolbar toolbarNavigation1 = ActionManager.getInstance().createActionToolbar(FindBugsPluginConstants.TOOL_WINDOW_ID, actionGroupNavigation, false);
 
 		final ActionGroup actionGroupUtils = (ActionGroup) ActionManager.getInstance().getAction(FindBugsPluginConstants.ACTION_GROUP_UTILS);
-		final ActionToolbar toolbarUtils1 = ActionManager.getInstance().createActionToolbar(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId(), actionGroupUtils, false);
+		final ActionToolbar toolbarUtils1 = ActionManager.getInstance().createActionToolbar(FindBugsPluginConstants.TOOL_WINDOW_ID, actionGroupUtils, false);
 
 
 		final Component toolbarLeft = new ActionToolbarContainer(FindBugsPluginConstants.TOOL_WINDOW_ID + ": Analysis...", SwingConstants.VERTICAL, toolbarLeft1, true);

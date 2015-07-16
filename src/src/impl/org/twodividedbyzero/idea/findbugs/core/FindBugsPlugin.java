@@ -52,8 +52,6 @@ public interface FindBugsPlugin extends Configurable, PersistentStateComponent<P
 
 	void activateToolWindow(boolean activate);
 
-	String getInternalToolWindowId();
-
 	FindBugsPreferences getPreferences();
 
 	Project getProject();

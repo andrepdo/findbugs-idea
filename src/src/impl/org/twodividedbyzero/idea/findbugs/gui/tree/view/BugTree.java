@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -38,6 +38,7 @@ import com.intellij.util.OpenSourceUtil;
 import com.intellij.util.ui.UIUtil;
 import edu.umd.cs.findbugs.BugInstance;
 import org.jetbrains.annotations.NonNls;
+import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.AnalysisRunDetailsDialog;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.BugTreePanel;
@@ -302,7 +303,7 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 					final int width = rendererComponent.getPreferredSize().width;
 					final int mouseX = e.getX();
 					if (mouseX <= width + 10 && mouseX >= width - 40) {
-						final ToolWindow toolWindow = ToolWindowManager.getInstance(_project).getToolWindow(IdeaUtilImpl.getPluginComponent(_project).getInternalToolWindowId());
+						final ToolWindow toolWindow = ToolWindowManager.getInstance(_project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
 						final Content content = toolWindow.getContentManager().getContent(0);
 						if (content != null) {
 							final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();

@@ -165,12 +165,6 @@ public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Con
 	}
 
 
-	@Override
-	public String getInternalToolWindowId() {
-		return FindBugsPluginConstants.TOOL_WINDOW_ID;
-	}
-
-
 	public FindBugsPreferences getProjectPreferences() {
 		return IdeaUtilImpl.getPluginComponent(_project).getPreferences();
 	}
