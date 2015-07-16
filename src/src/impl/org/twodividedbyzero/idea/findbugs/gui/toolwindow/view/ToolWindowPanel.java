@@ -18,7 +18,13 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.toolwindow.view;
 
+import com.intellij.CommonBundle;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationDisplayType;
+import com.intellij.notification.NotificationListener;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.impl.NotificationsConfigurationImpl;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
@@ -27,6 +33,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogBuilder;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiFile;
 import edu.umd.cs.findbugs.BugCollection;
@@ -38,9 +45,11 @@ import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
+import org.twodividedbyzero.idea.findbugs.common.util.ErrorUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.gui.common.ActionToolbarContainer;
 import org.twodividedbyzero.idea.findbugs.gui.common.AnalysisRunDetailsDialog;
@@ -57,11 +66,12 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import java.awt.Component;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
@@ -80,6 +90,7 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 	private static final Logger LOGGER = Logger.getInstance(ToolWindowPanel.class.getName());
 
 	private static final String A_HREF_MORE_ANCHOR = "#more";
+	private static final String A_HREF_DISABLE_ANCHOR = "#disable";
 
 	///private static final String DEFAULT_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (COLUMN weight=0.3 right.top right.bottom) (LEAF name=right weight=0.4))";
 	private static final String DEFAULT_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.4) (LEAF name=right weight=0.6))";
@@ -304,25 +315,31 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		final int numAnalysedClasses = stats != null ? stats.getNumClasses() : 0;
 
 		final StringBuilder message = new StringBuilder()
-				.append(VersionManager.getName())
-				.append(": <b>found ")
+				.append("Found ")
 				.append(_bugTreePanel.getGroupModel().getBugCount())
 				.append(" bugs in ")
 				.append(numAnalysedClasses)
-				.append(numAnalysedClasses > 1 ? " classes" : " class")
-				.append("</b>");
+				.append(numAnalysedClasses > 1 ? " classes" : " class");
 
 		_bugsProject = findBugsProject;
 
+		final NotificationType notificationType;
 		if (numAnalysedClasses == 0) {
+			notificationType = NotificationType.WARNING;
 			message.append("&nbsp; (no class files found <a href='").append(A_HREF_MORE_ANCHOR).append("'>more...</a>)<br/>");
-			message.append("<font size='10px'>using ").append(VersionManager.getFullVersion()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font>");
-			BalloonTipFactory.showToolWindowWarnNotifier(_project, message.toString(), new NotifierHyperlinkListener(ToolWindowPanel.this, _bugsProject));
 		} else {
+			notificationType = NotificationType.INFORMATION;
 			message.append("&nbsp;<a href='").append(A_HREF_MORE_ANCHOR).append("'>more...</a><br/>");
-			message.append("<font size='10px'>using ").append(VersionManager.getFullVersion()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font>");
-			BalloonTipFactory.showToolWindowInfoNotifier(_project, message.toString(), new NotifierHyperlinkListener(ToolWindowPanel.this, _bugsProject));
 		}
+		message.append("<font size='10px'>using ").append(VersionManager.getFullVersion()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font><br/><br/>");
+		message.append("<a href='").append(A_HREF_DISABLE_ANCHOR).append("'>Disable notification").append("</a>");
+
+		FindBugsPluginImpl.NOTIFICATION_GROUP_ANALYSIS_FINISHED.createNotification(
+				VersionManager.getName() + ": Analysis Finished",
+				message.toString(),
+				notificationType,
+				new NotificationListenerImpl(ToolWindowPanel.this, _bugsProject)
+		).setImportant(false).notify(_project);
 
 		EditorFactory.getInstance().refreshAllEditors();
 		DaemonCodeAnalyzer.getInstance(_project).restart();
@@ -405,25 +422,44 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		}
 	}
 
-	private static class NotifierHyperlinkListener implements HyperlinkListener {
+
+	private static class NotificationListenerImpl implements NotificationListener {
 
 		private final FindBugsProject _bugsProject;
 		private final ToolWindowPanel _toolWindowPanel;
 
 
-		private NotifierHyperlinkListener(final ToolWindowPanel toolWindowPanel, final FindBugsProject bugsProject) {
+		private NotificationListenerImpl(@NotNull final ToolWindowPanel toolWindowPanel, final FindBugsProject bugsProject) {
 			_bugsProject = bugsProject;
 			_toolWindowPanel = toolWindowPanel;
 		}
 
 
-		public void hyperlinkUpdate(final HyperlinkEvent e) {
+		@Override
+		public void hyperlinkUpdate(@NotNull final Notification notification, @NotNull final HyperlinkEvent e) {
 			if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
 				final String desc = e.getDescription();
 				if (desc.equals(A_HREF_MORE_ANCHOR)) {
 					final int bugCount = _toolWindowPanel.getBugTreePanel().getGroupModel().getBugCount();
 					final DialogBuilder dialog = AnalysisRunDetailsDialog.create(_toolWindowPanel.getProject(), bugCount, _toolWindowPanel.getBugCollection().getProjectStats(), _bugsProject);
 					dialog.showModal(false);
+				} else if (desc.equals(A_HREF_DISABLE_ANCHOR)) {
+					final int result = Messages.showYesNoDialog(
+							_toolWindowPanel.getProject(),
+							"Notification will be disabled for all projects.\n\n" +
+									"Settings | Appearance & Behavior | Notifications | " +
+									FindBugsPluginImpl.NOTIFICATION_GROUP_ID_ANALYSIS_FINISHED +
+									"\ncan be used to configure the notification.",
+							"FindBugs Analysis Finished Notification",
+							"Disable Notification", CommonBundle.getCancelButtonText(), Messages.getWarningIcon());
+					if (result == Messages.YES) {
+						getNotificationsConfigurationImpl().changeSettings(
+								FindBugsPluginImpl.NOTIFICATION_GROUP_ID_ANALYSIS_FINISHED,
+								NotificationDisplayType.NONE, false, false);
+						notification.expire();
+					} else {
+						notification.hideBalloon();
+					}
 				}
 			}
 		}
@@ -431,12 +467,32 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 
 		@Override
 		public String toString() {
-			final StringBuilder sb = new StringBuilder();
-			sb.append("NotifierHyperlinkListener");
-			sb.append("{_bugsProject=").append(_bugsProject);
-			sb.append(", _toolWindowPanel=").append(_toolWindowPanel);
-			sb.append('}');
-			return sb.toString();
+			return "NotifierHyperlinkListener" +
+					"{_bugsProject=" + _bugsProject +
+					", _toolWindowPanel=" + _toolWindowPanel +
+					'}';
+		}
+	}
+
+
+	@NotNull
+	private static NotificationsConfigurationImpl getNotificationsConfigurationImpl() {
+		try {
+			try {
+				final Method getInstanceImpl = NotificationsConfigurationImpl.class.getDeclaredMethod("getInstanceImpl");
+				return (NotificationsConfigurationImpl) getInstanceImpl.invoke(null);
+			} catch (NoSuchMethodException e) {
+				try {
+					final Method getNotificationsConfigurationImpl = NotificationsConfigurationImpl.class.getDeclaredMethod("getNotificationsConfigurationImpl");
+					return (NotificationsConfigurationImpl) getNotificationsConfigurationImpl.invoke(null);
+				} catch (NoSuchMethodException e1) {
+					throw ErrorUtil.toUnchecked(e1);
+				}
+			}
+		} catch (InvocationTargetException e) {
+			throw ErrorUtil.toUnchecked(e);
+		} catch (IllegalAccessException e) {
+			throw ErrorUtil.toUnchecked(e);
 		}
 	}
 }

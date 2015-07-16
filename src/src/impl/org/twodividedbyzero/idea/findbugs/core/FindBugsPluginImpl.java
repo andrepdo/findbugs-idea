@@ -21,8 +21,17 @@ package org.twodividedbyzero.idea.findbugs.core;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.ide.ui.search.SearchableOptionsRegistrar;
-import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.components.*;
+import com.intellij.notification.NotificationGroup;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.Anchor;
+import com.intellij.openapi.actionSystem.Constraints;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.ProjectComponent;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.components.StorageScheme;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.module.Module;
@@ -37,7 +46,11 @@ import com.intellij.openapi.wm.ToolWindowType;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import edu.umd.cs.findbugs.*;
+import edu.umd.cs.findbugs.BugCollection;
+import edu.umd.cs.findbugs.BugPattern;
+import edu.umd.cs.findbugs.DetectorFactory;
+import edu.umd.cs.findbugs.FindBugs;
+import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.ba.AnalysisException;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -62,9 +75,17 @@ import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
-import javax.swing.*;
-import java.util.*;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
@@ -91,6 +112,9 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	</category>*/
 	private static final Logger LOGGER = Logger.getInstance(FindBugsPluginImpl.class.getName());
 	private static final AtomicBoolean SEARCH_INDEX_CREATED = new AtomicBoolean(false);
+
+	public static final String NOTIFICATION_GROUP_ID_ANALYSIS_FINISHED = "FindBugs: Analysis Finished";
+	public static final NotificationGroup NOTIFICATION_GROUP_ANALYSIS_FINISHED = NotificationGroup.toolWindowGroup(NOTIFICATION_GROUP_ID_ANALYSIS_FINISHED, FindBugsPluginConstants.TOOL_WINDOW_ID, false);
 
 	private final Project _project;
 	private ToolWindow _toolWindow;
