@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -20,6 +20,7 @@
 package org.twodividedbyzero.idea.findbugs.plugins;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.IoUtil;
@@ -56,25 +57,49 @@ public enum Plugins {
 	private final String[] _legacyJarNames;
 
 
-	Plugins(final String jarName, boolean needsJava7OrLater, final String... legacyJarNames) {
+	Plugins(@NotNull final String jarName, boolean needsJava7OrLater, @NotNull final String... legacyJarNames) {
 		_jarName = jarName;
 		_needsJava7OrLater = needsJava7OrLater;
 		_legacyJarNames = legacyJarNames;
 	}
 
 
-	public static File getDirectory(@NotNull final IdeaPluginDescriptor plugin) {
-		final File dir = new File(plugin.getPath(), "customPlugins");
+	@NotNull
+	private static File findAccessibleFindBugsIdeaPluginPath(@NotNull final IdeaPluginDescriptor pluginDescriptor) {
+		File ret = pluginDescriptor.getPath();
+		if (!ret.isDirectory() || !ret.canWrite()) {
+			// PathManager.getSystemPath() may return relative path
+			final File pluginsPath = new File(PathManager.getPluginsPath()).getAbsoluteFile();
+			if (!pluginsPath.isDirectory() || !pluginsPath.canWrite()) {
+				throw new IllegalStateException("No accessible FindBugs-IDEA plugin directory found. Tested candidates:\n" +
+						"'" + ret.getAbsolutePath() + "': isDirectory=" + ret.isDirectory() + ", canWrite=" + ret.canWrite() + "\n" +
+						"'" + pluginsPath.getAbsolutePath() + "': isDirectory=" + pluginsPath.isDirectory() + ", canWrite=" + pluginsPath.canWrite());
+			}
+			ret = new File(pluginsPath, "FindBugs-IDEA");
+			if (!ret.isDirectory()) {
+				if (!ret.mkdirs()) {
+					throw new IllegalStateException("Could not create alternative FindBugs-IDEA plugin directory: " + ret.getAbsolutePath());
+				}
+			}
+		}
+		return ret;
+	}
+
+
+	@NotNull
+	public static File getDirectory(@NotNull final IdeaPluginDescriptor pluginDescriptor) {
+		final File homeDir = findAccessibleFindBugsIdeaPluginPath(pluginDescriptor);
+		final File dir = new File(homeDir, "customPlugins");
 		if (!dir.isDirectory()) {
 			if (!dir.mkdirs()) {
-				throw new IllegalStateException("Could not create plugins directory: " + dir.getPath());
+				throw new IllegalStateException("Could not create FindBugs-IDEA custom plugins directory: " + dir.getAbsolutePath());
 			}
 		}
 		return dir;
 	}
 
 
-	public static void deploy(final IdeaPluginDescriptor plugin) {
+	public static void deploy(@NotNull final IdeaPluginDescriptor plugin) {
 		final boolean isJava7OrLater = isJava7OrLater();
 		final File dir = getDirectory(plugin);
 		for (final Plugins customPlugin : values()) {
@@ -102,7 +127,7 @@ public enum Plugins {
 	}
 
 
-	private static void deployImpl(final File file, final Plugins plugin) {
+	private static void deployImpl(@NotNull final File file, @NotNull final Plugins plugin) {
 		final InputStream in = Plugins.class.getResourceAsStream(plugin._jarName);
 		if (in == null) {
 			throw new IllegalStateException("Can not find plugin: " + plugin);
@@ -122,7 +147,7 @@ public enum Plugins {
 	}
 
 
-	public static boolean isJava7OrLater() {
+	private static boolean isJava7OrLater() {
 		final BigDecimal current = new BigDecimal(System.getProperty("java.specification.version"));
 		return current.compareTo(new BigDecimal("1.7")) >= 0;
 	}
