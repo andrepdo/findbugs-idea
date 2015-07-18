@@ -92,6 +92,7 @@
             <li>Issue 99: fix possible NPE</li>
             <li>Issue 100: configurable notification</li>
             <li>Issue 102: make deployment of bundled custom plugins more stable</li>
+            <li>Update bundled custom plugins: fb-contrib 6.2.1 and find-sec-bugs 1.4.1</li>
             <li>Plugin compatibility: IDEA 13.0 (133.193) until the latest IDEA 15 EA (142.3230.1)</li>
         </ul>
         <h3>0.9.996</h3>

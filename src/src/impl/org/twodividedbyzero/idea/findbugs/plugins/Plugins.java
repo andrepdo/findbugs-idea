@@ -45,10 +45,10 @@ public enum Plugins {
 	AndroidFindbugs_0_5("AndroidFindbugs_0.5.jar", true),
 
 	// http://fb-contrib.sourceforge.net/
-	fb_contrib_6_0_0("fb-contrib-6.0.0.jar", false, "fb-contrib-5.2.1.jar"),
+	fb_contrib_6_2_1("fb-contrib-6.2.1.jar", false, "fb-contrib-6.0.0.jar", "fb-contrib-5.2.1.jar"),
 
 	// http://h3xstream.github.io/find-sec-bugs/
-	findsecbugs_plugin_1_4_0("findsecbugs-plugin-1.4.0.jar", false, "findsecbugs-plugin-1.3.0.jar", "findsecbugs-plugin-1.2.1.jar", "findsecbugs-plugin-1.2.0.jar");
+	findsecbugs_plugin_1_4_1("findsecbugs-plugin-1.4.1.jar", false, "findsecbugs-plugin-1.4.0.jar", "findsecbugs-plugin-1.3.0.jar", "findsecbugs-plugin-1.2.1.jar", "findsecbugs-plugin-1.2.0.jar");
 
 	private static final Logger LOGGER = Logger.getInstance(Plugins.class.getName());
 
