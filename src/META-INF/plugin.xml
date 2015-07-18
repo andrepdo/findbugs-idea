@@ -273,7 +273,11 @@
             email="see@https://github.com/andrepdo" url="https://github.com/andrepdo">Andre Pfeiler
     </vendor>
     <idea-version since-build="@IDEA_SINCE_BUILD@" until-build="@IDEA_UNTIL_BUILD@"/>
-    <!-- until-build="10762" min="8.0"-->
+
+    <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+         on how to target different products -->
+    <depends>com.intellij.modules.lang</depends>
+
     <!--<helpset file="your-help.jar" path="path-to-helpset.hs"/>-->
     <resource-bundle>org.twodividedbyzero.idea.findbugs.resources.i18n.Messages</resource-bundle>
     <extensions defaultExtensionNs="com.intellij">
