@@ -41,14 +41,14 @@ public class VersionManager {
 
 	private static final long _major = 0;
 	private static final long _minor = 9;
-	private static final long _build = 996;
+	private static final long _build = 997;
 
 	private static final String _branch = "trunk";
 
 
 	private static final String NAME = FindBugsPluginConstants.PLUGIN_NAME;
 
-	private static final String WEBSITE = "http://findbugs-idea.googlecode.com/";
+	private static final String WEBSITE = "http://andrepdo.github.io/findbugs-idea";
 
 	private static final String DOWNLOAD_WEBSITE = "http://plugins.intellij.net/plugin/?id=3847";
 
