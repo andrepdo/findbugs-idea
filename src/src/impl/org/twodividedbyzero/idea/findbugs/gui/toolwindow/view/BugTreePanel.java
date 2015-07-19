@@ -40,6 +40,7 @@ import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.ProjectStats;
 import edu.umd.cs.findbugs.SortedBugCollection;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
@@ -73,18 +74,19 @@ import java.util.Map;
  * @version $Revision$
  * @since 0.0.1
  */
+@SuppressFBWarnings("SE_BAD_FIELD")
 @SuppressWarnings({"AnonymousInnerClass"})
 public class BugTreePanel extends JPanel {
 
-	private final transient Project _project;
+	private final Project _project;
 
 	private boolean _scrollToSource;
 	private final BugTree _bugTree;
 
-	private final transient RootNode _visibleRootNode;
+	private final RootNode _visibleRootNode;
 	private final GroupTreeModel _treeModel;
 	private final FindBugsPreferences _preferences;
-	private transient SortedBugCollection _bugCollection;
+	private SortedBugCollection _bugCollection;
 	private GroupBy[] _groupBy;
 	private final ToolWindowPanel _parent;
 	private double _splitPaneVerticalWeight = 1.0;

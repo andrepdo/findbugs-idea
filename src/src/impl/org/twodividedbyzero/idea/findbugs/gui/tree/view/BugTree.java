@@ -37,6 +37,7 @@ import com.intellij.util.EditSourceOnDoubleClickHandler;
 import com.intellij.util.OpenSourceUtil;
 import com.intellij.util.ui.UIUtil;
 import edu.umd.cs.findbugs.BugInstance;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NonNls;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
@@ -73,6 +74,7 @@ import java.awt.event.MouseMotionAdapter;
  * @version $Revision$
  * @since 0.9.8-dev
  */
+@SuppressFBWarnings("SE_BAD_FIELD")
 public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 
 	private static final Logger LOGGER = Logger.getInstance(BugTree.class.getName());

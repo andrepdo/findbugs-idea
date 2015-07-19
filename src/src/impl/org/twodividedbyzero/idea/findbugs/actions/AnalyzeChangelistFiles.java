@@ -27,6 +27,7 @@ import com.intellij.openapi.vcs.changes.ChangeList;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
@@ -76,6 +77,7 @@ public final class AnalyzeChangelistFiles extends AbstractAnalyzeAction {
 	}
 
 
+	@SuppressFBWarnings("SIC_INNER_SHOULD_BE_STATIC_ANON")
 	@Override
 	void analyze(
 			@NotNull final AnActionEvent e,

@@ -166,6 +166,7 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 	}
 
 
+	@SuppressFBWarnings("SIC_INNER_SHOULD_BE_STATIC_ANON")
 	private void addClasses(
 			@NotNull final ProgressIndicator indicator,
 			@NotNull final Project project,

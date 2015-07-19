@@ -38,6 +38,7 @@ import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.ProjectStats;
 import edu.umd.cs.findbugs.SortedBugCollection;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.dom4j.DocumentException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -86,6 +87,7 @@ public final class ImportBugCollection extends AbstractAction {
 		e.getPresentation().setVisible(true);
 	}
 
+	@SuppressFBWarnings("SIC_INNER_SHOULD_BE_STATIC_ANON")
 	@Override
 	void actionPerformedImpl(
 			@NotNull final AnActionEvent e,
