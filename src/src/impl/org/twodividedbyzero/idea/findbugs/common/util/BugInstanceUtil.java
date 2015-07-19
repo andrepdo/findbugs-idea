@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -30,6 +30,7 @@ import edu.umd.cs.findbugs.FieldAnnotation;
 import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.MethodAnnotation;
 import edu.umd.cs.findbugs.SourceLineAnnotation;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
@@ -150,7 +151,9 @@ public class BugInstanceUtil {
 	}
 
 
-	public static int[] getSourceLines(final BugInstance bugInstance) {
+	@SuppressWarnings("ConstantConditions")
+	@SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE")
+	public static int[] getSourceLines(@NotNull final BugInstance bugInstance) {
 		final int[] lines = new int[2];
 		final SourceLineAnnotation annotation = bugInstance.getPrimarySourceLineAnnotation();
 

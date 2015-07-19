@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -110,7 +110,7 @@ public class DetectorConfiguration implements ConfigurationPage {
 
 			final double border = GuiUtil.SCALE_FACTOR*5;
 			final double rowsGap = GuiUtil.SCALE_FACTOR*5;
-			final double colsGap = GuiUtil.SCALE_FACTOR*10;
+			//final double colsGap = GuiUtil.SCALE_FACTOR*10;
 			final double[][] size = {{border, TableLayout.FILL, border}, // Columns
 									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, rowsGap, TableLayout.FILL, 15, 0, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);

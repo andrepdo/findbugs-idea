@@ -26,7 +26,6 @@ import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.psi.PsiAnonymousClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.awt.RelativePoint;
@@ -96,10 +95,10 @@ public final class BugsLineMarkerProvider implements LineMarkerProvider {
 				final PsiElement problemPsiElement = problemDescriptor.getPsiElement();
 				if (psiElement.equals(problemPsiElement)) {
 					matchingDescriptors.add(problemDescriptor);
-					if(psiElement instanceof PsiAnonymousClass) {
-						//final Editor[] editors = com.intellij.openapi.editor.EditorFactory.getInstance().getEditors(IdeaUtilImpl.getDocument(psiFile.getProject(), problemDescriptor));
-						//editors[0].getMarkupModel().addRangeHighlighter()
-					}
+					//if(psiElement instanceof PsiAnonymousClass) {
+					//	final Editor[] editors = com.intellij.openapi.editor.EditorFactory.getInstance().getEditors(IdeaUtilImpl.getDocument(psiFile.getProject(), problemDescriptor));
+					//	editors[0].getMarkupModel().addRangeHighlighter()
+					//}
 				}
 			}
 			if (!matchingDescriptors.isEmpty()) {

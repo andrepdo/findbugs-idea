@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -20,6 +20,7 @@
 package org.twodividedbyzero.idea.findbugs.gui.common;
 
 import com.intellij.ui.JBColor;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.Icon;
@@ -59,6 +60,7 @@ public class VerticalTextIcon implements Icon, SwingConstants {
 	}
 
 
+	@SuppressFBWarnings("BC_UNCONFIRMED_CAST")
 	@Override
 	public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
 		final Graphics2D g2 = (Graphics2D) g;

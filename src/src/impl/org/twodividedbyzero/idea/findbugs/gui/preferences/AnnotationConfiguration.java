@@ -57,7 +57,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Map;
 
 
 /**
@@ -136,14 +135,15 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 		// todo:
 
+		/*
 		final Map<String,Map<String,String>> annotationTypeSettings = _preferences.getAnnotationTypeSettings();
 		for (final AnnotationType annotationType : AnnotationType.values()) {
-			/*annotationType.setForegroundColor();
+			annotationType.setForegroundColor();
 			annotationType.setBackgroundColor();
 			annotationType.setEffectColor();
 			annotationType.setEffectType();
-			annotationType.setFont();*/
-		}
+			annotationType.setFont();
+		}*/
 
 
 		/*for (final String s : _preferences.getPlugins()) {

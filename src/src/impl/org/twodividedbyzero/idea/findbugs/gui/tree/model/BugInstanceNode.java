@@ -25,6 +25,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.ui.JBColor;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.SourceLineAnnotation;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
@@ -257,6 +258,8 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 
 
 	/** @return start line and end line */
+	@SuppressWarnings("ConstantConditions")
+	@SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE")
 	public int[] getSourceLines() {
 		final int[] lines = new int[2];
 		final SourceLineAnnotation annotation = _bugInstance.getPrimarySourceLineAnnotation();

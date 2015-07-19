@@ -26,6 +26,7 @@ import com.intellij.ui.JBColor;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.Project;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import info.clearthought.layout.TableLayout;
 import info.clearthought.layout.TableLayoutConstants;
 import org.jetbrains.annotations.Nullable;
@@ -433,6 +434,7 @@ public class PluginConfiguration implements ConfigurationPage {
 		}
 
 
+		@SuppressFBWarnings(value = "UCF_USELESS_CONTROL_FLOW_NEXT_LINE", justification = "See javadoc of RESPECT_PROJECT_PLUGIN_STATE")
 		@SuppressWarnings({"PointlessBooleanExpression", "SimplifiableIfStatement"})
 		static boolean isEnabled(@Nullable final Project project, final Plugin plugin) {
 			if (plugin.isCorePlugin()) {
@@ -445,6 +447,7 @@ public class PluginConfiguration implements ConfigurationPage {
 		}
 
 
+		@SuppressFBWarnings(value = "UCF_USELESS_CONTROL_FLOW_NEXT_LINE", justification = "See javadoc of RESPECT_PROJECT_PLUGIN_STATE")
 		@SuppressWarnings("PointlessBooleanExpression")
 		boolean isSelected(@Nullable final Project project, final Plugin plugin, final boolean userPlugin) {
 			if (plugin.isCorePlugin()) {

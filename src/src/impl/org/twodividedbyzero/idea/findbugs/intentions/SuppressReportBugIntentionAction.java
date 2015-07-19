@@ -38,16 +38,15 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDocCommentOwner;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifierList;
 import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.PsiTypeParameter;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.impl.source.jsp.jspJava.JspHolderMethod;
-import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -190,17 +189,16 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 			if (modifierList != null) {
 				addSuppressAnnotation(project, editor, container, modifierList, getID(container));
 			}
-		} else {
+		} /*else {
 			final PsiDocComment docComment = container.getDocComment();
 			final PsiManager manager = PsiManager.getInstance(project);
-			//noinspection IfStatementWithIdenticalBranches
 			if (docComment == null) {
-				/*final String commentText = "*//** @" + SUPPRESS_INSPECTIONS_TAG_NAME + ' ' + getID(container) + "*//*";
+				final String commentText = "*//** @" + SUPPRESS_INSPECTIONS_TAG_NAME + ' ' + getID(container) + "*//*";
 				docComment = JavaPsiFacade.getInstance(manager.getProject()).getElementFactory().createDocCommentFromText(commentText, null);
 				final PsiElement firstChild = container.getFirstChild();
-				container.addBefore(docComment, firstChild);*/
+				container.addBefore(docComment, firstChild);
 			} else {
-				/*final PsiDocTag noInspectionTag = docComment.findTagByName(SUPPRESS_INSPECTIONS_TAG_NAME);
+				final PsiDocTag noInspectionTag = docComment.findTagByName(SUPPRESS_INSPECTIONS_TAG_NAME);
 				if (noInspectionTag != null) {
 					final PsiDocTagValue valueElement = noInspectionTag.getValueElement();
 					final String tagText = '@' + SUPPRESS_INSPECTIONS_TAG_NAME + ' ' + (valueElement != null ? valueElement.getText() + ',' : "") + getID(container);
@@ -213,9 +211,9 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 					docComment.add(JavaPsiFacade.getInstance(manager.getProject()).getElementFactory().createDocTagFromText(tagText, null));
 
 					addImport(project, element);
-				}*/
+				}
 			}
-		}
+		}*/
 		final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = IdeaUtilImpl.getPluginComponent(project).getProblems();
 		problems.get(element.getContainingFile()).remove(getProblemDescriptor());
 		DaemonCodeAnalyzer.getInstance(project).restart();
@@ -236,6 +234,7 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 	}
 
 
+	@SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
 	@SuppressWarnings("HardcodedLineSeparator")
 	public void addSuppressAnnotation(final Project project, final Editor editor, final PsiElement container, final PsiModifierList modifierList, final String id) throws IncorrectOperationException {
 		PsiAnnotation annotation = modifierList.findAnnotation(_suppressWarningsClassName);
