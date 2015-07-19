@@ -21,11 +21,12 @@ package org.twodividedbyzero.idea.findbugs.resources;
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.JBColor;
 import org.jdesktop.swingx.color.ColorUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
 
 import javax.swing.Icon;
 import javax.swing.text.html.StyleSheet;
 import java.awt.Color;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 
@@ -72,14 +73,16 @@ public class GuiResources {
 	public static final Icon GROUP_BY_RANK_SCARY_ICON = ResourcesLoader.loadIcon("priority/rankScary.png");
 	public static final Icon GROUP_BY_RANK_TROUBLING_ICON = ResourcesLoader.loadIcon("priority/rankTroubling.png");
 	public static final Icon GROUP_BY_RANK_OF_CONCERN_ICON = ResourcesLoader.loadIcon("priority/rankOfConcern.png");
-	public static final Map<String, Icon> GROUP_BY_RANK_ICONS = new HashMap<String, Icon>(4);
+	public static final Map<String, Icon> GROUP_BY_RANK_ICONS;
 
 	static {
-		GROUP_BY_RANK_ICONS.put("SCARIEST", GROUP_BY_RANK_SCARIEST_ICON);
-		GROUP_BY_RANK_ICONS.put("SCARY", GROUP_BY_RANK_SCARY_ICON);
-		GROUP_BY_RANK_ICONS.put("TROUBLING", GROUP_BY_RANK_TROUBLING_ICON);
-		GROUP_BY_RANK_ICONS.put("OF_CONCERN", GROUP_BY_RANK_OF_CONCERN_ICON);
-		GROUP_BY_RANK_ICONS.put("OF CONCERN", GROUP_BY_RANK_OF_CONCERN_ICON);
+		final Map<String, Icon> groupByRankIcons = New.map(5);
+		groupByRankIcons.put("SCARIEST", GROUP_BY_RANK_SCARIEST_ICON);
+		groupByRankIcons.put("SCARY", GROUP_BY_RANK_SCARY_ICON);
+		groupByRankIcons.put("TROUBLING", GROUP_BY_RANK_TROUBLING_ICON);
+		groupByRankIcons.put("OF_CONCERN", GROUP_BY_RANK_OF_CONCERN_ICON);
+		groupByRankIcons.put("OF CONCERN", GROUP_BY_RANK_OF_CONCERN_ICON);
+		GROUP_BY_RANK_ICONS = Collections.unmodifiableMap(groupByRankIcons);
 	}
 
 	public static final Icon GROUP_BY_PRIORITY_HIGH_ICON = ResourcesLoader.loadIcon("priority/priorityHigh.png");
@@ -87,15 +90,17 @@ public class GuiResources {
 	public static final Icon GROUP_BY_PRIORITY_LOW_ICON = ResourcesLoader.loadIcon("priority/priorityLow.png");
 	public static final Icon GROUP_BY_PRIORITY_EXP_ICON = ResourcesLoader.loadIcon("priority/priorityExp.png");
 	public static final Icon GROUP_BY_PRIORITY_IGNORE_ICON = ResourcesLoader.loadIcon("priority/priorityIgnore.png");
-	public static final Map<String, Icon> GROUP_BY_PRIORITY_ICONS = new HashMap<String, Icon>(5);
+	public static final Map<String, Icon> GROUP_BY_PRIORITY_ICONS;
 
 
 	static {
-		GROUP_BY_PRIORITY_ICONS.put("Low", GROUP_BY_PRIORITY_LOW_ICON);
-		GROUP_BY_PRIORITY_ICONS.put("Medium", GROUP_BY_PRIORITY_MEDIUM_ICON);
-		GROUP_BY_PRIORITY_ICONS.put("High", GROUP_BY_PRIORITY_HIGH_ICON);
-		GROUP_BY_PRIORITY_ICONS.put("Exp", GROUP_BY_PRIORITY_EXP_ICON);
-		GROUP_BY_PRIORITY_ICONS.put("Ignore", GROUP_BY_PRIORITY_IGNORE_ICON); // this should never happen
+		final Map<String, Icon> groupByPriorityIcons = New.map(5);
+		groupByPriorityIcons.put("Low", GROUP_BY_PRIORITY_LOW_ICON);
+		groupByPriorityIcons.put("Medium", GROUP_BY_PRIORITY_MEDIUM_ICON);
+		groupByPriorityIcons.put("High", GROUP_BY_PRIORITY_HIGH_ICON);
+		groupByPriorityIcons.put("Exp", GROUP_BY_PRIORITY_EXP_ICON);
+		groupByPriorityIcons.put("Ignore", GROUP_BY_PRIORITY_IGNORE_ICON); // this should never happen
+		GROUP_BY_PRIORITY_ICONS = Collections.unmodifiableMap(groupByPriorityIcons);
 	}
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -20,6 +20,7 @@
 package org.twodividedbyzero.idea.findbugs.gui.common;
 
 import com.intellij.ui.components.JBTextField;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -33,6 +34,7 @@ import java.util.List;
  * @version $Revision$
  * @since 0.9.992
  */
+@SuppressFBWarnings("SE_BAD_FIELD")
 public class AaTextField extends JBTextField {
 
 	private List<ActionListener> _textChangeListeners;

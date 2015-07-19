@@ -78,6 +78,7 @@ import com.intellij.psi.PsiPackage;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtilCore;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -1001,6 +1002,7 @@ public final class IdeaUtilImpl {
 	}
 
 
+	@SuppressFBWarnings("DM_CONVERT_CASE")
 	@NotNull
 	public static String removeExtension(@NotNull final String name) {
 		int pos = name.lastIndexOf('.');

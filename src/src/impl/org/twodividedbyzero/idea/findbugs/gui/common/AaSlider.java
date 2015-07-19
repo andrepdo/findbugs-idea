@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -19,6 +19,8 @@
 
 package org.twodividedbyzero.idea.findbugs.gui.common;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -30,6 +32,7 @@ import java.util.List;
  * @version $Revision$
  * @since 0.9.992
  */
+@SuppressFBWarnings("SE_BAD_FIELD")
 public class AaSlider extends JSlider {
 
 	private List<ChangeListener> _valueChangeListeners;

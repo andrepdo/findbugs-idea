@@ -272,26 +272,6 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	public void setProperty(final String propertyName, final Iterable<String> value) {
-		if (value == null) {
-			//noinspection ConstantConditions
-			setProperty(propertyName, (String) null);
-			return;
-		}
-
-		final StringBuilder valueString = new StringBuilder();
-		for (final String part : value) {
-			if (valueString.length() > 0) {
-				valueString.append(';');
-			}
-			valueString.append(part);
-		}
-
-		setProperty(propertyName, valueString.toString());
-		setModified(true);
-	}
-
-
 	public boolean getBooleanProperty(final String propertyName, final boolean defaultValue) {
 		return Boolean.valueOf(getProperty(propertyName, Boolean.toString(defaultValue)));
 	}

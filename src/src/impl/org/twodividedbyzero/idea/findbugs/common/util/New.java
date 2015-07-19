@@ -60,6 +60,12 @@ public final class New {
 
 
 	@NotNull
+	public static <K, V> Map<K, V> map(final int initialCapacity) {
+		return new HashMap<K, V>(initialCapacity);
+	}
+
+
+	@NotNull
 	public static <K, V> WeakHashMap<K, V> weakHashMap() {
 		return new WeakHashMap<K, V>();
 	}

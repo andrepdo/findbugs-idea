@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -19,6 +19,8 @@
 
 package org.twodividedbyzero.idea.findbugs.gui.common;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import java.awt.event.ActionEvent;
@@ -31,6 +33,7 @@ import java.util.List;
  * @version $Revision$
  * @since 0.9.992
  */
+@SuppressFBWarnings("SE_BAD_FIELD")
 public class AaComboBox<E> extends JComboBox {
 
 	private List<ActionListener> _selectionChangeListeners;

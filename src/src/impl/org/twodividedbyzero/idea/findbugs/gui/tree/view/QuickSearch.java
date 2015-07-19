@@ -221,8 +221,8 @@ abstract class QuickSearch<E> {
 	}
 
 
-	private void keyTypedOrPressed(final KeyEvent e) {
-		if (e != null && (isActivationKey(e) || _searchActivated) && !isDeactivationKey(e)) {
+	private void keyTypedOrPressed(@NotNull final KeyEvent e) {
+		if ((isActivationKey(e) || _searchActivated) && !isDeactivationKey(e)) {
 			String searchingText = "";
 			if (e.getID() == KeyEvent.KEY_TYPED) {
 				if ((e.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) != 0) { // alt mask

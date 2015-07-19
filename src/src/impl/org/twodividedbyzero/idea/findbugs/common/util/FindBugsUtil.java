@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -22,7 +22,7 @@ package org.twodividedbyzero.idea.findbugs.common.util;
 import edu.umd.cs.findbugs.Version;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 
@@ -36,9 +36,9 @@ import java.util.Map;
 @SuppressWarnings("UnusedDeclaration")
 public final class FindBugsUtil {
 
-	public static final Map<String, String> ARCHIVE_EXTENSION_SET = new HashMap<String, String>();
-	public static final Map<String, String> XML_EXTENSIONS_SET = new HashMap<String, String>();
-	public static final Map<String, String> PLUGINS_EXTENSIONS_SET = new HashMap<String, String>();
+	public static final Map<String, String> ARCHIVE_EXTENSION_SET;
+	public static final Map<String, String> XML_EXTENSIONS_SET = Collections.singletonMap(".xml", "");
+	public static final Map<String, String> PLUGINS_EXTENSIONS_SET = Collections.singletonMap(".jar", "FindBugs Plugins");
 
 
 	private FindBugsUtil() {
@@ -47,15 +47,13 @@ public final class FindBugsUtil {
 
 
 	static {
-		ARCHIVE_EXTENSION_SET.put(".jar", "");
-		ARCHIVE_EXTENSION_SET.put(".zip", "");
-		ARCHIVE_EXTENSION_SET.put(".ear", "");
-		ARCHIVE_EXTENSION_SET.put(".war", "");
-		ARCHIVE_EXTENSION_SET.put(".sar", "");
-
-		XML_EXTENSIONS_SET.put(".xml", "");
-
-		PLUGINS_EXTENSIONS_SET.put(".jar", "FindBugs Plugins");
+		final Map<String, String> archiveExtensions = New.map(5);
+		archiveExtensions.put(".jar", "");
+		archiveExtensions.put(".zip", "");
+		archiveExtensions.put(".ear", "");
+		archiveExtensions.put(".war", "");
+		archiveExtensions.put(".sar", "");
+		ARCHIVE_EXTENSION_SET = Collections.unmodifiableMap(archiveExtensions);
 	}
 
 
