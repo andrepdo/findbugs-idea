@@ -23,15 +23,11 @@ import com.intellij.lang.Language;
 import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DataKeys;
-import com.intellij.openapi.application.ApplicationInfo;
-import com.intellij.openapi.compiler.CompilerPaths;
 import com.intellij.openapi.components.ComponentManager;
 import com.intellij.openapi.components.PathMacroManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.SelectionModel;
-import com.intellij.openapi.extensions.PluginDescriptor;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.FileType;
@@ -44,13 +40,10 @@ import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.CompilerProjectExtension;
-import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderEntry;
 import com.intellij.openapi.roots.OrderRootType;
-import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.roots.SourceFolder;
 import com.intellij.openapi.roots.impl.DirectoryIndex;
 import com.intellij.openapi.vcs.FilePath;
 import com.intellij.openapi.vcs.changes.Change;
@@ -58,7 +51,6 @@ import com.intellij.openapi.vcs.changes.ChangeList;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vcs.changes.ContentRevision;
 import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -69,22 +61,18 @@ import com.intellij.psi.PsiClassOwner;
 import com.intellij.psi.PsiCompiledElement;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiPackage;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.util.PsiUtilCore;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.collectors.AbstractClassAdder;
 import org.twodividedbyzero.idea.findbugs.collectors.ClassCollector;
-import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
@@ -97,7 +85,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -223,22 +210,6 @@ public final class IdeaUtilImpl {
 
 
 	@Nullable
-	public static PsiFile getPsiFile(@NotNull final DataContext dataContext, @NotNull final VirtualFile virtualFile) {
-		final Project project = IdeaUtilImpl.getProject(dataContext);
-		if (project != null) {
-			return PsiManager.getInstance(project).findFile(virtualFile);
-		}
-		return null;
-	}
-
-
-	@Nullable
-	public static PsiFile getPsiFile(@NotNull final Project project, @NotNull final VirtualFile virtualFile) {
-		return PsiManager.getInstance(project).findFile(virtualFile);
-	}
-
-
-	@Nullable
 	public static PsiFile getPsiFile(@Nullable final PsiElement psiClass) {
 		if (psiClass == null) {
 			return null;
@@ -270,23 +241,6 @@ public final class IdeaUtilImpl {
 		final Project project = getProject(dataContext);
 		final ChangeListManager changeListManager = ChangeListManager.getInstance(project);
 		return changeListManager.getAffectedFiles();
-	}
-
-
-	// todo:
-	/*public static void getSelectedChangelist() {
-		final Project project = getProject();
-		final ChangeListManager changeListManager = ChangeListManager.getInstance(project);
-		for (final LocalChangeList list : changeListManager.getChangeLists()) {
-		}
-
-	}*/
-
-
-	@Nullable
-	public static ChangeList getChangeListByName(final String name, final Project project) {
-		final ChangeListManager changeListManager = ChangeListManager.getInstance(project);
-		return changeListManager.findChangeList(name);
 	}
 
 
@@ -326,55 +280,6 @@ public final class IdeaUtilImpl {
 			return containingFile.getVirtualFile();
 		}
 		return null;
-	}
-
-
-	@Nullable
-	public static VirtualFile getVirtualFile(@NotNull final PsiFileSystemItem fileSystemItem) {
-		return fileSystemItem.getVirtualFile();
-	}
-
-
-	@Nullable
-	public static VirtualFile getVirtualFile(final PsiElement element) {
-		return PsiUtilCore.getVirtualFile(element);
-	}
-
-
-	@NotNull
-	public static PsiClass[] getPsiClasses(@NotNull final PsiClassOwner psiClassOwner) {
-		return psiClassOwner.getClasses();
-	}
-
-
-	@NotNull
-	public static PsiClass[] getContainingClasses(@NotNull final DataContext dataContext) {
-		final Project project = getProject(dataContext);
-
-		final Editor selectedEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-		if (selectedEditor == null) {
-			throw new NullPointerException("Expected not null Editor");
-		}
-		if (project == null) {
-			throw new NullPointerException("Expected not null project");
-		}
-		final PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(selectedEditor.getDocument());
-
-		//noinspection ZeroLengthArrayAllocation
-		PsiClass[] clazzes = new PsiClass[0];
-		if (psiFile instanceof PsiClassOwner) {
-			clazzes = ((PsiClassOwner) psiFile).getClasses();
-			if (clazzes.length > 0) {
-				// note, there could be more then one class in the file
-				// one needs to find public class or class with name = name of
-				// file w/o extension
-				// so adjust the index accordingly
-				//noinspection UseOfSystemOutOrSystemErr
-				System.out.println(clazzes[0].getQualifiedName());
-			}
-		}
-
-		return clazzes;
 	}
 
 
@@ -434,18 +339,6 @@ public final class IdeaUtilImpl {
 
 
 	@Nullable
-	public static VirtualFile getCompilerOutputPath(@NotNull final DataContext dataContext) {
-		final Module module = getModule(dataContext);
-		final CompilerModuleExtension compilerModuleExtension = CompilerModuleExtension.getInstance(module);
-		if (compilerModuleExtension != null) {
-			return compilerModuleExtension.getCompilerOutputPath();
-		}
-		return null;
-		//return ModuleRootManager.getInstance(module).getCompilerOutputPath();
-	}
-
-
-	@Nullable
 	public static VirtualFile getCompilerOutputPath(@NotNull final VirtualFile virtualFile, @NotNull final Project project) {
 		final Module module = findModuleForFile(virtualFile, project);
 		if (module == null) {
@@ -480,43 +373,6 @@ public final class IdeaUtilImpl {
 	@NotNull
 	public static String getPackageUrl(@NotNull final PsiElement psiElement) {
 		return getPackage(psiElement).replace('.', '/');
-	}
-
-
-	@Nullable
-	public static PsiElement getPackage(@NotNull final DataContext datacontext) {
-		final PsiElement element = (PsiElement) datacontext.getData("psi.Element");
-		if (element instanceof PsiPackage) {
-			return element;
-		}
-
-		return null;
-	}
-
-	/*public static Set<PsiPackage> getPackagesForModule(final Module module, final Project project) {
-				final Set<PsiPackage> packages = new HashSet<PsiPackage>();
-		final PsiManager psiMan = PsiManager.getInstance(project);
-		final PsiPackage psiPackage = psiMan.findPackage("");
-		final GlobalSearchScope scope = module.getModuleRuntimeScope(false);
-		getSubPackages(psiPackage, scope, packages);
-
-		return packages;
-	}*/
-
-
-	private static void getSubPackages(@NotNull final PsiPackage psiPackage, @NotNull final GlobalSearchScope scope, @NotNull final Set<PsiPackage> result) {
-		for (final PsiPackage child : psiPackage.getSubPackages(scope)) {
-			result.add(child);
-			getSubPackages(child, scope, result);
-		}
-	}
-
-
-	public static SourceFolder[] getSourceFolders(@NotNull final DataContext dataContext) {
-		final Module module = getModule(dataContext);
-		final ContentEntry[] contentEntries = ModuleRootManager.getInstance(module).getContentEntries();
-
-		return contentEntries[0].getSourceFolders();
 	}
 
 
@@ -561,14 +417,6 @@ public final class IdeaUtilImpl {
 
 
 	@NotNull
-	public static Module[] getProjectModules(@NotNull final DataContext dataContext) {
-		final Project project = getProject(dataContext);
-
-		return ModuleManager.getInstance(project).getModules();
-	}
-
-
-	@NotNull
 	public static VirtualFile[] getProjectClasspath(@NotNull final DataContext dataContext) {
 		final Module module = getModule(dataContext);
 		return getProjectClasspath(module);
@@ -600,55 +448,6 @@ public final class IdeaUtilImpl {
 	}
 
 
-	/*private Collection<? extends VirtualFile> findClassPathElements(final Module module) {
-		final Collection<VirtualFile> found = new LinkedList<VirtualFile>();
-
-		*//* our module output *//*
-		final CompilerModuleExtension compilerModuleExtension = CompilerModuleExtension.getInstance(module);
-		if (compilerModuleExtension != null) {
-			final VirtualFile[] outputRoots = compilerModuleExtension.getOutputRoots(true);
-			Collections.addAll(found, outputRoots);
-		}
-
-		*//* all our dependencies (recursively where needed) *//*
-		final ModuleRootManager mrm = ModuleRootManager.getInstance(module);
-		for (final OrderEntry entry : mrm.getOrderEntries()) {
-			final Collection<VirtualFile> files = new LinkedList<VirtualFile>();
-
-			if (entry instanceof ModuleOrderEntry) {
-				*//* other modules we depend on -> they could depend on modules themselves, so we need to add them recursively *//*
-				final ModuleOrderEntry moduleOrderEntry = (ModuleOrderEntry) entry;
-				final Module currentModule = moduleOrderEntry.getModule();
-				if (currentModule != null) {
-					files.addAll(Arrays.asList(OrderEnumerator.orderEntries(currentModule).compileOnly().recursively().classes().getRoots()));
-				}
-			} else if (entry instanceof LibraryOrderEntry) {
-				*//* libraries cannot be recursive and we only need the classes of them *//*
-				final LibraryOrSdkOrderEntry libraryOrderEntry = (LibraryOrderEntry) entry;
-				files.addAll(Arrays.asList(libraryOrderEntry.getRootFiles(OrderRootType.CLASSES)));
-			} else {
-				*//* all other cases (whichever they are) we want to have their classes outputs *//*
-				files.addAll(Arrays.asList(entry.getFiles(OrderRootType.CLASSES)));
-			}
-			for (final VirtualFile virtualFile : files) {
-				found.add(virtualFile);
-			}
-		}
-
-		return found;
-	}*/
-
-
-	private static boolean isLegacyApiAvailable() {
-		try {
-			OrderRootType.class.getField("COMPILATION_CLASSES");
-			return true;
-		} catch (final NoSuchFieldException ignore) {
-			return false;
-		}
-	}
-
-
 	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@Nullable
 	public static Module findModuleForFile(@NotNull final VirtualFile virtualFile, @NotNull final Project project) {
@@ -658,38 +457,6 @@ public final class IdeaUtilImpl {
 			return null;
 		}
 		return ModuleUtilCore.findModuleForFile(virtualFile, project);
-	}
-
-	/*public static VirtualFile[] getModuleClasspath(final DataContext dataContext) {
-		final Module module = getModuleByFile(dataContext);
-	}*/
-
-
-	/*@Nullable
-	public static Module getModuleByFile(final DataContext dataContext) {
-		final VirtualFile virtualFile;
-		final PsiElement psiElement = getCurrentElement(dataContext);
-		final PsiFile containingFile = psiElement.getContainingFile();
-
-		virtualFile = containingFile.getVirtualFile();
-		if (virtualFile != null) {
-			final Project currentProject = getProject(dataContext);
-			final ProjectRootManager projectRootManager = ProjectRootManager.getInstance(currentProject);
-			final ProjectFileIndex projectFileIndex = projectRootManager.getFileIndex();
-
-			return projectFileIndex.getModuleForFile(virtualFile);
-		}
-
-		return null;
-	}*/
-
-
-	@Nullable
-	public static Module getModuleForFile(@NotNull final VirtualFile virtualFile, final Project project) {
-		final ProjectRootManager projectRootManager = ProjectRootManager.getInstance(project);
-		final ProjectFileIndex projectFileIndex = projectRootManager.getFileIndex();
-
-		return projectFileIndex.getModuleForFile(virtualFile);
 	}
 
 
@@ -726,28 +493,6 @@ public final class IdeaUtilImpl {
 	private static Module[] getModules(final Project project) {
 		final ModuleManager moduleManager = ModuleManager.getInstance(project);
 		return moduleManager.getModules();
-	}
-
-
-	// TODO: maybe not needed
-
-
-	public static File[] getFileForModules(@NotNull final Module[] modules, final FileType fileType) {
-		final Collection<File> resolvedFiles = new HashSet<File>();
-
-		for (final Module module : modules) {
-			final Collection<VirtualFile> virtualFiles = new ArrayList<VirtualFile>();
-			final VirtualFile outputDirectory = CompilerPaths.getModuleOutputDirectory(module, false);
-			if (outputDirectory != null) {
-				virtualFiles.add(outputDirectory);
-			}
-			for (final VirtualFile virtualFile : virtualFiles) {
-				final File file = VfsUtilCore.virtualToIoFile(virtualFile);
-				resolvedFiles.add(file.getAbsoluteFile());
-			}
-		}
-
-		return resolvedFiles.toArray(new File[resolvedFiles.size()]);
 	}
 
 
@@ -795,30 +540,6 @@ public final class IdeaUtilImpl {
 
 
 	/**
-	 * Retrieves the current PsiField.
-	 *
-	 * @param dataContext The IntelliJ DataContext (can usually be obtained from the action-event).
-	 * @return The current PsiField or null if not found.
-	 */
-	@Nullable
-	public static PsiField getCurrentField(@NotNull final DataContext dataContext) {
-		return findField(getCurrentElement(dataContext));
-	}
-
-
-	@Nullable
-	public static VirtualFile getCurrentFolder(@NotNull final DataContext dataContext) {
-		final VirtualFile file = DataKeys.VIRTUAL_FILE.getData(dataContext);
-		VirtualFile folder = null;
-
-		if (file != null) {
-			folder = file.getParent();
-		}
-		return folder;
-	}
-
-
-	/**
 	 * Retrieves the current PsiMethod.
 	 *
 	 * @param dataContext The IntelliJ DataContext (can usually be obtained from the action-event).
@@ -828,26 +549,6 @@ public final class IdeaUtilImpl {
 	@Nullable
 	public static PsiMethod getCurrentMethod(@NotNull final DataContext dataContext) {
 		return findMethod(getCurrentElement(dataContext));
-	}
-
-
-	/**
-	 * Retrieves the current SelectionModel.
-	 *
-	 * @param dataContext The IntelliJ DataContext (can usually be obtained from the action-event).
-	 * @return The current SelectionModel or null if not found.
-	 */
-	@Nullable
-	public static SelectionModel getSelectionModel(@NotNull final DataContext dataContext) {
-		//final Editor editor = (Editor) dataContext.getData(DataConstants.EDITOR);
-		final Editor editor = DataKeys.EDITOR.getData(dataContext);
-		if (editor != null) {
-			final SelectionModel model = editor.getSelectionModel();
-			if (model.hasSelection()) {
-				return model;
-			}
-		}
-		return null;
 	}
 
 
@@ -865,23 +566,6 @@ public final class IdeaUtilImpl {
 			return findClass(psiClass.getParent());
 		}
 		return psiClass;
-	}
-
-
-	/**
-	 * Finds the PsiField for a specific PsiElement.
-	 *
-	 * @param element The PsiElement to locate the field for.
-	 * @return The PsiField you're looking for or null if not found.
-	 */
-	@Nullable
-	private static PsiField findField(final PsiElement element) {
-		final PsiField psiField = element instanceof PsiField ? (PsiField) element : PsiTreeUtil.getParentOfType(element, PsiField.class);
-		if (psiField != null && psiField.getContainingClass() instanceof PsiAnonymousClass) {
-			//noinspection TailRecursion
-			return findField(psiField.getParent());
-		}
-		return psiField;
 	}
 
 
@@ -953,12 +637,6 @@ public final class IdeaUtilImpl {
 	}
 
 
-	@Nullable
-	public static Module findModuleForPsiElement(@NotNull final PsiElement element, final Project project) {
-		return ModuleUtilCore.findModuleForPsiElement(element);
-	}
-
-
 	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@Nullable
 	public static PsiElement getElementAtLine(@NotNull final PsiFile file, final int line) {
@@ -996,12 +674,6 @@ public final class IdeaUtilImpl {
 	}
 
 
-	@Nullable
-	public static PluginDescriptor getPluginDescriptor(final String pluginId) {
-		return PluginManager.getPlugin(PluginId.getId(pluginId));
-	}
-
-
 	@SuppressFBWarnings("DM_CONVERT_CASE")
 	@NotNull
 	public static String removeExtension(@NotNull final String name) {
@@ -1027,24 +699,8 @@ public final class IdeaUtilImpl {
 	}
 
 
-	private static ToolWindow getToolWindowById(final String uniqueIdentifier, @NotNull final DataContext dataContext) {
-		final Project project = getProject(dataContext);
-		return ToolWindowManager.getInstance(project).getToolWindow(uniqueIdentifier);
-	}
-
-
 	public static ToolWindow getToolWindowById(final String uniqueIdentifier, @NotNull final Project project) {
 		return ToolWindowManager.getInstance(project).getToolWindow(uniqueIdentifier);
-	}
-
-
-	public static void activateToolWindow(final String toolWindowId, @NotNull final DataContext dataContext) {
-		EventDispatchThreadHelper.invokeLater(new Runnable() {
-			public void run() {
-				final ToolWindow toolWindow = getToolWindowById(toolWindowId, dataContext);
-				activateToolWindow(toolWindow);
-			}
-		});
 	}
 
 
@@ -1052,16 +708,6 @@ public final class IdeaUtilImpl {
 		if (!toolWindow.isActive() && toolWindow.isAvailable()) {
 			toolWindow.show(null);
 		}
-	}
-
-
-	public static String getIdeaMajorVersion() {
-		return ApplicationInfo.getInstance().getMajorVersion();
-	}
-
-
-	public static boolean isVersionGreaterThanIdea9() {
-		return Integer.valueOf(getIdeaMajorVersion()) > 9;
 	}
 
 

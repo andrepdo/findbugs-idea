@@ -20,14 +20,12 @@
 package org.twodividedbyzero.idea.findbugs.gui.common;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.ui.components.JBScrollPane;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import java.awt.Component;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 
 /**
@@ -48,25 +46,7 @@ public final class ScrollPaneFacade implements ScrollPaneConstants {
 
 	@SuppressWarnings( {"UndesirableClassUsage"})
 	public static JScrollPane createScrollPane(@Nullable final Component view, final int vsbPolicy, final int hsbPolicy) {
-		if (IdeaUtilImpl.isVersionGreaterThanIdea9()) {
-			try {
-				final Class<?> clazz = Class.forName("com.intellij.ui.components.JBScrollPane");
-				final Constructor<?> constructor = clazz.getConstructor(Component.class, int.class, int.class);
-				return (JScrollPane) constructor.newInstance(view, vsbPolicy, hsbPolicy);
-			} catch (final ClassNotFoundException e) {
-				LOGGER.error(e);
-			} catch (final NoSuchMethodException e) {
-				LOGGER.error(e);
-			} catch (final InvocationTargetException e) {
-				LOGGER.error(e.getTargetException());
-			} catch (final InstantiationException e) {
-				LOGGER.error(e);
-			} catch (final IllegalAccessException e) {
-				LOGGER.error(e);
-			}
-		}
-
-		return new JScrollPane(view, vsbPolicy, hsbPolicy);
+		return new JBScrollPane(view, vsbPolicy, hsbPolicy);
 	}
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -23,12 +23,13 @@ import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.ui.ColorChooser;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.UIBundle;
+import com.intellij.ui.components.JBList;
 import info.clearthought.layout.TableLayout;
 import info.clearthought.layout.TableLayoutConstants;
+import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.gui.common.AaComboBox;
 import org.twodividedbyzero.idea.findbugs.gui.common.AaTextField;
-import org.twodividedbyzero.idea.findbugs.gui.common.ListFacade;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
@@ -37,7 +38,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -84,7 +84,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 	private JPanel _annotationPathPanel;
 	private JPanel _markUpPanel;
 	private JPanel _typeSettingsPanel;
-	private JList _annotationTypeList;
+	private JBList _annotationTypeList;
 
 
 	public AnnotationConfiguration(final ConfigurationPanel parent, final FindBugsPreferences preferences) {
@@ -267,10 +267,12 @@ public class AnnotationConfiguration implements ConfigurationPage {
 		return _typeSettingsPanel;
 	}
 
-	private JList getAnnotationTypeList() {
+	@NotNull
+	private JBList getAnnotationTypeList() {
 		if (_annotationTypeList == null) {
-			_annotationTypeList = ListFacade.createList(AnnotationType.values());
+			_annotationTypeList = new JBList(AnnotationType.values());
 			_annotationTypeList.addListSelectionListener(new ListSelectionListener() {
+				@Override
 				public void valueChanged(final ListSelectionEvent e) {
 					if (!e.getValueIsAdjusting()) {
 						getAnnotationTypePanel().setAnnotationType((AnnotationType) _annotationTypeList.getSelectedValue());

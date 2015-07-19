@@ -19,6 +19,7 @@
 
 package org.twodividedbyzero.idea.findbugs.gui.toolwindow.view;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import info.clearthought.layout.TableLayout;
 
 import javax.swing.JLabel;
@@ -33,6 +34,8 @@ import java.awt.LayoutManager;
  * @version $Revision$
  * @since 0.9.97
  */
+@SuppressWarnings({"unused", "FieldCanBeLocal"})
+@SuppressFBWarnings("UPM_UNCALLED_PRIVATE_METHOD")
 public class CloudCommentsPane2  extends JPanel {
 
 	private final ToolWindowPanel _toolWindowPanel;

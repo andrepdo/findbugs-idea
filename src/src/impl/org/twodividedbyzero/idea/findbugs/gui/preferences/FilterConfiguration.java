@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -19,12 +19,13 @@
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.components.JBList;
 import info.clearthought.layout.TableLayout;
 import info.clearthought.layout.TableLayoutConstants;
+import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.ExtensionFileFilter;
-import org.twodividedbyzero.idea.findbugs.gui.common.ListFacade;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.BrowseAction.BrowseActionCallback;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -63,10 +64,10 @@ public class FilterConfiguration implements ConfigurationPage {
 	private final ConfigurationPanel _parent;
 	private Component _component;
 	private JPanel _includePanel;
-	private JList _includeList;
+	private JBList _includeList;
 	private JPanel _excludePanel;
-	private JList _excludeList;
-	private JList _baselineList;
+	private JBList _excludeList;
+	private JBList _baselineList;
 	private JPanel _baselinePanel;
 
 
@@ -142,7 +143,7 @@ public class FilterConfiguration implements ConfigurationPage {
 
 			final ListModel model = new DefaultListModel();
 
-			_includeList = ListFacade.createList(model);
+			_includeList = new JBList(model);
 			_includeList.setVisibleRowCount(7);
 			_includeList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			_includeList.setCellRenderer(new ExpandPathMacroListRenderer(_parent.getProject()));
@@ -211,7 +212,7 @@ public class FilterConfiguration implements ConfigurationPage {
 
 			final ListModel model = new DefaultListModel();
 
-			_excludeList = ListFacade.createList(model);
+			_excludeList = new JBList(model);
 			_excludeList.setVisibleRowCount(7);
 			_excludeList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			_excludeList.setCellRenderer(new ExpandPathMacroListRenderer(_parent.getProject()));
@@ -280,7 +281,7 @@ public class FilterConfiguration implements ConfigurationPage {
 
 			final ListModel model = new DefaultListModel();
 
-			_baselineList = ListFacade.createList(model);
+			_baselineList = new JBList(model);
 			_baselineList.setVisibleRowCount(7);
 			_baselineList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			_baselineList.setCellRenderer(new ExpandPathMacroListRenderer(_parent.getProject()));
@@ -336,7 +337,8 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	JList getIncludeList() {
+	@NotNull
+	JBList getIncludeList() {
 		if (_includeList == null) {
 			getIncludePanel();
 		}
@@ -344,7 +346,8 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	JList getExcludeList() {
+	@NotNull
+	JBList getExcludeList() {
 		if (_excludeList == null) {
 			getExcludePanel();
 		}
@@ -352,7 +355,8 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	JList getBaselineList() {
+	@NotNull
+	JBList getBaselineList() {
 		if (_baselineList == null) {
 			getBaseLinePanel();
 		}
@@ -360,7 +364,7 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
-	private static DefaultListModel getModel(final JList list) {
+	private static DefaultListModel getModel(@NotNull final JBList list) {
 		return (DefaultListModel) list.getModel();
 	}
 

@@ -21,11 +21,11 @@ package org.twodividedbyzero.idea.findbugs.gui.tree.view;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.gui.common.AbstractBar;
-import org.twodividedbyzero.idea.findbugs.gui.common.ListFacade;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.gui.common.ToolBarButton;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
@@ -36,7 +36,6 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
@@ -849,7 +848,7 @@ abstract class QuickSearch<E> {
 
 		private JLabel _label;
 		private DefaultListModel _listModel;
-		private JList _list;
+		private JBList _list;
 		private int _mouseOverIndex;
 
 
@@ -868,8 +867,7 @@ abstract class QuickSearch<E> {
 			_label.setVerticalAlignment(SwingConstants.CENTER);
 
 			_listModel = new DefaultListModel();
-			_list = ListFacade.createList();
-			_list.setModel(_listModel);
+			_list = new JBList(_listModel);
 			_list.setBorder(BorderFactory.createEmptyBorder(8, 5, 8, 5));
 			_list.setAutoscrolls(true);
 			_list.setFocusable(false);
@@ -968,7 +966,7 @@ abstract class QuickSearch<E> {
 
 
 		@Nullable
-		private JList getList() {
+		private JBList getList() {
 			return _list;
 		}
 
@@ -1070,7 +1068,7 @@ abstract class QuickSearch<E> {
 					_recentSearchesPopup.updateListData(_recentSearches);
 				}
 
-				final JList jList = _recentSearchesPopup.getList();
+				final JBList jList = _recentSearchesPopup.getList();
 				if (jList != null) {
 					final DefaultListModel listModel = (DefaultListModel) jList.getModel();
 					final int index = listModel.indexOf(text);

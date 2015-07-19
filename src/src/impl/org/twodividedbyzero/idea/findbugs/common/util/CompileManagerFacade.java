@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -26,9 +26,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 
 /**
  * $Date$
@@ -52,23 +49,7 @@ public class CompileManagerFacade {
 
 	public void compile(final VirtualFile[] virtualFiles, @Nullable final CompileStatusNotification notification) {
 		final CompilerManager compilerManager = CompilerManager.getInstance(_project);
-		try {
-			if (IdeaUtilImpl.isVersionGreaterThanIdea9()) {
-				final Method method = compilerManager.getClass().getDeclaredMethod("compile", VirtualFile[].class, CompileStatusNotification.class);
-				method.invoke(virtualFiles, notification);
-			} else {
-				final Method method = compilerManager.getClass().getDeclaredMethod("compile", VirtualFile[].class, CompileStatusNotification.class, boolean.class);
-				method.invoke(virtualFiles, notification, false);
-			}
-		} catch (final NoSuchMethodException e) {
-			LOGGER.debug(e);
-		} catch (final InvocationTargetException e) {
-			LOGGER.debug(e.getTargetException());
-		} catch (final IllegalAccessException e) {
-			LOGGER.debug(e);
-		} catch (final IllegalArgumentException e) {
-			LOGGER.debug(e);
-		}
+		compilerManager.compile(virtualFiles, notification);
 	}
 
 }
