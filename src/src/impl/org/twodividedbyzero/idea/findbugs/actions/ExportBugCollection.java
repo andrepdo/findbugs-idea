@@ -203,7 +203,7 @@ public final class ExportBugCollection extends AbstractAction {
 
 					showToolWindowNotifier(project, "Exported bug collection to " + exportDir + '.', MessageType.INFO);
 					if((!finalExportXml || finalExportBoth) && preferences.getBooleanProperty(FindBugsPreferences.EXPORT_OPEN_BROWSER, true)) {
-						BrowserUtil.launchBrowser(new File(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_HTML_SUFFIX).getAbsolutePath());
+						BrowserUtil.browse(new File(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_HTML_SUFFIX).getAbsolutePath());
 					}
 
 				} catch (final IOException e1) {

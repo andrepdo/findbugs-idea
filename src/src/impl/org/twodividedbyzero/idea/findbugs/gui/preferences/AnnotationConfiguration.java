@@ -270,7 +270,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 	@NotNull
 	private JBList getAnnotationTypeList() {
 		if (_annotationTypeList == null) {
-			_annotationTypeList = new JBList(AnnotationType.values());
+			_annotationTypeList = new JBList((Object[])AnnotationType.values());
 			_annotationTypeList.addListSelectionListener(new ListSelectionListener() {
 				@Override
 				public void valueChanged(final ListSelectionEvent e) {

@@ -275,7 +275,7 @@ public class BugDetailsComponents {
 		try {
 			if (evt.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
 				final URL url = evt.getURL();
-				BrowserUtil.launchBrowser(url.toExternalForm());
+				BrowserUtil.browse(url);
 				_explanationPane.setPage(url);
 			}
 		} catch (final Exception e) {
