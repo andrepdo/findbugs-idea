@@ -51,6 +51,7 @@ import edu.umd.cs.findbugs.BugPattern;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.FindBugs;
 import edu.umd.cs.findbugs.Plugin;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import edu.umd.cs.findbugs.ba.AnalysisException;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -160,7 +161,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
-	@SuppressWarnings({"NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"})
+	@SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
 	@Override
 	public void initComponent() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
@@ -169,7 +170,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
-	@SuppressWarnings({"NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"})
+	@SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
 	@Override
 	public void disposeComponent() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
@@ -178,6 +179,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
+	@SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE")
 	@Override
 	@NotNull
 	public String getComponentName() {
@@ -188,7 +190,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	/**
 	 * Invoked by EDT.
 	 */
-	@SuppressWarnings({"NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"})
+	@SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
 	@Override
 	public void projectOpened() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
@@ -203,7 +205,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	/**
 	 * Invoked by EDT.
 	 */
-	@SuppressWarnings({"NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"})
+	@SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
 	@Override
 	public void projectClosed() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
@@ -333,7 +335,8 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	 * @param error   the exception.
 	 * @return any exception to be passed upwards.
 	 */
-	@SuppressWarnings({"ThrowableInstanceNeverThrown", "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+	@SuppressWarnings("unused")
+	@SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE")
 	@NotNull
 	public static FindBugsPluginException processError(final String message, @Nullable final Throwable error) {
 		Throwable root = error;
@@ -354,8 +357,9 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
-	@SuppressWarnings({"ThrowableResultOfMethodCallIgnored"})
+	@SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "UnusedParameters"})
 	public static void processError(final Map<String, Map<String, Throwable>> status) {
+		// TODO
 	}
 
 
@@ -569,7 +573,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
-	@SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
+	@SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE")
 	@NotNull
 	@Override
 	public String getId() {

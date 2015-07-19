@@ -90,13 +90,7 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 		_bugCategories = bugCategories;
 		_indicator = indicator;
 		_cancellingByUser = cancellingByUser;
-		_transferToEDTQueue = new TransferToEDTQueue<Runnable>("Add New Bug Instance", new Processor<Runnable>() {
-			@Override
-			public boolean process(Runnable runnable) {
-				runnable.run();
-				return true;
-			}
-		}, new Condition<Object>() {
+		_transferToEDTQueue = new TransferToEDTQueue<Runnable>("Add New Bug Instance", new RunnableProcessor(), new Condition<Object>() {
 			@Override
 			public boolean value(Object o) {
 				return project.isDisposed() || _cancellingByUser.get() || _indicator.isCanceled();
@@ -172,7 +166,7 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 		// Report unique errors in order of their sequence
 		final List<Error> errorList = new ArrayList<Error>(getQueuedErrors());
 		if (!errorList.isEmpty()) {
-			Collections.sort(errorList, new QueuedErrorsComparator());
+			Collections.sort(errorList, QUEUED_ERRORS_COMPARATOR);
 
 			final Map<String, Map<String, Throwable>> status = new HashMap<String, Map<String, Throwable>>();
 			final String key = "The following errors occurred during FindBugs analysis:";
@@ -317,9 +311,19 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 	}
 
 
-	private static class QueuedErrorsComparator implements Comparator<Error> {
-		public int compare(final Error o1, final Error o2) {
-			return o1.getSequence() - o2.getSequence();
+	private static class RunnableProcessor implements Processor<Runnable> {
+		@Override
+		public boolean process(Runnable runnable) {
+			runnable.run();
+			return true;
 		}
 	}
+
+
+	private static final Comparator<Error> QUEUED_ERRORS_COMPARATOR = new Comparator<Error>() {
+		@Override
+		public int compare(final Error o1, final Error o2) {
+			return Integer.signum(o1.getSequence() - o2.getSequence());
+		}
+	};
 }

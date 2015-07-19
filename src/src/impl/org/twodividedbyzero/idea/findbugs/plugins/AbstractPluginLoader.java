@@ -27,6 +27,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.util.ui.UIUtil;
 import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.PluginException;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
@@ -96,7 +97,7 @@ public abstract class AbstractPluginLoader {
 					} else {
 						handleError("Plugin '" + pluginFile.getPath() + "' not loaded. Archive inaccessible.");
 					}
-				} catch (final Exception e) {
+				} catch (final Throwable e) {
 					handleError("Could not load custom findbugs plugin: " + pluginFile.getPath(), e);
 				}
 			}
@@ -180,7 +181,7 @@ public abstract class AbstractPluginLoader {
 	}
 
 
-	protected void handleError(final String message, final Exception exception) {
+	protected void handleError(final String message, @Nullable final Throwable exception) {
 		if (_treatErrorsAsWarnings) {
 			LOGGER.warn(message, exception);
 		} else {
@@ -202,16 +203,29 @@ public abstract class AbstractPluginLoader {
 
 			// do not use BalloonTipFactory here, at this point FindBugs tool window is not yet created
 			// code adapted from com.intellij.openapi.components.impl.stores.StorageUtil#notifyUnknownMacros
-			UIUtil.invokeLaterIfNeeded(new Runnable() {
-				@Override
-				public void run() {
-					Project currentProject = project;
-					if (project == null) {
-						currentProject = ProjectManager.getInstance().getDefaultProject();
-					}
-					new Notification("FindBugs Custom Plugin Load Error", "Error while loading custom FindBugs plugins", message.toString(), NotificationType.ERROR).notify(currentProject);
-				}
-			});
+			UIUtil.invokeLaterIfNeeded(new RunnableErrorNotification(project, message.toString()));
+		}
+	}
+
+
+	private static class RunnableErrorNotification implements Runnable {
+		private final Project _project;
+		private final String _message;
+
+
+		RunnableErrorNotification(@Nullable final Project project, @NotNull String message) {
+			_project = project;
+			_message = message;
+		}
+
+
+		@Override
+		public void run() {
+			Project currentProject = _project;
+			if (_project == null) {
+				currentProject = ProjectManager.getInstance().getDefaultProject();
+			}
+			new Notification("FindBugs Custom Plugin Load Error", "Error while loading custom FindBugs plugins", _message, NotificationType.ERROR).notify(currentProject);
 		}
 	}
 }

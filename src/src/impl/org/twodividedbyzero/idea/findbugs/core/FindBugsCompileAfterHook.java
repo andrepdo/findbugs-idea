@@ -35,6 +35,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.Alarm;
 import com.intellij.util.io.storage.HeavyProcessLatch;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
@@ -136,6 +137,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 	}
 
 
+	@Override
 	public void fileGenerated(final String s, final String s1) {
 	}
 
@@ -145,12 +147,15 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 	}
 
 
+	@SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE")
 	@NotNull
+	@Override
 	public String getComponentName() {
 		return FindBugsPluginConstants.PLUGIN_ID + "#FindBugsCompileAfterHook";
 	}
 
 
+	@Override
 	public void initComponent() {
 	}
 
@@ -165,6 +170,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 	}
 
 
+	@Override
 	public void disposeComponent() {
 	}
 
@@ -181,6 +187,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 	}
 
 
+	@SuppressFBWarnings(value = {"LI_LAZY_INIT_UPDATE_STATIC", "LI_LAZY_INIT_STATIC"}, justification = "EDT thread confinement")
 	public static void setAnalyzeAfterAutomake(@NotNull final Project project, final boolean enabled) {
 		if (enabled) {
 			Changes.INSTANCE.addListener(project);
