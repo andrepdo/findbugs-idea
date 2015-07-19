@@ -189,31 +189,9 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 			if (modifierList != null) {
 				addSuppressAnnotation(project, editor, container, modifierList, getID(container));
 			}
-		} /*else {
-			final PsiDocComment docComment = container.getDocComment();
-			final PsiManager manager = PsiManager.getInstance(project);
-			if (docComment == null) {
-				final String commentText = "*//** @" + SUPPRESS_INSPECTIONS_TAG_NAME + ' ' + getID(container) + "*//*";
-				docComment = JavaPsiFacade.getInstance(manager.getProject()).getElementFactory().createDocCommentFromText(commentText, null);
-				final PsiElement firstChild = container.getFirstChild();
-				container.addBefore(docComment, firstChild);
-			} else {
-				final PsiDocTag noInspectionTag = docComment.findTagByName(SUPPRESS_INSPECTIONS_TAG_NAME);
-				if (noInspectionTag != null) {
-					final PsiDocTagValue valueElement = noInspectionTag.getValueElement();
-					final String tagText = '@' + SUPPRESS_INSPECTIONS_TAG_NAME + ' ' + (valueElement != null ? valueElement.getText() + ',' : "") + getID(container);
-					noInspectionTag.replace(JavaPsiFacade.getInstance(manager.getProject()).getElementFactory().createDocTagFromText(tagText, null));
-
-					addImport(project, element);
-
-				} else {
-					final String tagText = '@' + SUPPRESS_INSPECTIONS_TAG_NAME + ' ' + getID(container);
-					docComment.add(JavaPsiFacade.getInstance(manager.getProject()).getElementFactory().createDocTagFromText(tagText, null));
-
-					addImport(project, element);
-				}
-			}
-		}*/
+		} else {
+			Messages.showErrorDialog(editor.getComponent(), "Add suppress annotation is not supported for Java 1.3 and older", "Unsupported");
+		}
 		final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = IdeaUtilImpl.getPluginComponent(project).getProblems();
 		problems.get(element.getContainingFile()).remove(getProblemDescriptor());
 		DaemonCodeAnalyzer.getInstance(project).restart();
