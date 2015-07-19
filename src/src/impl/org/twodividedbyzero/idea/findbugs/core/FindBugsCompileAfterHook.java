@@ -30,12 +30,16 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.util.Alarm;
+import com.intellij.util.io.storage.HeavyProcessLatch;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import java.util.ArrayList;
@@ -46,7 +50,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 
@@ -60,7 +64,10 @@ import java.util.concurrent.ConcurrentMap;
 public class FindBugsCompileAfterHook implements CompilationStatusListener, ProjectComponent {
 
 
-	private static final ConcurrentMap<UUID, Set<VirtualFile>> CHANGED_BY_SESSION_ID = new ConcurrentHashMap<UUID, Set<VirtualFile>>();
+	private static final int DEFAULT_DELAY_MS = 30000;
+	private static final int DELAY_MS = StringUtil.parseInt(System.getProperty("idea.findbugs.autoanalyze.delaymillis", String.valueOf(DEFAULT_DELAY_MS)), DEFAULT_DELAY_MS);
+	private static final ConcurrentMap<UUID, Set<VirtualFile>> CHANGED_BY_SESSION_ID = New.concurrentMap();
+	private static final WeakHashMap<Project, DelayedExecutor> DELAYED_EXECUTOR_BY_PROJECT = New.weakHashMap();
 	private static ChangeCollector CHANGE_COLLECTOR; // EDT thread confinement
 
 
@@ -73,9 +80,11 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		 */
 		ApplicationManager.getApplication().getMessageBus().connect().subscribe(BuildManagerListener.TOPIC, new BuildManagerListener() {
 
+
 			//@Override // introduced with IDEA 15 EA
-			public void beforeBuildProcessStarted(Project project, UUID sessionId) {
+			public void beforeBuildProcessStarted(final Project project, final UUID sessionId) {
 			}
+
 
 			@Override
 			public void buildStarted(final Project project, final UUID sessionId, final boolean isAutomake) {
@@ -93,12 +102,18 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 				if (isAutomake) {
 					final Set<VirtualFile> changed = CHANGED_BY_SESSION_ID.remove(sessionId);
 					if (changed != null) {
-						ApplicationManager.getApplication().runReadAction(new Runnable() {
-							@Override
-							public void run() {
-								initWorkerForAutoMake(project, changed);
+						if (DELAY_MS <= 0) {
+							initWorkerForAutoMake(project, changed);
+						} else {
+							synchronized (DELAYED_EXECUTOR_BY_PROJECT) {
+								DelayedExecutor task = DELAYED_EXECUTOR_BY_PROJECT.get(project);
+								if (task == null) {
+									task = new DelayedExecutor(project);
+									DELAYED_EXECUTOR_BY_PROJECT.put(project, task);
+								}
+								task.schedule(changed);
 							}
-						});
+						}
 					}
 				} // else do nothing ; see FindBugsCompileAfterHook#compilationFinished
 			}
@@ -166,7 +181,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 	}
 
 
-	public static void setAnalyzeAfterAutomake(@NotNull final Project project, boolean enabled) {
+	public static void setAnalyzeAfterAutomake(@NotNull final Project project, final boolean enabled) {
 		if (enabled) {
 			Changes.INSTANCE.addListener(project);
 			if (CHANGE_COLLECTOR == null) {
@@ -250,6 +265,16 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 
 
 	private static void initWorkerForAutoMake(@NotNull final Project project, @NotNull final Collection<VirtualFile> changed) {
+		ApplicationManager.getApplication().runReadAction(new Runnable() {
+			@Override
+			public void run() {
+				initWorkerForAutoMakeImpl(project, changed);
+			}
+		});
+	}
+
+
+	private static void initWorkerForAutoMakeImpl(@NotNull final Project project, @NotNull final Collection<VirtualFile> changed) {
 
 		final FindBugsPreferences preferences = FindBugsPreferences.getPreferences(project, null);
 		final Module[] modules = ModuleManager.getInstance(project).getModules();
@@ -263,7 +288,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 			public void run() {
 				new FindBugsStarter(project, "Running FindBugs analysis for affected files...", preferences, true) {
 					@Override
-					protected void configure(@NotNull ProgressIndicator indicator, @NotNull FindBugsProject findBugsProject) {
+					protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
 						findBugsProject.configureAuxClasspathEntries(indicator, classPaths);
 						findBugsProject.configureSourceDirectories(indicator, changed);
 						findBugsProject.configureOutputFiles(project, changed);
@@ -271,5 +296,55 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 				}.start();
 			}
 		});
+	}
+
+
+	private static class DelayedExecutor {
+		private final Project _project;
+		private final Alarm _alarm;
+		private Set<VirtualFile> _changed;
+
+
+		DelayedExecutor(@NotNull final Project project) {
+			_project = project;
+			_alarm = new Alarm(Alarm.ThreadToUse.SHARED_THREAD);
+		}
+
+
+		void schedule(@NotNull final Set<VirtualFile> changed) {
+			_alarm.cancelAllRequests();
+			synchronized (this) {
+				if (_changed == null) {
+					_changed = changed;
+				} else {
+					_changed.addAll(changed);
+				}
+			}
+			addRequest();
+		}
+
+
+		private void addRequest() {
+			_alarm.addRequest(new Runnable() {
+				@Override
+				public void run() {
+					if (HeavyProcessLatch.INSTANCE.isRunning()) {
+						addRequest();
+					} else {
+						final Set<VirtualFile> changed;
+						synchronized (DelayedExecutor.this) {
+							changed = _changed;
+							_changed = null;
+						}
+						ApplicationManager.getApplication().runReadAction(new Runnable() {
+							@Override
+							public void run() {
+								initWorkerForAutoMake(_project, changed);
+							}
+						});
+					}
+				}
+			}, DELAY_MS);
+		}
 	}
 }

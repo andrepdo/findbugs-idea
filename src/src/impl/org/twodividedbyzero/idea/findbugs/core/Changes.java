@@ -29,9 +29,9 @@ import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +77,7 @@ final class Changes {
 			vf = lfs.findFileByIoFile(f);
 			if (vf != null && vf.isValid() && !vf.isDirectory() && IdeaUtilImpl.isValidFileType(vf.getFileType())) {
 				if (vfs == null) {
-					vfs = new ArrayList<VirtualFile>();
+					vfs = New.arrayList();
 				}
 				vfs.add(vf);
 			}
@@ -94,7 +94,7 @@ final class Changes {
 						if (changesPerProject == null) {
 							changesPerProject = _changed.get(project);
 							if (changesPerProject == null) {
-								changesPerProject = new THashSet<VirtualFile>();
+								changesPerProject = New.tSet();
 								_changed.put(project, changesPerProject);
 							}
 						}

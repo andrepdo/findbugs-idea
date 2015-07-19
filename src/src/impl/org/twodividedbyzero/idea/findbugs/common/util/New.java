@@ -19,13 +19,17 @@
 package org.twodividedbyzero.idea.findbugs.common.util;
 
 
+import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -56,6 +60,12 @@ public final class New {
 
 
 	@NotNull
+	public static <K, V> WeakHashMap<K, V> weakHashMap() {
+		return new WeakHashMap<K, V>();
+	}
+
+
+	@NotNull
 	public static <K, V> ConcurrentMap<K, V> concurrentMap() {
 		return new ConcurrentHashMap<K, V>();
 	}
@@ -64,5 +74,17 @@ public final class New {
 	@NotNull
 	public static <E> Set<E> set() {
 		return new HashSet<E>();
+	}
+
+
+	@NotNull
+	public static <E> Set<E> tSet() {
+		return new THashSet<E>();
+	}
+
+
+	@NotNull
+	public static <E> List<E> arrayList() {
+		return new ArrayList<E>();
 	}
 }

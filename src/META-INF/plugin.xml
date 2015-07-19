@@ -91,6 +91,7 @@
             <li>Issue 97: HiDPI improvements (incomplete, icons)</li>
             <li>Issue 99: fix possible NPE</li>
             <li>Issue 100: configurable notification</li>
+            <li>Issue 101: delaying auto-analyze after auto-compile by 30 seconds (default)</li>
             <li>Issue 102: make deployment of bundled custom plugins more stable</li>
             <li>Update bundled custom plugins: fb-contrib 6.2.1 and find-sec-bugs 1.4.1</li>
             <li>Plugin compatibility: IDEA 13.0 (133.193) until the latest IDEA 15 EA (142.3230.1)</li>
