@@ -48,6 +48,7 @@ import com.intellij.psi.impl.source.jsp.jspJava.JspHolderMethod;
 import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
@@ -239,30 +240,58 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 	public void addSuppressAnnotation(final Project project, final Editor editor, final PsiElement container, final PsiModifierList modifierList, final String id) throws IncorrectOperationException {
 		PsiAnnotation annotation = modifierList.findAnnotation(_suppressWarningsClassName);
 		if (annotation != null) {
-			if (!annotation.getText().contains("{")) {
-				final PsiNameValuePair[] attributes = annotation.getParameterList().getAttributes();
-				if (attributes.length == 1) {
-					final String suppressedWarnings = attributes[0].getText();
-					final PsiAnnotation newAnnotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + _suppressWarningsClassName + "({" + suppressedWarnings + ", \"" + id + "\"})\r\n", container);
-					annotation.replace(newAnnotation);
+
+			String value = null;
+			String justification = null;
+			String name;
+			final PsiNameValuePair[] attributes = annotation.getParameterList().getAttributes();
+			for (PsiNameValuePair attribute : attributes) {
+				name = attribute.getName();
+				if (name == null || "value".equalsIgnoreCase(name)) { // name is null if annotation use "simple" syntax (=only default value is specified)
+					value = attribute.getLiteralValue();
+					if (value == null) { // getLiteralValue return null if syntax use array {}
+						//noinspection ConstantConditions
+						value = attribute.getValue().getText();
+						if (value.startsWith("{\"") && value.endsWith("\"}")) {
+							value = value.substring(2, value.length()-2);
+						}
+					}
+				} else if ("justification".equalsIgnoreCase(name)) {
+					justification = attribute.getLiteralValue();
 				}
+			}
+
+			if (value != null) {
+				// LATER: respect Java CodeStyle Space settings (because, at the moment, createAnnotationFromText is the only way to create an annotation)
+				if (justification != null) {
+					value = "value = {\"" + value + "\", \"" + id + "\"}";
+					justification = ", justification = \"" + justification + "\"";
+				} else {
+					value = "{\"" + value + "\", \"" + id + "\"}";
+					justification = "";
+				}
+				final String annotationText = '@' + _suppressWarningsClassName + "(" + value + justification + ")\r\n";
+				annotation.replace(createAnnotationFromText(project, annotationText, container));
 			} else {
-				final int curlyBraceIndex = annotation.getText().lastIndexOf('}');
-				if (curlyBraceIndex > 0) {
-					annotation.replace(JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText(annotation.getText().substring(0, curlyBraceIndex) + ", \"" + id + "\"})\r\n", container));
-				} else if (!ApplicationManager.getApplication().isUnitTestMode() && editor != null) {
+				if (!ApplicationManager.getApplication().isUnitTestMode() && editor != null) {
 					Messages.showErrorDialog(editor.getComponent(), InspectionsBundle.message("suppress.inspection.annotation.syntax.error", annotation.getText()));
 				}
 			}
+
 		} else {
-			annotation = JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText('@' + _suppressWarningsClassName + "({\"" + id + "\"})\r\n", container);
+			annotation = createAnnotationFromText(project, '@' + _suppressWarningsClassName + "(\"" + id + "\")\r\n", container);
 			modifierList.addBefore(annotation, modifierList.getFirstChild());
 			JavaCodeStyleManager.getInstance(project).shortenClassReferences(modifierList);
-
 			if (needsImportStatement()) {
 				addImport(project, container);
 			}
 		}
+	}
+
+
+	@NotNull
+	private static PsiAnnotation createAnnotationFromText(final Project project, @NotNull @NonNls String annotationText, @Nullable PsiElement context) {
+		return JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText(annotationText, context);
 	}
 
 
