@@ -343,12 +343,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 							changed = _changed;
 							_changed = null;
 						}
-						ApplicationManager.getApplication().runReadAction(new Runnable() {
-							@Override
-							public void run() {
-								initWorkerForAutoMake(_project, changed);
-							}
-						});
+						initWorkerForAutoMake(_project, changed);
 					}
 				}
 			}, DELAY_MS);
