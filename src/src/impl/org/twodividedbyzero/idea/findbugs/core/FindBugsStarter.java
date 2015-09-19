@@ -52,7 +52,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Reto Merz<reto.merz@gmail.com>
- * @version $Revision: 369 $
  * @since 0.9.995
  */
 public abstract class FindBugsStarter implements AnalysisAbortingListener {
@@ -145,7 +144,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 			}
 		});
 
-		final Reporter reporter = new Reporter(_project, bugCollection, findBugsProject, _bugCategories, indicator, _cancellingByUser);
+		final Reporter reporter = new Reporter(_project, bugCollection, _bugCategories, indicator, _cancellingByUser);
 		reporter.setPriorityThreshold(userPrefs.getUserDetectorThreshold());
 
 		final FindBugs2 engine = new FindBugs2();
@@ -163,14 +162,21 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		}
 
 		indicator.setText("Start FindBugs...");
+		Throwable error = null;
 		try {
 			engine.execute();
 		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
-		} catch (final IOException e) {
-			LOGGER.error("Error performing FindBugs analysis", e);
+		} catch (final Throwable e) {
+			error = e;
 		} finally {
 			engine.dispose();
+		}
+
+		if (reporter.isCanceled()) {
+			MessageBusManager.publishAnalysisAbortedToEDT(_project);
+		} else {
+			MessageBusManager.publishAnalysisFinishedToEDT(_project, reporter.getBugCollection(), findBugsProject, error);
 		}
 
 		bugCollection.setDoNotUseCloud(false);

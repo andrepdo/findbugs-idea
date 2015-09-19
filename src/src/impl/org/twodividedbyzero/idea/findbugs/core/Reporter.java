@@ -51,7 +51,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Reto Merz<reto.merz@gmail.com>
- * @version $Revision: 369 $
  * @since 0.9.995
  */
 final class Reporter extends AbstractBugReporter implements FindBugsProgress {
@@ -61,7 +60,6 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 
 	private final Project _project;
 	private final SortedBugCollection _bugCollection;
-	private final FindBugsProject _findBugsProject;
 	private final Map<String, String> _bugCategories;
 	private final ProgressIndicator _indicator;
 	private final AtomicBoolean _cancellingByUser;
@@ -79,14 +77,12 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 	Reporter(
 			@NotNull final Project project,
 			@NotNull final SortedBugCollection bugCollection,
-			@NotNull final FindBugsProject findBugsProject,
 			@NotNull final Map<String, String> bugCategories,
 			@NotNull final ProgressIndicator indicator,
 			@NotNull final AtomicBoolean cancellingByUser
 	) {
 		_project = project;
 		_bugCollection = bugCollection;
-		_findBugsProject = findBugsProject;
 		_bugCategories = bugCategories;
 		_indicator = indicator;
 		_cancellingByUser = cancellingByUser;
@@ -206,12 +202,11 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 		});
 		_indicator.setText("Finished: Found " + _filteredBugCount + " bugs.");
 		_indicator.finishNonCancelableSection();
+	}
 
-		if (_canceled) {
-			MessageBusManager.publishAnalysisAbortedToEDT(_project);
-		} else {
-			MessageBusManager.publishAnalysisFinishedToEDT(_project, getBugCollection(), _findBugsProject);
-		}
+
+	boolean isCanceled() {
+		return _canceled;
 	}
 
 

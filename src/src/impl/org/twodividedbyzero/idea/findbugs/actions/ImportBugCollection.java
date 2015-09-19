@@ -65,7 +65,6 @@ import java.util.concurrent.atomic.AtomicReference;
  * $Date$
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
  * @since 0.9.96
  */
 public final class ImportBugCollection extends AbstractAction {
@@ -219,7 +218,7 @@ public final class ImportBugCollection extends AbstractAction {
 					LOGGER.error(message, e1);
 
 				} finally {
-					MessageBusManager.publishAnalysisFinishedToEDT(project, importBugCollection, null);
+					MessageBusManager.publishAnalysisFinishedToEDT(project, importBugCollection, null, null);
 					Thread.currentThread().interrupt();
 				}
 			}

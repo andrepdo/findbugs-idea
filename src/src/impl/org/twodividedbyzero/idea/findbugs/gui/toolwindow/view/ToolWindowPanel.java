@@ -20,6 +20,7 @@ package org.twodividedbyzero.idea.findbugs.gui.toolwindow.view;
 
 import com.intellij.CommonBundle;
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
+import com.intellij.diagnostic.IdeMessagePanel;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationListener;
@@ -34,7 +35,10 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.wm.StatusBar;
+import com.intellij.openapi.wm.StatusBarWidget;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.WindowManager;
 import com.intellij.psi.PsiFile;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.BugInstance;
@@ -66,6 +70,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import java.awt.Component;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -80,7 +85,6 @@ import java.util.Map;
  * $Date$
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
  * @since 0.0.1
  */
 @SuppressWarnings({"HardCodedStringLiteral", "AnonymousInnerClass", "AnonymousInnerClassMayBeStatic"})
@@ -91,6 +95,7 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 
 	private static final String A_HREF_MORE_ANCHOR = "#more";
 	private static final String A_HREF_DISABLE_ANCHOR = "#disable";
+	private static final String A_HREF_ERROR_ANCHOR = "#error";
 
 	///private static final String DEFAULT_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.3) (COLUMN weight=0.3 right.top right.bottom) (LEAF name=right weight=0.4))";
 	private static final String DEFAULT_LAYOUT_DEF = "(ROW (LEAF name=left weight=0.4) (LEAF name=right weight=0.6))";
@@ -307,7 +312,7 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 
 
 	@Override
-	public void analysisFinished(@NotNull final BugCollection bugCollection, @Nullable final FindBugsProject findBugsProject) {
+	public void analysisFinished(@NotNull final BugCollection bugCollection, @Nullable final FindBugsProject findBugsProject, @Nullable final Throwable error) {
 		_bugTreePanel.setBugCollection(bugCollection);
 		final ProjectStats stats = bugCollection.getProjectStats();
 		_bugTreePanel.updateRootNode(stats);
@@ -332,14 +337,38 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 			message.append("&nbsp;<a href='").append(A_HREF_MORE_ANCHOR).append("'>more...</a><br/>");
 		}
 		message.append("<font size='10px'>using ").append(VersionManager.getFullVersion()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font><br/><br/>");
-		message.append("<a href='").append(A_HREF_DISABLE_ANCHOR).append("'>Disable notification").append("</a>");
 
-		FindBugsPluginImpl.NOTIFICATION_GROUP_ANALYSIS_FINISHED.createNotification(
-				VersionManager.getName() + ": Analysis Finished",
-				message.toString(),
-				notificationType,
-				new NotificationListenerImpl(ToolWindowPanel.this, _bugsProject)
-		).setImportant(false).notify(_project);
+		if (error != null) {
+			final boolean findBugsError = FindBugsUtil.isFindBugsError(error);
+			final String impl;
+			if (findBugsError) {
+				impl = "FindBugs";
+			} else {
+				impl = "FindBugs-IDEA Plugin";
+			}
+			String errorText = "An " + impl + " error occurred.";
+
+			final StatusBar statusBar = WindowManager.getInstance().getIdeFrame(_project).getStatusBar();
+			final StatusBarWidget widget = statusBar.getWidget(IdeMessagePanel.FATAL_ERROR);
+			IdeMessagePanel ideMessagePanel = null; // openFatals like ErrorNotifier
+			if (widget instanceof IdeMessagePanel) {
+				ideMessagePanel = (IdeMessagePanel)widget;
+				errorText = "<a href='" + A_HREF_ERROR_ANCHOR + "'>" + errorText + "</a>";
+			}
+
+			message.append(String.format("%s The results of the analysis might be incomplete.", errorText));
+			LOGGER.error(error);
+			// use balloon because error should never disabled
+			BalloonTipFactory.showToolWindowErrorNotifier(_project, message.toString(), new BalloonErrorListenerImpl(ToolWindowPanel.this, _bugsProject, ideMessagePanel));
+		} else {
+			message.append("<a href='").append(A_HREF_DISABLE_ANCHOR).append("'>Disable notification").append("</a>");
+			FindBugsPluginImpl.NOTIFICATION_GROUP_ANALYSIS_FINISHED.createNotification(
+					VersionManager.getName() + ": Analysis Finished",
+					message.toString(),
+					notificationType,
+					new NotificationListenerImpl(ToolWindowPanel.this, _bugsProject)
+			).setImportant(false).notify(_project);
+		}
 
 		EditorFactory.getInstance().refreshAllEditors();
 		DaemonCodeAnalyzer.getInstance(_project).restart();
@@ -423,15 +452,31 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 	}
 
 
-	private static class NotificationListenerImpl implements NotificationListener {
+	private static abstract class AbstractListenerImpl {
 
-		private final FindBugsProject _bugsProject;
-		private final ToolWindowPanel _toolWindowPanel;
+		protected final FindBugsProject _bugsProject;
+		protected final ToolWindowPanel _toolWindowPanel;
+
+
+		private AbstractListenerImpl(@NotNull final ToolWindowPanel toolWindowPanel, final FindBugsProject bugsProject) {
+			_bugsProject = bugsProject;
+			_toolWindowPanel = toolWindowPanel;
+		}
+
+
+		final void openAnalysisRunDetailsDialog() {
+			final int bugCount = _toolWindowPanel.getBugTreePanel().getGroupModel().getBugCount();
+			final DialogBuilder dialog = AnalysisRunDetailsDialog.create(_toolWindowPanel.getProject(), bugCount, _toolWindowPanel.getBugCollection().getProjectStats(), _bugsProject);
+			dialog.showModal(false);
+		}
+	}
+
+
+	private static class NotificationListenerImpl extends AbstractListenerImpl implements NotificationListener {
 
 
 		private NotificationListenerImpl(@NotNull final ToolWindowPanel toolWindowPanel, final FindBugsProject bugsProject) {
-			_bugsProject = bugsProject;
-			_toolWindowPanel = toolWindowPanel;
+			super(toolWindowPanel, bugsProject);
 		}
 
 
@@ -440,9 +485,7 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 			if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
 				final String desc = e.getDescription();
 				if (desc.equals(A_HREF_MORE_ANCHOR)) {
-					final int bugCount = _toolWindowPanel.getBugTreePanel().getGroupModel().getBugCount();
-					final DialogBuilder dialog = AnalysisRunDetailsDialog.create(_toolWindowPanel.getProject(), bugCount, _toolWindowPanel.getBugCollection().getProjectStats(), _bugsProject);
-					dialog.showModal(false);
+					openAnalysisRunDetailsDialog();
 				} else if (desc.equals(A_HREF_DISABLE_ANCHOR)) {
 					final int result = Messages.showYesNoDialog(
 							_toolWindowPanel.getProject(),
@@ -471,6 +514,31 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 					"{_bugsProject=" + _bugsProject +
 					", _toolWindowPanel=" + _toolWindowPanel +
 					'}';
+		}
+	}
+
+
+	private static class BalloonErrorListenerImpl extends AbstractListenerImpl implements HyperlinkListener {
+
+		private final IdeMessagePanel _ideMessagePanel;
+
+
+		private BalloonErrorListenerImpl(@NotNull final ToolWindowPanel toolWindowPanel, final FindBugsProject bugsProject, @Nullable final IdeMessagePanel ideMessagePanel) {
+			super(toolWindowPanel, bugsProject);
+			_ideMessagePanel = ideMessagePanel;
+		}
+
+
+		@Override
+		public void hyperlinkUpdate(HyperlinkEvent e) {
+			if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+				final String desc = e.getDescription();
+				if (desc.equals(A_HREF_MORE_ANCHOR)) {
+					openAnalysisRunDetailsDialog();
+				} else if (desc.equals(A_HREF_ERROR_ANCHOR)) {
+					_ideMessagePanel.openFatals(null);
+				}
+			}
 		}
 	}
 

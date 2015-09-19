@@ -37,7 +37,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Reto Merz<reto.merz@gmail.com>
- * @version $Revision: 358 $
  * @since 0.9.995
  */
 public final class MessageBusManager {
@@ -136,18 +135,19 @@ public final class MessageBusManager {
 	}
 
 
-	public static void publishAnalysisFinishedToEDT(@NotNull final Project project, @NotNull final BugCollection bugCollection, @Nullable final FindBugsProject findBugsProject) {
+	public static void publishAnalysisFinishedToEDT(@NotNull final Project project, @NotNull final BugCollection bugCollection, @Nullable final FindBugsProject findBugsProject, @Nullable final Throwable error) {
 		EventDispatchThreadHelper.checkNotEDT();
 		/**
 		 * Guarantee thread visibility *one* time.
 		 */
 		final AtomicReference<BugCollection> bugCollectionRef = New.atomicRef(bugCollection);
 		final AtomicReference<FindBugsProject> findBugsProjectRef = New.atomicRef(findBugsProject);
+		final AtomicReference<Throwable> errorRef = New.atomicRef(error);
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				FindBugsState.set(project, FindBugsState.Finished);
-				publish(project, AnalysisFinishedListener.TOPIC).analysisFinished(bugCollectionRef.get(), findBugsProjectRef.get());
+				publish(project, AnalysisFinishedListener.TOPIC).analysisFinished(bugCollectionRef.get(), findBugsProjectRef.get(), errorRef.get());
 			}
 		});
 	}

@@ -28,7 +28,6 @@ import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 
 /**
  * @author Reto Merz<reto.merz@gmail.com>
- * @version $Revision: 364 $
  * @since 0.9.995
  */
 public interface AnalysisFinishedListener {
@@ -37,6 +36,6 @@ public interface AnalysisFinishedListener {
 	/**
 	 * Invoked by EDT.
 	 */
-	void analysisFinished(@NotNull final BugCollection bugCollection, @Nullable final FindBugsProject findBugsProject);
+	void analysisFinished(@NotNull final BugCollection bugCollection, @Nullable final FindBugsProject findBugsProject, @Nullable final Throwable error);
 
 }

@@ -89,6 +89,7 @@
         <h3>0.9.998</h3>
         <ul>
             <li>Issue 68: Introduce custom error report submitter</li>
+            <li>Issue 106: Improved error handling/feedback</li>
             <li>Minor fixes, cleanups and improvements</li>
         </ul>
         <h3>0.9.997</h3>
