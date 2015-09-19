@@ -20,6 +20,7 @@
 package org.twodividedbyzero.idea.findbugs.common.util;
 
 import edu.umd.cs.findbugs.Version;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.Collections;
@@ -30,7 +31,6 @@ import java.util.Map;
  * $Date$
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
  * @since 0.0.1
  */
 @SuppressWarnings("UnusedDeclaration")
@@ -77,6 +77,20 @@ public final class FindBugsUtil {
 	}
 
 
+	public static boolean isFindBugsError(@NotNull final Throwable error) {
+		@SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+		final Throwable cause = ErrorUtil.getCause(error);
+		final StackTraceElement[] stack = error.getStackTrace();
+		if (stack != null && stack.length > 0) { // just in case - think of -XX:-OmitStackTraceInFastThrow
+			final String className = stack[0].getClassName();
+			if (className != null) {
+				return className.startsWith("edu.umd.cs.findbugs.") || className.startsWith("org.apache.bcel.");
+			}
+		}
+		return true;
+	}
+
+
 	/** File filter for choosing archives and directories. */
 	private static class ArchiveAndDirectoryFilter implements java.io.FileFilter {
 
@@ -95,5 +109,3 @@ public final class FindBugsUtil {
 		}
 	}
 }
-
-

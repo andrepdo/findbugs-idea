@@ -86,6 +86,11 @@
     </description>
     <change-notes>
         <![CDATA[<html>
+        <h3>0.9.998</h3>
+        <ul>
+            <li>Issue 68: Introduce custom error report submitter</li>
+            <li>Minor fixes, cleanups and improvements</li>
+        </ul>
         <h3>0.9.997</h3>
         <ul>
             <li>Issue 97: HiDPI improvements (incomplete, icons)</li>
@@ -283,6 +288,7 @@
     <!--<helpset file="your-help.jar" path="path-to-helpset.hs"/>-->
     <resource-bundle>org.twodividedbyzero.idea.findbugs.resources.i18n.Messages</resource-bundle>
     <extensions defaultExtensionNs="com.intellij">
+        <errorHandler implementation="org.twodividedbyzero.idea.findbugs.core.ErrorReportSubmitterImpl"/>
         <annotator language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugAnnotator"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugsLineMarkerProvider"/>
     </extensions>

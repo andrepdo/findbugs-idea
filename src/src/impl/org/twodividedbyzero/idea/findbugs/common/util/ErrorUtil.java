@@ -29,10 +29,7 @@ import java.io.IOException;
 /**
  * $Date: 2015-02-13 20:45:02 +0100 (Fr, 13 Feb 2015) $
  *
- * $Id: ErrorUtil.java 308 2015-02-13 19:45:02Z reto.merz@gmail.com $
- *
- * @author $Author: reto.merz@gmail.com $
- * @version $Revision: 337 $
+ * @author Reto Merz<reto.merz@gmail.com>
  * @since 0.9.995
  */
 public final class ErrorUtil {
@@ -54,5 +51,15 @@ public final class ErrorUtil {
 	@NotNull
 	public static RuntimeException toUnchecked(@Nullable final String message, @NotNull final IOException e) {
 		return new RuntimeException(message, e);
+	}
+
+
+	@NotNull
+	public static Throwable getCause(@NotNull final Throwable e) {
+		Throwable ret = e;
+		while (ret.getCause() != null) {
+			ret = ret.getCause();
+		}
+		return ret;
 	}
 }
