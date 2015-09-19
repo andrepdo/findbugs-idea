@@ -90,6 +90,7 @@
         <ul>
             <li>Issue 68: Introduce custom error report submitter</li>
             <li>Issue 106: Improved error handling/feedback</li>
+            <li>Plugin compatibility: IDEA 13.0 (133.193) until the latest IDEA 15 EA (142.4859.6)</li>
             <li>Minor fixes, cleanups and improvements</li>
         </ul>
         <h3>0.9.997</h3>

@@ -52,9 +52,28 @@ public final class ErrorReportSubmitterImpl extends ErrorReportSubmitter {
 	}
 
 
-	@SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+	@SuppressWarnings("deprecation") // maximize compatibility
 	@Override
-	public boolean submit(@NotNull IdeaLoggingEvent[] events, @Nullable String additionalInfo, @NotNull Component parentComponent, @NotNull Consumer<SubmittedReportInfo> consumer) {
+	public SubmittedReportInfo submit(IdeaLoggingEvent[] events, Component parentComponent) {
+		return submitImpl(events, null, parentComponent);
+	}
+
+
+	@SuppressWarnings("deprecation") // maximize compatibility
+	@Override
+	public boolean trySubmitAsync(IdeaLoggingEvent[] events, String additionalInfo, Component parentComponent, Consumer<SubmittedReportInfo> consumer) {
+		consumer.consume(submitImpl(events, additionalInfo, parentComponent));
+		return true;
+	}
+
+
+	@NotNull
+	private SubmittedReportInfo submitImpl(
+			@NotNull final IdeaLoggingEvent[] events,
+			@Nullable final String additionalInfo,
+			@NotNull final Component parentComponent
+	) {
+
 		final StringBuilder body = new StringBuilder();
 		if (!StringUtil.isEmptyOrSpaces(additionalInfo)) {
 			body.append(additionalInfo);
@@ -94,32 +113,30 @@ public final class ErrorReportSubmitterImpl extends ErrorReportSubmitter {
 			title = "Analysis Error";
 		}
 
-		//noinspection ConstantConditions
-		return submitImpl(
+		return openBrowser(
 				isFindBugsError,
 				title,
 				body.toString(),
-				parentComponent,
-				consumer
+				parentComponent
 		);
 	}
 
 
-	private boolean submitImpl(
+	@NotNull
+	private SubmittedReportInfo openBrowser(
 			final boolean isFindBugsError,
 			@NotNull final String title,
 			@NotNull final String errorText,
-			@NotNull final Component parentComponent,
-			@NotNull final Consumer<SubmittedReportInfo> consumer
+			@SuppressWarnings("UnusedParameters") @NotNull final Component parentComponent
 	) {
 
-		final StringBuilder url = new StringBuilder();
+		final String baseUrl;
 		if (isFindBugsError) {
 			// http://sourceforge.net/p/findbugs/bugs/
 			// is locked - assume we should report on github - 19.9.2015
-			url.append("https://github.com/findbugsproject/findbugs");
+			baseUrl = "https://github.com/findbugsproject/findbugs/issues";
 		} else {
-			url.append("https://github.com/andrepdo/findbugs-idea");
+			baseUrl = "https://github.com/andrepdo/findbugs-idea/issues";
 		}
 
 		/**
@@ -129,11 +146,11 @@ public final class ErrorReportSubmitterImpl extends ErrorReportSubmitter {
 		 *     502 - "This page is taking way too long to load." (this will also occure with HTTP POST).
 		 */
 		final String body = "The error was copied to the clipboard. Press " + (SystemInfo.isMac ? "Command+V" : "Ctrl+V");
-		url.append("/issues/new?title=").append(encode(title)).append("&body=").append(encode(body));
+		final String newIssueUrl = baseUrl + "/new?title=" + encode(title) + "&body=" + encode(body);
 
 		CopyPasteManager.getInstance().setContents(new StringSelection(errorText));
-		BrowserUtil.browse(url.toString());
-		return true;
+		BrowserUtil.browse(newIssueUrl);
+		return new SubmittedReportInfo(baseUrl, "issue", SubmittedReportInfo.SubmissionStatus.NEW_ISSUE);
 	}
 
 
