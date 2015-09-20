@@ -20,12 +20,15 @@ package org.twodividedbyzero.idea.findbugs.actions;
 
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.compiler.CompileScope;
+import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiClass;
+import com.intellij.util.Consumer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,7 +44,6 @@ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
  * $Date$
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
  * @since 0.0.1
  */
 public final class AnalyzeClassUnderCursor extends AbstractAnalyzeAction {
@@ -86,13 +88,20 @@ public final class AnalyzeClassUnderCursor extends AbstractAnalyzeAction {
 
 		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
 		final VirtualFile selectedSourceFile = IdeaUtilImpl.getVirtualFile(e.getDataContext());
+		final VirtualFile[] selectedSourceFiles = new VirtualFile[] {selectedSourceFile};
 		final PsiClass psiClass = IdeaUtilImpl.getCurrentClass(e.getDataContext());
 
 		new FindBugsStarter(project, "Running FindBugs analysis for current class...", preferences) {
 			@Override
-			protected void configure(@NotNull ProgressIndicator indicator, @NotNull FindBugsProject findBugsProject) {
+			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
+				consumer.consume(compilerManager.createFilesCompileScope(selectedSourceFiles));
+			}
+
+
+			@Override
+			protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
 				findBugsProject.configureAuxClasspathEntries(indicator, files);
-				findBugsProject.configureSourceDirectories(indicator, new VirtualFile[] {selectedSourceFile});
+				findBugsProject.configureSourceDirectories(indicator, selectedSourceFiles);
 				findBugsProject.configureOutputFile(project, psiClass);
 			}
 		}.start();

@@ -19,14 +19,22 @@
 package org.twodividedbyzero.idea.findbugs.core;
 
 
+import com.intellij.compiler.impl.CompositeScope;
+import com.intellij.compiler.impl.OneProjectItemCompileScope;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.compiler.CompileContext;
+import com.intellij.openapi.compiler.CompileScope;
+import com.intellij.openapi.compiler.CompileStatusNotification;
+import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.util.Consumer;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import edu.umd.cs.findbugs.FindBugs2;
 import edu.umd.cs.findbugs.Plugin;
@@ -35,6 +43,7 @@ import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import edu.umd.cs.findbugs.config.UserPreferences;
 import org.dom4j.DocumentException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
@@ -45,6 +54,7 @@ import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -84,8 +94,33 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 	}
 
 
-	public void start() {
+	public final void start() {
 		EventDispatchThreadHelper.checkEDT();
+		if (false) { // TODO configuration + think of auto analysis after compile
+			final CompilerManager compilerManager = CompilerManager.getInstance(_project);
+			createCompileScope(compilerManager, new Consumer<CompileScope>() {
+				@Override
+				public void consume(@Nullable final CompileScope compileScope) {
+					if (compileScope != null) {
+						compilerManager.make(compileScope, new CompileStatusNotification() {
+							@Override
+							public void finished(final boolean aborted, final int errors, final int warnings, final CompileContext compileContext) {
+								if (!aborted && errors == 0) {
+									EventDispatchThreadHelper.checkEDT(); // see javadoc of CompileStatusNotification
+									startImpl();
+								}
+							}
+						});
+					}
+				}
+			});
+		} else {
+			startImpl();
+		}
+	}
+
+
+	private void startImpl() {
 		MessageBusManager.publishAnalysisStarted(_project);
 
 		if (Boolean.valueOf(_preferences.getProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT))) {
@@ -185,11 +220,26 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 	}
 
 
+	protected abstract void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final  Consumer<CompileScope> consumer);
+
+
+	// like CompilerManagerImpl#createFilesCompileScope but Collection based
+	@NotNull
+	protected final CompileScope createFilesCompileScope(@NotNull final Collection<VirtualFile> files) {
+		final CompileScope[] scopes = new CompileScope[files.size()];
+		int i = 0;
+		for (final VirtualFile file : files){
+			scopes[i++] = new OneProjectItemCompileScope(_project, file);
+		}
+		return new CompositeScope(scopes);
+	}
+
+
 	protected abstract void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject);
 
 
 	@Override
-	public void analysisAborting() {
+	public final void analysisAborting() {
 		_cancellingByUser.set(true);
 	}
 

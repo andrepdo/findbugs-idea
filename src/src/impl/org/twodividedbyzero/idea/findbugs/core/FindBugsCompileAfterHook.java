@@ -34,6 +34,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.Alarm;
+import com.intellij.util.Consumer;
 import com.intellij.util.io.storage.HeavyProcessLatch;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
@@ -59,7 +60,6 @@ import java.util.concurrent.ConcurrentMap;
  * $Date$
  *
  * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
  * @since 0.9.92
  */
 public class FindBugsCompileAfterHook implements CompilationStatusListener, ProjectComponent {
@@ -230,7 +230,13 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 
 		new FindBugsStarter(project, "Running FindBugs analysis for affected files...", preferences, true) {
 			@Override
-			protected void configure(@NotNull ProgressIndicator indicator, @NotNull FindBugsProject findBugsProject) {
+			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
+				throw new UnsupportedOperationException();
+			}
+
+
+			@Override
+			protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
 				findBugsProject.configureAuxClasspathEntries(indicator, auxFiles);
 				findBugsProject.configureSourceDirectories(indicator, affectedFiles);
 				findBugsProject.configureOutputFiles(project, affectedFiles);
@@ -294,6 +300,12 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 			@Override
 			public void run() {
 				new FindBugsStarter(project, "Running FindBugs analysis for affected files...", preferences, true) {
+					@Override
+					protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
+						throw new UnsupportedOperationException();
+					}
+
+
 					@Override
 					protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
 						findBugsProject.configureAuxClasspathEntries(indicator, classPaths);

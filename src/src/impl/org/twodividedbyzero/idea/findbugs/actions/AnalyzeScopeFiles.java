@@ -32,6 +32,8 @@ import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.application.Result;
+import com.intellij.openapi.compiler.CompileScope;
+import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.help.HelpManager;
 import com.intellij.openapi.module.Module;
@@ -50,6 +52,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiRecursiveElementVisitor;
+import com.intellij.util.Consumer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -72,7 +75,6 @@ import java.util.Set;
 
 /**
  * @author Reto Merz<reto.merz@gmail.com>
- * @version $Revision$
  * @since 0.9.99
  */
 public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
@@ -155,6 +157,12 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 		final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(e.getDataContext());
 
 		new FindBugsStarter(project, "Running FindBugs analysis...", preferences) {
+			@Override
+			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
+				consumer.consume(compilerManager.createProjectCompileScope(project));
+			}
+
+
 			@Override
 			protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
 				findBugsProject.configureAuxClasspathEntries(indicator, files);
