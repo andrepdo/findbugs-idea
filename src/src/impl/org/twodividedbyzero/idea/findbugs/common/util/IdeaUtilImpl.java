@@ -96,7 +96,6 @@ import java.util.Set;
  * $Date$
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
  * @since 0.0.1
  */
 @SuppressWarnings({"HardcodedFileSeparator"})
@@ -205,7 +204,7 @@ public final class IdeaUtilImpl {
 	 */
 	@Nullable
 	private static PsiFile getPsiFile(@NotNull final DataContext dataContext) {
-		return (PsiFile) dataContext.getData("psi.File");
+		return DataKeys.PSI_FILE.getData(dataContext);
 	}
 
 
@@ -504,25 +503,19 @@ public final class IdeaUtilImpl {
 	 */
 	@Nullable
 	private static PsiElement getCurrentElement(@NotNull final DataContext dataContext) {
-		// Try directly on dataContext
-		final PsiElement psiElement = (PsiElement) dataContext.getData("psi.Element");
-		//psiElement.getContainingFile().getOriginalFile().getVirtualFile()
 
-		if (psiElement != null) {
-			// success
-			return psiElement;
-		}
+		/**
+		 * Do not use "psi.Element" because this element could be contextless.
+		 */
+		//final PsiElement psiElement = (PsiElement) dataContext.getData("psi.Element");
 
-		// Try through editor + PsiFile
-		//final Editor editor = (Editor) dataContext.getData(DataConstants.EDITOR);// DataConstants.EDITOR
 		final Editor editor = DataKeys.EDITOR.getData(dataContext);
-
-
-		final PsiFile psiFile = getPsiFile(dataContext);
-		if (editor != null && psiFile != null) {
-			return psiFile.findElementAt(editor.getCaretModel().getOffset());
+		if (editor != null) {
+			final PsiFile psiFile = getPsiFile(dataContext);
+			if (psiFile != null) {
+				return psiFile.findElementAt(editor.getCaretModel().getOffset());
+			}
 		}
-		// Unable to find currentElement
 		return null;
 	}
 
