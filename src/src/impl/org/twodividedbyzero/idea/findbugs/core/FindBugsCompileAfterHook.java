@@ -230,6 +230,12 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 
 		new FindBugsStarter(project, "Running FindBugs analysis for affected files...", preferences, true) {
 			@Override
+			protected boolean isCompileBeforeAnalyze() {
+				return false;
+			}
+
+
+			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 				throw new UnsupportedOperationException();
 			}
@@ -300,6 +306,12 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 			@Override
 			public void run() {
 				new FindBugsStarter(project, "Running FindBugs analysis for affected files...", preferences, true) {
+					@Override
+					protected boolean isCompileBeforeAnalyze() {
+						return false;
+					}
+
+
 					@Override
 					protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 						throw new UnsupportedOperationException();

@@ -54,7 +54,6 @@ import java.util.Set;
  * $Date$
  *
  * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
  * @since 0.9.9
  */
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
@@ -674,6 +673,7 @@ public class FindBugsPreferences extends Properties {
 		preferences.setProperty(FindBugsPreferences.MIN_PRIORITY_TO_REPORT, filterSettings.getMinPriority());
 		preferences.setProperty(FindBugsPreferences.SHOW_HIDDEN_DETECTORS, false);
 		preferences.setProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT, true);
+		preferences.setProperty(FindBugsPreferences.COMPILE_BEFORE_ANALYZE, true);
 		preferences.setProperty(FindBugsPreferences.ANALYZE_AFTER_COMPILE, false);
 		preferences.setProperty(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE, false);
 

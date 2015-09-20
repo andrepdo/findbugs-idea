@@ -38,12 +38,14 @@ import info.clearthought.layout.TableLayout;
 import org.jdesktop.swingx.color.ColorUtil;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.AaComboBox;
 import org.twodividedbyzero.idea.findbugs.gui.common.AaSlider;
-import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
+import org.twodividedbyzero.idea.findbugs.gui.common.VerticalFlowLayout;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.importer.SonarProfileImporter;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -62,7 +64,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
@@ -79,38 +80,35 @@ import java.util.Locale;
  * $Date$
  *
  * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
  * @since 0.9.84-dev
  */
-@SuppressWarnings({"AnonymousInnerClass"})
-public class ConfigurationPanel extends JPanel {
+public final class ConfigurationPanel extends JPanel {
 
 	private static final Logger LOGGER = Logger.getInstance(ConfigurationPanel.class.getName());
 	private static final String PERSISTENCE_ROOT_NAME = "findbugs";
 
-	private final transient FindBugsPlugin _plugin;
+	private final FindBugsPlugin _plugin;
 	private JCheckBox _compileBeforeAnalyseChkb;
 	private JCheckBox _analyzeAfterCompileChkb;
 	private JCheckBox _analyzeAfterAutoMakeChkb;
 	private JCheckBox _runInBackgroundChkb;
 	private JCheckBox _toolwindowToFront;
 
-
 	private AaComboBox<AnalysisEffort> _effortLevelCombobox;
-	private JPanel _mainPanel;
+	private JPanel _topPanel;
 	private JCheckBox _detectorThresholdChkb;
 	private JPanel _effortPanel;
 	private JLabel _effortLabel;
 	private JBTabbedPane _tabbedPane;
-	private transient DetectorConfiguration _detectorConfig;
-	private transient ReportConfiguration _reporterConfig;
+	private DetectorConfiguration _detectorConfig;
+	private ReportConfiguration _reporterConfig;
 	private JButton _restoreDefaultsButton;
 	private AaSlider _effortSlider;
-	private transient FilterConfiguration _filterConfig;
-	private transient PluginConfiguration _pluginConfig;
-	private transient ImportExportConfiguration _importExportConfig;
-	private transient AnnotationConfiguration _annotationConfig;
-	private transient List<ConfigurationPage> _configPagesRegistry;
+	private FilterConfiguration _filterConfig;
+	private PluginConfiguration _pluginConfig;
+	private ImportExportConfiguration _importExportConfig;
+	private AnnotationConfiguration _annotationConfig;
+	private List<ConfigurationPage> _configPagesRegistry;
 	private JToggleButton _showAdvancedConfigsButton;
 	private JButton _exportButton;
 	private JButton _importButton;
@@ -146,66 +144,47 @@ public class ConfigurationPanel extends JPanel {
 
 
 	private void initGui() {
-		add( ScrollPaneFacade.createScrollPane(getMainPanel()), BorderLayout.CENTER );
+		updatePreferences();
+
+		add(getTopPanel(), BorderLayout.NORTH);
+		add(getTabbedPane());
+
+		final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		buttonsPanel.add(getMyFilter());
+		buttonsPanel.add(getExportButton());
+		buttonsPanel.add(getImportButton());
+		buttonsPanel.add(getShowAdvancedConfigsButton());
+		buttonsPanel.add(getRestoreDefaultsButton());
+		add(buttonsPanel, BorderLayout.SOUTH);
 	}
 
 
-	private Component getMainPanel() {
-		if (_mainPanel == null) {
-
-			final double border = 5;
-			final double rowsGap = 0;
-			final double colsGap = 10;
-			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.FILL, border}, // Columns
-									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, 10, TableLayout.FILL, 10, TableLayout.PREFERRED, border}};// Rows
-			final LayoutManager tbl = new TableLayout(size);
-
-			_mainPanel = new JPanel();
-			_mainPanel.setLayout(tbl);
-			//panel.setBorder(BorderFactory.createTitledBorder("Inspections"));
-			_mainPanel.setBorder(BorderFactory.createTitledBorder("Configuration options"));
-			//_compileBeforeAnalyseChkb = new JCheckBox("Compile before inspect");
-
-			updatePreferences();
-
+	@NotNull
+	private JPanel getTopPanel() {
+		if (_topPanel == null) {
+			_topPanel = new JPanel(new VerticalFlowLayout());
+			_topPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 4 * GuiUtil.SCALE_FACTOR, 0));
 			//_detectorThresholdChkb = new JCheckBox("Set DetectorThreshold");
-
-			//_mainPanel.add(_compileBeforeAnalyseChkb);
-			final Container checkboxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-			checkboxPanel.add(getRunInBgCheckbox());
-			checkboxPanel.add(getAnalyzeAfterCompileCheckbox());
-			checkboxPanel.add(getAnalyzeAfterAutoMakeCheckbox());
-			checkboxPanel.add(getToolwindowToFrontCheckbox());
-			_mainPanel.add(checkboxPanel, "1, 1, 3, 1");
-			//_mainPanel.add(_detectorThresholdChkb);
-			////_mainPanel.add(getEffortPanel(), "1, 3, 3, 3");
-
-			final Container tabPanel = new JPanel(new BorderLayout());
-			tabPanel.add(getTabbedPane(), BorderLayout.CENTER);
-			_mainPanel.add(tabPanel, "1, 5, 3, 5");
-
-			final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-			buttonsPanel.add(getMyFilter());
-			buttonsPanel.add(getExportButton());
-			buttonsPanel.add(getImportButton());
-			buttonsPanel.add(getShowAdvancedConfigsButton());
-			buttonsPanel.add(getRestoreDefaultsButton());
-			_mainPanel.add(buttonsPanel, "3, 7, 3, 7, R, T");
-
+			// TODO group
+			_topPanel.add(getRunInBgCheckbox());
+			_topPanel.add(getToolwindowToFrontCheckbox());
+			_topPanel.add(getAnalyzeAfterCompileCheckbox());
+			_topPanel.add(getAnalyzeAfterAutoMakeCheckbox());
+			_topPanel.add(getCompileBeforeAnalyseCheckbox());
+			_topPanel.add(getCompileBeforeAnalyseCheckbox());
 		}
-
-		return _mainPanel;
+		return _topPanel;
 	}
 
 
 	public void updatePreferences() {
 		getEffortSlider().setValue(AnalysisEffort.valueOfLevel(getPreferences().getProperty(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL, AnalysisEffort.DEFAULT.getEffortLevel())).getValue(), false);
 		getRunInBgCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND, false));
+		getCompileBeforeAnalyseCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.COMPILE_BEFORE_ANALYZE, true));
 		getAnalyzeAfterCompileCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.ANALYZE_AFTER_COMPILE, false));
 		getAnalyzeAfterAutoMakeCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE, false));
 		getToolwindowToFrontCheckbox().setSelected(getPreferences().getBooleanProperty(FindBugsPreferences.TOOLWINDOW_TO_FRONT, true));
 		getEffortLevelComboBox().setSelectedItem(AnalysisEffort.valueOfLevel(getPreferences().getProperty(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL, AnalysisEffort.DEFAULT.getEffortLevel())), false);
-		//((FindBugsPluginImpl) _plugin).setPreferences(FindBugsPreferences.createDefaultPreferences());
 		getReporterConfig().updatePreferences();
 		getDetectorConfig().updatePreferences();
 		getFilterConfig().updatePreferences();
@@ -236,11 +215,29 @@ public class ConfigurationPanel extends JPanel {
 	}
 
 
+	@NotNull
+	private AbstractButton getCompileBeforeAnalyseCheckbox() {
+		if (_compileBeforeAnalyseChkb == null) {
+			_compileBeforeAnalyseChkb = new JCheckBox("Compile affected files before analyze");
+			_compileBeforeAnalyseChkb.setFocusable(false);
+			_compileBeforeAnalyseChkb.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					getPreferences().setProperty(FindBugsPreferences.COMPILE_BEFORE_ANALYZE, _compileBeforeAnalyseChkb.isSelected());
+				}
+			});
+		}
+		return _compileBeforeAnalyseChkb;
+	}
+
+
+	@NotNull
 	private AbstractButton getAnalyzeAfterCompileCheckbox() {
 		if (_analyzeAfterCompileChkb == null) {
 			_analyzeAfterCompileChkb = new JCheckBox("Analyze affected files after compile");
-			_analyzeAfterCompileChkb.setFocusable( false );
+			_analyzeAfterCompileChkb.setFocusable(false);
 			_analyzeAfterCompileChkb.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(final ActionEvent e) {
 					getPreferences().setProperty(FindBugsPreferences.ANALYZE_AFTER_COMPILE, _analyzeAfterCompileChkb.isSelected());
 				}
@@ -282,7 +279,6 @@ public class ConfigurationPanel extends JPanel {
 		if (_effortPanel == null) {
 
 			final double border = 5;
-			final double rowsGap = 0;
 			final double colsGap = 10;
 			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, border}, // Columns
 									 {border, TableLayout.PREFERRED, border}};// Rows
@@ -498,13 +494,9 @@ public class ConfigurationPanel extends JPanel {
 
 	private void showAdvancedConfigs(final boolean show) {
 		if (show) {
-			_mainPanel.add(getEffortPanel(), "1, 3, 3, 3");
-			_mainPanel.validate();
-			_mainPanel.repaint();
+			getTopPanel().add(getEffortPanel());
 		} else {
-			_mainPanel.remove(getEffortPanel());
-			_mainPanel.validate();
-			_mainPanel.repaint();
+			getTopPanel().remove(getEffortPanel());
 		}
 
 		final String fontColorHex = ColorUtil.toHexString(GuiResources.HIGHLIGHT_COLOR_DARKER);
@@ -647,7 +639,7 @@ public class ConfigurationPanel extends JPanel {
 		//     - getTabbedPane() and getShowAdvancedConfigsButton() -> allow browsing all read only settings
 		//     - getExportButton() -> allow export
 		//     - getMyFilter() -> allow filter/search
-		getMainPanel().setEnabled(enabled);
+		getCompileBeforeAnalyseCheckbox().setEnabled(enabled);
 		getAnalyzeAfterCompileCheckbox().setEnabled(enabled);
 		getAnalyzeAfterAutoMakeCheckbox().setEnabled(enabled);
 		getRunInBgCheckbox().setEnabled(enabled);

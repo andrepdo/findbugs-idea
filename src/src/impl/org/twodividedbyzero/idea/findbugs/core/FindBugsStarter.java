@@ -31,6 +31,7 @@ import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -94,9 +95,22 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 	}
 
 
+	@SuppressWarnings("SimplifiableIfStatement") // debug style
+	protected boolean isCompileBeforeAnalyze() {
+		if (true) { // TODO think of auto analysis after compile
+			return false;
+		}
+		final String b = _preferences.getProperty(FindBugsPreferences.COMPILE_BEFORE_ANALYZE);
+		if (StringUtil.isEmptyOrSpaces(b)) {
+			return true; // default
+		}
+		return Boolean.parseBoolean(b);
+	}
+
+
 	public final void start() {
 		EventDispatchThreadHelper.checkEDT();
-		if (false) { // TODO configuration + think of auto analysis after compile
+		if (isCompileBeforeAnalyze()) {
 			final CompilerManager compilerManager = CompilerManager.getInstance(_project);
 			createCompileScope(compilerManager, new Consumer<CompileScope>() {
 				@Override
