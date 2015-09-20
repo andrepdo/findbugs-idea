@@ -33,6 +33,7 @@ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -54,7 +55,6 @@ import java.io.File;
  * $Date$
  *
  * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
  * @since 0.9.9
  */
 @SuppressWarnings("AnonymousInnerClass")
@@ -62,7 +62,7 @@ public class FilterConfiguration implements ConfigurationPage {
 
 	private final FindBugsPreferences _preferences;
 	private final ConfigurationPanel _parent;
-	private Component _component;
+	private JPanel _component;
 	private JPanel _includePanel;
 	private JBList _includeList;
 	private JPanel _excludePanel;
@@ -78,24 +78,17 @@ public class FilterConfiguration implements ConfigurationPage {
 	}
 
 
+	@NotNull
 	@Override
 	public Component getComponent() {
 		if (_component == null) {
-			final double border = 5;
-			final double rowsGap = 5;
-			final double colsGap = 10;
-			final double[][] size = {{border, TableLayoutConstants.FILL, border}, // Columns
-									 {border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
-			final TableLayout tbl = new TableLayout(size);
-
-			final Container mainPanel = new JPanel(tbl);
-			mainPanel.add(getIncludePanel(), "1, 1, 1, 1");
-			mainPanel.add(getExcludePanel(), "1, 3, 1, 3");
-			mainPanel.add(getBaseLinePanel(), "1, 5, 1, 5");
-
-			_component = mainPanel;
+			_component = new JPanel();
+			final BoxLayout layout = new BoxLayout(_component, BoxLayout.Y_AXIS);
+			_component.setLayout(layout);
+			_component.add(getIncludePanel());
+			_component.add(getExcludePanel());
+			_component.add(getBaseLinePanel());
 		}
-		//updatePreferences();
 		return _component;
 	}
 
@@ -422,6 +415,7 @@ public class FilterConfiguration implements ConfigurationPage {
 		}
 	}
 
+
 	private static class ExcludeListSelectionListener implements ListSelectionListener {
 
 		private final AbstractButton _removeButton;
@@ -438,6 +432,7 @@ public class FilterConfiguration implements ConfigurationPage {
 
 		}
 	}
+
 
 	private static class BaselineListSelectionListener implements ListSelectionListener {
 

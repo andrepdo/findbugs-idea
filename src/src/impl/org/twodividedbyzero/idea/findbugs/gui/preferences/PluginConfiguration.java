@@ -19,7 +19,6 @@
 
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.JBColor;
@@ -29,6 +28,7 @@ import edu.umd.cs.findbugs.Project;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import info.clearthought.layout.TableLayout;
 import info.clearthought.layout.TableLayoutConstants;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
@@ -36,6 +36,7 @@ import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.gui.common.CustomLineBorder;
 import org.twodividedbyzero.idea.findbugs.gui.common.ExtensionFileFilter;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
+import org.twodividedbyzero.idea.findbugs.gui.common.VerticalFlowLayout;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.BrowseAction.BrowseActionCallback;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.plugins.AbstractPluginLoader;
@@ -46,21 +47,18 @@ import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 import javax.swing.text.html.HTMLEditorKit;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -75,13 +73,10 @@ import java.util.List;
  * $Date$
  *
  * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
  * @since 0.9.97
  */
 @SuppressWarnings({"AnonymousInnerClass", "HardcodedLineSeparator"})
 public class PluginConfiguration implements ConfigurationPage {
-
-	private static final Logger LOGGER = Logger.getInstance(PluginConfiguration.class.getName());
 
 	/**
 	 * False because:
@@ -94,9 +89,9 @@ public class PluginConfiguration implements ConfigurationPage {
 
 	private final FindBugsPreferences _preferences;
 	private final ConfigurationPanel _parent;
-	private Component _component;
-	private JPanel _pluginsPanel;
+	private JPanel _component;
 	private JPanel _pluginComponentPanel;
+	private AbstractButton _addButton;
 
 
 	public PluginConfiguration(final ConfigurationPanel parent, final FindBugsPreferences preferences) {
@@ -106,25 +101,41 @@ public class PluginConfiguration implements ConfigurationPage {
 	}
 
 
+	@NotNull
 	public Component getComponent() {
 		if (_component == null) {
-			final double border = GuiUtil.SCALE_FACTOR*5;
-			final int iBorder = GuiUtil.SCALE_FACTOR*5;
-			final double[][] size = {{border, TableLayoutConstants.FILL, border}, // Columns
-									 {border, TableLayoutConstants.PREFERRED, border}};// Rows
-			final TableLayout tbl = new TableLayout(size);
+			_component = new JPanel(new BorderLayout());
+			_component.setBorder(BorderFactory.createTitledBorder("Installed Plugins"));
 
-			final JComponent mainPanel = new JPanel(tbl);
-			mainPanel.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(iBorder, iBorder, iBorder, iBorder), BorderFactory.createTitledBorder("Installed Plugins")));
-			_component = mainPanel;
-			mainPanel.add(getPluginPanel(), "1, 1, 1, 1");
+			_pluginComponentPanel = new JPanel(new VerticalFlowLayout());
+			rebuildPluginComponents();
 
+			_component.add(ScrollPaneFacade.createScrollPane(_pluginComponentPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+
+			final JPanel buttonPanel = new JPanel(new BorderLayout());
+			buttonPanel.add(getAddButton(), BorderLayout.NORTH);
+			_component.add(buttonPanel, BorderLayout.EAST);
 		}
-		//updatePreferences();
 		return _component;
 	}
 
 
+	@NotNull
+	private AbstractButton getAddButton() {
+		if (_addButton == null) {
+			_addButton = new JButton();
+			final Action action = new BrowseAction(_parent, "Add Plugin...", new ExtensionFileFilter(FindBugsUtil.PLUGINS_EXTENSIONS_SET), new BrowseActionCallback() {
+				public void addSelection(final File selectedFile) {
+					doAddPlugin(selectedFile);
+				}
+			});
+			_addButton.setAction(action);
+		}
+		return _addButton;
+	}
+
+
+	@Override
 	public void updatePreferences() {
 		rebuildPluginComponents();
 	}
@@ -150,47 +161,6 @@ public class PluginConfiguration implements ConfigurationPage {
 				}
 			});
 		}
-	}
-
-
-	JPanel getPluginPanel() {
-		if (_pluginsPanel == null) {
-
-			final double border = GuiUtil.SCALE_FACTOR*5;
-			final double colsGap = GuiUtil.SCALE_FACTOR*10;
-			final double[][] size = {{border, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.PREFERRED, border}, // Columns
-									 {border, TableLayoutConstants.FILL, border}};// Rows
-			final TableLayout tbl = new TableLayout(size);
-			_pluginsPanel = new JPanel(tbl);
-
-			_pluginComponentPanel = new JPanel();
-			_pluginComponentPanel.setLayout(new BoxLayout(_pluginComponentPanel, BoxLayout.Y_AXIS));
-			rebuildPluginComponents();
-
-			final Component scrollPane = ScrollPaneFacade.createScrollPane(_pluginComponentPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			_pluginsPanel.add(scrollPane, "1, 1, 1, 1"); // col ,row, col, row
-
-
-			final double rowsGap = GuiUtil.SCALE_FACTOR*5;
-			final double[][] bPanelSize = {{border, TableLayoutConstants.PREFERRED}, // Columns
-										   {border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
-			final TableLayout tableLayout = new TableLayout(bPanelSize);
-
-			final Container buttonPanel = new JPanel(tableLayout);
-			_pluginsPanel.add(buttonPanel, "3, 1, 3, 1");
-
-			final AbstractButton addButton = new JButton();
-			final Action action = new BrowseAction(_parent, "Add Plugin...", new ExtensionFileFilter(FindBugsUtil.PLUGINS_EXTENSIONS_SET), new BrowseActionCallback() {
-				public void addSelection(final File selectedFile) {
-					doAddPlugin(selectedFile);
-				}
-			});
-			addButton.setAction(action);
-			buttonPanel.add(addButton, "1, 1, 1, 1");
-
-		}
-
-		return _pluginsPanel;
 	}
 
 
@@ -233,26 +203,32 @@ public class PluginConfiguration implements ConfigurationPage {
 	}
 
 
+	@Override
 	public void setEnabled(final boolean enabled) {
-		getPluginPanel().setEnabled(enabled);
+		getAddButton().setEnabled(enabled);
+		// TODO Plugin checkboxes
 	}
 
 
+	@Override
 	public boolean showInModulePreferences() {
 		return false;
 	}
 
 
+	@Override
 	public boolean isAdvancedConfig() {
 		return false;
 	}
 
 
+	@Override
 	public String getTitle() {
 		return "Plugins";
 	}
 
 
+	@Override
 	public void filter(final String filter) {
 		// TODO support search
 	}
@@ -362,8 +338,11 @@ public class PluginConfiguration implements ConfigurationPage {
 			checkbox.setBackground(PLUGIN_DESCRIPTION_BG_COLOR);
 			_component.add(checkbox,"1, 1, 1, 1, L, T");
 
-			final String longText = plugin.getDetailedDescription();
+			String longText = plugin.getDetailedDescription();
 			if (longText != null) {
+				if (!longText.toLowerCase().startsWith("<p>")) {
+					longText = "<p>" + longText + "</p>";
+				}
 				checkbox.setToolTipText("<html>" + longText + "</html>");
 			}
 			checkbox.setSelected(isSelected(currentProject, plugin, userPlugin));

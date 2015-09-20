@@ -23,14 +23,19 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.ui.UIUtil;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.Detector;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
+import javax.swing.Box;
 import javax.swing.Icon;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -44,7 +49,6 @@ import java.util.Map;
  * $Date$
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
  * @since 0.0.1
  */
 public final class GuiUtil {
@@ -207,4 +211,19 @@ public final class GuiUtil {
 		return icon;
 	}
 
+
+	@NotNull
+	public static Component createVerticalStrut(final int height) {
+		return new Box.Filler(new Dimension(0, height), new Dimension(0, height), new Dimension(Short.MAX_VALUE, height));
+	}
+
+
+	@NotNull
+	public static JPanel newFlowPane(@NotNull final Component... components) {
+		final JPanel ret = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		for (final Component component : components) {
+			ret.add(component);
+		}
+		return ret;
+	}
 }

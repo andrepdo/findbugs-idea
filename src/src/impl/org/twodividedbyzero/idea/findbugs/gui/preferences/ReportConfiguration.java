@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -20,7 +20,7 @@ package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
 import edu.umd.cs.findbugs.I18N;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
-import info.clearthought.layout.TableLayout;
+import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.gui.common.AaComboBox;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
@@ -36,6 +36,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -48,10 +49,9 @@ import java.util.Map.Entry;
  * $Date$
  *
  * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
  * @since 0.9.9-dev
  */
-public class ReportConfiguration implements ConfigurationPage {
+public final class ReportConfiguration implements ConfigurationPage {
 
 	public static final String DEFAULT_PRIORITY = ProjectFilterSettings.MEDIUM_PRIORITY;
 
@@ -59,7 +59,7 @@ public class ReportConfiguration implements ConfigurationPage {
 	private AaComboBox<String> _priorityBox;
 	private JPanel _categoryPanel;
 	private JTable _categoryTable;
-	private Component _component;
+	private JPanel _component;
 
 	private final FindBugsPreferences _preferences;
 	private final ConfigurationPanel _parent;
@@ -72,29 +72,24 @@ public class ReportConfiguration implements ConfigurationPage {
 	}
 
 
+	@NotNull
+	@Override
 	public Component getComponent() {
 		if (_component == null) {
 
-			final double border = GuiUtil.SCALE_FACTOR*5;
-			final double rowsGap = GuiUtil.SCALE_FACTOR*5;
-			final double colsGap = GuiUtil.SCALE_FACTOR*10;
-			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED}, // Columns
-									 {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
-			final TableLayout tbl = new TableLayout(size);
+			final JPanel priorityPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			priorityPanel.add(getPriorityLabel());
+			priorityPanel.add(getPriorityComboBox());
 
-			final JPanel mainPanel = new JPanel(tbl);
-			mainPanel.add(getPriorityLabel(), "1, 1, 1, 1");
-			final JPanel comp = new JPanel(new FlowLayout(FlowLayout.LEFT));
-			comp.add(getPriorityComboBox());
-			mainPanel.add(comp, "3, 1, 3, 1");
-			mainPanel.add(getCategoryPanel(), "1, 3, 3, 3");
-
-			_component = mainPanel;
+			_component = new JPanel(new BorderLayout());
+			_component.add(priorityPanel, BorderLayout.NORTH);
+			_component.add(getCategoryPanel());
 		}
 		return _component;
 	}
 
 
+	@Override
 	public void updatePreferences() {
 		getPriorityComboBox().setSelectedItem(_preferences.getProperty(FindBugsPreferences.MIN_PRIORITY_TO_REPORT), false);
 		getModel().clear();
@@ -102,6 +97,7 @@ public class ReportConfiguration implements ConfigurationPage {
 	}
 
 
+	@NotNull
 	private JLabel getPriorityLabel() {
 		if (_priorityLabel == null) {
 			_priorityLabel = new JLabel("Minimum confidence to report");
@@ -110,6 +106,7 @@ public class ReportConfiguration implements ConfigurationPage {
 	}
 
 
+	@NotNull
 	private AaComboBox getPriorityComboBox() {
 		if (_priorityBox == null) {
 			_priorityBox = new AaComboBox<String>();
@@ -126,9 +123,10 @@ public class ReportConfiguration implements ConfigurationPage {
 	}
 
 
+	@NotNull
 	private JPanel getCategoryPanel() {
 		if (_categoryPanel == null) {
-			_categoryPanel = new JPanel();
+			_categoryPanel = new JPanel(new BorderLayout());
 			_categoryPanel.setBorder(BorderFactory.createTitledBorder("Reported (visible) bug categories"));
 			_categoryPanel.add(ScrollPaneFacade.createScrollPane(getBugCategoriesTable(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 		}
@@ -136,6 +134,7 @@ public class ReportConfiguration implements ConfigurationPage {
 	}
 
 
+	@NotNull
 	private JTable getBugCategoriesTable() {
 		if (_categoryTable == null) {
 			_categoryTable = TableFacade.createTable();
@@ -159,6 +158,7 @@ public class ReportConfiguration implements ConfigurationPage {
 			syncTableModel(model);
 
 			model.addTableModelListener(new TableModelListener() {
+				@Override
 				public void tableChanged(final TableModelEvent e) {
 					if (e.getColumn() == 0 && TableModelEvent.UPDATE == e.getType()) {
 						final String enabled = String.valueOf(model.getValueAt(e.getFirstRow(), 0));
@@ -205,6 +205,7 @@ public class ReportConfiguration implements ConfigurationPage {
 	}
 
 
+	@Override
 	public void setEnabled(final boolean enabled) {
 		getPriorityLabel().setEnabled(enabled);
 		getPriorityComboBox().setEnabled(enabled);
@@ -213,21 +214,25 @@ public class ReportConfiguration implements ConfigurationPage {
 	}
 
 
+	@Override
 	public boolean showInModulePreferences() {
 		return true;
 	}
 
 
+	@Override
 	public boolean isAdvancedConfig() {
 		return false;
 	}
 
 
+	@Override
 	public String getTitle() {
 		return "Reporting";
 	}
 
 
+	@Override
 	public void filter(final String filter) {
 		// TODO support search
 	}
