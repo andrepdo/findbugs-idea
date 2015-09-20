@@ -898,6 +898,11 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
+	public boolean isAnalyzeAfterCompile() {
+		return Boolean.parseBoolean(getProperty(FindBugsPreferences.ANALYZE_AFTER_COMPILE));
+	}
+
+
 	public static FindBugsPreferences getPreferences(@NotNull final Project project, @Nullable final Module module) {
 		FindBugsPreferences ret = IdeaUtilImpl.getPluginComponent(project).getPreferences();
 		if (module != null && ret.isModuleConfigEnabled(module)) {

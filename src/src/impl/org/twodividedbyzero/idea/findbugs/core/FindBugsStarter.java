@@ -97,9 +97,6 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 
 	@SuppressWarnings("SimplifiableIfStatement") // debug style
 	protected boolean isCompileBeforeAnalyze() {
-		if (true) { // TODO think of auto analysis after compile
-			return false;
-		}
 		final String b = _preferences.getProperty(FindBugsPreferences.COMPILE_BEFORE_ANALYZE);
 		if (StringUtil.isEmptyOrSpaces(b)) {
 			return true; // default
@@ -111,6 +108,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 	public final void start() {
 		EventDispatchThreadHelper.checkEDT();
 		if (isCompileBeforeAnalyze()) {
+			final boolean isAnalyzeAfterCompile = _preferences.isAnalyzeAfterCompile();
 			final CompilerManager compilerManager = CompilerManager.getInstance(_project);
 			createCompileScope(compilerManager, new Consumer<CompileScope>() {
 				@Override
@@ -119,7 +117,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 						compilerManager.make(compileScope, new CompileStatusNotification() {
 							@Override
 							public void finished(final boolean aborted, final int errors, final int warnings, final CompileContext compileContext) {
-								if (!aborted && errors == 0) {
+								if (!aborted && errors == 0 && !isAnalyzeAfterCompile) {
 									EventDispatchThreadHelper.checkEDT(); // see javadoc of CompileStatusNotification
 									startImpl();
 								}

@@ -133,7 +133,9 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 	@Override
 	public void compilationFinished(final boolean aborted, final int errors, final int warnings, final CompileContext compileContext) {
 		// note that this is not invoked when auto make trigger compilation
-		initWorker(compileContext);
+		if (!aborted && errors == 0) {
+			initWorker(compileContext);
+		}
 	}
 
 
@@ -215,7 +217,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		final FindBugsPlugin findBugsPlugin = IdeaUtilImpl.getPluginComponent(project);
 		final FindBugsPreferences preferences = findBugsPlugin.getPreferences();
 
-		if (!Boolean.valueOf(preferences.getProperty(FindBugsPreferences.ANALYZE_AFTER_COMPILE))) {
+		if (!preferences.isAnalyzeAfterCompile()) {
 			return;
 		}
 
