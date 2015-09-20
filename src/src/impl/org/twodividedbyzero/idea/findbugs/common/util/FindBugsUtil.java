@@ -87,7 +87,7 @@ public final class FindBugsUtil {
 				return className.startsWith("edu.umd.cs.findbugs.") || className.startsWith("org.apache.bcel.");
 			}
 		}
-		return true;
+		return false;
 	}
 
 
