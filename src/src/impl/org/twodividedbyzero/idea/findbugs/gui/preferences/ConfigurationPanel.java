@@ -34,7 +34,6 @@ import com.intellij.openapi.vfs.VirtualFileWrapper;
 import com.intellij.ui.FilterComponent;
 import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.util.xmlb.XmlSerializer;
-import info.clearthought.layout.TableLayout;
 import org.jdesktop.swingx.color.ColorUtil;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -98,7 +97,6 @@ public final class ConfigurationPanel extends JPanel {
 	private JPanel _topPanel;
 	private JCheckBox _detectorThresholdChkb;
 	private JPanel _effortPanel;
-	private JLabel _effortLabel;
 	private JBTabbedPane _tabbedPane;
 	private DetectorConfiguration _detectorConfig;
 	private ReportConfiguration _reporterConfig;
@@ -162,16 +160,23 @@ public final class ConfigurationPanel extends JPanel {
 	@NotNull
 	private JPanel getTopPanel() {
 		if (_topPanel == null) {
-			_topPanel = new JPanel(new VerticalFlowLayout());
+			_topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 			_topPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 4 * GuiUtil.SCALE_FACTOR, 0));
 			//_detectorThresholdChkb = new JCheckBox("Set DetectorThreshold");
-			// TODO group
-			_topPanel.add(getRunInBgCheckbox());
-			_topPanel.add(getToolwindowToFrontCheckbox());
-			_topPanel.add(getAnalyzeAfterCompileCheckbox());
-			_topPanel.add(getAnalyzeAfterAutoMakeCheckbox());
-			_topPanel.add(getCompileBeforeAnalyseCheckbox());
-			_topPanel.add(getCompileBeforeAnalyseCheckbox());
+
+			final JPanel generalPanel = new JPanel(new VerticalFlowLayout());
+			generalPanel.setBorder(BorderFactory.createTitledBorder("General"));
+			generalPanel.add(getRunInBgCheckbox());
+			generalPanel.add(getToolwindowToFrontCheckbox());
+			_topPanel.add(generalPanel);
+
+			final JPanel analyzePanel = new JPanel(new VerticalFlowLayout());
+			analyzePanel.setBorder(BorderFactory.createTitledBorder("Auto Analyze"));
+			analyzePanel.add(getAnalyzeAfterCompileCheckbox());
+			analyzePanel.add(getAnalyzeAfterAutoMakeCheckbox());
+			analyzePanel.add(getCompileBeforeAnalyseCheckbox());
+			analyzePanel.add(getCompileBeforeAnalyseCheckbox());
+			_topPanel.add(analyzePanel);
 		}
 		return _topPanel;
 	}
@@ -275,29 +280,14 @@ public final class ConfigurationPanel extends JPanel {
 	}
 
 
-	private Component getEffortPanel() {
+	@NotNull
+	private JPanel getEffortPanel() {
 		if (_effortPanel == null) {
-
-			final double border = 5;
-			final double colsGap = 10;
-			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, border}, // Columns
-									 {border, TableLayout.PREFERRED, border}};// Rows
-			final LayoutManager tbl = new TableLayout(size);
-
-			_effortPanel = new JPanel(tbl);
-			_effortPanel.add(getEffortLabel(), "1, 1, 1, 1");
-			_effortPanel.setBorder(null);
-			_effortPanel.add( getEffortSlider(), "3, 1, 3, 1, l, t" );
+			_effortPanel = new JPanel(new BorderLayout());
+			_effortPanel.setBorder(BorderFactory.createTitledBorder("Analysis effort"));
+			_effortPanel.add(getEffortSlider());
 		}
 		return _effortPanel;
-	}
-
-
-	private JLabel getEffortLabel() {
-		if (_effortLabel == null) {
-			_effortLabel = new JLabel("Analysis effort");
-		}
-		return _effortLabel;
 	}
 
 
@@ -650,7 +640,6 @@ public final class ConfigurationPanel extends JPanel {
 		}
 		getImportButton().setEnabled(enabled);
 		getRestoreDefaultsButton().setEnabled(enabled);
-		getEffortLabel().setEnabled(enabled);
 		getEffortSlider().setEnabled(enabled);
 	}
 
