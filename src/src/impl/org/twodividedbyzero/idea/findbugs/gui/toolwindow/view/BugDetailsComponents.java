@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2015 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -20,6 +20,7 @@ package org.twodividedbyzero.idea.findbugs.gui.toolwindow.view;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBTabbedPane;
 import edu.umd.cs.findbugs.BugAnnotation;
@@ -74,7 +75,6 @@ import java.net.URL;
  * $Date$
  *
  * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
  * @since 0.0.1
  */
 @SuppressWarnings("MagicNumber")
@@ -112,16 +112,35 @@ public class BugDetailsComponents {
 
 	JTabbedPane getTabbedPane() {
 		if (_jTabbedPane == null) {
-			_jTabbedPane = new JBTabbedPane(SwingConstants.RIGHT);
+			if (SystemInfo.isMac) {
+				// use JTabbedPane because JBTabbedPane does not work with tabPlacement=RIGHT
+				// on OS X (Aqua) at least with IDEA 14.1.4 (141.1532.4) and OS X 10.10 Yosemite.
+				//noinspection UndesirableClassUsage
+				_jTabbedPane = new JTabbedPane(SwingConstants.RIGHT);
+			} else {
+				_jTabbedPane = new JBTabbedPane(SwingConstants.RIGHT);
+			}
+
 			_jTabbedPane.setFocusable(false);
 			_jTabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
-			_jTabbedPane.addTab(null, new VerticalTextIcon("Bug Details", true, GuiResources.FINDBUGS_ICON), getBugDetailsSplitPane(), "Bug details concerning the current selected bug in the left tree");
+			if (SystemInfo.isMac) {
+				// Aqua LF will rotate content
+				_jTabbedPane.addTab("Bug Details", GuiResources.FINDBUGS_ICON, getBugDetailsSplitPane(), "Bug details concerning the current selected bug in the left tree");
+			} else {
+				_jTabbedPane.addTab(null, new VerticalTextIcon("Bug Details", true, GuiResources.FINDBUGS_ICON), getBugDetailsSplitPane(), "Bug details concerning the current selected bug in the left tree");
+			}
+
 			_jTabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
 
 			if (Plugin.getByPluginId(EDU_UMD_CS_FINDBUGS_PLUGINS_WEB_CLOUD) != null) {
-				_jTabbedPane.addTab(null, new VerticalTextIcon("Comments", true, GuiResources.FINDBUGS_CLOUD_ICON), getCloudCommentsPanel(), "Comments from the FindBugs Cloud");
+				if (SystemInfo.isMac) {
+					// Aqua LF will rotate content
+					_jTabbedPane.addTab("Comments", GuiResources.FINDBUGS_CLOUD_ICON, getCloudCommentsPanel(), "Comments from the FindBugs Cloud");
+				} else {
+					_jTabbedPane.addTab(null, new VerticalTextIcon("Comments", true, GuiResources.FINDBUGS_CLOUD_ICON), getCloudCommentsPanel(), "Comments from the FindBugs Cloud");
+				}
 				_jTabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 			}
 		}
