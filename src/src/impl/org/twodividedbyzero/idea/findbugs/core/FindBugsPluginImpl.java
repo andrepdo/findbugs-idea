@@ -21,6 +21,7 @@ package org.twodividedbyzero.idea.findbugs.core;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.ide.ui.search.SearchableOptionsRegistrar;
+import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -117,6 +118,9 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	public static final String NOTIFICATION_GROUP_ID_ANALYSIS_FINISHED = "FindBugs: Analysis Finished";
 	public static final NotificationGroup NOTIFICATION_GROUP_ANALYSIS_FINISHED = NotificationGroup.toolWindowGroup(NOTIFICATION_GROUP_ID_ANALYSIS_FINISHED, FindBugsPluginConstants.TOOL_WINDOW_ID, false);
 
+	static final String NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION = "FindBugs: Plugin Suggestion";
+	static final NotificationGroup NOTIFICATION_GROUP_PLUGIN_SUGGESTION = new NotificationGroup(NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION, NotificationDisplayType.STICKY_BALLOON, false);
+
 	private final Project _project;
 	private ToolWindow _toolWindow;
 	private static final Set<AnAction> _mainToolbarActions;
@@ -199,6 +203,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 		initToolWindow();
 		setActionGroupsIcon();
 		registerToolbarActions();
+		PluginSuggestion.suggest(_project, _preferences);
 	}
 
 

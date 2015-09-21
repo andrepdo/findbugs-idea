@@ -25,7 +25,6 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
-import com.intellij.notification.impl.NotificationsConfigurationImpl;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
@@ -49,7 +48,6 @@ import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
-import org.twodividedbyzero.idea.findbugs.common.util.ErrorUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
@@ -61,6 +59,7 @@ import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitLayout;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitPane;
 import org.twodividedbyzero.idea.findbugs.gui.common.NDockLayout;
+import org.twodividedbyzero.idea.findbugs.gui.common.NotificationUtil;
 import org.twodividedbyzero.idea.findbugs.messages.AnalysisStateListener;
 import org.twodividedbyzero.idea.findbugs.messages.ClearListener;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
@@ -75,8 +74,6 @@ import java.awt.Component;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
@@ -496,7 +493,7 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 							"FindBugs Analysis Finished Notification",
 							"Disable Notification", CommonBundle.getCancelButtonText(), Messages.getWarningIcon());
 					if (result == Messages.YES) {
-						getNotificationsConfigurationImpl().changeSettings(
+						NotificationUtil.getNotificationsConfigurationImpl().changeSettings(
 								FindBugsPluginImpl.NOTIFICATION_GROUP_ID_ANALYSIS_FINISHED,
 								NotificationDisplayType.NONE, false, false);
 						notification.expire();
@@ -539,28 +536,6 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 					_ideMessagePanel.openFatals(null);
 				}
 			}
-		}
-	}
-
-
-	@NotNull
-	private static NotificationsConfigurationImpl getNotificationsConfigurationImpl() {
-		try {
-			try {
-				final Method getInstanceImpl = NotificationsConfigurationImpl.class.getDeclaredMethod("getInstanceImpl");
-				return (NotificationsConfigurationImpl) getInstanceImpl.invoke(null);
-			} catch (NoSuchMethodException e) {
-				try {
-					final Method getNotificationsConfigurationImpl = NotificationsConfigurationImpl.class.getDeclaredMethod("getNotificationsConfigurationImpl");
-					return (NotificationsConfigurationImpl) getNotificationsConfigurationImpl.invoke(null);
-				} catch (NoSuchMethodException e1) {
-					throw ErrorUtil.toUnchecked(e1);
-				}
-			}
-		} catch (InvocationTargetException e) {
-			throw ErrorUtil.toUnchecked(e);
-		} catch (IllegalAccessException e) {
-			throw ErrorUtil.toUnchecked(e);
 		}
 	}
 }

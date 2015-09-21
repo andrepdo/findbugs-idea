@@ -36,7 +36,6 @@ import java.math.BigDecimal;
  * $Date: 2014-06-01 23:40:00 +0100 (So, 01 June 2014) $
  *
  * @author Reto Merz<reto.merz@gmail.com>
- * @version $Revision: 308 $
  * @since 0.9.993
  */
 public enum Plugins {
@@ -49,6 +48,8 @@ public enum Plugins {
 
 	// http://h3xstream.github.io/find-sec-bugs/
 	findsecbugs_plugin_1_4_1("findsecbugs-plugin-1.4.1.jar", false, "findsecbugs-plugin-1.4.0.jar", "findsecbugs-plugin-1.3.0.jar", "findsecbugs-plugin-1.2.1.jar", "findsecbugs-plugin-1.2.0.jar");
+
+	public static final String PLUGIN_ID_ANDROID = "jp.f.dev.findbugs.detect.android";
 
 	private static final Logger LOGGER = Logger.getInstance(Plugins.class.getName());
 
