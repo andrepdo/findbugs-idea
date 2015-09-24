@@ -30,12 +30,14 @@ import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.gui.common.NotificationUtil;
+import org.twodividedbyzero.idea.findbugs.gui.preferences.ConfigurationPanel;
 import org.twodividedbyzero.idea.findbugs.plugins.Plugins;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
@@ -56,7 +58,12 @@ final class PluginSuggestion {
 	}
 
 
-	static void suggest(@NotNull final Project project, @Nullable final FindBugsPreferences preferences) {
+	static void suggest(
+			@NotNull final Project project,
+			@NotNull final FindBugsPlugin findBugsPlugin,
+			@Nullable final FindBugsPreferences preferences
+	) {
+
 		if (preferences == null) {
 			return;
 		}
@@ -68,7 +75,7 @@ final class PluginSuggestion {
 		}
 		final Set<Suggestion> suggestions = collectSuggestions(project, preferences);
 		if (!suggestions.isEmpty()) {
-			showSuggestions(project, preferences, suggestions);
+			showSuggestions(project, findBugsPlugin, preferences, suggestions);
 		}
 	}
 
@@ -79,12 +86,32 @@ final class PluginSuggestion {
 	}
 
 
-	private static void enablePlugin(@NotNull final String pluginId, @NotNull final FindBugsPreferences preferences) {
-		// TODO think of bundled / user
+	@SuppressWarnings("UnusedParameters") // LATER: enabled plugin - think of bundled and user plugins
+	private static void enablePlugin(
+			@NotNull final Project project,
+			@NotNull final FindBugsPlugin findBugsPlugin,
+			@NotNull final String pluginId,
+			@NotNull final FindBugsPreferences preferences
+	) {
+
+		ShowSettingsUtil.getInstance().editConfigurable(project, findBugsPlugin, new Runnable() {
+			@SuppressWarnings("ConstantConditions")
+			@Override
+			public void run() {
+				final ConfigurationPanel panel = ((ConfigurationPanel)findBugsPlugin.createComponent());
+				panel.showConfigPage(panel.getPluginConfig());
+			}
+		});
 	}
 
 
-	private static void showSuggestions(@NotNull final Project project, @NotNull final FindBugsPreferences preferences, @NotNull final Set<Suggestion> suggestions) {
+	private static void showSuggestions(
+			@NotNull final Project project,
+			@NotNull final FindBugsPlugin findBugsPlugin,
+			@NotNull final FindBugsPreferences preferences,
+			@NotNull final Set<Suggestion> suggestions
+	) {
+
 		final StringBuilder sb = new StringBuilder();
 		for (final Suggestion suggestion : suggestions) {
 			sb.append("&nbsp;&nbsp;- <a href='").append(suggestion._pluginId).append("'>").append("Enable '").append(suggestion._name).append("'</a><br>");
@@ -118,7 +145,8 @@ final class PluginSuggestion {
 									notification.hideBalloon();
 								}
 							} else {
-								enablePlugin(desc, preferences);
+								enablePlugin(project, findBugsPlugin, desc, preferences);
+								notification.hideBalloon();
 							}
 						}
 					}
@@ -191,7 +219,7 @@ final class PluginSuggestion {
 
 
 		@Override
-		public boolean equals(Object o) {
+		public boolean equals(@Nullable final Object o) {
 			return this == o || !(o == null || getClass() != o.getClass()) && _pluginId.equals(((Suggestion) o)._pluginId);
 		}
 

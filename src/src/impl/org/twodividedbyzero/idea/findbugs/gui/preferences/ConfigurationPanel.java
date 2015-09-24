@@ -336,7 +336,8 @@ public final class ConfigurationPanel extends JPanel {
 	}
 
 
-	private Component getTabbedPane() {
+	@NotNull
+	private JBTabbedPane getTabbedPane() {
 		if (_tabbedPane == null) {
 			_tabbedPane = new JBTabbedPane();
 
@@ -352,6 +353,16 @@ public final class ConfigurationPanel extends JPanel {
 		return _tabbedPane;
 	}
 
+
+	public void showConfigPage(@NotNull final ConfigurationPage page) {
+		final int index = getTabbedPane().indexOfTab(page.getTitle());
+		if (index != -1) {
+			getTabbedPane().setSelectedIndex(index);
+		}
+	}
+
+
+	@NotNull
 	List<ConfigurationPage> getConfigPages() {
 		if (_configPagesRegistry == null) {
 			_configPagesRegistry = new ArrayList<ConfigurationPage>();
@@ -392,7 +403,8 @@ public final class ConfigurationPanel extends JPanel {
 	}
 
 
-	ConfigurationPage getPluginConfig() {
+	@NotNull
+	public ConfigurationPage getPluginConfig() {
 		if (_pluginConfig == null) {
 			_pluginConfig = new PluginConfiguration(this, getPreferences());
 		}

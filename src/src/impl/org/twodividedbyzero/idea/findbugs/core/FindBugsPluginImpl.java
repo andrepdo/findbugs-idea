@@ -95,7 +95,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * $Date$
  *
  * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
  * @since 0.1.1
  */
 @SuppressWarnings({"HardcodedFileSeparator", "RedundantInterfaceDeclaration"})
@@ -203,7 +202,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 		initToolWindow();
 		setActionGroupsIcon();
 		registerToolbarActions();
-		PluginSuggestion.suggest(_project, _preferences);
+		PluginSuggestion.suggest(_project, this, _preferences);
 	}
 
 
