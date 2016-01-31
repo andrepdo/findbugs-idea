@@ -161,7 +161,7 @@ public class ImportExportConfiguration implements ConfigurationPage {
 
 			final AbstractButton browseButton = new JButton("Browse");
 			browseButton.setPreferredSize(new Dimension(80, 20));
-			browseButton.addActionListener(new FileChooserActionListener());
+			browseButton.addActionListener(new ExportDirChooserActionListener());
 			_exportDirPanel.add(browseButton, "5, 1, 5, 1");
 
 			_exportDirPanel.add(getExportDirFormatCheckbox(), "1, 3, 1, 3");
@@ -327,7 +327,7 @@ public class ImportExportConfiguration implements ConfigurationPage {
 	public void filter(final String filter) {
 		// TODO support search
 	}
-	
+
     private class ExportDirChooserActionListener implements ActionListener {
 
         @Override
