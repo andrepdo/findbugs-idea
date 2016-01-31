@@ -40,6 +40,7 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.SonarImporterUtil;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.AaComboBox;
@@ -83,7 +84,6 @@ import java.util.Locale;
 public final class ConfigurationPanel extends JPanel {
 
 	private static final Logger LOGGER = Logger.getInstance(ConfigurationPanel.class.getName());
-	private static final String PERSISTENCE_ROOT_NAME = "findbugs";
 
 	private final FindBugsPlugin _plugin;
 	private JCheckBox _compileBeforeAnalyseChkb;
@@ -551,7 +551,7 @@ public final class ConfigurationPanel extends JPanel {
 				new FileSaverDescriptor("Export FindBugs Preferences to File...", "", "xml"), this).save( null, null );
 		if (wrapper == null) return;
 		final Element el= XmlSerializer.serialize(prefs);
-		el.setName(PERSISTENCE_ROOT_NAME); // rename "PersistencePreferencesBean"
+		el.setName(SonarImporterUtil.PERSISTENCE_ROOT_NAME); // rename "PersistencePreferencesBean"
 		final Document document = new Document(el);
 		try {
 			JDOMUtil.writeDocument(document, wrapper.getFile(), "\n");
@@ -589,12 +589,12 @@ public final class ConfigurationPanel extends JPanel {
 		try {
 			final Document document = JDOMUtil.loadDocument(files[0].getInputStream());
 			if (SonarProfileImporter.isValid(document)) {
-				prefs = SonarProfileImporter.doImport(this, document);
+				prefs = SonarProfileImporter.doImport(getProject(), document);
 				if (prefs == null) {
 					return;
 				}
 			} else {
-				if (!PERSISTENCE_ROOT_NAME.equals(document.getRootElement().getName())) {
+				if (!SonarImporterUtil.PERSISTENCE_ROOT_NAME.equals(document.getRootElement().getName())) {
 					Messages.showErrorDialog(this, "The file format is invalid.", "Invalid File");
 					return;
 				}
