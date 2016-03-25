@@ -20,12 +20,15 @@
 package org.twodividedbyzero.idea.findbugs.gui.preferences.importer;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import edu.umd.cs.findbugs.BugPattern;
 import edu.umd.cs.findbugs.DetectorFactory;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
 
@@ -59,11 +62,12 @@ public final class SonarProfileImporter {
 
 
 	@Nullable
-	public static PersistencePreferencesBean doImport(final Component owner, final Document document) {
+	public static PersistencePreferencesBean doImport(Project project, final Document document) {
 		final Element profile = document.getRootElement();
 		final Element rules = profile.getChild("rules");
 		if (rules == null) {
-			Messages.showErrorDialog(owner, "The file format is invalid. No rules element found.", "Invalid File");
+			FindBugsPluginImpl.showToolWindowNotifier(project, "The file format is invalid. No rules element found.",
+					MessageType.ERROR);
 			return null;
 		}
 

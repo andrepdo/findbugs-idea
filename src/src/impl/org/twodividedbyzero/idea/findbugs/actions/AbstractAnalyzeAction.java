@@ -26,8 +26,11 @@ import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.wm.ToolWindow;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
+import org.twodividedbyzero.idea.findbugs.common.util.SonarImporterUtil;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
@@ -51,7 +54,8 @@ abstract class AbstractAnalyzeAction extends AbstractAction {
 			@NotNull final FindBugsState state,
 			@NotNull final FindBugsPreferences preferences
 	) {
-
+		String importFilePath = preferences.getProperty(FindBugsPreferences.IMPORT_FILE_PATH);
+		importRules(plugin, importFilePath);
 		if (preferences.getBugCategories().containsValue("true") && preferences.getDetectors().containsValue("true")) {
 			analyze(
 					e,
@@ -68,6 +72,16 @@ abstract class AbstractAnalyzeAction extends AbstractAction {
 		}
 	}
 
+	private void importRules(@NotNull FindBugsPlugin plugin, final String importFilePath) {
+		if (StringUtils.isNotBlank(importFilePath)) {
+			EventDispatchThreadHelper.invokeLater(new Runnable() {
+				public void run() {
+					FindBugsPluginImpl.showToolWindowNotifier(plugin.getProject(), "Using rules at " + importFilePath, MessageType.INFO);
+				}
+			});
+			SonarImporterUtil.importRules(plugin, importFilePath);
+		}
+	}
 
 	abstract void analyze(
 			@NotNull final AnActionEvent e,

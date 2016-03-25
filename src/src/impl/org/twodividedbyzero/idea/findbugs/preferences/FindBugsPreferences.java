@@ -84,6 +84,7 @@ public class FindBugsPreferences extends Properties {
 	public static final String ANALYZE_AFTER_COMPILE = PROPERTIES_PREFIX + "analyzeAfterCompile";
 	public static final String ANALYZE_AFTER_AUTOMAKE = PROPERTIES_PREFIX + "analyzeAfterAutoMake";
 
+	public static final String IMPORT_FILE_PATH = PROPERTIES_PREFIX + "importedFilePath";
 	public static final String EXPORT_BASE_DIR = PROPERTIES_PREFIX + "exportBaseDir";
 	public static final String EXPORT_CREATE_ARCHIVE_DIR = PROPERTIES_PREFIX + "exportCreateArchiveDir";
 	public static final String EXPORT_AS_HTML = PROPERTIES_PREFIX + "exportAsHtml";
