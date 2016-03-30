@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Findbugs-idea by andrepdo</title>
+    <title>FindBugs-IDEA by André Pfeiler</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/github-light.css">
@@ -15,95 +15,79 @@
   <body>
     <div class="wrapper">
       <header>
-        <h1>Findbugs-idea</h1>
-        <p>The FindBugs Plugin for IntelliJ IDEA -Findbugs-IDEA</p>
 
+        <h1>FindBugs-IDEA</h1>
+        <p>The FindBugs Plugin for IntelliJ IDEA</p>
+
+        <h3><a id="releases" class="anchor" href="#releases" aria-hidden="true"><span class="octicon octicon-link"></span></a>Downloads</h3>
+        <p>Please download the latest version  from <a href="http://plugins.jetbrains.com/plugin/3847">http://plugins.jetbrains.com/plugin/3847</a></p>
+
+        <h3><a id="sourcecode" class="anchor" href="#sourcecode" aria-hidden="true"><span class="octicon octicon-link"></span></a>Source Code</h3>
         <p class="view"><a href="https://github.com/andrepdo/findbugs-idea">View the Project on GitHub <small>andrepdo/findbugs-idea</small></a></p>
 
-
-        <ul>
-          <li><a href="https://github.com/andrepdo/findbugs-idea/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/andrepdo/findbugs-idea/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/andrepdo/findbugs-idea">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
+        </header>
       <section>
-        <p><img src="https://raw.githubusercontent.com/andrepdo/findbugs-idea/master/src/src/impl/org/twodividedbyzero/idea/findbugs/resources/icons/fb-idea-logo-red.png" alt="FindBugs-IDEA Logo"></p>
-
+<img src="images/logo.png" alt="FindBugs-IDEA Logo">
+ 
 <h3>
 <a id="findbugs-for-intellij-idea" class="anchor" href="#findbugs-for-intellij-idea" aria-hidden="true"><span class="octicon octicon-link"></span></a>FindBugs for IntelliJ IDEA</h3>
 
-<p>provides static byte code analysis to look for bugs in Java code from within IntelliJ IDEA. FindBugs is a defect detection tool for Java that uses static analysis to look for more than 200 bug patterns, such as null pointer dereferences, infinite recursive loops, bad uses of the Java libraries and deadlocks. FindBugs can identify hundreds of serious defects in large applications (typically about 1 defect per 1000-2000 lines of non-commenting source statements). The name FindBugs™ and the FindBugs logo are trademarked by The University of Maryland. As of July, 2008, FindBugs has been downloaded more than 700,000 times. FindBugs requires JRE (or JDK) 1.5.0 or later to run. However, it can analyze programs compiled for any version of Java and is used by many major companies and financial institutions. FindBugs-IDEA uses FindBugs™ under the hood. for more information see <a href="http://findbugs.sourceforge.net/">http://findbugs.sourceforge.net/</a>.</p>
+<p style="text-align: justify;">provides static byte code analysis to look for bugs in Java code from within IntelliJ IDEA. FindBugs is a defect detection tool for Java that uses static analysis to look for more than 200 bug patterns, such as null pointer dereferences, infinite recursive loops, bad uses of the Java libraries and deadlocks. FindBugs can identify hundreds of serious defects in large applications (typically about 1 defect per 1000-2000 lines of non-commenting source statements). The name FindBugs™ and the FindBugs logo are trademarked by The University of Maryland. As of July, 2008, FindBugs has been downloaded more than 700,000 times. FindBugs-IDEA uses FindBugs™ under the hood. For more information see <a href="http://findbugs.sourceforge.net/">http://findbugs.sourceforge.net/</a>.</p>
 
-<p>..."We use IDEA inspections and FindBugs complementary. FindBugs is running in our continuous integration process and IDEA inspections are used during coding." What about using both during coding from within IntelliJ IDEA?</p>
+<blockquote>
+<p>We use IDEA inspections and FindBugs complementary. FindBugs is running in our continuous integration process and IDEA inspections are used during coding.</p>
+</blockquote>
+
+<p>What about using both during coding from within IntelliJ IDEA?</p>
 
 <ul>
-<li>for screenshots see <a href="http://plugins.intellij.net/plugin?idea&amp;id=3847">http://plugins.intellij.net/plugin?idea&amp;id=3847</a>
+<li>For screenshots see <a href="http://plugins.intellij.net/plugin?idea&amp;id=3847">http://plugins.intellij.net/plugin?idea&amp;id=3847</a>
 </li>
 <li>
-<a href="https://github.com/see" class="user-mention">@see</a> article at dzone: <a href="http://jetbrains.dzone.com/tips/intellij-idea-finds-bugs">http://jetbrains.dzone.com/tips/intellij-idea-finds-bugs</a>
+See article at DZone: <a href="http://jetbrains.dzone.com/tips/intellij-idea-finds-bugs">http://jetbrains.dzone.com/tips/intellij-idea-finds-bugs</a>
 </li>
 </ul>
 
 <h3>
-<a id="downloads" class="anchor" href="#downloads" aria-hidden="true"><span class="octicon octicon-link"></span></a>Downloads</h3>
-
-<p>Please download the latest version from <a href="http://plugins.jetbrains.com/plugin/3847">http://plugins.jetbrains.com/plugin/3847</a></p>
-
-<h3>
-<a id="supporters" class="anchor" href="#supporters" aria-hidden="true"><span class="octicon octicon-link"></span></a>Supporters</h3>
-
-<p>YourKit is kindly supporting FindBugs-IDEA open source project with its full-featured Java Profiler.
-YourKit, LLC is the creator of innovative and intelligent tools for profiling
-Java and .NET applications. Take a look at YourKit's leading software products:
-<a href="http://www.yourkit.com/java/profiler/index.jsp">YourKit Java Profiler</a> and
-<a href="http://www.yourkit.com/.net/profiler/index.jsp">YourKit .NET Profiler</a>.</p>
-
-<h2>
-<a id="" class="anchor" href="#" aria-hidden="true"><span class="octicon octicon-link"></span></a><img src="http://www.yourkit.com/images/yklogo.png" alt="YourKit">
-</h2>
-
-<h3>
-<a id="findbugs-idea-plugin-features" class="anchor" href="#findbugs-idea-plugin-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>FindBugs-IDEA plugin features</h3>
+<a id="findbugs-idea-plugin-features" class="anchor" href="#findbugs-idea-plugin-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h3>
 
 <ul>
-<li>findbugs-2 support 
-
-<ul>
-<li>Quickfix: annotate, suppress findbugs patterns (GutterIcon and document markup (alt+enter)) idea 9 until 13 compatibility </li>
-<li>configure findbugs on idea project and module level</li>
-<li>jump to source from results shown in toolwindow including anonymous classes</li>
-<li>bug descriptions, solutions</li>
-<li>run analysis always in background</li>
-<li>run findbugs analysis on all affected files after compile</li>
-<li>min. priority to report</li>
-<li>background scanning</li>
-<li>configurable effort run level</li>
-<li>configurable detectors</li>
-<li>bug categories to report</li>
-<li>file filter (include, exclude, exclude baseline bugs)</li>
-<li>load additional detector plugins like fb-contrib.jar</li>
-<li>group results by: bug category, classname, package, priority, bug rank</li>
-<li>intellij local history support</li>
-<li>quick search within the result tree</li>
-<li>run Findbugs analysis as IntelliJ inspection (experimental)</li>
-<li>Analyze actions (all actions are also available in the intellij project tree, toolbar  menu, context menu):
-** analyze all modified files
-** analyze all files on the active changelist (available from FindBugs-IDEA main ToolWindow and the ChangelistToolWindow)
-** analyze class under cursor
-** analyze current editor file
-** analyze all files of an intellij project
-** analyze all files of an intellij module
-** analyze all files of the selected package
-** analyze a bunch of selected files (project tree) 
-** analyze a scope</li>
-<li>export a bug collection to html and/or xml with limited </li>
-<li>configurable dir based archive support</li>
-<li>import a bug collection from xml</li>
-<li>configurable : open an exported bug collection html page in the intellij configured  browser</li>
-<li>configurable : preview found bugs in an editor preview panel</li>
-</ul>
-</li>
+    <li>FindBugs 3 support</li>
+    <li>Quickfix: annotate, suppress findbugs patterns (GutterIcon and document markup (alt+enter))</li>
+    <li>Idea 13.0 until the latest 15 EAP compatibility</li>
+    <li>Configure findbugs on idea project and module level</li>
+    <li>Jump to source from results shown in toolwindow including anonymous classes</li>
+    <li>Bug descriptions, solutions</li>
+    <li>Run analysis always in background</li>
+    <li>Run findbugs analysis on all affected files after compile/automake</li>
+    <li>Min. priority to report</li>
+    <li>Background scanning</li>
+    <li>Configurable effort run level</li>
+    <li>Configurable detectors</li>
+    <li>Bug categories to report</li>
+    <li>File filter (include, exclude, exclude baseline bugs)</li>
+    <li>Load additional detector plugins like fb-contrib.jar</li>
+    <li>Group results by: bug category, classname, package, priority, bug rank</li>
+    <li>IntelliJ local history support</li>
+    <li>Quick search within the result tree</li>
+    <li>Basic Scala, Groovy and AspectJ support</li>
+    <li>Analyze actions (all actions are also available in the IntelliJ project tree, toolbar menu, context menu):
+        <ul>
+            <li>All modified files</li>
+            <li>All files on the active changelist (available from FindBugs-IDEA main ToolWindow and the ChangelistToolWindow)</li>
+            <li>Class under cursor</li>
+            <li>Current editor file</li>
+            <li>All files of an IntelliJ project</li>
+            <li>All files of an IntelliJ module</li>
+            <li>All files of the selected package</li>
+            <li>A bunch of selected files (project tree)</li>
+            <li>A scope</li>
+        </ul>
+    </li>
+    <li>Export a bug collection to html and/or xml with limited configurable dir based archive support</li>
+    <li>Import a bug collection from xml</li>
+    <li>Configurable : open an exported bug collection html page in the IntelliJ configured browser</li>
+    <li>Configurable : preview found bugs in an editor preview panel</li>
 </ul>
 
 <h3>
@@ -119,15 +103,30 @@ Contributors: are always welcome</p>
 <img src="http://plugins.jetbrains.com/oldimg/screenshots/FindBugs-IDEA_5750.png" alt=""></p>
 
 <h3>
-<a id="yourkit" class="anchor" href="#yourkit" aria-hidden="true"><span class="octicon octicon-link"></span></a>YourKit</h3>
+<a id="supporters" class="anchor" href="#supporters" aria-hidden="true"><span class="octicon octicon-link"></span></a>Supporters</h3>
 
-<p><a href="#yourkit"></a>
-YourKit is kindly supporting FindBugs-IDEA open source project with its full-featured Java Profiler.
-YourKit, LLC is the creator of innovative and intelligent tools for profiling
-Java and .NET applications. Take a look at YourKit's leading software products:
-<a href="http://www.yourkit.com/java/profiler/index.jsp">YourKit Java Profiler</a> and
-<a href="http://www.yourkit.com/.net/profiler/index.jsp">YourKit .NET Profiler</a>.<br>
-<img src="http://www.yourkit.com/images/yklogo.png" alt="YourKit"></p>
+<table><tbody>
+
+<tr><td style="width:144px"><a href="http://www.araxis.com/"><img src="images/araxis_logo.png" alt="Araxis"></a>
+</td>
+<td><p>Araxis generously supports FindBugs-IDEA with free licenses of
+<a href="http://www.araxis.com/merge/">Araxis Merge</a>.
+</p></td></tr>
+
+<tr><td><a href="https://www.jetbrains.com/"><img src="images/jetbrains_logo.png" alt="JetBrains"></a></a>
+</td>
+<td><p>JetBrains sponsored free licenses for their premium products like
+<a href="https://www.jetbrains.com/idea/">IDEA Ultimate</a>.
+</p></td></tr>
+
+<tr><td><a href="https://www.yourkit.com/"><img src="images/yourkit_logo.png" alt="YourKit"></a>
+</td>
+<td><p>YourKit is kindly supporting FindBugs-IDEA with its full-featured
+<a href="https://www.yourkit.com/java/profiler/">Java Profiler</a>.
+</p></td></tr>
+
+</tbody></table>
+
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/andrepdo">andrepdo</a></p>
