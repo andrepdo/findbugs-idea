@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -26,6 +26,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import info.clearthought.layout.TableLayout;
+import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.AaTextField;
@@ -64,9 +65,9 @@ public class ImportExportConfiguration implements ConfigurationPage {
 	private JPanel _mainPanel;
 
 	private JPanel _exportDirPanel;
-    private JPanel _importFilePathPanel;
+	private JPanel _importFilePathPanel;
 	private AaTextField _exportDirTextField;
-    private AaTextField _importFilePathTextField;
+	private AaTextField _importFilePathTextField;
 	private JCheckBox _exportDirFormatCheckbox;
 
 	private JPanel _fileFormatPanel;
@@ -76,7 +77,7 @@ public class ImportExportConfiguration implements ConfigurationPage {
 	private JPanel _browserPanel;
 	private JCheckBox _openBrowserCheckbox;
 	private String _currentExportDir;
-    private String _currentimportFilePath;
+	private String _currentimportFilePath;
 
 
 	public ImportExportConfiguration(final ConfigurationPanel parent, final FindBugsPreferences preferences) {
@@ -99,7 +100,7 @@ public class ImportExportConfiguration implements ConfigurationPage {
 			_mainPanel.add(getExportDirPanel(), "1, 1, 1, 1");
 			_mainPanel.add(getFileFormatPanel(), "1, 3, 1, 3");
 			_mainPanel.add(getBrowserPanel(), "1, 5, 1, 5");
-            _mainPanel.add(getImportFilePathPanel(), "1, 7, 1, 7");
+			_mainPanel.add(getImportFilePathPanel(), "1, 7, 1, 7");
 
 			_component = _mainPanel;
 		}
@@ -116,7 +117,7 @@ public class ImportExportConfiguration implements ConfigurationPage {
 		_currentExportDir = _preferences.getProperty(FindBugsPreferences.EXPORT_BASE_DIR);
 		getExportDirTextField().setText(_currentExportDir);
 		_currentimportFilePath = _preferences.getProperty(FindBugsPreferences.IMPORT_FILE_PATH);
-        getimportFilePathTextField().setText(_currentimportFilePath);
+		getImportFilePathTextField().setText(_currentimportFilePath);
 	}
 
 
@@ -171,29 +172,29 @@ public class ImportExportConfiguration implements ConfigurationPage {
 		return _exportDirPanel;
 	}
 
-    private Component getImportFilePathPanel() {
-        if (_importFilePathPanel == null) {
-            final double border = 5;
-            final double rowsGap = 5;
-            final double colsGap = 10;
-            final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.FILL, colsGap, TableLayout.PREFERRED, border}, // Columns
-                    {border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
-            final TableLayout tbl = new TableLayout(size);
-            _importFilePathPanel = new JPanel(tbl);
-            _importFilePathPanel.setBorder(BorderFactory.createTitledBorder("Import file path settings"));
-            final JComponent importFilePathLabel = new JLabel("Import File Path");
-            importFilePathLabel.setToolTipText("Set the file path used to import settings before each analysis. If not set the import process is ignored.");
-            _importFilePathPanel.add(importFilePathLabel, "1, 1, 1, 1");
-            _importFilePathPanel.add(getimportFilePathTextField(), "3, 1, 3, 1");
+	private Component getImportFilePathPanel() {
+		if (_importFilePathPanel == null) {
+			final double border = 5;
+			final double rowsGap = 5;
+			final double colsGap = 10;
+			final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.FILL, colsGap, TableLayout.PREFERRED, border}, // Columns
+					{border, TableLayout.PREFERRED, rowsGap, TableLayout.PREFERRED, border}};// Rows
+			final TableLayout tbl = new TableLayout(size);
+			_importFilePathPanel = new JPanel(tbl);
+			_importFilePathPanel.setBorder(BorderFactory.createTitledBorder("Import file path settings"));
+			final JComponent importFilePathLabel = new JLabel("Import File Path");
+			importFilePathLabel.setToolTipText("Set the file path used to import settings before each analysis. If not set the import process is ignored.");
+			_importFilePathPanel.add(importFilePathLabel, "1, 1, 1, 1");
+			_importFilePathPanel.add(getImportFilePathTextField(), "3, 1, 3, 1");
 
-            final AbstractButton browseButton = new JButton("Browse");
-            browseButton.setPreferredSize(new Dimension(80, 20));
-            browseButton.addActionListener(new ImportFileChooserActionListener());
-            _importFilePathPanel.add(browseButton, "5, 1, 5, 1");
-        }
+			final AbstractButton browseButton = new JButton("Browse");
+			browseButton.setPreferredSize(new Dimension(80, 20));
+			browseButton.addActionListener(new ImportFileChooserActionListener());
+			_importFilePathPanel.add(browseButton, "5, 1, 5, 1");
+		}
 
-        return _importFilePathPanel;
-    }
+		return _importFilePathPanel;
+	}
 
 
 	private void showToolWindowNotifier(final String message, final MessageType type) {
@@ -218,18 +219,20 @@ public class ImportExportConfiguration implements ConfigurationPage {
 		return _exportDirTextField;
 	}
 
-    private JTextComponent getimportFilePathTextField() {
-        if (_importFilePathTextField == null) {
-            _importFilePathTextField = new AaTextField(30);
-            _importFilePathTextField.setText(_currentimportFilePath);
-            _importFilePathTextField.addTextChangeListener(new ActionListener() {
-                public void actionPerformed(final ActionEvent e) {
-                    _preferences.setProperty(FindBugsPreferences.IMPORT_FILE_PATH, _importFilePathTextField.getText());
-                }
-            });
-        }
-        return _importFilePathTextField;
-    }
+
+	@NotNull
+	public JTextComponent getImportFilePathTextField() {
+		if (_importFilePathTextField == null) {
+			_importFilePathTextField = new AaTextField(30);
+			_importFilePathTextField.setText(_currentimportFilePath);
+			_importFilePathTextField.addTextChangeListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					_preferences.setProperty(FindBugsPreferences.IMPORT_FILE_PATH, _importFilePathTextField.getText());
+				}
+			});
+		}
+		return _importFilePathTextField;
+	}
 
 
 	private AbstractButton getExportDirFormatCheckbox() {
@@ -328,41 +331,42 @@ public class ImportExportConfiguration implements ConfigurationPage {
 		// TODO support search
 	}
 
-    private class ExportDirChooserActionListener implements ActionListener {
 
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-            final FileChooserDescriptor descriptor = new FilterFileChooserDescriptor("Select", "Select an export directory");
-            final VirtualFile toSelect = LocalFileSystem.getInstance().findFileByPath(getExportDirTextField().getText());
-            final VirtualFile chosen = FileChooser.chooseFile(descriptor, _parent, _parent.getProject(), toSelect);
-            if (chosen != null) {
-                final File selectedFile = VfsUtilCore.virtualToIoFile(chosen);
-                if (selectedFile.isDirectory() && selectedFile.canWrite()) {
-                    getExportDirTextField().setText(selectedFile.getPath());
-                } else {
-                    showToolWindowNotifier("Invalid directory.", MessageType.ERROR);
-                }
-            }
-        }
-    }
+	private class ExportDirChooserActionListener implements ActionListener {
 
-    private class ImportFileChooserActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(final ActionEvent e) {
+			final FileChooserDescriptor descriptor = new FilterFileChooserDescriptor("Select", "Select an export directory");
+			final VirtualFile toSelect = LocalFileSystem.getInstance().findFileByPath(getExportDirTextField().getText());
+			final VirtualFile chosen = FileChooser.chooseFile(descriptor, _parent, _parent.getProject(), toSelect);
+			if (chosen != null) {
+				final File selectedFile = VfsUtilCore.virtualToIoFile(chosen);
+				if (selectedFile.isDirectory() && selectedFile.canWrite()) {
+					getExportDirTextField().setText(selectedFile.getPath());
+				} else {
+					showToolWindowNotifier("Invalid directory.", MessageType.ERROR);
+				}
+			}
+		}
+	}
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            FileChooserDescriptor descriptor = new FilterFileChooserDescriptor("Select", "Select a file to import",
-                    new FileNameExtensionFilter("XML files", "xml"));
-            VirtualFile toSelect = LocalFileSystem.getInstance().findFileByPath(getimportFilePathTextField().getText());
-            VirtualFile chosen = FileChooser.chooseFile(descriptor, _parent, _parent.getProject(), toSelect);
-            if (chosen != null) {
-                File selectedFile = VfsUtilCore.virtualToIoFile(chosen);
-                if (selectedFile.canRead() && selectedFile.isFile()) {
-                    getimportFilePathTextField().setText(selectedFile.getPath());
-                } else {
-                    showToolWindowNotifier("Invalid file to import : " + selectedFile.getName(), MessageType.ERROR);
-                }
-            }
-        }
-    }
 
+	private class ImportFileChooserActionListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			FileChooserDescriptor descriptor = new FilterFileChooserDescriptor("Select", "Select a file to import",
+					new FileNameExtensionFilter("XML files", "xml"));
+			VirtualFile toSelect = LocalFileSystem.getInstance().findFileByPath(getImportFilePathTextField().getText());
+			VirtualFile chosen = FileChooser.chooseFile(descriptor, _parent, _parent.getProject(), toSelect);
+			if (chosen != null) {
+				File selectedFile = VfsUtilCore.virtualToIoFile(chosen);
+				if (selectedFile.canRead() && selectedFile.isFile()) {
+					getImportFilePathTextField().setText(selectedFile.getPath());
+				} else {
+					showToolWindowNotifier("Invalid file to import : " + selectedFile.getName(), MessageType.ERROR);
+				}
+			}
+		}
+	}
 }

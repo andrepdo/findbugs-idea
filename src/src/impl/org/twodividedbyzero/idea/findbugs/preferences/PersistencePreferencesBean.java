@@ -36,6 +36,7 @@ import java.util.Set;
  * @since 0.9.90-dev
  */
 public class PersistencePreferencesBean {
+	public static final String PERSISTENCE_ROOT_NAME = "findbugs";
 
 	// do not make fields final or private - initialized per reflection from intellij persistence framework
 	public Map<String, String> _basePreferences;

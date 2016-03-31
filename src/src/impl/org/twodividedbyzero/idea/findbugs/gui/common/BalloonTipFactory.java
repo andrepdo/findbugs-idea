@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -26,6 +26,7 @@ import com.intellij.openapi.ui.popup.BalloonBuilder;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.awt.RelativePoint;
+import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 
 import javax.annotation.Nullable;
@@ -72,12 +73,12 @@ public class BalloonTipFactory {
 	}
 
 
-	public static void showToolWindowInfoNotifier(final Project project, final String html) {
+	public static void showToolWindowInfoNotifier(@NotNull final Project project, final String html) {
 		showToolWindowInfoNotifier(project, html, null);
 	}
 
 
-	public static void showToolWindowInfoNotifier(final Project project, final String html, @Nullable final HyperlinkListener hyperlinkListener) {
+	public static void showToolWindowInfoNotifier(@NotNull final Project project, final String html, @Nullable final HyperlinkListener hyperlinkListener) {
 		final ToolWindowManager manager = ToolWindowManager.getInstance(project);
 		if (manager == null) { // this should never happen.
 			return;
@@ -86,12 +87,12 @@ public class BalloonTipFactory {
 	}
 
 
-	public static void showToolWindowWarnNotifier(final Project project, final String html) {
+	public static void showToolWindowWarnNotifier(@NotNull final Project project, final String html) {
 		showToolWindowWarnNotifier(project, html, null);
 	}
 
 
-	public static void showToolWindowWarnNotifier(final Project project, final String html, @Nullable final HyperlinkListener hyperlinkListener) {
+	public static void showToolWindowWarnNotifier(@NotNull final Project project, final String html, @Nullable final HyperlinkListener hyperlinkListener) {
 		final ToolWindowManager manager = ToolWindowManager.getInstance(project);
 		if (manager == null) { // this should never happen.
 			return;
@@ -100,12 +101,12 @@ public class BalloonTipFactory {
 	}
 
 
-	public static void showToolWindowErrorNotifier(final Project project, final String html) {
+	public static void showToolWindowErrorNotifier(@NotNull final Project project, final String html) {
 		showToolWindowErrorNotifier(project, html, null);
 	}
 
 
-	public static void showToolWindowErrorNotifier(final Project project, final String html, @Nullable final HyperlinkListener hyperlinkListener) {
+	public static void showToolWindowErrorNotifier(@NotNull final Project project, final String html, @Nullable final HyperlinkListener hyperlinkListener) {
 		final ToolWindowManager manager = ToolWindowManager.getInstance(project);
 		if (manager == null) { // this should never happen.
 			return;

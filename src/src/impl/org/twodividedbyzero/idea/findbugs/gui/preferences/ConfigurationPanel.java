@@ -40,7 +40,6 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
-import org.twodividedbyzero.idea.findbugs.common.util.SonarImporterUtil;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.AaComboBox;
@@ -412,7 +411,8 @@ public final class ConfigurationPanel extends JPanel {
 	}
 
 
-	ConfigurationPage getImportExportConfig() {
+	@NotNull
+	public ImportExportConfiguration getImportExportConfig() {
 		if (_importExportConfig == null) {
 			_importExportConfig = new ImportExportConfiguration(this, getPreferences());
 		}
@@ -551,7 +551,7 @@ public final class ConfigurationPanel extends JPanel {
 				new FileSaverDescriptor("Export FindBugs Preferences to File...", "", "xml"), this).save( null, null );
 		if (wrapper == null) return;
 		final Element el= XmlSerializer.serialize(prefs);
-		el.setName(SonarImporterUtil.PERSISTENCE_ROOT_NAME); // rename "PersistencePreferencesBean"
+		el.setName(PersistencePreferencesBean.PERSISTENCE_ROOT_NAME); // rename "PersistencePreferencesBean"
 		final Document document = new Document(el);
 		try {
 			JDOMUtil.writeDocument(document, wrapper.getFile(), "\n");
@@ -563,6 +563,9 @@ public final class ConfigurationPanel extends JPanel {
 	}
 
 
+	/**
+	 * LATER: Consolidate this with {@link org.twodividedbyzero.idea.findbugs.actions.AnalyzeUtil#importPreferences(FindBugsPlugin, String)}.
+	 */
 	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SIC_INNER_SHOULD_BE_STATIC_ANON", "REC_CATCH_EXCEPTION"})
 	private void importPreferences() {
 		@SuppressWarnings("AnonymousInnerClassMayBeStatic")
@@ -594,7 +597,7 @@ public final class ConfigurationPanel extends JPanel {
 					return;
 				}
 			} else {
-				if (!SonarImporterUtil.PERSISTENCE_ROOT_NAME.equals(document.getRootElement().getName())) {
+				if (!PersistencePreferencesBean.PERSISTENCE_ROOT_NAME.equals(document.getRootElement().getName())) {
 					Messages.showErrorDialog(this, "The file format is invalid.", "Invalid File");
 					return;
 				}

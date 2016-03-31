@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -367,7 +367,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
-	public static void showToolWindowNotifier(final Project project, final String message, final MessageType type) {
+	public static void showToolWindowNotifier(@NotNull final Project project, final String message, final MessageType type) {
 		if (MessageType.INFO.equals(type)) {
 			BalloonTipFactory.showToolWindowInfoNotifier(project, message);
 		} else if (MessageType.WARNING.equals(type)) {
