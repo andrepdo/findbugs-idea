@@ -54,7 +54,7 @@
                deprecation="${javac.deprecation}"
                failonerror="true"
                fork="true"
-               memoryMaximumSize="32m"
+               memoryMaximumSize="${javac.memory}"
                encoding="${javac.encoding}"
                listfiles="${javac.listfiles}">
             <compilerarg value="${javac.compilerarg}"/>
@@ -112,7 +112,7 @@
                deprecation="${javac.deprecation}"
                failonerror="true"
                fork="true"
-               memoryMaximumSize="256m"
+               memoryMaximumSize="${javac.memory}"
                encoding="${javac.encoding}"
                listfiles="${javac.listfiles}">
             <compilerarg value="${javac.compilerarg}"/>
@@ -131,7 +131,7 @@
                deprecation="${javac.deprecation}"
                failonerror="true"
                fork="true"
-               memoryMaximumSize="256m"
+               memoryMaximumSize="${javac.memory}"
                encoding="${javac.encoding}"
                listfiles="${javac.listfiles}">
             <compilerarg value="${javac.compilerarg}"/>
@@ -244,8 +244,6 @@
               tofile="plugin.xml">
             <filterset>
                 <filter token="VERSION" value="${versionString}"/>
-                <filter token="IDEA_SINCE_BUILD" value="${idea.since.build.number}"/>
-                <filter token="IDEA_UNTIL_BUILD" value="${idea.until.build.number}"/>
             </filterset>
         </copy>
     </target>
@@ -296,8 +294,6 @@
         <echo>
             JAVA_HOME=${java.home}
             IDEA.LIB=${idea.home}
-            idea.until.build.number=${idea.since.build.number}
-            idea.until.build.number=${idea.until.build.number}
         </echo>
     </target>
 

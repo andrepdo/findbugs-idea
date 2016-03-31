@@ -281,7 +281,10 @@
     <vendor logo="/org/twodividedbyzero/idea/findbugs/resources/icons/fb-idea-logo_16x16.png"
             email="see@https://github.com/andrepdo" url="https://github.com/andrepdo">Andre Pfeiler
     </vendor>
-    <idea-version since-build="@IDEA_SINCE_BUILD@" until-build="@IDEA_UNTIL_BUILD@"/>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html
+         -->
+    <idea-version since-build="133.193"/>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
