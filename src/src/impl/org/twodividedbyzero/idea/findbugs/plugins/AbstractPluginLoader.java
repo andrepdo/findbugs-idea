@@ -191,7 +191,8 @@ public abstract class AbstractPluginLoader {
 	}
 
 
-	public void showErrorBalloonIfNecessary(@Nullable final Project project) {
+	@Nullable
+	public String makeErrorMessage() {
 		if (!_errorMessages.isEmpty()) {
 			final StringBuilder message = new StringBuilder();
 			for (final String errorMessage : _errorMessages) {
@@ -200,10 +201,18 @@ public abstract class AbstractPluginLoader {
 				}
 				message.append(" - ").append(errorMessage);
 			}
+			return message.toString();
+		}
+		return null;
+	}
 
+
+	public void showErrorBalloonIfNecessary(@Nullable final Project project) {
+		final String errorMessage = makeErrorMessage();
+		if (errorMessage != null) {
 			// do not use BalloonTipFactory here, at this point FindBugs tool window is not yet created
 			// code adapted from com.intellij.openapi.components.impl.stores.StorageUtil#notifyUnknownMacros
-			UIUtil.invokeLaterIfNeeded(new RunnableErrorNotification(project, message.toString()));
+			UIUtil.invokeLaterIfNeeded(new RunnableErrorNotification(project, errorMessage));
 		}
 	}
 

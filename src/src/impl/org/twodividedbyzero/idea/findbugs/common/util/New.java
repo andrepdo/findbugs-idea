@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -80,6 +81,20 @@ public final class New {
 	@NotNull
 	public static <E> Set<E> set() {
 		return new HashSet<E>();
+	}
+
+
+	@NotNull
+	public static <T> Set<T> asSet(@Nullable final T... elements) {
+		int cap = 4;
+		if (elements != null) {
+			cap = elements.length;
+		}
+		final HashSet<T> ret = new HashSet<T>(cap);
+		if (elements != null) {
+			ret.addAll(Arrays.asList(elements));
+		}
+		return ret;
 	}
 
 

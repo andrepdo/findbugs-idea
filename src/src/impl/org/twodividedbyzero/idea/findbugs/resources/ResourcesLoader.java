@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -18,11 +18,12 @@
  */
 package org.twodividedbyzero.idea.findbugs.resources;
 
-
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.containers.SoftHashMap;
+import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.PropertyKey;
 import org.twodividedbyzero.idea.findbugs.common.util.ErrorUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IoUtil;
 
@@ -31,6 +32,7 @@ import javax.swing.ImageIcon;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -50,7 +52,7 @@ public final class ResourcesLoader {
 	private static final Logger LOGGER = Logger.getInstance(ResourcesLoader.class.getName());
 
 	private static volatile ResourceBundle _bundle;
-	private static final String LOCALE_RESOURCES_PKG = "org.twodividedbyzero.idea.findbugs.resources.i18n.Messages";
+	public static final String BUNDLE = "org.twodividedbyzero.idea.findbugs.resources.i18n.Messages";
 	private static final String ICON_RESOURCES_PKG = "/org/twodividedbyzero/idea/findbugs/resources/icons";
 	private static final Map<String, Icon> _iconCache = new SoftHashMap<String, Icon>();
 
@@ -70,25 +72,30 @@ public final class ResourcesLoader {
 
 		//noinspection UnusedCatchParameter
 		try {
-			_bundle = ResourceBundle.getBundle(LOCALE_RESOURCES_PKG, Locale.getDefault());
+			_bundle = ResourceBundle.getBundle(BUNDLE, Locale.getDefault());
 		} catch (final MissingResourceException e) {
-			throw new MissingResourceException("Missing Resource bundle: " + Locale.getDefault() + ' ', LOCALE_RESOURCES_PKG, "");
+			throw new MissingResourceException("Missing Resource bundle: " + Locale.getDefault() + ' ', BUNDLE, "");
 		}
 
 		return _bundle;
 	}
 
 
+	@Nls
 	@SuppressWarnings({"UnusedCatchParameter"})
-	public static String getString(final String key) {
+	public static String getString(@NotNull @PropertyKey(resourceBundle = BUNDLE) final String key, @Nullable Object... params) {
 		try {
 			//noinspection StaticVariableUsedBeforeInitialization
 			if (_bundle == null) {
 				getResourceBundle();
 			}
-			return _bundle.getString(key);
+			String ret = _bundle.getString(key);
+			if (params != null && params.length > 0 && ret.indexOf('{') >= 0) {
+				return MessageFormat.format(ret, params);
+			}
+			return ret;
 		} catch (final MissingResourceException e) {
-			throw new MissingResourceException("Missing Resource: " + Locale.getDefault() + " - key: " + key + "  - resources: " + LOCALE_RESOURCES_PKG, LOCALE_RESOURCES_PKG, key);
+			throw new MissingResourceException("Missing Resource: " + Locale.getDefault() + " - key: " + key + "  - resources: " + BUNDLE, BUNDLE, key);
 		}
 	}
 

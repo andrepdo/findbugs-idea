@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -18,9 +18,9 @@
  */
 package org.twodividedbyzero.idea.findbugs.common.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jsoup.Jsoup;
-
 
 /**
  * $Date$
@@ -29,7 +29,7 @@ import org.jsoup.Jsoup;
  * @version $Revision$
  * @since 0.9.97
  */
-public class StringUtil {
+public class StringUtil extends com.intellij.openapi.util.text.StringUtil { // TODO split
 
 	private StringUtil() {
 	}
@@ -63,5 +63,31 @@ public class StringUtil {
 
 	public static boolean isEmpty(@Nullable final String s) {
 		return null == s || s.trim().isEmpty();
+	}
+
+
+	@NotNull
+	public static String trim(@NotNull String text, @NotNull char... chars) {
+		int len = 0;
+		while (len != text.length()) {
+			len = text.length();
+			final char firstChar = text.charAt(0);
+			for (final char c : chars) {
+				if (c == firstChar) {
+					text = text.substring(1);
+					break;
+				}
+			}
+			if (text.length() > 0) {
+				final char lastChar = text.charAt(text.length() - 1);
+				for (final char c : chars) {
+					if (c == lastChar) {
+						text = text.substring(0, text.length()-1);
+						break;
+					}
+				}
+			}
+		}
+		return text;
 	}
 }

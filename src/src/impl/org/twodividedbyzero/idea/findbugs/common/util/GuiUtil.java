@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -20,6 +20,10 @@ package org.twodividedbyzero.idea.findbugs.common.util;
 
 import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiElement;
+import com.intellij.ui.IdeBorderFactory;
+import com.intellij.ui.TableUtil;
+import com.intellij.ui.border.IdeaTitledBorder;
+import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.UIUtil;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.Detector;
@@ -31,15 +35,25 @@ import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.Box;
 import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.KeyStroke;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -53,29 +67,29 @@ import java.util.Map;
  */
 public final class GuiUtil {
 
-	public static final String DESKTOP_PROPERTY_AWT_FONT_DESKTOP_HINTS = "awt.font.desktophints";
+	private static final String DESKTOP_PROPERTY_AWT_FONT_DESKTOP_HINTS = "awt.font.desktophints";
 	public static final boolean HiDPI;
 	public static final int SCALE_FACTOR;
 
-    static {
-        if (UIUtil.isRetina()) {
-            HiDPI = true;
-        } else {
-            boolean isHiDPI = false;
-            try {
-                // JBUI was introduced with IDEA 14
-                final Class<?> class_JBUI = Class.forName("com.intellij.util.ui.JBUI");
-                final Method method_isHiDPI = class_JBUI.getDeclaredMethod("isHiDPI");
-                isHiDPI = (Boolean)method_isHiDPI.invoke(null);
-            } catch (ClassNotFoundException e) { // ; ignore
-            } catch (NoSuchMethodException e) { // ; ignore
-            } catch (InvocationTargetException e) { // ; ignore
-            } catch (IllegalAccessException e) { // ; ignore
-            }
-            HiDPI = isHiDPI;
-        }
-        SCALE_FACTOR = HiDPI ? 2 : 1;
-    }
+	static {
+		if (UIUtil.isRetina()) {
+			HiDPI = true;
+		} else {
+			boolean isHiDPI = false;
+			try {
+				// JBUI was introduced with IDEA 14
+				final Class<?> class_JBUI = Class.forName("com.intellij.util.ui.JBUI");
+				final Method method_isHiDPI = class_JBUI.getDeclaredMethod("isHiDPI");
+				isHiDPI = (Boolean) method_isHiDPI.invoke(null);
+			} catch (ClassNotFoundException e) { // ; ignore
+			} catch (NoSuchMethodException e) { // ; ignore
+			} catch (InvocationTargetException e) { // ; ignore
+			} catch (IllegalAccessException e) { // ; ignore
+			}
+			HiDPI = isHiDPI;
+		}
+		SCALE_FACTOR = HiDPI ? 2 : 1;
+	}
 
 	private GuiUtil() {
 		throw new UnsupportedOperationException();
@@ -130,22 +144,22 @@ public final class GuiUtil {
 		final int priority = bugInstance.getPriority();
 		final Icon icon;
 		switch (priority) {
-			case Detector.HIGH_PRIORITY :
+			case Detector.HIGH_PRIORITY:
 				icon = GuiResources.PRIORITY_HIGH_ICON;
 				break;
-			case Detector.NORMAL_PRIORITY :
+			case Detector.NORMAL_PRIORITY:
 				icon = GuiResources.PRIORITY_NORMAL_ICON;
 				break;
-			case Detector.LOW_PRIORITY :
+			case Detector.LOW_PRIORITY:
 				icon = GuiResources.PRIORITY_LOW_ICON;
 				break;
-			case Detector.EXP_PRIORITY :
+			case Detector.EXP_PRIORITY:
 				icon = GuiResources.PRIORITY_EXP_ICON;
 				break;
-			case Detector.IGNORE_PRIORITY :
+			case Detector.IGNORE_PRIORITY:
 			default:
 				icon = GuiResources.PRIORITY_HIGH_ICON;
-			break;
+				break;
 
 		}
 		return icon;
@@ -160,22 +174,22 @@ public final class GuiUtil {
 		final int priority = bugInstance.getPriority();
 		final Icon icon;
 		switch (priority) {
-			case Detector.HIGH_PRIORITY :
+			case Detector.HIGH_PRIORITY:
 				icon = ResourcesLoader.loadIcon("priority/bug_high_tiny.png");
 				break;
-			case Detector.NORMAL_PRIORITY :
+			case Detector.NORMAL_PRIORITY:
 				icon = ResourcesLoader.loadIcon("priority/bug_normal_tiny.png");
 				break;
-			case Detector.LOW_PRIORITY :
+			case Detector.LOW_PRIORITY:
 				icon = ResourcesLoader.loadIcon("priority/bug_low_tiny.png");
 				break;
-			case Detector.EXP_PRIORITY :
+			case Detector.EXP_PRIORITY:
 				icon = ResourcesLoader.loadIcon("priority/bug_exp_tiny.png");
 				break;
-			case Detector.IGNORE_PRIORITY :
+			case Detector.IGNORE_PRIORITY:
 			default:
 				icon = ResourcesLoader.loadIcon("priority/bug_high_tiny.png");
-			break;
+				break;
 
 		}
 		return icon;
@@ -190,22 +204,22 @@ public final class GuiUtil {
 		final int priority = bugInstance.getPriority();
 		final Icon icon;
 		switch (priority) {
-			case Detector.HIGH_PRIORITY :
+			case Detector.HIGH_PRIORITY:
 				icon = ResourcesLoader.loadIcon("intentions/bugBulbHigh.png");
 				break;
-			case Detector.NORMAL_PRIORITY :
+			case Detector.NORMAL_PRIORITY:
 				icon = ResourcesLoader.loadIcon("intentions/bugBulbNormal.png");
 				break;
-			case Detector.LOW_PRIORITY :
+			case Detector.LOW_PRIORITY:
 				icon = ResourcesLoader.loadIcon("intentions/bugBulbLow.png");
 				break;
-			case Detector.EXP_PRIORITY :
+			case Detector.EXP_PRIORITY:
 				icon = ResourcesLoader.loadIcon("intentions/bugBulbExt.png");
 				break;
-			case Detector.IGNORE_PRIORITY :
+			case Detector.IGNORE_PRIORITY:
 			default:
 				icon = ResourcesLoader.loadIcon("intentions/bugBulbHigh.png");
-			break;
+				break;
 
 		}
 		return icon;
@@ -224,6 +238,51 @@ public final class GuiUtil {
 		for (final Component component : components) {
 			ret.add(component);
 		}
+		return ret;
+	}
+
+
+	@NotNull
+	public static IdeaTitledBorder createTitledBorder(@NotNull final String title) {
+		return IdeBorderFactory.createTitledBorder(title, true,
+				new Insets(IdeBorderFactory.TITLED_BORDER_TOP_INSET,
+						0,
+						IdeBorderFactory.TITLED_BORDER_BOTTOM_INSET,
+						IdeBorderFactory.TITLED_BORDER_RIGHT_INSET));
+	}
+
+
+	@NotNull
+	public static JBTable createCheckboxTable(
+			@NotNull final TableModel model,
+			final int checkboxColumn,
+			@NotNull final ActionListener swapEnabled
+	) {
+		final JBTable ret = new JBTable();
+		ret.setModel(model);
+		ret.setShowGrid(false);
+		ret.setIntercellSpacing(new Dimension(0, 0));
+		ret.setTableHeader(null);
+		ret.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+		ret.setColumnSelectionAllowed(false);
+		final TableColumnModel columnModel = ret.getColumnModel();
+		final TableColumn column = columnModel.getColumn(checkboxColumn);
+		TableUtil.setupCheckboxColumn(column);
+		ret.registerKeyboardAction(
+				new ActionListener() {
+					@Override
+					public void actionPerformed(@NotNull final ActionEvent e) {
+						final int[] rows = ret.getSelectedRows();
+						if (rows.length > 0) {
+							swapEnabled.actionPerformed(e);
+							final int lastRow = rows[rows.length-1];
+							ret.setRowSelectionInterval(lastRow, lastRow);
+						}
+					}
+				},
+				KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0),
+				JComponent.WHEN_FOCUSED
+		);
 		return ret;
 	}
 }

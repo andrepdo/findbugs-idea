@@ -103,6 +103,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 		storages = {
 				@Storage(id = "other", file = "$PROJECT_FILE$"),
 				@Storage(id = "dir", file = "$PROJECT_CONFIG_DIR$/findbugs-idea.xml", scheme = StorageScheme.DIRECTORY_BASED)})
+@Deprecated
 public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, SearchableConfigurable, PersistentStateComponent<PersistencePreferencesBean> {
 
 	// idea_home/bin/log.xml

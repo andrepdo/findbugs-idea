@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2008-2015 Andre Pfeiler
+  ~ Copyright 2008-2016 Andre Pfeiler
   ~
   ~ This file is part of FindBugs-IDEA.
   ~
@@ -278,8 +278,7 @@
     </change-notes>
     <id>FindBugs-IDEA</id>
     <version>@VERSION@</version>
-    <vendor logo="/org/twodividedbyzero/idea/findbugs/resources/icons/fb-idea-logo_16x16.png"
-            email="see@https://github.com/andrepdo" url="https://github.com/andrepdo">Andre Pfeiler
+    <vendor email="see@https://github.com/andrepdo" url="https://github.com/andrepdo">Andre Pfeiler
     </vendor>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html
@@ -293,6 +292,20 @@
     <!--<helpset file="your-help.jar" path="path-to-helpset.hs"/>-->
     <resource-bundle>org.twodividedbyzero.idea.findbugs.resources.i18n.Messages</resource-bundle>
     <extensions defaultExtensionNs="com.intellij">
+        <toolWindow anchor="bottom" id="FindBugs-IDEA" icon="/org/twodividedbyzero/idea/findbugs/resources/icons/bug13x13.png"
+                    factoryClass="org.twodividedbyzero.idea.findbugs.core.ToolWindowFactoryImpl"/>
+
+        <projectService serviceImplementation="org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings"/>
+        <projectService serviceImplementation="org.twodividedbyzero.idea.findbugs.core.ProjectSettings"/>
+        <projectConfigurable provider="org.twodividedbyzero.idea.findbugs.core.ProjectConfigurableProvider"
+                             displayName="FindBugs-IDEA"/>
+
+        <moduleService serviceImplementation="org.twodividedbyzero.idea.findbugs.core.ModuleSettings"/>
+        <moduleConfigurable provider="org.twodividedbyzero.idea.findbugs.core.ModuleConfigurableProvider"
+                            displayName="FindBugs-IDEA"/>
+    </extensions>
+
+    <!--<extensions defaultExtensionNs="com.intellij">
         <errorHandler implementation="org.twodividedbyzero.idea.findbugs.core.ErrorReportSubmitterImpl"/>
         <annotator language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugAnnotator"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugsLineMarkerProvider"/>
@@ -310,9 +323,6 @@
             <implementation-class>org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl</implementation-class>
             <interface-class>org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin</interface-class>
         </component>
-        <!--<component>
-            <implementation-class>org.twodividedbyzero.idea.findbugs.gui.editor.EditorHandler</implementation-class>
-        </component>-->
         <component>
             <implementation-class>org.twodividedbyzero.idea.findbugs.core.FindBugsCompileAfterHook
             </implementation-class>
@@ -323,7 +333,7 @@
             <implementation-class>org.twodividedbyzero.idea.findbugs.core.ModuleComponentImpl</implementation-class>
             <interface-class>org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin</interface-class>
         </component>
-    </module-components>
+    </module-components>-->
 
     <actions>
         <group id="FindBugs.EditorPopup" text="FindBugs" popup="true">

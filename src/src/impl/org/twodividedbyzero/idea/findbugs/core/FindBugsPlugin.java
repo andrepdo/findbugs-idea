@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -41,6 +41,7 @@ import java.util.Map;
  * @version $Revision$
  * @since 0.9.29-dev
  */
+@Deprecated
 public interface FindBugsPlugin extends Configurable, PersistentStateComponent<PersistencePreferencesBean> {
 
 	/**

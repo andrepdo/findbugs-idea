@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.preferences;
 
 import java.util.ArrayList;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 /**
  * $Date$
  *
@@ -35,6 +33,7 @@ import java.util.Set;
  * @version $Revision$
  * @since 0.9.90-dev
  */
+@Deprecated
 public class PersistencePreferencesBean {
 	public static final String PERSISTENCE_ROOT_NAME = "findbugs";
 

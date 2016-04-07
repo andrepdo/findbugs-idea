@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -19,39 +19,68 @@
 package org.twodividedbyzero.idea.findbugs.preferences;
 
 import edu.umd.cs.findbugs.config.UserPreferences;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.PropertyKey;
+import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import java.util.Locale;
 
 
 /**
- * $Date$
- *
- * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
- * @since 0.9.9-dev
+ * @see UserPreferences#setEffort(String)
  */
-public enum AnalysisEffort {
+public enum AnalysisEffort { // TODO Cleanup unused
 
-	MIN(UserPreferences.EFFORT_MIN, "Minimal", 10),
-	DEFAULT(UserPreferences.EFFORT_DEFAULT, "Default", 20),
-	MAX(UserPreferences.EFFORT_MAX, "Maximal", 30);
+	MIN(UserPreferences.EFFORT_MIN, "effort.minimal", "Minimal", 10),
+	DEFAULT(UserPreferences.EFFORT_DEFAULT, "effort.default", "Default", 20),
+	MAX(UserPreferences.EFFORT_MAX, "effort.maximal", "Maximal", 30);
 
-	private final String _effortLevel;
-	private final String _message;
-	private final int _value;
+	@NotNull
+	private final String effortLevel;
+
+	@NotNull
+	private final String propertyKey;
+
+	@Deprecated
+	private final String message;
+
+	@Deprecated
+	private final int value;
 
 
-	AnalysisEffort(final String effortLevel, final String message, final int value) {
-		_effortLevel = effortLevel;
-		_message = message;
-		_value = value;
+	AnalysisEffort(
+			@NotNull final String effortLevel,
+			@NotNull @PropertyKey(resourceBundle = ResourcesLoader.BUNDLE) String propertyKey,
+			final String message,
+			final int value
+	) {
+		this.effortLevel = effortLevel;
+		this.propertyKey = propertyKey;
+		this.message = message;
+		this.value = value;
 	}
 
 
+	@NotNull
 	public String getEffortLevel() {
-		return _effortLevel;
+		return effortLevel;
 	}
 
+
+	public String getText() {
+		return ResourcesLoader.getString(propertyKey);
+	}
+
+	@NotNull
+	public static AnalysisEffort of(@Nullable final String value) {
+		for (final AnalysisEffort effort : values()) {
+			if (effort.effortLevel.equalsIgnoreCase(value)) {
+				return effort;
+			}
+		}
+		return AnalysisEffort.DEFAULT;
+	}
 
 	public static AnalysisEffort valueOfLevel(final String effortLevel) {
 		return valueOf(effortLevel.toUpperCase(Locale.ENGLISH));
@@ -59,33 +88,26 @@ public enum AnalysisEffort {
 
 
 	public String getMessage() {
-		return _message;
-	}
-
-
-	@Override
-	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append("AnalysisEffort");
-		sb.append("{_effortLevel='").append(_effortLevel).append('\'');
-		sb.append(", _message='").append(_message).append('\'');
-		sb.append(", _value=").append(_value);
-		sb.append('}');
-		return sb.toString();
+		return message;
 	}
 
 
 	public int getValue() {
-		return _value;
+		return value;
 	}
 
 
 	public static String getEffortLevelByValue(final int value) {
 		for (final AnalysisEffort effort : AnalysisEffort.values()) {
-			if(effort.getValue() == value) {
+			if (effort.getValue() == value) {
 				return effort.getEffortLevel();
 			}
 		}
 		return AnalysisEffort.DEFAULT.getEffortLevel();
+	}
+
+	@Override
+	public String toString() {
+		return getText();
 	}
 }

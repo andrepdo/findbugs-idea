@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -65,6 +65,7 @@ import java.util.Map.Entry;
 		name = FindBugsPluginConstants.PLUGIN_ID,
 		storages = {@Storage(id = "other", file = "$MODULE_FILE$")
 					/*@Storage(id = "dir", file = "$PROJECT_CONFIG_DIR$/findbugs-idea.xml", scheme = StorageScheme.DIRECTORY_BASED)*/})
+@Deprecated
 public class ModuleComponentImpl implements FindBugsPlugin, ModuleComponent, Configurable, PersistentStateComponent<PersistencePreferencesBean> {
 
 	private static final Logger LOGGER = Logger.getInstance(FindBugsPluginImpl.class.getName());
