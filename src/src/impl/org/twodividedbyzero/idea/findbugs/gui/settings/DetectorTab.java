@@ -46,6 +46,7 @@ final class DetectorTab extends JPanel implements SettingsOwner<AbstractSettings
 
 	DetectorTab() {
 		super(new BorderLayout());
+		setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
 		final JPanel hintPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		hintPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 0));

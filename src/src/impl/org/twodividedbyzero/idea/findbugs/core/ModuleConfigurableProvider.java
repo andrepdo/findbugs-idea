@@ -23,6 +23,7 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurableProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.gui.settings.ModuleConfigurableImpl;
 
 public final class ModuleConfigurableProvider extends ConfigurableProvider {
 	@NotNull

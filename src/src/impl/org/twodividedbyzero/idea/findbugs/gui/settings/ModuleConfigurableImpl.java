@@ -16,35 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.twodividedbyzero.idea.findbugs.core;
+package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
+import org.twodividedbyzero.idea.findbugs.core.ModuleSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
-import java.awt.FlowLayout;
 
 public final class ModuleConfigurableImpl implements Configurable {
 
 	@NotNull
-	private final Module module;
 	private final ModuleSettings settings;
-	private JPanel panel;
-	private JCheckBox overrideProjectSettings;
-	private JCheckBox compileBeforeAnalyse;
 
-	public ModuleConfigurableImpl( @NotNull final Module module) {
-		this.module = module;
+	private SettingsPane pane;
+
+	public ModuleConfigurableImpl(@NotNull final Module module) {
 		settings = ModuleSettings.getInstance(module);
-		System.out.println();
 	}
 
 	@Nls
@@ -56,44 +51,56 @@ public final class ModuleConfigurableImpl implements Configurable {
 	@Nullable
 	@Override
 	public String getHelpTopic() {
-		return FindBugsPluginConstants.FINDBUGS_EXTERNAL_HELP_URI;
+		return null;
 	}
 
 	@Nullable
 	@Override
 	public JComponent createComponent() {
-		if (panel == null) {
-			overrideProjectSettings = new JCheckBox("Override Project Settings");
-			compileBeforeAnalyse = new JCheckBox("Compile before analyze");
-			panel = new JPanel(new FlowLayout());
-			panel.add(overrideProjectSettings);
-			panel.add(compileBeforeAnalyse);
+		if (pane == null) {
+			pane = new SettingsPane() {
+				@NotNull
+				@Override
+				GeneralTab createGeneralTab() {
+					return new GeneralTab(false);
+				}
+
+				@Nullable
+				@Override
+				ShareTab createShareTab() {
+					return null;
+				}
+
+				@NotNull
+				@Override
+				AbstractSettings createSettings() {
+					return new ModuleSettings();
+				}
+			};
 		}
-		return panel;
+		return pane;
 	}
 
 	@Override
 	public boolean isModified() {
-		return settings.overrideProjectSettings != overrideProjectSettings.isSelected() ||
-				settings.compileBeforeAnalyze != compileBeforeAnalyse.isSelected();
+		return pane.isModified(settings);
 	}
 
 	@Override
 	public void apply() throws ConfigurationException {
-		settings.overrideProjectSettings = overrideProjectSettings.isSelected();
-		settings.compileBeforeAnalyze = compileBeforeAnalyse.isSelected();
+		pane.apply(settings);
 	}
 
 	@Override
 	public void reset() {
-		overrideProjectSettings.setSelected(settings.overrideProjectSettings);
-		compileBeforeAnalyse.setSelected(settings.compileBeforeAnalyze);
+		pane.reset(settings);
 	}
 
 	@Override
 	public void disposeUIResources() {
-		panel = null;
-		overrideProjectSettings = null;
-		compileBeforeAnalyse = null;
+		if (pane != null) {
+			Disposer.dispose(pane);
+			pane = null;
+		}
 	}
 }

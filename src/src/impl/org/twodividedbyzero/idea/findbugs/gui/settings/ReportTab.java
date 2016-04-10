@@ -25,7 +25,9 @@ import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.HAlignment;
 import org.twodividedbyzero.idea.findbugs.gui.common.VAlignment;
 import org.twodividedbyzero.idea.findbugs.gui.common.VerticalFlowLayout;
+import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 
@@ -38,6 +40,7 @@ final class ReportTab extends JPanel implements SettingsOwner<AbstractSettings> 
 
 	ReportTab() {
 		super(new VerticalFlowLayout(HAlignment.Left, VAlignment.Top, 0, UIUtil.DEFAULT_HGAP, true, false));
+		setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 		add(getAnalysisEffort());
 		add(getMinRank());
 		add(getMinPriority());
@@ -101,5 +104,27 @@ final class ReportTab extends JPanel implements SettingsOwner<AbstractSettings> 
 		getMinRank().reset(settings);
 		getMinPriority().reset(settings);
 		getBugCategory().reset(settings);
+	}
+
+	@NotNull
+	static String getSearchPath() {
+		return ResourcesLoader.getString("settings.report");
+	}
+
+	@NotNull
+	static String[] getSearchResourceKey() {
+		return new String[]{
+				// AnalysisEffortPane
+				"effort.text",
+				"effort.description",
+				// MinRankPane
+				"minRank.text",
+				"minRank.description",
+				// MinPriorityPane
+				"minPriority.text",
+				"minPriority.description",
+				// BugCategoryPane
+				"bugCategory.title"
+		};
 	}
 }

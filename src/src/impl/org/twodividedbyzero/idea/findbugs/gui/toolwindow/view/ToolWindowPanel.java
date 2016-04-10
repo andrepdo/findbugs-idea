@@ -23,6 +23,7 @@ import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.diagnostic.IdeMessagePanel;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
+import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.ActionGroup;
@@ -49,9 +50,6 @@ import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
-import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.gui.common.ActionToolbarContainer;
 import org.twodividedbyzero.idea.findbugs.gui.common.AnalysisRunDetailsDialog;
@@ -77,7 +75,6 @@ import java.awt.event.ComponentListener;
 import java.util.List;
 import java.util.Map;
 
-
 /**
  * $Date$
  *
@@ -88,6 +85,12 @@ import java.util.Map;
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SE_BAD_FIELD"})
 public final class ToolWindowPanel extends JPanel implements AnalysisStateListener {
 
+	private static final String NOTIFICATION_GROUP_ID_ANALYSIS_FINISHED = "FindBugs: Analysis Finished";
+	private static final NotificationGroup NOTIFICATION_GROUP_ANALYSIS_FINISHED = NotificationGroup.toolWindowGroup(
+			NOTIFICATION_GROUP_ID_ANALYSIS_FINISHED,
+			FindBugsPluginConstants.TOOL_WINDOW_ID,
+			false
+	);
 	private static final Logger LOGGER = Logger.getInstance(ToolWindowPanel.class.getName());
 
 	private static final String A_HREF_MORE_ANCHOR = "#more";
@@ -116,7 +119,7 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 	public ToolWindowPanel(@NotNull final Project project, final ToolWindow parent) {
 		_project = project;
 		_parent = parent;
-		checkFindBugsPlugin();
+		installListeners();
 		initGui();
 		MessageBusManager.subscribeAnalysisState(project, this, this);
 		MessageBusManager.subscribe(project, this, ClearListener.TOPIC, new ClearListener() {
@@ -250,15 +253,6 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 	}
 
 
-	private void checkFindBugsPlugin() {
-		final FindBugsPlugin findBugsPlugin = IdeaUtilImpl.getPluginComponent(_project);
-		installListeners();
-		if (findBugsPlugin == null) {
-			throw new IllegalStateException("Couldn't get " + FindBugsPluginConstants.TOOL_WINDOW_ID + " plugin");
-		}
-	}
-
-
 	public Project getProject() {
 		return _project;
 	}
@@ -349,7 +343,7 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 			final StatusBarWidget widget = statusBar.getWidget(IdeMessagePanel.FATAL_ERROR);
 			IdeMessagePanel ideMessagePanel = null; // openFatals like ErrorNotifier
 			if (widget instanceof IdeMessagePanel) {
-				ideMessagePanel = (IdeMessagePanel)widget;
+				ideMessagePanel = (IdeMessagePanel) widget;
 				errorText = "<a href='" + A_HREF_ERROR_ANCHOR + "'>" + errorText + "</a>";
 			}
 
@@ -359,7 +353,7 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 			BalloonTipFactory.showToolWindowErrorNotifier(_project, message.toString(), new BalloonErrorListenerImpl(ToolWindowPanel.this, _bugsProject, ideMessagePanel));
 		} else {
 			message.append("<a href='").append(A_HREF_DISABLE_ANCHOR).append("'>Disable notification").append("</a>");
-			FindBugsPluginImpl.NOTIFICATION_GROUP_ANALYSIS_FINISHED.createNotification(
+			NOTIFICATION_GROUP_ANALYSIS_FINISHED.createNotification(
 					VersionManager.getName() + ": Analysis Finished",
 					message.toString(),
 					notificationType,
@@ -488,13 +482,13 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 							_toolWindowPanel.getProject(),
 							"Notification will be disabled for all projects.\n\n" +
 									"Settings | Appearance & Behavior | Notifications | " +
-									FindBugsPluginImpl.NOTIFICATION_GROUP_ID_ANALYSIS_FINISHED +
+									NOTIFICATION_GROUP_ID_ANALYSIS_FINISHED +
 									"\ncan be used to configure the notification.",
 							"FindBugs Analysis Finished Notification",
 							"Disable Notification", CommonBundle.getCancelButtonText(), Messages.getWarningIcon());
 					if (result == Messages.YES) {
 						NotificationUtil.getNotificationsConfigurationImpl().changeSettings(
-								FindBugsPluginImpl.NOTIFICATION_GROUP_ID_ANALYSIS_FINISHED,
+								NOTIFICATION_GROUP_ID_ANALYSIS_FINISHED,
 								NotificationDisplayType.NONE, false, false);
 						notification.expire();
 					} else {

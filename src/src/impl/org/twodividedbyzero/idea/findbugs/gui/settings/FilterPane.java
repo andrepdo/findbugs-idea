@@ -18,6 +18,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
+import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -29,7 +30,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.AnActionButtonRunnable;
 import com.intellij.ui.ScrollPaneFactory;
-import com.intellij.ui.TableUtil;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
@@ -42,13 +42,9 @@ import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -128,7 +124,7 @@ final class FilterPane extends JPanel {
 		descriptor.withFileFilter(new Condition<VirtualFile>() {
 			@Override
 			public boolean value(final VirtualFile virtualFile) {
-				return "xml".equalsIgnoreCase(virtualFile.getExtension());
+				return XmlFileType.DEFAULT_EXTENSION.equalsIgnoreCase(virtualFile.getExtension());
 			}
 		});
 
@@ -169,8 +165,37 @@ final class FilterPane extends JPanel {
 
 	void apply(@NotNull final Map<String, Boolean> map) throws ConfigurationException {
 		map.clear();
+		StringBuilder error = null;
 		for (final Item row : getModel().rows) {
+			final File file = new File(row.path);
+			if (!file.exists()) {
+				if (error == null) {
+					error = new StringBuilder();
+				} else {
+					error.append("\n");
+				}
+				error.append(ResourcesLoader.getString("error.path.exists", row.path));
+			}
+			if (!file.isFile()) {
+				if (error == null) {
+					error = new StringBuilder();
+				} else {
+					error.append("\n");
+				}
+				error.append(ResourcesLoader.getString("error.path.type", row.path));
+			}
+			if (!file.canRead()) {
+				if (error == null) {
+					error = new StringBuilder();
+				} else {
+					error.append("\n");
+				}
+				error.append(ResourcesLoader.getString("error.file.readable", row.path));
+			}
 			map.put(row.path, row.enabled);
+		}
+		if (error != null) {
+			throw new ConfigurationException(error.toString());
 		}
 	}
 

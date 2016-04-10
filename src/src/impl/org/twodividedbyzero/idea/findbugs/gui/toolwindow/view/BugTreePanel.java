@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -52,7 +52,6 @@ import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.GroupTreeModel;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.RootNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.BugTree;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -65,7 +64,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
 
 /**
  * $Date$
@@ -85,7 +83,6 @@ public class BugTreePanel extends JPanel {
 
 	private final RootNode _visibleRootNode;
 	private final GroupTreeModel _treeModel;
-	private final FindBugsPreferences _preferences;
 	private SortedBugCollection _bugCollection;
 	private GroupBy[] _groupBy;
 	private final ToolWindowPanel _parent;
@@ -94,12 +91,11 @@ public class BugTreePanel extends JPanel {
 	private boolean _bugPreviewEnabled;
 
 
-	public BugTreePanel(@NotNull final ToolWindowPanel parent, @NotNull final Project project) {
+	BugTreePanel(@NotNull final ToolWindowPanel parent, @NotNull final Project project) {
 		setLayout(new BorderLayout());
 
 		_parent = parent;
 		_project = project;
-		_preferences = IdeaUtilImpl.getPluginComponent(project).getPreferences();
 		_groupBy = GroupBy.getSortOrderGroup(GroupBy.BugCategory); // default sort oder group
 
 		_visibleRootNode = new RootNode(_project.getName());
@@ -147,21 +143,14 @@ public class BugTreePanel extends JPanel {
 	}
 
 
-	GroupTreeModel getTreeModel() {
+	private GroupTreeModel getTreeModel() {
 		return _treeModel;
-	}
-
-
-	boolean isHiddenBugGroup(final BugInstance node) {
-		final Map<String, String> categories = _preferences.getBugCategories();
-		final String category = node.getBugPattern().getCategory();
-		return categories.containsKey(category) && "false".equals(categories.get(category));
 	}
 
 
 	private static void scrollToPreviewSource(final BugInstanceNode bugInstanceNode, final Editor editor) {
 		final int line = bugInstanceNode.getSourceLines()[0] - 1;
-		if(line >= 0) {
+		if (line >= 0) {
 			final LogicalPosition problemPos = new LogicalPosition(line, 0);
 			editor.getCaretModel().moveToLogicalPosition(problemPos);
 		} else { // anonymous classes
@@ -172,9 +161,9 @@ public class BugTreePanel extends JPanel {
 	}
 
 
-	public void setPreviewEnabled(final boolean enabled) {
+	void setPreviewEnabled(final boolean enabled) {
 		_bugPreviewEnabled = enabled;
-		if(enabled) {
+		if (enabled) {
 			setPreview(getBugTree().getSelectionPath());
 		}
 	}
@@ -225,7 +214,7 @@ public class BugTreePanel extends JPanel {
 		final int lineEnd = bugInstanceNode.getSourceLines()[1];
 		PsiElement element = null;
 
-		if(lineStart < 0 && lineEnd < 0) {   // find anonymous classes
+		if (lineStart < 0 && lineEnd < 0) {   // find anonymous classes
 			final PsiElement psiElement = IdeaUtilImpl.findAnonymousClassPsiElement(bugInstanceNode, _project);
 			if (psiElement != null) {
 				element = psiElement;
@@ -241,7 +230,7 @@ public class BugTreePanel extends JPanel {
 			marker = document.createRangeMarker(document.getLineStartOffset(lineStart), document.getLineEndOffset(lineEnd));
 		}
 
-		if(marker != null) {
+		if (marker != null) {
 			editor.getMarkupModel().addRangeHighlighter(marker.getStartOffset(), marker.getEndOffset(), HighlighterLayer.FIRST - 1, new TextAttributes(null, null, JBColor.RED, EffectType.BOXED, Font.BOLD), HighlighterTargetArea.EXACT_RANGE);
 		}
 
@@ -292,13 +281,17 @@ public class BugTreePanel extends JPanel {
 	}
 
 
-	/** Collapse the tree so that only the root node is visible. */
+	/**
+	 * Collapse the tree so that only the root node is visible.
+	 */
 	public void collapseTree() {
 		_bugTree.getTreeHelper().collapseTree();
 	}
 
 
-	/** Expand the error tree to the fullest. */
+	/**
+	 * Expand the error tree to the fullest.
+	 */
 	public void expandTree() {
 		_bugTree.getTreeHelper().expandTree(3);
 	}
@@ -356,7 +349,7 @@ public class BugTreePanel extends JPanel {
 	}
 
 
-	public void adaptSize(final int width, final int height) {
+	void adaptSize(final int width, final int height) {
 		//final int newWidth = (int) (width * _splitPaneHorizontalWeight);
 		setPreferredSize(new Dimension(width, height));
 		setSize(new Dimension(width, height));
@@ -382,6 +375,4 @@ public class BugTreePanel extends JPanel {
 	public GroupTreeModel getGroupModel() {
 		return (GroupTreeModel) _bugTree.getModel();
 	}
-
-
 }

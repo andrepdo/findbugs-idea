@@ -299,6 +299,7 @@
         <projectService serviceImplementation="org.twodividedbyzero.idea.findbugs.core.ProjectSettings"/>
         <projectConfigurable provider="org.twodividedbyzero.idea.findbugs.core.ProjectConfigurableProvider"
                              displayName="FindBugs-IDEA"/>
+        <search.optionContributor implementation="org.twodividedbyzero.idea.findbugs.gui.settings.SearchableOptionContributorImpl"/>
 
         <moduleService serviceImplementation="org.twodividedbyzero.idea.findbugs.core.ModuleSettings"/>
         <moduleConfigurable provider="org.twodividedbyzero.idea.findbugs.core.ModuleConfigurableProvider"

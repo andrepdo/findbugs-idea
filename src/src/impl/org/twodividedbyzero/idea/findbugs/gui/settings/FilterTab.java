@@ -22,6 +22,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
@@ -33,6 +34,7 @@ final class FilterTab extends JPanel implements SettingsOwner<AbstractSettings> 
 
 	FilterTab() {
 		super(new BorderLayout());
+		setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
 		include = new FilterPane("filter.include.title");
 		exclude = new FilterPane("filter.exclude.title");

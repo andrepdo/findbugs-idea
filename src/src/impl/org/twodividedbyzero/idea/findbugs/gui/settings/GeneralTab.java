@@ -22,6 +22,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.HAlignment;
 import org.twodividedbyzero.idea.findbugs.gui.common.VAlignment;
@@ -31,7 +32,7 @@ import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 
-final class GeneralTab extends JPanel implements SettingsOwner<ProjectSettings> {
+final class GeneralTab extends JPanel implements SettingsOwner<AbstractSettings> {
 	private JBCheckBox compileBeforeAnalyze;
 	private JBCheckBox analyzeAfterCompile;
 	private JBCheckBox analyzeAfterAutoMake;
@@ -39,14 +40,16 @@ final class GeneralTab extends JPanel implements SettingsOwner<ProjectSettings> 
 	private JBCheckBox toolWindowToFront;
 	private PluginTablePane plugin;
 
-	GeneralTab() {
+	GeneralTab(final boolean addPlugin) {
 		super(new BorderLayout());
 		compileBeforeAnalyze = new JBCheckBox(ResourcesLoader.getString("general.compileBeforeAnalyze.title"));
 		analyzeAfterCompile = new JBCheckBox(ResourcesLoader.getString("general.analyzeAfterCompile.title"));
 		analyzeAfterAutoMake = new JBCheckBox(ResourcesLoader.getString("general.analyzeAfterAutoMake.title"));
 		runInBackground = new JBCheckBox(ResourcesLoader.getString("general.runInBackground.title"));
 		toolWindowToFront = new JBCheckBox(ResourcesLoader.getString("general.toolWindowToFront.title"));
-		plugin = new PluginTablePane();
+		if (addPlugin) {
+			plugin = new PluginTablePane();
+		}
 
 		final JPanel topPane = new JPanel(new VerticalFlowLayout(HAlignment.Left, VAlignment.Top, 0, UIUtil.DEFAULT_VGAP, false, false));
 		topPane.add(compileBeforeAnalyze);
@@ -56,7 +59,9 @@ final class GeneralTab extends JPanel implements SettingsOwner<ProjectSettings> 
 		topPane.add(toolWindowToFront);
 
 		add(topPane, BorderLayout.NORTH);
-		add(plugin);
+		if (plugin != null) {
+			add(plugin);
+		}
 	}
 
 	@Override
@@ -67,35 +72,58 @@ final class GeneralTab extends JPanel implements SettingsOwner<ProjectSettings> 
 		analyzeAfterAutoMake.setEnabled(enabled);
 		runInBackground.setEnabled(enabled);
 		toolWindowToFront.setEnabled(enabled);
+		if (plugin != null) {
+			plugin.setEnabled(enabled);
+		}
 	}
 
 	@Override
-	public boolean isModified(@NotNull final ProjectSettings settings) {
+	public boolean isModified(@NotNull final AbstractSettings settings) {
 		return compileBeforeAnalyze.isSelected() != settings.compileBeforeAnalyze ||
 				analyzeAfterCompile.isSelected() != settings.analyzeAfterCompile ||
 				analyzeAfterAutoMake.isSelected() != settings.analyzeAfterAutoMake ||
 				runInBackground.isSelected() != settings.runInBackground ||
 				toolWindowToFront.isSelected() != settings.toolWindowToFront ||
-				plugin.isModified(settings);
+				(settings instanceof ProjectSettings && plugin != null && plugin.isModified((ProjectSettings) settings));
 	}
 
 	@Override
-	public void apply(@NotNull final ProjectSettings settings) throws ConfigurationException {
+	public void apply(@NotNull final AbstractSettings settings) throws ConfigurationException {
 		settings.compileBeforeAnalyze = compileBeforeAnalyze.isSelected();
 		settings.analyzeAfterCompile = analyzeAfterCompile.isSelected();
 		settings.analyzeAfterAutoMake = analyzeAfterAutoMake.isSelected();
 		settings.runInBackground = runInBackground.isSelected();
 		settings.toolWindowToFront = toolWindowToFront.isSelected();
-		plugin.apply(settings);
+		if (settings instanceof ProjectSettings && plugin != null) {
+			plugin.apply((ProjectSettings) settings);
+		}
 	}
 
 	@Override
-	public void reset(@NotNull final ProjectSettings settings) {
+	public void reset(@NotNull final AbstractSettings settings) {
 		compileBeforeAnalyze.setSelected(settings.compileBeforeAnalyze);
 		analyzeAfterCompile.setSelected(settings.analyzeAfterCompile);
 		analyzeAfterAutoMake.setSelected(settings.analyzeAfterAutoMake);
 		runInBackground.setSelected(settings.runInBackground);
 		toolWindowToFront.setSelected(settings.toolWindowToFront);
-		plugin.reset(settings);
+		if (settings instanceof ProjectSettings && plugin != null) {
+			plugin.reset((ProjectSettings) settings);
+		}
+	}
+
+	@NotNull
+	static String getSearchPath() {
+		return ResourcesLoader.getString("settings.general");
+	}
+
+	@NotNull
+	static String[] getSearchResourceKey() {
+		return new String[]{
+				"general.compileBeforeAnalyze.title",
+				"general.analyzeAfterCompile.title",
+				"general.analyzeAfterAutoMake.title",
+				"general.runInBackground.title",
+				"general.toolWindowToFront.title"
+		};
 	}
 }

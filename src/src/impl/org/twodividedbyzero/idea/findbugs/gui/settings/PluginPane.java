@@ -82,17 +82,18 @@ final class PluginPane extends JPanel {
 		add(bottom, BorderLayout.SOUTH);
 	}
 
+	// TODO load error
 	void load(@NotNull final PluginInfo plugin) {
-		title.setText(plugin.getTitle());
-		id.setText("(" + plugin.getId() + ")");
-		text.setText(normalize(plugin.getText()));
+		title.setText(plugin.shortDescription);
+		id.setText("(" + plugin.settings.id + ")");
+		text.setText(normalize(plugin.detailedDescription));
 		bottom.remove(website);
-		if (!StringUtil.isEmptyOrSpaces(plugin.getWebsite())) {
+		if (!StringUtil.isEmptyOrSpaces(plugin.website)) {
 			bottom.add(website, BorderLayout.NORTH);
 			website.setVisible(true);
-			website.setText(plugin.getWebsite());
+			website.setText(plugin.website);
 		}
-		url.setText(plugin.getUrl());
+		url.setText(plugin.settings.path);
 	}
 
 	@NotNull

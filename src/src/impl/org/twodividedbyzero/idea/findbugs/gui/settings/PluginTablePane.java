@@ -18,16 +18,30 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.Condition;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.VfsUtilCore;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.AnActionButton;
+import com.intellij.ui.AnActionButtonRunnable;
 import com.intellij.ui.ScrollPaneFactory;
+import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
 import edu.umd.cs.findbugs.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
+import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
-import org.twodividedbyzero.idea.findbugs.plugins.AbstractPluginLoader;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JPanel;
@@ -40,10 +54,13 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collections;
+import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSettings> {
+	private static final Logger LOGGER = Logger.getInstance(PluginTablePane.class);
+
 	private JBTable table;
 	private JScrollPane scrollPane;
 	private String lastPluginError;
@@ -53,7 +70,7 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 		setBorder(GuiUtil.createTitledBorder(ResourcesLoader.getString("plugins.title")));
 		table = new JBTable();
 		table = GuiUtil.createCheckboxTable(
-				new Model(New.<Item>arrayList()),
+				new Model(New.<PluginInfo>arrayList()),
 				Model.IS_ENABLED_COLUMN,
 				new ActionListener() {
 					@Override
@@ -66,18 +83,37 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 		//table.setRowSelectionAllowed(false);
 		table.getColumnModel().getColumn(Model.NAME_COLUMN).setCellRenderer(new TableCellRenderer() {
 			private PluginPane pane;
+
 			@Override
 			public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
 				if (pane == null) {
 					pane = new PluginPane();
 				}
-				pane.load(((Item) value).plugin);
+				pane.load((PluginInfo) value);
 				return pane;
 			}
 		});
 
+		final JPanel toolbar = ToolbarDecorator.createDecorator(table)
+				.setAddAction(new AnActionButtonRunnable() {
+					@Override
+					public void run(@NotNull final AnActionButton anActionButton) {
+						final Project project = IdeaUtilImpl.getProject(anActionButton.getDataContext());
+						doAdd(project);
+					}
+				})
+				.setRemoveAction(new AnActionButtonRunnable() {
+					@Override
+					public void run(@NotNull final AnActionButton anActionButton) {
+						doRemove();
+					}
+				})
+				.setAsUsualTopToolbar().createPanel();
+
 		scrollPane = ScrollPaneFactory.createScrollPane(table);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+		add(toolbar, BorderLayout.NORTH);
 		add(scrollPane);
 	}
 
@@ -86,27 +122,68 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 		return (Model) table.getModel();
 	}
 
-	@Nullable
-	private String loadRows() {
-		lastPluginError = null;
-		getModel().rows.clear();
-		final PluginLoaderImpl pluginLoader = new PluginLoaderImpl();
-		pluginLoader.load( // TODO
-				Collections.<String>emptyList(),
-				Collections.<String>emptyList(),
-				Collections.<String>emptyList(),
-				Collections.<String>emptyList()
-		);
-		lastPluginError = pluginLoader.makeErrorMessage();
-		return lastPluginError;
-	}
-
 	private void swapEnabled() {
 		final int rows[] = table.getSelectedRows();
 		for (final int row : rows) {
-			getModel().rows.get(row).enabled = !getModel().rows.get(row).enabled;
+			getModel().rows.get(row).settings.enabled = !getModel().rows.get(row).settings.enabled;
 		}
 		getModel().fireTableDataChanged();
+	}
+
+	private void doAdd(@Nullable final Project project) {
+		final FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, true, true, false, true);
+		descriptor.setTitle(ResourcesLoader.getString("plugins.choose.title"));
+		descriptor.setDescription(ResourcesLoader.getString("plugins.choose.description"));
+		descriptor.withFileFilter(new Condition<VirtualFile>() {
+			@Override
+			public boolean value(final VirtualFile virtualFile) {
+				return "jar".equalsIgnoreCase(virtualFile.getExtension());
+			}
+		});
+
+		final VirtualFile[] files = FileChooser.chooseFiles(descriptor, this, project, null);
+		if (files.length > 0) {
+			StringBuilder errors = new StringBuilder();
+			for (final VirtualFile virtualFile : files) {
+				final File file = VfsUtilCore.virtualToIoFile(virtualFile);
+				Plugin plugin = null;
+				try {
+					plugin = FindBugsCustomPluginUtil.loadTemporary(file);
+					final PluginInfo pluginInfo = PluginInfo.create(file, plugin);
+					for (final PluginInfo other : getModel().rows) {
+						if (other.settings.id.equals(pluginInfo.settings.id)) {
+							pluginInfo.settings.enabled = false;
+						}
+					}
+					getModel().rows.add(pluginInfo); // LATER: sort
+				} catch (final Exception e) {
+					LOGGER.warn(String.valueOf(file), e);
+					errors.append("\n    - ").append(e.getMessage());
+				} finally {
+					if (plugin != null) {
+						FindBugsCustomPluginUtil.unload(plugin);
+					}
+				}
+			}
+			if (errors.length() > 0) {
+				Messages.showErrorDialog(
+						this,
+						ResourcesLoader.getString("plugins.load.error.text") + errors.toString(),
+						StringUtil.capitalizeWords(ResourcesLoader.getString("plugins.load.error.title"), true)
+				);
+			}
+		}
+	}
+
+	private void doRemove() {
+		final int[] index = table.getSelectedRows();
+		if (index != null && index.length > 0) {
+			final Set<PluginInfo> toRemove = New.set();
+			for (final int idx : index) {
+				toRemove.add(getModel().rows.get(idx));
+			}
+			getModel().rows.removeAll(toRemove);
+		}
 	}
 
 	@Override
@@ -118,28 +195,30 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 
 	@Override
 	public boolean isModified(@NotNull final ProjectSettings settings) {
-		return false; // TODO
+		final Set<PluginSettings> plugins = New.set();
+		for (final PluginInfo pluginInfo : getModel().rows) {
+			plugins.add(pluginInfo.settings);
+		}
+		return !settings.plugins.equals(plugins);
 	}
 
 	@Override
 	public void apply(@NotNull final ProjectSettings settings) throws ConfigurationException {
 		if (lastPluginError != null) {
-			throw new ConfigurationException(lastPluginError); // TODO: set title ?
+			throw new ConfigurationException(lastPluginError, ResourcesLoader.getString("plugins.error.title"));
+		}
+		settings.plugins.clear();
+		for (final PluginInfo pluginInfo : getModel().rows) {
+			settings.plugins.add(pluginInfo.settings);
 		}
 	}
 
 	@Override
 	public void reset(@NotNull final ProjectSettings settings) {
-		loadRows();
-	}
-
-	private class Item {
-		@NotNull
-		private final PluginInfo plugin;
-		private boolean enabled;
-
-		private Item(@NotNull final PluginInfo plugin) {
-			this.plugin = plugin;
+		lastPluginError = null;
+		getModel().rows.clear();
+		for (final PluginSettings pluginSettings : settings.plugins) {
+			getModel().rows.add(PluginInfo.load(pluginSettings));
 		}
 	}
 
@@ -147,9 +226,9 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 		private static final int IS_ENABLED_COLUMN = 0;
 		private static final int NAME_COLUMN = 1;
 		@NotNull
-		private final List<Item> rows;
+		private final List<PluginInfo> rows;
 
-		private Model(@NotNull final List<Item> rows) {
+		private Model(@NotNull final List<PluginInfo> rows) {
 			this.rows = rows;
 		}
 
@@ -184,7 +263,7 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 		public Object getValueAt(final int rowIndex, final int columnIndex) {
 			switch (columnIndex) {
 				case IS_ENABLED_COLUMN:
-					return rows.get(rowIndex).enabled;
+					return rows.get(rowIndex).settings.enabled;
 				case NAME_COLUMN:
 					return rows.get(rowIndex);
 				default:
@@ -195,34 +274,24 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 		@Override
 		public void setValueAt(final Object aValue, final int rowIndex, final int columnIndex) {
 			if (columnIndex == IS_ENABLED_COLUMN) {
-				rows.get(rowIndex).enabled = (Boolean) aValue;
+				final PluginSettings settings = rows.get(rowIndex).settings;
+				boolean enabled = (Boolean) aValue;
+				if (enabled) {
+					for (final PluginInfo other : rows) {
+						if (other.settings != settings) {
+							if (other.settings.id.equals(settings.id) && other.settings.enabled) {
+								Messages.showInfoMessage(
+										PluginTablePane.this,
+										ResourcesLoader.getString("plugins.duplicate.text"),
+										StringUtil.capitalizeWords(ResourcesLoader.getString("plugins.duplicate.title"), true)
+								);
+								enabled = false;
+							}
+						}
+					}
+				}
+				rows.get(rowIndex).settings.enabled = enabled;
 			}
-		}
-	}
-
-	private class PluginLoaderImpl extends AbstractPluginLoader {
-
-		private PluginLoaderImpl() {
-			super(true);
-		}
-
-		@Override
-		protected void seenCorePlugin(@NotNull final Plugin plugin) {
-			seenPlugin(plugin, false);
-		}
-
-		@Override
-		protected void seenBundledPlugin(@NotNull final Plugin plugin) {
-			seenPlugin(plugin, false);
-		}
-
-		@Override
-		protected void seenUserPlugin(@NotNull final Plugin plugin) {
-			seenPlugin(plugin, true);
-		}
-
-		private void seenPlugin(@NotNull final Plugin plugin, final boolean userPlugin) {
-			getModel().rows.add(new Item(PluginInfo.create(plugin)));
 		}
 	}
 }

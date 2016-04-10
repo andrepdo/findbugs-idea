@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,10 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.gui.toolwindow.view;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
 import com.intellij.openapi.ui.popup.PopupStep;
@@ -29,8 +29,8 @@ import com.intellij.ui.components.labels.LinkListener;
 import edu.umd.cs.findbugs.cloud.CloudPlugin;
 import edu.umd.cs.findbugs.gui2.CloudCommentsPane;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 
 import javax.swing.JLabel;
 import java.awt.Graphics;
@@ -38,14 +38,14 @@ import java.util.List;
 
 
 @SuppressWarnings({"override"})
-public class CloudCommentsPaneIntellij extends CloudCommentsPane {
+class CloudCommentsPaneIntellij extends CloudCommentsPane {
 
 	private static final Logger LOGGER = Logger.getInstance(CloudCommentsPane.class.getName());
 
 	private final ToolWindowPanel _toolWindowPanel;
 
 
-	public CloudCommentsPaneIntellij(final ToolWindowPanel toolWindowPanel) {
+	CloudCommentsPaneIntellij(final ToolWindowPanel toolWindowPanel) {
 		_toolWindowPanel = toolWindowPanel;
 	}
 
@@ -64,11 +64,13 @@ public class CloudCommentsPaneIntellij extends CloudCommentsPane {
 	}
 
 
+	@Override
 	protected void setSignInOutText(final String buttonText) {
 		((JLabel) signInOutLink).setText(buttonText);
 	}
 
 
+	@Override
 	protected void setupLinksOrButtons() {
 		/* _addCommentLink = new LinkLabel();
 				((LinkLabel)_addCommentLink).setText("add comment");
@@ -102,6 +104,7 @@ public class CloudCommentsPaneIntellij extends CloudCommentsPane {
 	}
 
 
+	@Override
 	protected void showCloudChooser(final List<CloudPlugin> plugins, final List<String> descriptions) {
 		final JBPopupFactory factory = JBPopupFactory.getInstance();
 		final ListPopup popup = factory.createListPopup(new BaseListPopupStep<String>("Store comments in:", descriptions) {
@@ -130,10 +133,17 @@ public class CloudCommentsPaneIntellij extends CloudCommentsPane {
 	}
 
 
+	@Override
 	protected boolean isDisabled(final CloudPlugin plugin) {
-		final FindBugsPlugin findBugsPlugin = _toolWindowPanel.getProject().getComponent(FindBugsPlugin.class);
-		final FindBugsPreferences prefs = findBugsPlugin.getPreferences();
-		return prefs.isPluginDisabled(plugin.getFindbugsPluginId());
+		final Project project = _toolWindowPanel.getProject();
+		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
+		boolean ret = false;
+		for (final PluginSettings settings : projectSettings.plugins) {
+			if (plugin.getFindbugsPluginId().equals(settings.id) && !settings.enabled) {
+				ret = true;
+			}
+		}
+		return ret;
 	}
 
 

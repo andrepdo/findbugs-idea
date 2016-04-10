@@ -53,12 +53,12 @@ final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>,
 	ShareTab() {
 		super(new VerticalFlowLayout(HAlignment.Left, VAlignment.Top, 0, 0, true, false));
 
-		description = new JLabel(ResourcesLoader.getString("share.description"));
+		description = new JLabel("<html>" + ResourcesLoader.getString("share.description"));
 		description.setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 5));
 		description.setIcon(MessageType.INFO.getDefaultIcon());
 
-		final String url = "https://www.jetbrains.com/help/idea/2016.1/synchronizing-and-sharing-settings.html";
-		link = new HyperlinkLabel();
+		final String url = ResourcesLoader.getString("share.url");
+		link = new HyperlinkLabel(); // LATER: HotspotPainter (Search) does not work with HyperlinkLabel
 		link.setHyperlinkText(url);
 		link.setHyperlinkTarget(url);
 
@@ -69,8 +69,8 @@ final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>,
 		final FileTextField field = FileChooserFactory.getInstance().createFileTextField(descriptor, this);
 		final TextFieldWithBrowseButton importPath = new TextFieldWithBrowseButton(field.getField());
 		importPath.addBrowseFolderListener(
-				ResourcesLoader.getString("share.choose.title"),
-				ResourcesLoader.getString("share.choose.description"),
+				ResourcesLoader.getString("settings.choose.title"),
+				ResourcesLoader.getString("settings.choose.description"),
 				null,
 				descriptor
 		);
@@ -113,13 +113,13 @@ final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>,
 		if (filePath != null) {
 			final File file = new File(filePath);
 			if (!file.exists()) {
-				throw new ConfigurationException(ResourcesLoader.getString("share.error.path.exists", filePath));
+				throw new ConfigurationException(ResourcesLoader.getString("error.path.exists", filePath));
 			}
 			if (!file.isFile()) {
-				throw new ConfigurationException(ResourcesLoader.getString("share.error.path.type", filePath));
+				throw new ConfigurationException(ResourcesLoader.getString("error.path.type", filePath));
 			}
 			if (!file.canRead()) {
-				throw new ConfigurationException(ResourcesLoader.getString("share.error.file.readable", filePath));
+				throw new ConfigurationException(ResourcesLoader.getString("error.file.readable", filePath));
 			}
 		}
 		settings.importFilePath = filePath;
@@ -132,5 +132,19 @@ final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>,
 
 	@Override
 	public void dispose() {
+	}
+
+	@NotNull
+	static String getSearchPath() {
+		return ResourcesLoader.getString("settings.share");
+	}
+
+	@NotNull
+	static String[] getSearchResourceKey() {
+		return new String[]{
+				"share.description",
+				"share.file.title",
+				"share.url"
+		};
 	}
 }

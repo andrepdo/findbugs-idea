@@ -115,9 +115,6 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	private static final Logger LOGGER = Logger.getInstance(FindBugsPluginImpl.class.getName());
 	private static final AtomicBoolean SEARCH_INDEX_CREATED = new AtomicBoolean(false);
 
-	public static final String NOTIFICATION_GROUP_ID_ANALYSIS_FINISHED = "FindBugs: Analysis Finished";
-	public static final NotificationGroup NOTIFICATION_GROUP_ANALYSIS_FINISHED = NotificationGroup.toolWindowGroup(NOTIFICATION_GROUP_ID_ANALYSIS_FINISHED, FindBugsPluginConstants.TOOL_WINDOW_ID, false);
-
 	static final String NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION = "FindBugs: Plugin Suggestion";
 	static final NotificationGroup NOTIFICATION_GROUP_PLUGIN_SUGGESTION = new NotificationGroup(NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION, NotificationDisplayType.STICKY_BALLOON, false);
 
@@ -170,7 +167,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	public void initComponent() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
 		//noinspection ConstantConditions
-		LOGGER.debug("initComponent: " + plugin.getName() + " project="  + getProject());
+		LOGGER.debug("initComponent: " + plugin.getName() + " project=" + getProject());
 	}
 
 
@@ -179,7 +176,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	public void disposeComponent() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
 		//noinspection ConstantConditions
-		LOGGER.debug("disposeComponent: " + plugin.getName() + " project="  + getProject());
+		LOGGER.debug("disposeComponent: " + plugin.getName() + " project=" + getProject());
 	}
 
 
@@ -199,7 +196,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	public void projectOpened() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
 		//noinspection ConstantConditions
-		LOGGER.debug("project is opened: " + plugin.getName() + " project="  + getProject());
+		LOGGER.debug("project is opened: " + plugin.getName() + " project=" + getProject());
 		initToolWindow();
 		setActionGroupsIcon();
 		registerToolbarActions();
@@ -215,7 +212,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	public void projectClosed() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
 		//noinspection ConstantConditions
-		LOGGER.debug("project is being closed: " + plugin.getName() + " project="  + getProject());
+		LOGGER.debug("project is being closed: " + plugin.getName() + " project=" + getProject());
 		MessageBusManager.dispose(_project);
 		unregisterToolWindow();
 		disableToolbarActions();
@@ -550,7 +547,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 		}
 
 		//noinspection ForLoopWithMissingComponent
-		for (final Enumeration<?> confNames = _preferences.propertyNames(); confNames.hasMoreElements();) {
+		for (final Enumeration<?> confNames = _preferences.propertyNames(); confNames.hasMoreElements(); ) {
 			final String elementName = (String) confNames.nextElement();
 			preferencesBean.getBasePreferences().put(elementName, _preferences.getProperty(elementName));
 		}
@@ -588,7 +585,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 	@Override
 	public Runnable enableSearch(final String option) {
-		return new Runnable(){
+		return new Runnable() {
 			public void run() {
 				if (_configPanel != null) {
 					_configPanel.setFilter(option);

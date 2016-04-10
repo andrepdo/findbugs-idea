@@ -19,79 +19,106 @@
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import edu.umd.cs.findbugs.Plugin;
+import edu.umd.cs.findbugs.PluginException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
+import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
+import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
+
+import java.io.File;
+import java.net.MalformedURLException;
 
 final class PluginInfo {
-	@Nullable
-	private final String title;
-
-	@Nullable
-	private final String id;
-
-	@Nullable
-	private final String text;
-
 	@NotNull
-	private String url;
+	final PluginSettings settings;
 
 	@Nullable
-	private String website;
+	final String shortDescription;
 
-	private boolean enabled;
+	@Nullable
+	final String detailedDescription;
+
+	@Nullable
+	final String website;
+
+	@Nullable
+	final String errorMessage;
+
+	@Nullable
+	final Throwable error;
 
 	private PluginInfo(
-			@Nullable final String title,
-			@Nullable final String id,
-			@Nullable final String text,
-			@NotNull final String url,
-			@Nullable final String website
+			@NotNull final PluginSettings settings,
+			@Nullable final String shortDescription,
+			@Nullable final String detailedDescription,
+			@Nullable final String website,
+			@Nullable final String errorMessage,
+			@Nullable final Throwable error
 	) {
-		this.title = title;
-		this.id = id;
-		this.text = text;
-		this.url = url;
+		this.settings = settings;
+		this.shortDescription = shortDescription;
+		this.detailedDescription = detailedDescription;
 		this.website = website;
-	}
-
-	@Nullable
-	String getTitle() {
-		return title;
-	}
-
-	@Nullable
-	String getId() {
-		return id;
-	}
-
-	@Nullable
-	String getText() {
-		return text;
+		this.errorMessage = errorMessage;
+		this.error = error;
 	}
 
 	@NotNull
-	String getUrl() {
-		return url;
-	}
-
-	@Nullable
-	String getWebsite() {
-		return website;
-	}
-
-	boolean isEnabled() {
-		return enabled;
-	}
-
-	@NotNull
-	static PluginInfo create(@NotNull final Plugin plugin) {
+	static PluginInfo create(@NotNull final File path, @NotNull final Plugin plugin) throws MalformedURLException, PluginException {
+		final PluginSettings settings = new PluginSettings();
+		settings.id = plugin.getPluginId();
+		settings.enabled = plugin.isEnabledByDefault();
+		settings.path = path.getPath();
 		return new PluginInfo(
+				settings,
 				plugin.getShortDescription(),
-				plugin.getPluginId(),
 				plugin.getDetailedDescription(),
-				FindBugsCustomPluginUtil.getAsString(plugin),
-				plugin.getWebsite()
+				plugin.getWebsite(),
+				null,
+				null
+		);
+	}
+
+	@NotNull
+	static PluginInfo load(@NotNull final PluginSettings settings) {
+
+		String shortDescription = null;
+		String detailedDescription = null;
+		String website = null;
+		String errorMessage = null;
+		Throwable error = null;
+
+		final File file = new File(settings.path);
+		if (!file.exists()) {
+			errorMessage = ResourcesLoader.getString(ResourcesLoader.getString("error.path.exists", file.getPath()));
+		} else if (!file.isFile()) {
+			errorMessage = ResourcesLoader.getString(ResourcesLoader.getString("error.path.type", file.getPath()));
+		} else if (!file.canRead()) {
+			errorMessage = ResourcesLoader.getString(ResourcesLoader.getString("error.file.readable", file.getPath()));
+		} else {
+			Plugin plugin = null;
+			try {
+				plugin = FindBugsCustomPluginUtil.loadTemporary(file);
+				shortDescription = plugin.getShortDescription();
+				detailedDescription = plugin.getDetailedDescription();
+				website = plugin.getWebsite();
+			} catch (final Throwable e) {
+				errorMessage = e.getMessage();
+				error = e;
+			} finally {
+				if (plugin != null) {
+					FindBugsCustomPluginUtil.unload(plugin);
+				}
+			}
+		}
+		return new PluginInfo(
+				settings,
+				shortDescription,
+				detailedDescription,
+				website,
+				errorMessage,
+				error
 		);
 	}
 }

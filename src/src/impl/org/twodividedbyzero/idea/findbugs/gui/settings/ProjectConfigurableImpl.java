@@ -20,19 +20,21 @@ package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
-import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JComponent;
 
-public final class ProjectConfigurableImpl implements Configurable, Configurable.NoScroll {
+public final class ProjectConfigurableImpl implements SearchableConfigurable, Configurable.NoScroll {
+	public static final String ID = "settings.findbugs.project";
+	public static final String DISPLAY_NAME = "FindBugs-IDEA";
 
 	@NotNull
 	private final ProjectSettings settings;
@@ -40,7 +42,7 @@ public final class ProjectConfigurableImpl implements Configurable, Configurable
 	@NotNull
 	private final WorkspaceSettings workspaceSettings;
 
-	private ProjectSettingsPane pane;
+	private SettingsPane pane;
 
 	public ProjectConfigurableImpl(@NotNull final Project project) {
 		settings = ProjectSettings.getInstance(project);
@@ -50,37 +52,57 @@ public final class ProjectConfigurableImpl implements Configurable, Configurable
 	@Nls
 	@Override
 	public String getDisplayName() {
-		return ResourcesLoader.getString("findbugs.plugin.configuration.name");
+		return DISPLAY_NAME;
 	}
 
 	@Nullable
 	@Override
 	public String getHelpTopic() {
-		return FindBugsPluginConstants.FINDBUGS_EXTERNAL_HELP_URI;
+		return null;
 	}
 
 	@Nullable
 	@Override
 	public JComponent createComponent() {
 		if (pane == null) {
-			pane = new ProjectSettingsPane();
+			pane = new SettingsPane() {
+				@NotNull
+				@Override
+				GeneralTab createGeneralTab() {
+					return new GeneralTab(true);
+				}
+
+				@Nullable
+				@Override
+				ShareTab createShareTab() {
+					return new ShareTab();
+				}
+
+				@NotNull
+				@Override
+				AbstractSettings createSettings() {
+					return new ProjectSettings();
+				}
+			};
 		}
 		return pane;
 	}
 
 	@Override
 	public boolean isModified() {
-		return pane.isModified(settings, workspaceSettings);
+		return pane.isModified(settings) || pane.isModified(workspaceSettings);
 	}
 
 	@Override
 	public void apply() throws ConfigurationException {
-		pane.apply(settings, workspaceSettings);
+		pane.apply(settings);
+		pane.apply(workspaceSettings);
 	}
 
 	@Override
 	public void reset() {
-		pane.reset(settings, workspaceSettings);
+		pane.reset(settings);
+		pane.reset(workspaceSettings);
 	}
 
 	@Override
@@ -89,5 +111,24 @@ public final class ProjectConfigurableImpl implements Configurable, Configurable
 			Disposer.dispose(pane);
 			pane = null;
 		}
+	}
+
+	@NotNull
+	@Override
+	public String getId() {
+		return ID;
+	}
+
+	@Nullable
+	@Override
+	public Runnable enableSearch(final String option) {
+		return new Runnable() {
+			@Override
+			public void run() {
+				if (pane != null) {
+					pane.setFilter(option);
+				}
+			}
+		};
 	}
 }

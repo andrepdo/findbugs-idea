@@ -23,11 +23,13 @@ import com.intellij.openapi.components.RoamingType;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.components.StoragePathMacros;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
+
+import java.util.Set;
 
 @State(
 		name = "FindBugs-IDEA",
@@ -35,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 )
 public final class ProjectSettings extends AbstractSettings implements PersistentStateComponent<ProjectSettings> {
 
-	// TODO plugins settings
+	public Set<PluginSettings> plugins = New.set();
 
 	@Nullable
 	@Override

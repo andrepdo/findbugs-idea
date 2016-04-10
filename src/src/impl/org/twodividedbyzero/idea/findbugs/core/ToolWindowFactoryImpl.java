@@ -23,13 +23,12 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.FakeToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 
 public final class ToolWindowFactoryImpl implements ToolWindowFactory {
 	@Override
 	public void createToolWindowContent(@NotNull final Project project, @NotNull final ToolWindow toolWindow) {
-		final FakeToolWindowPanel win = new FakeToolWindowPanel(project, toolWindow);
+		final ToolWindowPanel win = new ToolWindowPanel(project, toolWindow);
 		toolWindow.getContentManager().addContent(ContentFactory.SERVICE.getInstance().createContent(win, "", false));
 	}
 }
