@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -53,21 +53,14 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.util.FileModificationServiceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
+import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.Icon;
 import java.util.List;
 import java.util.Map;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
- * @since 0.9.97
- */
 @SuppressWarnings({"RedundantInterfaceDeclaration"})
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"RI_REDUNDANT_INTERFACES"})
 public class SuppressReportBugIntentionAction extends SuppressIntentionAction implements Iconable {
@@ -83,10 +76,9 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 		_bugPatternId = getBugId(problemDescriptor);
 
 		final Project project = IdeaUtilImpl.getProject(problemDescriptor.getPsiFile());
-		final FindBugsPreferences preferences = IdeaUtilImpl.getPluginComponent(project).getPreferences();
-		_suppressWarningsClassName = preferences.getProperty(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS);
+		final WorkspaceSettings workspaceSettings = WorkspaceSettings.getInstance(project);
+		_suppressWarningsClassName = workspaceSettings.suppressWarningsClassName;
 	}
-
 
 	@SuppressWarnings({"override", "HardcodedFileSeparator"}) // idea 8 compatibility
 	public Icon getIcon(final int flags) {
@@ -94,11 +86,9 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 		//return GuiUtil.getIcon(_problemDescriptor);
 	}
 
-
 	protected static String getBugId(final ExtendedProblemDescriptor problemDescriptor) {
 		return problemDescriptor.getBugInstance().getBugPattern().getType();
 	}
-
 
 	@Override
 	@NotNull
@@ -106,12 +96,10 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 		return ResourcesLoader.getString("findbugs.inspection.quickfix.suppress.warning") + " '" + _bugPatternId + '\'';
 	}
 
-
 	@NotNull
 	public String getFamilyName() {
 		return ResourcesLoader.getString("findbugs.inspection.quickfix.bug.pattern") + " '" + _bugPatternId + '\'';
 	}
-
 
 	@Nullable
 	protected PsiDocCommentOwner getContainer(final PsiElement context) {
@@ -136,7 +124,6 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 		return (PsiDocCommentOwner) container;
 	}
 
-
 	@Override
 	@SuppressWarnings({"SimplifiableIfStatement"})
 	public boolean isAvailable(@NotNull final Project project, final Editor editor, @Nullable final PsiElement context) {
@@ -149,12 +136,11 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 		return context != null && context.getManager().isInProject(context);
 	}
 
-
 	/**
 	 * Invoked by EDT.
 	 *
 	 * @param project ..
-	 * @param editor ..
+	 * @param editor  ..
 	 * @param element ..
 	 * @throws IncorrectOperationException ..
 	 */
@@ -192,11 +178,11 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 		} else {
 			Messages.showErrorDialog(editor.getComponent(), "Add suppress annotation is not supported for Java 1.3 and older", "Unsupported");
 		}
-		final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = IdeaUtilImpl.getPluginComponent(project).getProblems();
+		final ToolWindowPanel toolWindow = ToolWindowPanel.getInstance(project);
+		final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = toolWindow.getProblems();
 		problems.get(element.getContainingFile()).remove(getProblemDescriptor());
 		DaemonCodeAnalyzer.getInstance(project).restart();
 	}
-
 
 	private void addImport(final Project project, final PsiElement element) {
 		/*final PsiFile file = element.getContainingFile();
@@ -210,7 +196,6 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 			}
 		}*/
 	}
-
 
 	@SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
 	@SuppressWarnings("HardcodedLineSeparator")
@@ -230,7 +215,7 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 						//noinspection ConstantConditions
 						value = attribute.getValue().getText();
 						if (value.startsWith("{\"") && value.endsWith("\"}")) {
-							value = value.substring(2, value.length()-2);
+							value = value.substring(2, value.length() - 2);
 						}
 					}
 				} else if ("justification".equalsIgnoreCase(name)) {
@@ -265,29 +250,24 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 		}
 	}
 
-
 	@NotNull
 	private static PsiAnnotation createAnnotationFromText(final Project project, @NotNull @NonNls String annotationText, @Nullable PsiElement context) {
 		return JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText(annotationText, context);
 	}
-
 
 	private boolean needsImportStatement() {
 		final String result = _suppressWarningsClassName.substring(0, _suppressWarningsClassName.lastIndexOf('.'));
 		return result.indexOf('.') != -1;
 	}
 
-
 	protected static boolean use15Suppressions(final PsiDocCommentOwner container) {
 		return SuppressManager.getInstance().canHave15Suppressions(container) && !SuppressManager.getInstance().alreadyHas14Suppressions(container);
 	}
-
 
 	@Override
 	public boolean startInWriteAction() {
 		return true;
 	}
-
 
 	public String getID(final PsiElement place) {
 		/*if (myAlternativeID != null) {
@@ -302,16 +282,13 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 		return _bugPatternId;
 	}
 
-
 	public ExtendedProblemDescriptor getProblemDescriptor() {
 		return _problemDescriptor;
 	}
 
-
 	public String getBugPatternId() {
 		return _bugPatternId;
 	}
-
 
 	@Override
 	public String toString() {

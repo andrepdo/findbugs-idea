@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -18,7 +18,6 @@
  */
 package org.twodividedbyzero.idea.findbugs.actions;
 
-
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ShowSettingsUtil;
@@ -26,18 +25,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.gui.settings.ProjectConfigurableImpl;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
- * @since 0.9.85-dev
- */
 public final class ShowPreferencesPage extends AbstractAction {
 
 	@Override
@@ -45,10 +37,10 @@ public final class ShowPreferencesPage extends AbstractAction {
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
 
 		e.getPresentation().setEnabled(state.isIdle());
@@ -60,12 +52,11 @@ public final class ShowPreferencesPage extends AbstractAction {
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
-
-		ShowSettingsUtil.getInstance().editConfigurable(project, plugin);
+		ShowSettingsUtil.getInstance().showSettingsDialog(project, ProjectConfigurableImpl.DISPLAY_NAME); // TODO test it
 	}
 }

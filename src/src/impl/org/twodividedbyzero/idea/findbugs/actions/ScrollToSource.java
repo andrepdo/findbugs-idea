@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,9 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.actions;
-
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
@@ -26,19 +24,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
- * @since 0.0.1
- */
 public final class ScrollToSource extends AbstractToggleAction {
 
 	@Override
@@ -46,34 +37,37 @@ public final class ScrollToSource extends AbstractToggleAction {
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final ToolWindowPanel panel,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences) {
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
+	) {
 
 		final boolean isEnabled = panel.getBugTreePanel().isScrollToSource();
-		final boolean enabled = preferences.getBooleanProperty(FindBugsPreferences.TOOLWINDOW_SCROLL_TO_SOURCE, isEnabled);
-		if(enabled != isEnabled) {
+		final WorkspaceSettings workspaceSettings = WorkspaceSettings.getInstance(project);
+		final boolean enabled = workspaceSettings.toolWindowScrollToSource;
+		if (enabled != isEnabled) {
 			panel.getBugTreePanel().setScrollToSource(enabled);
 		}
 		return enabled;
 	}
-
 
 	@Override
 	void setSelectedImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final ToolWindowPanel panel,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences,
-			final boolean select) {
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings,
+			final boolean select
+	) {
 
-		preferences.setProperty(FindBugsPreferences.TOOLWINDOW_SCROLL_TO_SOURCE, select);
+		final WorkspaceSettings workspaceSettings = WorkspaceSettings.getInstance(project);
+		workspaceSettings.toolWindowScrollToSource = select;
 		panel.getBugTreePanel().setScrollToSource(select);
 	}
 }

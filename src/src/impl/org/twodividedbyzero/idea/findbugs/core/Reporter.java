@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -17,7 +17,6 @@
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.twodividedbyzero.idea.findbugs.core;
-
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -48,11 +47,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-
-/**
- * @author Reto Merz<reto.merz@gmail.com>
- * @since 0.9.995
- */
 final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 
 	private static final Logger LOGGER = Logger.getInstance(Reporter.class.getName());
@@ -60,7 +54,10 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 
 	private final Project _project;
 	private final SortedBugCollection _bugCollection;
-	private final Map<String, String> _bugCategories;
+
+	@NotNull
+	private final Set<String> hiddenBugCategory;
+
 	private final ProgressIndicator _indicator;
 	private final AtomicBoolean _cancellingByUser;
 	private final TransferToEDTQueue<Runnable> _transferToEDTQueue;
@@ -77,13 +74,13 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 	Reporter(
 			@NotNull final Project project,
 			@NotNull final SortedBugCollection bugCollection,
-			@NotNull final Map<String, String> bugCategories,
+			@NotNull final Set<String> hiddenBugCategory,
 			@NotNull final ProgressIndicator indicator,
 			@NotNull final AtomicBoolean cancellingByUser
 	) {
 		_project = project;
 		_bugCollection = bugCollection;
-		_bugCategories = bugCategories;
+		this.hiddenBugCategory = hiddenBugCategory;
 		_indicator = indicator;
 		_cancellingByUser = cancellingByUser;
 		_transferToEDTQueue = new TransferToEDTQueue<Runnable>("Add New Bug Instance", new RunnableProcessor(), new Condition<Object>() {
@@ -141,7 +138,7 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 
 	private boolean isHiddenBugGroup(final BugInstance bug) {
 		final String category = bug.getBugPattern().getCategory();
-		return _bugCategories.containsKey(category) && "false".equals(_bugCategories.get(category));
+		return hiddenBugCategory.contains(category);
 	}
 
 

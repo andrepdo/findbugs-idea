@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,9 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.actions;
-
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -30,29 +28,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+import org.twodividedbyzero.idea.findbugs.core.ModuleSettings;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 
-
-/**
- * @author $Author: reto.merz@gmail.com $
- * @version $Revision: 376 $
- * @since 0.9.995
- */
 abstract class AbstractAction extends AnAction {
-
 
 	@Override
 	public final void update(@NotNull final AnActionEvent e) {
 		final Project project = IdeaUtilImpl.getProject(e.getDataContext());
 		if (project == null || !project.isInitialized() || !project.isOpen()) {
-			e.getPresentation().setEnabled(false);
-			e.getPresentation().setVisible(false);
-			return;
-		}
-		final FindBugsPlugin plugin = IdeaUtilImpl.getPluginComponent(project);
-		if (plugin == null) {
 			e.getPresentation().setEnabled(false);
 			e.getPresentation().setVisible(false);
 			return;
@@ -64,40 +50,39 @@ abstract class AbstractAction extends AnAction {
 			return;
 		}
 		final Module module = IdeaUtilImpl.getModule(e.getDataContext(), project);
-		final FindBugsPreferences preferences = FindBugsPreferences.getPreferences(project, module);
+		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
+		AbstractSettings settings = projectSettings;
+		if (module != null) {
+			final ModuleSettings moduleSettings = ModuleSettings.getInstance(module);
+			if (moduleSettings.overrideProjectSettings) {
+				settings = moduleSettings;
+			}
+		}
 		updateImpl(
 				e,
 				project,
 				module,
-				plugin,
 				toolWindow,
 				FindBugsState.get(project),
-				preferences
+				projectSettings,
+				settings
 		);
 	}
-
 
 	abstract void updateImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	);
-
 
 	@Override
 	public final void actionPerformed(@NotNull final AnActionEvent e) {
 		final Project project = IdeaUtilImpl.getProject(e.getDataContext());
 		if (project == null) {
-			e.getPresentation().setEnabled(false);
-			e.getPresentation().setVisible(false);
-			return;
-		}
-		final FindBugsPlugin plugin = IdeaUtilImpl.getPluginComponent(project);
-		if (plugin == null) {
 			e.getPresentation().setEnabled(false);
 			e.getPresentation().setVisible(false);
 			return;
@@ -108,27 +93,33 @@ abstract class AbstractAction extends AnAction {
 			e.getPresentation().setVisible(false);
 			return;
 		}
-		final Module module = IdeaUtilImpl.getModule(e.getDataContext());
-		final FindBugsPreferences preferences = FindBugsPreferences.getPreferences(project, module);
+		final Module module = IdeaUtilImpl.getModule(e.getDataContext(), project);
+		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
+		AbstractSettings settings = projectSettings;
+		if (module != null) {
+			final ModuleSettings moduleSettings = ModuleSettings.getInstance(module);
+			if (moduleSettings.overrideProjectSettings) {
+				settings = moduleSettings;
+			}
+		}
 		actionPerformedImpl(
 				e,
 				project,
 				module,
-				plugin,
 				toolWindow,
 				FindBugsState.get(project),
-				preferences
+				projectSettings,
+				settings
 		);
 	}
-
 
 	abstract void actionPerformedImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	);
 }

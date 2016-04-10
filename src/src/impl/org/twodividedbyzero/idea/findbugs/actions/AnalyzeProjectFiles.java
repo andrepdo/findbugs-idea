@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,9 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.actions;
-
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.compiler.CompileScope;
@@ -33,19 +31,12 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @since 0.0.1
- */
 public final class AnalyzeProjectFiles extends AbstractAnalyzeAction {
 
 	@Override
@@ -53,10 +44,10 @@ public final class AnalyzeProjectFiles extends AbstractAnalyzeAction {
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
 
 		final boolean enable = state.isIdle();
@@ -65,29 +56,27 @@ public final class AnalyzeProjectFiles extends AbstractAnalyzeAction {
 		e.getPresentation().setVisible(true);
 	}
 
-
 	@SuppressFBWarnings("SIC_INNER_SHOULD_BE_STATIC_ANON")
 	@Override
 	void analyze(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
 
 		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
 		final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(e.getDataContext());
 		final String[] outPaths = IdeaUtilImpl.getCompilerOutputUrls(project);
 
-		new FindBugsStarter(project, "Running FindBugs analysis for project '" + project.getName() + "'...", preferences) {
+		new FindBugsStarter(project, "Running FindBugs analysis for project '" + project.getName() + "'...", projectSettings, settings) {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 				consumer.consume(compilerManager.createProjectCompileScope(project));
 			}
-
 
 			@Override
 			protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {

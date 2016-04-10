@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -17,7 +17,6 @@
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.twodividedbyzero.idea.findbugs.gui.editor;
-
 
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
@@ -38,8 +37,10 @@ import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
+import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.intentions.GroupBugIntentionListPopupStep;
 import org.twodividedbyzero.idea.findbugs.gui.intentions.RootGroupBugIntentionListPopupStep;
+import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.intentions.ClearAndSuppressBugIntentionAction;
 import org.twodividedbyzero.idea.findbugs.intentions.ClearBugIntentionAction;
 import org.twodividedbyzero.idea.findbugs.intentions.SuppressReportBugForClassIntentionAction;
@@ -52,35 +53,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
- * @since 0.9.92
- */
 public final class BugsLineMarkerProvider implements LineMarkerProvider {
 
 	public BugsLineMarkerProvider() {
 	}
 
-
 	@Override
 	@Nullable
 	public LineMarkerInfo<?> getLineMarkerInfo(@NotNull final PsiElement psiElement) {
 		final Project project = psiElement.getProject();
-
-		final FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(project);
-		if (! pluginComponent.getPreferences().isAnnotationGutterIconEnabled()) {
+		final WorkspaceSettings workspaceSettings = WorkspaceSettings.getInstance(project);
+		if (!workspaceSettings.annotationGutterIcon) {
 			return null;
 		}
-		if(!FindBugsState.get(project).isIdle()) {
+		if (!FindBugsState.get(project).isIdle()) {
 			return null;
 		}
 
 		final PsiFile psiFile = IdeaUtilImpl.getPsiFile(psiElement);
-		final Map<PsiFile, List<ExtendedProblemDescriptor>> problemCache = pluginComponent.getProblems();
+		final ToolWindowPanel toolWindow = ToolWindowPanel.getInstance(project);
+		if (toolWindow == null) {
+			return null;
+		}
+		final Map<PsiFile, List<ExtendedProblemDescriptor>> problemCache = toolWindow.getProblems();
 
 		if (problemCache.containsKey(psiFile)) {
 			final List<ExtendedProblemDescriptor> matchingDescriptors = new ArrayList<ExtendedProblemDescriptor>();
@@ -110,10 +105,8 @@ public final class BugsLineMarkerProvider implements LineMarkerProvider {
 		return null;
 	}
 
-
 	public void collectSlowLineMarkers(@NotNull final List<PsiElement> elements, @NotNull final Collection<LineMarkerInfo> result) {
 	}
-
 
 	private static class BugGutterIconNavigationHandler implements GutterIconNavigationHandler<PsiElement> {
 
@@ -201,7 +194,7 @@ public final class BugsLineMarkerProvider implements LineMarkerProvider {
 			buffer.append("<HTML><HEAD><TITLE>");
 
 			final int problemDescriptorsSize = problemDescriptors.size();
-			for (int i = 0;i < problemDescriptorsSize; i++) {
+			for (int i = 0; i < problemDescriptorsSize; i++) {
 				final ExtendedProblemDescriptor problemDescriptor = problemDescriptors.get(i);
 				buffer.append("");
 				buffer.append("</TITLE></HEAD><BODY><H3>");
@@ -224,5 +217,4 @@ public final class BugsLineMarkerProvider implements LineMarkerProvider {
 			return "TooltipProvider" + "{_problemDescriptor=" + _problemDescriptors + '}';
 		}
 	}
-
 }

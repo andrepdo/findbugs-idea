@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -42,7 +42,6 @@ import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,22 +54,14 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @since 0.9.92
- */
+// TODO think of ModuleSettings and ModuleManager.getInstance(project).getModules();
 public class FindBugsCompileAfterHook implements CompilationStatusListener, ProjectComponent {
-
 
 	private static final int DEFAULT_DELAY_MS = 30000;
 	private static final int DELAY_MS = StringUtil.parseInt(System.getProperty("idea.findbugs.autoanalyze.delaymillis", String.valueOf(DEFAULT_DELAY_MS)), DEFAULT_DELAY_MS);
 	private static final ConcurrentMap<UUID, Set<VirtualFile>> CHANGED_BY_SESSION_ID = New.concurrentMap();
 	private static final WeakHashMap<Project, DelayedExecutor> DELAYED_EXECUTOR_BY_PROJECT = New.weakHashMap();
 	private static ChangeCollector CHANGE_COLLECTOR; // EDT thread confinement
-
 
 	static {
 		/**
@@ -81,11 +72,9 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		 */
 		ApplicationManager.getApplication().getMessageBus().connect().subscribe(BuildManagerListener.TOPIC, new BuildManagerListener() {
 
-
 			//@Override // introduced with IDEA 15 EA
 			public void beforeBuildProcessStarted(final Project project, final UUID sessionId) {
 			}
-
 
 			@Override
 			public void buildStarted(final Project project, final UUID sessionId, final boolean isAutomake) {
@@ -96,7 +85,6 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 					}
 				}
 			}
-
 
 			@Override
 			public void buildFinished(final Project project, final UUID sessionId, final boolean isAutomake) {
@@ -121,14 +109,11 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		});
 	}
 
-
 	private final Project _project;
-
 
 	public FindBugsCompileAfterHook(@NotNull final Project project) {
 		_project = project;
 	}
-
 
 	@Override
 	public void compilationFinished(final boolean aborted, final int errors, final int warnings, final CompileContext compileContext) {
@@ -138,16 +123,13 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		}
 	}
 
-
 	@Override
 	public void fileGenerated(final String s, final String s1) {
 	}
 
-
 	@SuppressWarnings("UnusedDeclaration")
 	public void fileGenerated(final String s) {
 	}
-
 
 	@SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE")
 	@NotNull
@@ -156,11 +138,9 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		return FindBugsPluginConstants.PLUGIN_ID + "#FindBugsCompileAfterHook";
 	}
 
-
 	@Override
 	public void initComponent() {
 	}
-
 
 	/**
 	 * Invoked by EDT.
@@ -171,11 +151,9 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		setAnalyzeAfterAutomake(_project, false);
 	}
 
-
 	@Override
 	public void disposeComponent() {
 	}
-
 
 	/**
 	 * Invoked by EDT.
@@ -188,9 +166,8 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		}
 	}
 
-
 	@SuppressFBWarnings(value = {"LI_LAZY_INIT_UPDATE_STATIC", "LI_LAZY_INIT_STATIC"}, justification = "EDT thread confinement")
-	public static void setAnalyzeAfterAutomake(@NotNull final Project project, final boolean enabled) {
+	static void setAnalyzeAfterAutomake(@NotNull final Project project, final boolean enabled) {
 		if (enabled) {
 			Changes.INSTANCE.addListener(project);
 			if (CHANGE_COLLECTOR == null) {
@@ -208,16 +185,14 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		}
 	}
 
-
 	private static void initWorker(final CompileContext compileContext) {
 		final com.intellij.openapi.project.Project project = compileContext.getProject();
 		if (null == project) { // project reload, eg: open IDEA project with unknown JRE and fix it
 			return;
 		}
-		final FindBugsPlugin findBugsPlugin = IdeaUtilImpl.getPluginComponent(project);
-		final FindBugsPreferences preferences = findBugsPlugin.getPreferences();
+		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
 
-		if (!preferences.isAnalyzeAfterCompile()) {
+		if (!projectSettings.analyzeAfterCompile) {
 			return;
 		}
 
@@ -230,18 +205,16 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 			auxFiles.addAll(Arrays.asList(files));
 		}
 
-		new FindBugsStarter(project, "Running FindBugs analysis for affected files...", preferences, true) {
+		new FindBugsStarter(project, "Running FindBugs analysis for affected files...", projectSettings, projectSettings, true) {
 			@Override
 			protected boolean isCompileBeforeAnalyze() {
 				return false;
 			}
 
-
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 				throw new UnsupportedOperationException();
 			}
-
 
 			@Override
 			protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
@@ -251,7 +224,6 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 			}
 		}.start();
 	}
-
 
 	@NotNull
 	private static VirtualFile[] getAffectedFiles(@NotNull final CompileScope compileScope) {
@@ -264,7 +236,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 				affectedFiles = af;
 			} else if (af.length > 0) {
 				if (affectedFilesList == null) {
-					affectedFilesList = new ArrayList<VirtualFile>(affectedFiles.length+af.length);
+					affectedFilesList = new ArrayList<VirtualFile>(affectedFiles.length + af.length);
 					Collections.addAll(affectedFilesList, affectedFiles);
 				}
 				Collections.addAll(affectedFilesList, af);
@@ -277,13 +249,10 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		return affectedFiles;
 	}
 
-
 	private static boolean isAfterAutoMakeEnabled(@NotNull final Project project) {
-		final FindBugsPlugin findBugsPlugin = IdeaUtilImpl.getPluginComponent(project);
-		final FindBugsPreferences preferences = findBugsPlugin.getPreferences();
-		return Boolean.valueOf(preferences.getProperty(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE));
+		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
+		return projectSettings.analyzeAfterAutoMake;
 	}
-
 
 	private static void initWorkerForAutoMake(@NotNull final Project project, @NotNull final Collection<VirtualFile> changed) {
 		ApplicationManager.getApplication().runReadAction(new Runnable() {
@@ -294,10 +263,9 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		});
 	}
 
-
 	private static void initWorkerForAutoMakeImpl(@NotNull final Project project, @NotNull final Collection<VirtualFile> changed) {
 
-		final FindBugsPreferences preferences = FindBugsPreferences.getPreferences(project, null);
+		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
 		final Module[] modules = ModuleManager.getInstance(project).getModules();
 		final List<VirtualFile> classPaths = new LinkedList<VirtualFile>();
 		for (final Module module : modules) {
@@ -307,18 +275,16 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new FindBugsStarter(project, "Running FindBugs analysis for affected files...", preferences, true) {
+				new FindBugsStarter(project, "Running FindBugs analysis for affected files...", projectSettings, projectSettings, true) {
 					@Override
 					protected boolean isCompileBeforeAnalyze() {
 						return false;
 					}
 
-
 					@Override
 					protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 						throw new UnsupportedOperationException();
 					}
-
 
 					@Override
 					protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
@@ -331,18 +297,15 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		});
 	}
 
-
 	private static class DelayedExecutor {
 		private final Project _project;
 		private final Alarm _alarm;
 		private Set<VirtualFile> _changed;
 
-
 		DelayedExecutor(@NotNull final Project project) {
 			_project = project;
 			_alarm = new Alarm(Alarm.ThreadToUse.SHARED_THREAD);
 		}
-
 
 		void schedule(@NotNull final Set<VirtualFile> changed) {
 			_alarm.cancelAllRequests();
@@ -355,7 +318,6 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 			}
 			addRequest();
 		}
-
 
 		private void addRequest() {
 			_alarm.addRequest(new Runnable() {

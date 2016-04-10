@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,9 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.actions;
-
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
@@ -26,24 +24,18 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import java.util.Arrays;
 
-
-/**
- * @author $Author: reto.merz@gmail.com $
- * @version $Revision: 384 $
- * @since 0.9.995
- */
 abstract class AbstractGroupByAction extends AbstractToggleAction {
 
 	private final GroupBy _groupBy;
-
 
 	AbstractGroupByAction(@NotNull final GroupBy groupBy) {
 		_groupBy = groupBy;
@@ -54,36 +46,39 @@ abstract class AbstractGroupByAction extends AbstractToggleAction {
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final ToolWindowPanel panel,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences) {
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
+	) {
 
-		final String groupByProperty = preferences.getProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, GroupBy.BugCategory.name());
+		final WorkspaceSettings workspaceSettings = WorkspaceSettings.getInstance(project);
+		final String groupByProperty = workspaceSettings.toolWindowGroupBy;
 		final boolean equals = _groupBy.name().equals(groupByProperty);
 		final GroupBy[] sortOrderGroup = GroupBy.getSortOrderGroup(_groupBy);
-		if(equals && !Arrays.equals(panel.getBugTreePanel().getGroupBy(), sortOrderGroup)) {
+		if (equals && !Arrays.equals(panel.getBugTreePanel().getGroupBy(), sortOrderGroup)) {
 			panel.getBugTreePanel().setGroupBy(sortOrderGroup);
 		}
 		return equals;
 	}
-
 
 	@Override
 	final void setSelectedImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final ToolWindowPanel panel,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences,
-			final boolean select) {
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings,
+			final boolean select
+	) {
 
 		if (select) {
-			preferences.setProperty(FindBugsPreferences.TOOLWINDOW_GROUP_BY, _groupBy.name());
+			final WorkspaceSettings workspaceSettings = WorkspaceSettings.getInstance(project);
+			workspaceSettings.toolWindowGroupBy = _groupBy.name();
 			panel.getBugTreePanel().setGroupBy(GroupBy.getSortOrderGroup(_groupBy));
 		}
 	}

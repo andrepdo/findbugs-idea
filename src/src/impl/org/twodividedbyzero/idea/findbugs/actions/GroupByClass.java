@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -18,17 +18,8 @@
  */
 package org.twodividedbyzero.idea.findbugs.actions;
 
-
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
- * @since 0.0.1
- */
 public final class GroupByClass extends AbstractGroupByAction {
 	public GroupByClass() {
 		super(GroupBy.Class);

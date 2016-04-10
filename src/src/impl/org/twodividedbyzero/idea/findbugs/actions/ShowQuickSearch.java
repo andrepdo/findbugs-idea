@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -26,20 +25,12 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.content.Content;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.BugTree;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@dev.java.net>
- * @version $Revision$
- * @since 0.9.97
- */
 public final class ShowQuickSearch extends AbstractAction {
 
 	@Override
@@ -47,26 +38,25 @@ public final class ShowQuickSearch extends AbstractAction {
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
 
 		e.getPresentation().setEnabled(state.isIdle());
 		e.getPresentation().setVisible(true);
 	}
 
-
 	@Override
 	void actionPerformedImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
 
 		final Content content = toolWindow.getContentManager().getContent(0);

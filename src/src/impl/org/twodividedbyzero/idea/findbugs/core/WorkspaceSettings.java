@@ -27,6 +27,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
 
 @State(
 		name = "FindBugs-IDEA-Workspace",
@@ -38,8 +39,25 @@ public final class WorkspaceSettings implements PersistentStateComponent<Workspa
 	 * export settings (path, type etc) should use PropertiesComponent.getInstance().getValue("export.settings.path", DEFAULT_PATH)
 	 * like IDEA export settings dialog, see com.intellij.ide.actions.ChooseComponentsToExportDialog
 	 */
+	public String exportDirectory;
+
+	public boolean exportAsXml = true;
+
+	public boolean exportAsHtml = true;
 
 	public String importFilePath;
+
+	public boolean annotationTextRangeMarkup = true; // TODO UI
+
+	public boolean annotationGutterIcon = true;
+
+	public String suppressWarningsClassName = "edu.umd.cs.findbugs.annotations.SuppressFBWarnings";
+
+	public boolean toolWindowScrollToSource = true;
+
+	public boolean toolWindowEditorPreview = true;
+
+	public String toolWindowGroupBy = GroupBy.BugCategory.name();
 
 	@Nullable
 	@Override

@@ -16,9 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.actions;
-
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
@@ -30,17 +28,13 @@ import com.intellij.openapi.wm.ToolWindow;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
+import org.twodividedbyzero.idea.findbugs.gui.settings.ProjectConfigurableImpl;
 
-
-/**
- * @author $Author: reto.merz@gmail.com $
- * @version $Revision: 378 $
- * @since 0.9.995
- */
 abstract class AbstractAnalyzeAction extends AbstractAction {
 
 	@Override
@@ -48,43 +42,56 @@ abstract class AbstractAnalyzeAction extends AbstractAction {
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
 
 		EventDispatchThreadHelper.checkEDT();
 
-		final String importFilePath = preferences.getProperty(FindBugsPreferences.IMPORT_FILE_PATH);
+		final String importFilePath = WorkspaceSettings.getInstance(project).importFilePath;
 		if (!StringUtil.isEmptyOrSpaces(importFilePath)) {
-			AnalyzeUtil.importPreferences(plugin, importFilePath);
+			//AnalyzeUtil.importPreferences(plugin, importFilePath); // TODO
 		}
 
-		if (preferences.getBugCategories().containsValue("true") && preferences.getDetectors().containsValue("true")) {
-			analyze(
-					e,
-					project,
-					module,
-					plugin,
-					toolWindow,
-					state,
-					preferences
-			);
-		} else {
-			FindBugsPluginImpl.showToolWindowNotifier(project, "No bug categories or bug pattern detectors selected. Analysis aborted.", MessageType.WARNING);
-			ShowSettingsUtil.getInstance().editConfigurable(project, plugin);
+		if (areAllBugCategoriesDisabled(settings)) {
+			FindBugsPluginImpl.showToolWindowNotifier(project, "All bug categories are disabled. Analysis aborted.", MessageType.WARNING);
+			ShowSettingsUtil.getInstance().showSettingsDialog(project, ProjectConfigurableImpl.DISPLAY_NAME);
+			return;
 		}
+
+		if (areAllDetectorsDisabled(settings)) {
+			FindBugsPluginImpl.showToolWindowNotifier(project, "All detectors are disabled. Analysis aborted.", MessageType.WARNING);
+			ShowSettingsUtil.getInstance().showSettingsDialog(project, ProjectConfigurableImpl.DISPLAY_NAME);
+		}
+
+		analyze(
+				e,
+				project,
+				module,
+				toolWindow,
+				state,
+				projectSettings,
+				settings
+		);
 	}
-
 
 	abstract void analyze(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	);
+
+	private static boolean areAllBugCategoriesDisabled(@NotNull final AbstractSettings settings) {
+		return false; // TODO
+	}
+
+	private static boolean areAllDetectorsDisabled(@NotNull final AbstractSettings settings) {
+		return false; // TODO
+	}
 }

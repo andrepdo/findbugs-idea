@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.actions;
 
 import com.intellij.ide.BrowserUtil;
@@ -29,6 +28,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.MessageType;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ToolWindow;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.BugInstance;
@@ -39,14 +39,15 @@ import org.dom4j.io.DocumentSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
-import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.IoUtil;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.ExportFileDialog;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.tasks.BackgroundableTask;
 
 import javax.xml.transform.Result;
@@ -72,15 +73,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @author Keith Lea <keithl@gmail.com>
- * @version $Revision$
- * @since 0.9.95
- */
 @SuppressWarnings({"HardCodedStringLiteral"})
 public final class ExportBugCollection extends AbstractAction {
 
@@ -98,15 +90,15 @@ public final class ExportBugCollection extends AbstractAction {
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
 
 		boolean enable = false;
 		if (state.isIdle()) {
-			final BugCollection bugCollection = IdeaUtilImpl.getPluginComponent(project).getBugCollection();
+			final BugCollection bugCollection = ToolWindowPanel.getInstance(project).getBugCollection();
 			enable = bugCollection != null && bugCollection.iterator().hasNext();
 		}
 
@@ -119,24 +111,25 @@ public final class ExportBugCollection extends AbstractAction {
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
 
-		final BugCollection bugCollection = IdeaUtilImpl.getPluginComponent(project).getBugCollection();
+		final BugCollection bugCollection = ToolWindowPanel.getInstance(project).getBugCollection();
 		if (bugCollection == null) {
 			FindBugsPluginImpl.showToolWindowNotifier(project, "No bug collection", MessageType.WARNING);
 			return;
 		}
 
-		String exportDir = preferences.getProperty(FindBugsPreferences.EXPORT_BASE_DIR, FindBugsPluginConstants.DEFAULT_EXPORT_DIR);
-		boolean exportXml = preferences.getBooleanProperty(FindBugsPreferences.EXPORT_AS_XML, true);
-		boolean exportHtml = preferences.getBooleanProperty(FindBugsPreferences.EXPORT_AS_HTML, true);
-		boolean exportBoth = exportXml && preferences.getBooleanProperty(FindBugsPreferences.EXPORT_AS_HTML, true);
+		final WorkspaceSettings workspaceSettings = WorkspaceSettings.getInstance(project);
+		String exportDir = workspaceSettings.exportDirectory;
+		boolean exportXml = workspaceSettings.exportAsXml;
+		boolean exportHtml = workspaceSettings.exportAsHtml;
+		boolean exportBoth = exportXml && exportHtml;
 
-		if (exportDir.isEmpty() || !exportXml && !exportBoth && !exportHtml) {
+		if (StringUtil.isEmptyOrSpaces(exportDir) || !exportXml && !exportHtml) {
 
 			//Ask the user for a export directory
 			final DialogBuilder dialogBuilder = new DialogBuilder(project);
@@ -183,8 +176,8 @@ public final class ExportBugCollection extends AbstractAction {
 				try {
 					createDirIfAbsent(project, finalExportDir);
 					String exportDir = finalExportDir;
-					final boolean createSubDir = preferences.getBooleanProperty(FindBugsPreferences.EXPORT_CREATE_ARCHIVE_DIR, true);
-					if(createSubDir) {
+					final boolean createSubDir = false; // preferences.getBooleanProperty(FindBugsPreferences.EXPORT_CREATE_ARCHIVE_DIR, true); TODO UI Checkbox
+					if (createSubDir) {
 						exportDir = finalExportDir + File.separatorChar + new SimpleDateFormat("yyyy_MM_dd", Locale.ENGLISH).format(currentDate);
 						createDirIfAbsent(project, exportDir);
 					}
@@ -202,7 +195,7 @@ public final class ExportBugCollection extends AbstractAction {
 					bugCollection.setWithMessages(false);
 
 					showToolWindowNotifier(project, "Exported bug collection to " + exportDir + '.', MessageType.INFO);
-					if((!finalExportXml || finalExportBoth) && preferences.getBooleanProperty(FindBugsPreferences.EXPORT_OPEN_BROWSER, true)) {
+					if ((!finalExportXml || finalExportBoth) /*&& preferences.getBooleanProperty(FindBugsPreferences.EXPORT_OPEN_BROWSER, true)*/) { // TODO "Open in Browser" Ui Checkbox
 						BrowserUtil.browse(new File(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_HTML_SUFFIX).getAbsolutePath());
 					}
 
@@ -287,8 +280,8 @@ public final class ExportBugCollection extends AbstractAction {
 
 	private static void createDirIfAbsent(final Project project, final String dir) {
 		final File exportDir = new File(dir);
-		if(!exportDir.exists()) {
-			if(!exportDir.mkdirs()) {
+		if (!exportDir.exists()) {
+			if (!exportDir.mkdirs()) {
 				final String message = "Creating the export directory '" + exportDir + "' failed.";
 				showToolWindowNotifier(project, message, MessageType.ERROR);
 				LOGGER.error(message);

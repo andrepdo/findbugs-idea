@@ -305,8 +305,7 @@
         <moduleConfigurable provider="org.twodividedbyzero.idea.findbugs.core.ModuleConfigurableProvider"
                             displayName="FindBugs-IDEA"/>
     </extensions>
-
-    <!--<extensions defaultExtensionNs="com.intellij">
+    <extensions defaultExtensionNs="com.intellij">
         <errorHandler implementation="org.twodividedbyzero.idea.findbugs.core.ErrorReportSubmitterImpl"/>
         <annotator language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugAnnotator"/>
         <codeInsight.lineMarkerProvider language="JAVA" implementationClass="org.twodividedbyzero.idea.findbugs.gui.editor.BugsLineMarkerProvider"/>
@@ -321,20 +320,10 @@
     </extensions>
     <project-components>
         <component>
-            <implementation-class>org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl</implementation-class>
-            <interface-class>org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin</interface-class>
-        </component>
-        <component>
             <implementation-class>org.twodividedbyzero.idea.findbugs.core.FindBugsCompileAfterHook
             </implementation-class>
         </component>
     </project-components>
-    <module-components>
-        <component>
-            <implementation-class>org.twodividedbyzero.idea.findbugs.core.ModuleComponentImpl</implementation-class>
-            <interface-class>org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin</interface-class>
-        </component>
-    </module-components>-->
 
     <actions>
         <group id="FindBugs.EditorPopup" text="FindBugs" popup="true">

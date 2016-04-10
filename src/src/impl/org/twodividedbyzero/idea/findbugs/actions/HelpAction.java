@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -18,7 +18,6 @@
  */
 package org.twodividedbyzero.idea.findbugs.actions;
 
-
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
@@ -30,24 +29,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
-
-/**
- * $Date$
- *
- * @version $Revision$
- */
 public final class HelpAction extends AbstractAction {
 
 	@NonNls
 	@SuppressWarnings({"StringBufferField"})
 	private static final StringBuilder HTML_BODY;
-
 
 	static {
 		HTML_BODY = new StringBuilder();
@@ -77,32 +69,30 @@ public final class HelpAction extends AbstractAction {
 
 	}
 
-
 	@Override
 	void updateImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
 
 		e.getPresentation().setEnabled(true);
 		e.getPresentation().setVisible(true);
 	}
 
-
 	@Override
 	void actionPerformedImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
 
 		BalloonTipFactory.showPopup(

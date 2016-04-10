@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -35,10 +35,10 @@ import edu.umd.cs.findbugs.Detector;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
-import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.StringUtil;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
+import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
+import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.intentions.ClearAndSuppressBugIntentionAction;
 import org.twodividedbyzero.idea.findbugs.intentions.ClearBugIntentionAction;
 import org.twodividedbyzero.idea.findbugs.intentions.SuppressReportBugForClassIntentionAction;
@@ -50,39 +50,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
- * @since 0.9.94
- */
 public final class BugAnnotator implements Annotator {
-
 
 	public BugAnnotator() {
 	}
 
-
 	@Override
 	public void annotate(@NotNull final PsiElement psiElement, @NotNull final AnnotationHolder annotationHolder) {
 		final Project project = psiElement.getProject();
-		final FindBugsPlugin plugin = IdeaUtilImpl.getPluginComponent(project);
-		if (!plugin.getPreferences().isAnnotationTextRangeMarkupEnabled()) {
+		final WorkspaceSettings workspaceSettings = WorkspaceSettings.getInstance(project);
+		if (!workspaceSettings.annotationTextRangeMarkup) {
 			return;
 		}
 		if (!FindBugsState.get(project).isIdle()) {
 			return;
 		}
-		final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = plugin.getProblems();
+		final ToolWindowPanel toolWindow = ToolWindowPanel.getInstance(project);
+		if (toolWindow == null) {
+			return;
+		}
+		final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = toolWindow.getProblems();
 
 		final PsiFile psiFile = psiElement.getContainingFile();
 		if (problems.containsKey(psiFile)) {
 			addAnnotation(psiElement, new ArrayList<ExtendedProblemDescriptor>(problems.get(psiFile)), annotationHolder);
 		}
 	}
-
 
 	private static void addAnnotation(@NotNull final PsiElement psiElement, final Iterable<ExtendedProblemDescriptor> problemDescriptors, @NotNull final AnnotationHolder annotationHolder) {
 		final List<ExtendedProblemDescriptor> matchingDescriptors = new ArrayList<ExtendedProblemDescriptor>();
@@ -99,7 +92,6 @@ public final class BugAnnotator implements Annotator {
 			}
 		}
 	}
-
 
 	private static void addAnnotation(final ExtendedProblemDescriptor problemDescriptor, final List<ExtendedProblemDescriptor> matchingDescriptors, final PsiElement psiElement, @NotNull final AnnotationHolder annotationHolder) {
 		final BugInstance bugInstance = problemDescriptor.getBugInstance();
@@ -207,7 +199,6 @@ public final class BugAnnotator implements Annotator {
 				throw new IllegalArgumentException("Unknown bugInstance.getPriority() == " + priority);
 		}
 	}
-	
 
 	private static String getAnnotationText(final List<ExtendedProblemDescriptor> problemDescriptors) {
 		final StringBuilder buffer = new StringBuilder();
@@ -224,7 +215,6 @@ public final class BugAnnotator implements Annotator {
 
 		return StringUtil.addLineSeparatorAt(buffer, 250).toString();
 	}
-
 
 	/*private static class AnonymousInnerClassMayBeStaticVisitor extends BaseInspectionVisitor {
 

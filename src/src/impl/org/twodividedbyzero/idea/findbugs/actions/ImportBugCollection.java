@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,9 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.actions;
-
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
@@ -30,6 +28,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Condition;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.util.Processor;
 import com.intellij.util.containers.TransferToEDTQueue;
@@ -46,9 +45,12 @@ import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
 import org.twodividedbyzero.idea.findbugs.gui.common.ImportFileDialog;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
@@ -60,26 +62,19 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @since 0.9.96
- */
 public final class ImportBugCollection extends AbstractAction {
 
-	private static final Logger LOGGER = Logger.getInstance(ImportBugCollection.class.getName());
+	private static final Logger LOGGER = Logger.getInstance(ImportBugCollection.class);
 
 	@Override
 	void updateImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
 
 		e.getPresentation().setEnabled(state.isIdle());
@@ -92,10 +87,10 @@ public final class ImportBugCollection extends AbstractAction {
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
 
 		final DialogBuilder dialogBuilder = new DialogBuilder(project);
@@ -103,7 +98,9 @@ public final class ImportBugCollection extends AbstractAction {
 		dialogBuilder.addCancelAction();
 		dialogBuilder.setTitle("Import previous saved bug collection xml");
 
-		final String exportDir = preferences.getProperty(FindBugsPreferences.EXPORT_BASE_DIR, FindBugsPluginConstants.DEFAULT_EXPORT_DIR) + File.separatorChar + project.getName();
+		final WorkspaceSettings workspaceSettings = WorkspaceSettings.getInstance(project);
+		String exportDir = StringUtil.isEmptyOrSpaces(workspaceSettings.exportDirectory) ? FindBugsPluginConstants.DEFAULT_EXPORT_DIR : workspaceSettings.exportDirectory;
+		exportDir += File.separatorChar + project.getName();
 
 		final ImportFileDialog importFileDialog = new ImportFileDialog(exportDir, dialogBuilder);
 		dialogBuilder.showModal(true);
@@ -116,7 +113,7 @@ public final class ImportBugCollection extends AbstractAction {
 		}
 
 
-		final BugCollection bugCollection = plugin.getToolWindowPanel().getBugCollection();
+		final BugCollection bugCollection = null; // plugin.getToolWindowPanel().getBugCollection(); TODO
 		if (bugCollection != null && !bugCollection.getCollection().isEmpty()) {
 			//noinspection DialogTitleCapitalization
 			final int result = Messages.showYesNoDialog(project, "Current result in the 'Found bugs view' will be deleted. Continue ?", "Delete found bugs?", Messages.getQuestionIcon());
@@ -161,9 +158,9 @@ public final class ImportBugCollection extends AbstractAction {
 					final edu.umd.cs.findbugs.Project importProject = importBugCollection.getProject();
 					importProject.setGuiCallback(new PluginGuiCallback(pluginComponent));
 					importBugCollection.setDoNotUseCloud(true);
-					for (final Plugin plugin : Plugin.getAllPlugins()) {
-						importProject.setPluginStatusTrinary(plugin.getPluginId(), !preferences.isPluginDisabled(plugin.getPluginId()));
-					}
+					//for (final Plugin plugin : Plugin.getAllPlugins()) { TODO
+					//	importProject.setPluginStatusTrinary(plugin.getPluginId(), !preferences.isPluginDisabled(plugin.getPluginId()));
+					//}
 					importBugCollection.readXML(fileToImport);
 
 					final ProjectStats projectStats = importBugCollection.getProjectStats();
@@ -236,11 +233,10 @@ public final class ImportBugCollection extends AbstractAction {
 			}
 		};
 
-		task.setCancelText( "Cancel" );
+		task.setCancelText("Cancel");
 		task.asBackgroundable();
 		task.queue();
 	}
-
 
 	private static void showToolWindowNotifier(final Project project, final String message, final MessageType type) {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {

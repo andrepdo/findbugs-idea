@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,9 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.actions;
-
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
@@ -31,17 +29,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
+import org.twodividedbyzero.idea.findbugs.core.ModuleSettings;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
-
-/**
- * @author $Author: reto.merz@gmail.com $
- * @version $Revision: 383 $
- * @since 0.9.995
- */
 abstract class AbstractToggleAction extends ToggleAction {
 
 	@Override
@@ -52,12 +45,6 @@ abstract class AbstractToggleAction extends ToggleAction {
 			e.getPresentation().setVisible(false);
 			return;
 		}
-		final FindBugsPlugin plugin = IdeaUtilImpl.getPluginComponent(project);
-		if (plugin == null) {
-			e.getPresentation().setEnabled(false);
-			e.getPresentation().setVisible(false);
-			return;
-		}
 		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
 		if (toolWindow == null || !toolWindow.isAvailable()) {
 			e.getPresentation().setEnabled(false);
@@ -70,25 +57,31 @@ abstract class AbstractToggleAction extends ToggleAction {
 			e.getPresentation().setVisible(false);
 			return;
 		}
-		final ToolWindowPanel panel = (ToolWindowPanel)content.getComponent();
-		final Module module = IdeaUtilImpl.getModule(e.getDataContext());
-		final FindBugsPreferences preferences = FindBugsPreferences.getPreferences(project, module);
+		final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
+		final Module module = IdeaUtilImpl.getModule(e.getDataContext(), project);
+		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
+		AbstractSettings settings = projectSettings;
+		if (module != null) {
+			final ModuleSettings moduleSettings = ModuleSettings.getInstance(module);
+			if (moduleSettings.overrideProjectSettings) {
+				settings = moduleSettings;
+			}
+		}
 		final boolean select = isSelectedImpl(
 				e,
 				project,
 				module,
-				plugin,
 				toolWindow,
 				panel,
 				FindBugsState.get(project),
-				preferences
+				projectSettings,
+				settings
 		);
 		final Boolean selected = select ? Boolean.TRUE : Boolean.FALSE;
 		e.getPresentation().putClientProperty(SELECTED_PROPERTY, selected);
 		e.getPresentation().setEnabled(true);
 		e.getPresentation().setVisible(true);
 	}
-
 
 	@Override
 	public final boolean isSelected(@NotNull AnActionEvent e) {
@@ -98,12 +91,6 @@ abstract class AbstractToggleAction extends ToggleAction {
 			e.getPresentation().setVisible(false);
 			return false;
 		}
-		final FindBugsPlugin plugin = IdeaUtilImpl.getPluginComponent(project);
-		if (plugin == null) {
-			e.getPresentation().setEnabled(false);
-			e.getPresentation().setVisible(false);
-			return false;
-		}
 		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
 		if (toolWindow == null || !toolWindow.isAvailable()) {
 			e.getPresentation().setEnabled(false);
@@ -116,33 +103,38 @@ abstract class AbstractToggleAction extends ToggleAction {
 			e.getPresentation().setVisible(false);
 			return false;
 		}
-		final ToolWindowPanel panel = (ToolWindowPanel)content.getComponent();
-		final Module module = IdeaUtilImpl.getModule(e.getDataContext());
-		final FindBugsPreferences preferences = FindBugsPreferences.getPreferences(project, module);
+		final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
+		final Module module = IdeaUtilImpl.getModule(e.getDataContext(), project);
+		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
+		AbstractSettings settings = projectSettings;
+		if (module != null) {
+			final ModuleSettings moduleSettings = ModuleSettings.getInstance(module);
+			if (moduleSettings.overrideProjectSettings) {
+				settings = moduleSettings;
+			}
+		}
 		return isSelectedImpl(
 				e,
 				project,
 				module,
-				plugin,
 				toolWindow,
 				panel,
 				FindBugsState.get(project),
-				preferences
+				projectSettings,
+				settings
 		);
 	}
-
 
 	abstract boolean isSelectedImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final ToolWindowPanel panel,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	);
-
 
 	@Override
 	public final void setSelected(@NotNull AnActionEvent e, boolean select) {
@@ -152,12 +144,6 @@ abstract class AbstractToggleAction extends ToggleAction {
 			e.getPresentation().setVisible(false);
 			return;
 		}
-		final FindBugsPlugin plugin = IdeaUtilImpl.getPluginComponent(project);
-		if (plugin == null) {
-			e.getPresentation().setEnabled(false);
-			e.getPresentation().setVisible(false);
-			return;
-		}
 		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
 		if (toolWindow == null || !toolWindow.isAvailable()) {
 			e.getPresentation().setEnabled(false);
@@ -170,32 +156,38 @@ abstract class AbstractToggleAction extends ToggleAction {
 			e.getPresentation().setVisible(false);
 			return;
 		}
-		final ToolWindowPanel panel = (ToolWindowPanel)content.getComponent();
-		final Module module = IdeaUtilImpl.getModule(e.getDataContext());
-		final FindBugsPreferences preferences = FindBugsPreferences.getPreferences(project, module);
+		final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
+		final Module module = IdeaUtilImpl.getModule(e.getDataContext(), project);
+		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
+		AbstractSettings settings = projectSettings;
+		if (module != null) {
+			final ModuleSettings moduleSettings = ModuleSettings.getInstance(module);
+			if (moduleSettings.overrideProjectSettings) {
+				settings = moduleSettings;
+			}
+		}
 		setSelectedImpl(
 				e,
 				project,
 				module,
-				plugin,
 				toolWindow,
 				panel,
 				FindBugsState.get(project),
-				preferences,
+				projectSettings,
+				settings,
 				select
 		);
 	}
-
 
 	abstract void setSelectedImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final ToolWindowPanel panel,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences,
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings,
 			boolean select
 	);
 }

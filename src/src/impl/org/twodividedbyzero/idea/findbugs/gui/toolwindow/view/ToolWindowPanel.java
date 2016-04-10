@@ -38,8 +38,10 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.StatusBarWidget;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.psi.PsiFile;
+import com.intellij.ui.content.Content;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.ProjectStats;
@@ -63,6 +65,7 @@ import org.twodividedbyzero.idea.findbugs.messages.ClearListener;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
 import org.twodividedbyzero.idea.findbugs.messages.NewBugInstanceListener;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
@@ -407,6 +410,20 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		_bugTreePanel.updateRootNode(null);
 	}
 
+	@Nullable
+	public static ToolWindowPanel getInstance(@NotNull final Project project) {
+		final String id = "FindBugs-IDEA"; // see plugin.xml
+		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(id);
+		final Content content = toolWindow.getContentManager().getContent(0);
+		if (content == null) {
+			return null;
+		}
+		final JComponent component = content.getComponent();
+		if (component instanceof ToolWindowPanel) {
+			return (ToolWindowPanel)component;
+		}
+		return null;
+	}
 
 	private static class ToolWindowComponentAdapter extends ComponentAdapter {
 

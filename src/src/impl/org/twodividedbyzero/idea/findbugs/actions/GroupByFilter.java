@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -18,7 +18,6 @@
  */
 package org.twodividedbyzero.idea.findbugs.actions;
 
-
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -30,33 +29,24 @@ import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.wm.ToolWindow;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 
 import java.awt.Component;
 import java.awt.event.InputEvent;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
- * @since 0.0.1
- */
 public final class GroupByFilter extends AbstractAction {
-
 
 	@Override
 	void updateImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
 
 		e.getPresentation().setEnabled(state.isIdle());
@@ -68,10 +58,10 @@ public final class GroupByFilter extends AbstractAction {
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
 
 		/*_actionEvent.getPresentation().putClientProperty("button", _actionEvent.getPresentation());
@@ -90,7 +80,6 @@ public final class GroupByFilter extends AbstractAction {
 		actionpopupmenu.getComponent().show(component, component.getWidth(), 0);
 	}
 
-
 	/*public JComponent createCustomComponent(final Presentation presentation) {
 		*//*final ActionButton actionbutton = new ActionButtonPresentation(true, "TodoViewToolbar", false);
 		presentation.putClientProperty("button", actionbutton);
@@ -102,20 +91,17 @@ public final class GroupByFilter extends AbstractAction {
 		return actionpopupmenu.getComponent();
 	}*/
 
-
 	private DefaultActionGroup filterApplierGroup() {
 		final DefaultActionGroup group = new DefaultActionGroup("FindBugs.GroupByFilter.PopupGroup", true);
 		group.add(new FilterApplyAction());
 		return group;
 	}
 
-
 	private static class FilterApplyAction extends AnAction {
 
 		private FilterApplyAction() {
 			super("test1", "test description", IconLoader.getIcon("/general/ideOptions.png"));
 		}
-
 
 		@Override
 		public void actionPerformed(final AnActionEvent anactionevent) {
@@ -126,8 +112,8 @@ public final class GroupByFilter extends AbstractAction {
 
 
 		//{
-			// this$1 = MySetTodoFilterAction.this;
-			//super(s, s1, icon);
+		// this$1 = MySetTodoFilterAction.this;
+		//super(s, s1, icon);
 		//}
 	}
 }

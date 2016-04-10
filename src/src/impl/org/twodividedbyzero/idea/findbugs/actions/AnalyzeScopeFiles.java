@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -17,7 +17,6 @@
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.twodividedbyzero.idea.findbugs.actions;
-
 
 import com.intellij.analysis.AnalysisScope;
 import com.intellij.analysis.AnalysisScopeBundle;
@@ -59,11 +58,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.collectors.StatelessClassAdder;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 
 import javax.swing.Action;
 import java.util.ArrayList;
@@ -72,11 +71,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
-/**
- * @author Reto Merz<reto.merz@gmail.com>
- * @since 0.9.99
- */
 public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 
 	@Override
@@ -84,10 +78,10 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
 
 		e.getPresentation().setEnabled(state.isIdle());
@@ -100,10 +94,10 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@Nullable final Module module,
-			@NotNull final FindBugsPlugin plugin,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
 
 		final DataContext dataContext = e.getDataContext();
@@ -142,7 +136,7 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 		uiOptions.ANALYZE_TEST_SOURCES = dlg.isInspectTestSources();
 		FileDocumentManager.getInstance().saveAllDocuments();
 
-		analyzeImpl(e, project, scope, preferences);
+		analyzeImpl(e, project, scope, projectSettings, settings);
 	}
 
 
@@ -150,18 +144,18 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@NotNull final AnalysisScope scope,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
 	) {
 
 		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
 		final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(e.getDataContext());
 
-		new FindBugsStarter(project, "Running FindBugs analysis...", preferences) {
+		new FindBugsStarter(project, "Running FindBugs analysis...", projectSettings, settings) {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 				consumer.consume(compilerManager.createProjectCompileScope(project));
 			}
-
 
 			@Override
 			protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
@@ -172,7 +166,6 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 			}
 		}.start();
 	}
-
 
 	@SuppressFBWarnings("SIC_INNER_SHOULD_BE_STATIC_ANON")
 	private void addClasses(
@@ -208,12 +201,10 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 		findBugsProject.setConfiguredOutputFiles(outputFiles);
 	}
 
-
 	@NonNls
 	private String getHelpTopic() {
 		return "reference.dialogs.analyzeDependencies.scope";
 	}
-
 
 	@Nullable
 	private AnalysisScope getInspectionScope(@NotNull final DataContext dataContext) {
@@ -223,7 +214,6 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 
 		return scope != null && scope.getScopeType() != AnalysisScope.INVALID ? scope : null;
 	}
-
 
 	@Nullable
 	private AnalysisScope getInspectionScopeImpl(@NotNull final DataContext dataContext) {
@@ -243,7 +233,7 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 			return new AnalysisScope(moduleContext);
 		}
 
-		final Module [] modulesArray = LangDataKeys.MODULE_CONTEXT_ARRAY.getData(dataContext);
+		final Module[] modulesArray = LangDataKeys.MODULE_CONTEXT_ARRAY.getData(dataContext);
 		if (modulesArray != null) {
 			return new AnalysisScope(modulesArray);
 		}
@@ -277,7 +267,7 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 				if (fileIndex.isInContent(vFile)) {
 					if (vFile instanceof VirtualFileWindow) {
 						files.add(vFile);
-						vFile = ((VirtualFileWindow)vFile).getDelegate();
+						vFile = ((VirtualFileWindow) vFile).getDelegate();
 					}
 					collectFilesUnder(vFile, files);
 				}
@@ -287,11 +277,9 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 		return project == null ? null : new AnalysisScope(project);
 	}
 
-
 	private boolean acceptNonProjectDirectories() {
 		return false;
 	}
-
 
 	private static void collectFilesUnder(@NotNull final VirtualFile vFile, @NotNull final Collection<VirtualFile> files) {
 		VfsUtilCore.visitChildrenRecursively(vFile, new VirtualFileVisitor() {
@@ -304,7 +292,6 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 			}
 		});
 	}
-
 
 	private static String getModuleNameInReadAction(@NotNull final Module module) {
 		return new ReadAction<String>() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -31,35 +31,26 @@ import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
-import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.Icon;
 import java.util.List;
 import java.util.Map;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
- * @since 0.9.97
- */
 public class ClearBugIntentionAction extends SuppressReportBugIntentionAction {
 
 	public ClearBugIntentionAction(final ExtendedProblemDescriptor problemDescriptor) {
 		super(problemDescriptor);
 	}
 
-
 	@Override
 	public void invoke(@NotNull final Project project, final Editor editor, @NotNull final PsiElement element) throws IncorrectOperationException {
-		final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = IdeaUtilImpl.getPluginComponent(project).getProblems();
+		final ToolWindowPanel toolWindow = ToolWindowPanel.getInstance(project);
+		final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = toolWindow.getProblems();
 		problems.get(element.getContainingFile()).remove(getProblemDescriptor());
 		DaemonCodeAnalyzer.getInstance(project).restart();
 	}
-
 
 	@Override
 	@Nullable
@@ -78,13 +69,11 @@ public class ClearBugIntentionAction extends SuppressReportBugIntentionAction {
 		return container;
 	}
 
-
 	@Override
 	@NotNull
 	public String getText() {
 		return ResourcesLoader.getString("findbugs.inspection.quickfix.clear") + " '" + getBugPatternId() + '\'';
 	}
-
 
 	@SuppressWarnings("HardcodedFileSeparator")
 	@Override
