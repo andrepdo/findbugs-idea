@@ -19,7 +19,9 @@
 package org.twodividedbyzero.idea.findbugs.core;
 
 import com.intellij.util.xmlb.annotations.MapAnnotation;
+import com.intellij.util.xmlb.annotations.Property;
 import com.intellij.util.xmlb.annotations.Tag;
+import edu.umd.cs.findbugs.DetectorFactory;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 
@@ -29,7 +31,14 @@ import java.util.Map;
 @Tag(value = "detectors")
 public final class DetectorSettings implements Comparable<DetectorSettings> {
 
-	//@Tag(value = "XYZ")
+	/**
+	 * Note that the map only contains enabled state which are not equal to the default enable state
+	 * {@link DetectorFactory#isDefaultEnabled()}.
+	 * <p>
+	 * Key = {@link DetectorFactory#getShortName()} (like {@link edu.umd.cs.findbugs.config.UserPreferences#detectorEnablementMap})
+	 * Value = Enabled state
+	 */
+	@Property(surroundWithTag = false)
 	@MapAnnotation(
 			surroundWithTag = false,
 			surroundValueWithTag = false,

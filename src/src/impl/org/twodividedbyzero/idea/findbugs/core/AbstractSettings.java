@@ -19,9 +19,9 @@
 package org.twodividedbyzero.idea.findbugs.core;
 
 import com.intellij.util.xmlb.annotations.MapAnnotation;
-import com.intellij.util.xmlb.annotations.Tag;
+import com.intellij.util.xmlb.annotations.Property;
 import edu.umd.cs.findbugs.BugRanker;
-import edu.umd.cs.findbugs.DetectorFactory;
+import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
@@ -80,13 +80,11 @@ public abstract class AbstractSettings {
 	public Map<String, Boolean> excludeBugsFiles = New.map();
 
 	/**
-	 * Note that the map only contains enabled state which are not equal to the default enable state
-	 * {@link DetectorFactory#isDefaultEnabled()}.
+	 * Detector settings by plugin.
 	 * <p>
-	 * Key = {@link DetectorFactory#getShortName()} (like {@link edu.umd.cs.findbugs.config.UserPreferences#detectorEnablementMap})
-	 * Value = Enabled state
+	 * Key = {@link Plugin#getPluginId()}
 	 */
-	@Tag(value = "detectorsByPlugin")
+	@Property(surroundWithTag = false)
 	@MapAnnotation(
 			surroundWithTag = false,
 			surroundValueWithTag = false,
