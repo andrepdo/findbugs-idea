@@ -165,6 +165,7 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 					}
 				}
 			}
+			getModel().fireTableDataChanged();
 			if (errors.length() > 0) {
 				Messages.showErrorDialog(
 						this,
@@ -183,6 +184,7 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 				toRemove.add(getModel().rows.get(idx));
 			}
 			getModel().rows.removeAll(toRemove);
+			getModel().fireTableDataChanged();
 		}
 	}
 

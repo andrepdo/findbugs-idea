@@ -18,15 +18,13 @@
  */
 package org.twodividedbyzero.idea.findbugs.core;
 
+import com.intellij.util.xmlb.annotations.Tag;
 import edu.umd.cs.findbugs.BugRanker;
 import edu.umd.cs.findbugs.DetectorFactory;
-import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
-import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -61,19 +59,6 @@ public abstract class AbstractSettings {
 	/**
 	 * @see ProjectFilterSettings#addCategory(String)
 	 * @see ProjectFilterSettings#removeCategory(String)
-	 */
-	public Set<String> activeBugCategory = activeBugCategoryDefault(); // TODO only store hidden categories
-
-	@NotNull
-	private static Set<String> activeBugCategoryDefault() {
-		final Set<String> ret = new HashSet<String>(DetectorFactoryCollection.instance().getBugCategories());
-		ret.remove("NOISE");
-		return ret;
-	}
-
-	/**
-	 * @see ProjectFilterSettings#addCategory(String)
-	 * @see ProjectFilterSettings#removeCategory(String)
 	 * @see ProjectFilterSettings#containsCategory(String)
 	 */
 	public Set<String> hiddenBugCategory = New.asSet("NOISE");
@@ -100,5 +85,6 @@ public abstract class AbstractSettings {
 	 * Key = {@link DetectorFactory#getShortName()} (like {@link edu.umd.cs.findbugs.config.UserPreferences#detectorEnablementMap})
 	 * Value = Enabled state
 	 */
-	public Map<String, Boolean> detectors = New.map();
+	@Tag(value = "detectors")
+	public Set<DetectorSettings> detectors = New.set();
 }

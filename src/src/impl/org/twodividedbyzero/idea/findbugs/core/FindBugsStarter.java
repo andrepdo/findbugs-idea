@@ -180,10 +180,10 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 			userPrefs.setExcludeBugsFiles(new HashMap<String, Boolean>(settings.excludeBugsFiles));
 			userPrefs.setExcludeFilterFiles(new HashMap<String, Boolean>(settings.excludeFilterFiles));
 
-			for (final Map.Entry<String, Boolean> detector : settings.detectors.entrySet()) {
-				final DetectorFactory detectorFactory = detectorFactoryCollection.getFactory(detector.getKey());
+			for (final DetectorSettings detectorSettings : settings.detectors) {
+				final DetectorFactory detectorFactory = detectorFactoryCollection.getFactory(detectorSettings.shortName);
 				if (detectorFactory != null) {
-					userPrefs.enableDetector(detectorFactory, detector.getValue());
+					userPrefs.enableDetector(detectorFactory, detectorSettings.enabled);
 				}
 			}
 		}

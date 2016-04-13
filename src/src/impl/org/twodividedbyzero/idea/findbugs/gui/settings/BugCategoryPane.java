@@ -31,7 +31,6 @@ import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -67,6 +66,7 @@ final class BugCategoryPane extends JPanel implements SettingsOwner<AbstractSett
 		table.getColumnModel().getColumn(Model.NAME_COLUMN).setCellRenderer(new TableCellRenderer() {
 			final SimpleColoredComponent label = new SimpleColoredComponent();
 			final SimpleColoredText text = new SimpleColoredText();
+
 			@Override
 			public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
 				final Item item = getModel().rows.get(row);
@@ -108,11 +108,11 @@ final class BugCategoryPane extends JPanel implements SettingsOwner<AbstractSett
 		final Model model = getModel();
 		for (final Item item : model.rows) {
 			if (item.enabled) {
-				if (!settings.activeBugCategory.contains(item.category) || settings.hiddenBugCategory.contains(item.category)) {
+				if (settings.hiddenBugCategory.contains(item.category)) {
 					return true;
 				}
 			} else {
-				if (settings.activeBugCategory.contains(item.category) || !settings.hiddenBugCategory.contains(item.category)) {
+				if (!settings.hiddenBugCategory.contains(item.category)) {
 					return true;
 				}
 			}
@@ -125,10 +125,8 @@ final class BugCategoryPane extends JPanel implements SettingsOwner<AbstractSett
 		final Model model = getModel();
 		for (final Item item : model.rows) {
 			if (item.enabled) {
-				settings.activeBugCategory.add(item.category);
 				settings.hiddenBugCategory.remove(item.category);
 			} else {
-				settings.activeBugCategory.remove(item.category);
 				settings.hiddenBugCategory.add(item.category);
 			}
 		}

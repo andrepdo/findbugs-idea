@@ -23,6 +23,7 @@ import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
+import org.twodividedbyzero.idea.findbugs.core.DetectorSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -32,6 +33,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 	AbstractDetectorNode(@NotNull final String text) {
@@ -63,10 +65,10 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 	@NotNull
 	static AbstractDetectorNode buildRoot(
 			final boolean addHidden,
-			@NotNull final Map<String, Boolean> enabled
+			@NotNull final Set<DetectorSettings> detectorSettings
 	) {
 
-		final Map<String, List<DetectorNode>> byProvider = buildByProvider(addHidden, enabled);
+		final Map<String, List<DetectorNode>> byProvider = buildByProvider(addHidden, detectorSettings);
 
 		final Comparator<DetectorNode> nodeComparator = new Comparator<DetectorNode>() {
 			@Override
@@ -93,7 +95,7 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 	@NotNull
 	private static Map<String, List<DetectorNode>> buildByProvider(
 			final boolean addHidden,
-			@NotNull final Map<String, Boolean> enabled
+			@NotNull final Set<DetectorSettings> detectorSettings
 	) {
 
 		final Iterator<DetectorFactory> iterator = DetectorFactoryCollection.instance().factoryIterator();
@@ -112,22 +114,75 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 					detectors = New.arrayList();
 					byProvider.put(provider, detectors);
 				}
-				detectors.add(create(factory, enabled.get(factory.getShortName())));
+				final Boolean enabled = isEnabled(detectorSettings, factory);
+				detectors.add(create(factory, enabled));
 			}
 		}
 		return byProvider;
 	}
 
-	static void fillEnabledMap(@NotNull final AbstractDetectorNode node, @NotNull final Map<String, Boolean> enabled) {
+	static void fillEnabledSet(
+			@NotNull final AbstractDetectorNode node,
+			@NotNull final Set<DetectorSettings> detectorSettings
+	) {
 		for (int i = 0; i < node.getChildCount(); i++) {
-			fillEnabledMap((AbstractDetectorNode) node.getChildAt(i), enabled);
+			fillEnabledSet((AbstractDetectorNode) node.getChildAt(i), detectorSettings);
 		}
 		if (!node.isGroup()) {
 			final DetectorNode detectorNode = (DetectorNode) node;
-			enabled.remove(detectorNode.getDetector().getShortName());
+			remove(detectorSettings, detectorNode.getDetector());
 			if (detectorNode.isEnabledDefaultDifferent()) {
-				enabled.put(detectorNode.getDetector().getShortName(), detectorNode.getEnabled());
+				add(detectorSettings, detectorNode.getDetector(), detectorNode.getEnabled());
 			}
 		}
+	}
+
+	@Nullable
+	private static Boolean isEnabled(
+			@NotNull final Set<DetectorSettings> detectorSettings,
+			@NotNull final DetectorFactory detector
+	) {
+		final String pluginId = detector.getPlugin().getPluginId();
+		final String shortName = detector.getShortName();
+		Boolean ret = null;
+		for (final DetectorSettings settings : detectorSettings) {
+			if (settings.pluginId.equals(pluginId)) {
+				if (settings.shortName.equals(shortName)) {
+					ret = settings.enabled;
+					break;
+				}
+			}
+		}
+		return ret;
+	}
+
+	private static void remove(
+			@NotNull final Set<DetectorSettings> detectorSettings,
+			@NotNull final DetectorFactory detector
+	) {
+		final String pluginId = detector.getPlugin().getPluginId();
+		final String shortName = detector.getShortName();
+		final Set<DetectorSettings> toRemove = New.set();
+		Boolean ret = null;
+		for (final DetectorSettings settings : detectorSettings) {
+			if (settings.pluginId.equals(pluginId)) {
+				if (settings.shortName.equals(shortName)) {
+					toRemove.add(settings);
+				}
+			}
+		}
+		detectorSettings.removeAll(toRemove);
+	}
+
+	private static void add(
+			@NotNull final Set<DetectorSettings> detectorSettings,
+			@NotNull final DetectorFactory detector,
+			final boolean enabled
+	) {
+		final DetectorSettings settings = new DetectorSettings();
+		settings.pluginId = detector.getPlugin().getPluginId();
+		settings.shortName = detector.getShortName();
+		settings.enabled = enabled;
+		detectorSettings.add(settings);
 	}
 }

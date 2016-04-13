@@ -33,7 +33,7 @@ import java.util.Set;
 
 @State(
 		name = "FindBugs-IDEA",
-		storages = @Storage(value = "findbugs-26.xml", roamingType = RoamingType.DEFAULT) // TODO kick -26
+		storages = @Storage(value = "findbugs-31.xml", roamingType = RoamingType.DEFAULT) // TODO kick -26
 )
 public final class ProjectSettings extends AbstractSettings implements PersistentStateComponent<ProjectSettings> {
 

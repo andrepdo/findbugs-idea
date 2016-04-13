@@ -30,13 +30,14 @@ import com.intellij.util.ui.tree.TreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
+import org.twodividedbyzero.idea.findbugs.core.DetectorSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import java.awt.BorderLayout;
-import java.util.Map;
+import java.util.Set;
 
 final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSettings> {
 	private FilterHidden filterHidden;
@@ -89,15 +90,15 @@ final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSe
 
 	@Override
 	public boolean isModified(@NotNull final AbstractSettings settings) {
-		final Map<String, Boolean> enabled = New.map();
-		AbstractDetectorNode.fillEnabledMap(getRootNode(), enabled);
+		final Set<DetectorSettings> detectorSettings = New.set();
+		AbstractDetectorNode.fillEnabledSet(getRootNode(), detectorSettings);
 		// TODO should not return true if settings contains an unknown detector!
-		return !settings.detectors.equals(enabled);
+		return !settings.detectors.equals(detectorSettings);
 	}
 
 	@Override
 	public void apply(@NotNull final AbstractSettings settings) throws ConfigurationException {
-		AbstractDetectorNode.fillEnabledMap(getRootNode(), settings.detectors);
+		AbstractDetectorNode.fillEnabledSet(getRootNode(), settings.detectors);
 	}
 
 	@Override
@@ -126,10 +127,10 @@ final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSe
 		@Override
 		public void setSelected(final AnActionEvent e, final boolean state) {
 			selected = state;
-			final Map<String, Boolean> enabled = New.map();
-			AbstractDetectorNode.fillEnabledMap(getRootNode(), enabled);
+			final Set<DetectorSettings> detectorSettings = New.set();
+			AbstractDetectorNode.fillEnabledSet(getRootNode(), detectorSettings);
 			final TreeState treeState = TreeState.createOn(table.getTree(), getRootNode());
-			model.setRoot(DetectorNode.buildRoot(!state, enabled));
+			model.setRoot(DetectorNode.buildRoot(!state, detectorSettings));
 			TreeUtil.expandAll(table.getTree()); // because TreeState does not work
 			treeState.applyTo(table.getTree());
 		}

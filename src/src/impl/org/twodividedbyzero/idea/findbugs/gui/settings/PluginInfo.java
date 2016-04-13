@@ -68,7 +68,7 @@ final class PluginInfo {
 	static PluginInfo create(@NotNull final File path, @NotNull final Plugin plugin) throws MalformedURLException, PluginException {
 		final PluginSettings settings = new PluginSettings();
 		settings.id = plugin.getPluginId();
-		settings.enabled = plugin.isEnabledByDefault();
+		settings.enabled = true; // enable ; do not use plugin.isEnabledByDefault();
 		settings.path = path.getPath();
 		return new PluginInfo(
 				settings,
