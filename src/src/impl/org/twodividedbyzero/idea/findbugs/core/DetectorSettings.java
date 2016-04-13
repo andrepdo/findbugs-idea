@@ -18,52 +18,67 @@
  */
 package org.twodividedbyzero.idea.findbugs.core;
 
-import com.intellij.util.xmlb.annotations.Attribute;
+import com.intellij.util.xmlb.annotations.MapAnnotation;
 import com.intellij.util.xmlb.annotations.Tag;
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
 
-@Tag(value = "detector")
+import java.util.Iterator;
+import java.util.Map;
+
+@Tag(value = "detectors")
 public final class DetectorSettings implements Comparable<DetectorSettings> {
 
-	@Attribute
-	public String pluginId = "Unknown";
-
-	@Attribute
-	public boolean enabled = false;
-
-	@Attribute(value = "name")
-	public String shortName = "Unknown";
+	//@Tag(value = "XYZ")
+	@MapAnnotation(
+			surroundWithTag = false,
+			surroundValueWithTag = false,
+			surroundKeyWithTag = false,
+			entryTagName = "detector",
+			keyAttributeName = "name",
+			valueAttributeName = "enabled"
+	)
+	public Map<String, Boolean> enabled = New.map();
 
 	@Override
 	public int compareTo(@NotNull final DetectorSettings o) {
-		int ret = pluginId.compareTo(o.pluginId);
-		if (ret == 0) {
-			ret = shortName.compareTo(o.shortName);
-			if (ret == 0) {
-				ret = Boolean.valueOf(enabled).compareTo(o.enabled);
+		final Iterator<Map.Entry<String, Boolean>> a = enabled.entrySet().iterator();
+		final Iterator<Map.Entry<String, Boolean>> b = o.enabled.entrySet().iterator();
+		while (true) {
+			final boolean aHasNext = a.hasNext();
+			final boolean bHasNext = b.hasNext();
+			if (!aHasNext && !bHasNext) {
+				return 0;
+			} else if (aHasNext && bHasNext) {
+				final Map.Entry<String, Boolean> aNext = a.next();
+				final Map.Entry<String, Boolean> bNext = b.next();
+				int ret = aNext.getValue().compareTo(bNext.getValue());
+				if (ret != 0) {
+					return ret;
+				}
+				ret = aNext.getValue().compareTo(bNext.getValue());
+				if (ret != 0) {
+					return ret;
+				}
+			} else if (aHasNext) {
+				return 1;
+			} else {
+				return -1;
 			}
 		}
-		return ret;
 	}
 
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-
-		final DetectorSettings that = (DetectorSettings) o;
-
-		if (enabled != that.enabled) return false;
-		if (!pluginId.equals(that.pluginId)) return false;
-		return shortName.equals(that.shortName);
+		final DetectorSettings settings = (DetectorSettings) o;
+		return enabled.equals(settings.enabled);
 
 	}
 
 	@Override
 	public int hashCode() {
-		int result = pluginId.hashCode();
-		result = 31 * result + (enabled ? 1 : 0);
-		result = 31 * result + shortName.hashCode();
-		return result;
+		return enabled.hashCode();
 	}
 }

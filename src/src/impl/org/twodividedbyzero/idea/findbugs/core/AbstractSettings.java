@@ -18,6 +18,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.core;
 
+import com.intellij.util.xmlb.annotations.MapAnnotation;
 import com.intellij.util.xmlb.annotations.Tag;
 import edu.umd.cs.findbugs.BugRanker;
 import edu.umd.cs.findbugs.DetectorFactory;
@@ -85,6 +86,13 @@ public abstract class AbstractSettings {
 	 * Key = {@link DetectorFactory#getShortName()} (like {@link edu.umd.cs.findbugs.config.UserPreferences#detectorEnablementMap})
 	 * Value = Enabled state
 	 */
-	@Tag(value = "detectors")
-	public Set<DetectorSettings> detectors = New.set();
+	@Tag(value = "detectorsByPlugin")
+	@MapAnnotation(
+			surroundWithTag = false,
+			surroundValueWithTag = false,
+			surroundKeyWithTag = false,
+			entryTagName = "plugin",
+			keyAttributeName = "id"
+	)
+	public Map<String, DetectorSettings> detectors = New.map();
 }

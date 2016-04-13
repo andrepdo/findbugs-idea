@@ -33,7 +33,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 	AbstractDetectorNode(@NotNull final String text) {
@@ -65,7 +64,7 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 	@NotNull
 	static AbstractDetectorNode buildRoot(
 			final boolean addHidden,
-			@NotNull final Set<DetectorSettings> detectorSettings
+			@NotNull final Map<String, DetectorSettings> detectorSettings
 	) {
 
 		final Map<String, List<DetectorNode>> byProvider = buildByProvider(addHidden, detectorSettings);
@@ -95,7 +94,7 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 	@NotNull
 	private static Map<String, List<DetectorNode>> buildByProvider(
 			final boolean addHidden,
-			@NotNull final Set<DetectorSettings> detectorSettings
+			@NotNull final Map<String, DetectorSettings> detectorSettings
 	) {
 
 		final Iterator<DetectorFactory> iterator = DetectorFactoryCollection.instance().factoryIterator();
@@ -123,7 +122,7 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 
 	static void fillEnabledSet(
 			@NotNull final AbstractDetectorNode node,
-			@NotNull final Set<DetectorSettings> detectorSettings
+			@NotNull final Map<String, DetectorSettings> detectorSettings
 	) {
 		for (int i = 0; i < node.getChildCount(); i++) {
 			fillEnabledSet((AbstractDetectorNode) node.getChildAt(i), detectorSettings);
@@ -139,50 +138,41 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 
 	@Nullable
 	private static Boolean isEnabled(
-			@NotNull final Set<DetectorSettings> detectorSettings,
+			@NotNull final Map<String, DetectorSettings> detectorSettings,
 			@NotNull final DetectorFactory detector
 	) {
-		final String pluginId = detector.getPlugin().getPluginId();
-		final String shortName = detector.getShortName();
-		Boolean ret = null;
-		for (final DetectorSettings settings : detectorSettings) {
-			if (settings.pluginId.equals(pluginId)) {
-				if (settings.shortName.equals(shortName)) {
-					ret = settings.enabled;
-					break;
-				}
-			}
+		final DetectorSettings settings = detectorSettings.get(detector.getPlugin().getPluginId());
+		if (settings != null) {
+			return settings.enabled.get(detector.getShortName());
 		}
-		return ret;
+		return null;
 	}
 
 	private static void remove(
-			@NotNull final Set<DetectorSettings> detectorSettings,
+			@NotNull final Map<String, DetectorSettings> detectorSettings,
 			@NotNull final DetectorFactory detector
 	) {
 		final String pluginId = detector.getPlugin().getPluginId();
-		final String shortName = detector.getShortName();
-		final Set<DetectorSettings> toRemove = New.set();
-		Boolean ret = null;
-		for (final DetectorSettings settings : detectorSettings) {
-			if (settings.pluginId.equals(pluginId)) {
-				if (settings.shortName.equals(shortName)) {
-					toRemove.add(settings);
-				}
+		final DetectorSettings settings = detectorSettings.get(pluginId);
+		if (settings != null) {
+			settings.enabled.remove(detector.getShortName());
+			if (settings.enabled.isEmpty()) {
+				detectorSettings.remove(pluginId);
 			}
 		}
-		detectorSettings.removeAll(toRemove);
 	}
 
 	private static void add(
-			@NotNull final Set<DetectorSettings> detectorSettings,
+			@NotNull final Map<String, DetectorSettings> detectorSettings,
 			@NotNull final DetectorFactory detector,
 			final boolean enabled
 	) {
-		final DetectorSettings settings = new DetectorSettings();
-		settings.pluginId = detector.getPlugin().getPluginId();
-		settings.shortName = detector.getShortName();
-		settings.enabled = enabled;
-		detectorSettings.add(settings);
+		final String pluginId = detector.getPlugin().getPluginId();
+		DetectorSettings settings = detectorSettings.get(pluginId);
+		if (settings == null) {
+			settings = new DetectorSettings();
+			detectorSettings.put(pluginId, settings);
+		}
+		settings.enabled.put(detector.getShortName(), enabled);
 	}
 }

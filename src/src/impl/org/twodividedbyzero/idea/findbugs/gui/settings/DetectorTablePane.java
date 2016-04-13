@@ -37,7 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import java.awt.BorderLayout;
-import java.util.Set;
+import java.util.Map;
 
 final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSettings> {
 	private FilterHidden filterHidden;
@@ -90,7 +90,7 @@ final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSe
 
 	@Override
 	public boolean isModified(@NotNull final AbstractSettings settings) {
-		final Set<DetectorSettings> detectorSettings = New.set();
+		final Map<String, DetectorSettings> detectorSettings = New.map();
 		AbstractDetectorNode.fillEnabledSet(getRootNode(), detectorSettings);
 		// TODO should not return true if settings contains an unknown detector!
 		return !settings.detectors.equals(detectorSettings);
@@ -127,7 +127,7 @@ final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSe
 		@Override
 		public void setSelected(final AnActionEvent e, final boolean state) {
 			selected = state;
-			final Set<DetectorSettings> detectorSettings = New.set();
+			final Map<String, DetectorSettings> detectorSettings = New.map();
 			AbstractDetectorNode.fillEnabledSet(getRootNode(), detectorSettings);
 			final TreeState treeState = TreeState.createOn(table.getTree(), getRootNode());
 			model.setRoot(DetectorNode.buildRoot(!state, detectorSettings));
