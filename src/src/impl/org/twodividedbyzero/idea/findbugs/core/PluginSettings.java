@@ -18,14 +18,32 @@
  */
 package org.twodividedbyzero.idea.findbugs.core;
 
+import edu.umd.cs.findbugs.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
+
+import java.util.Iterator;
+import java.util.Map;
 
 public final class PluginSettings implements Comparable<PluginSettings> {
+
+	/**
+	 * Plugin id ({@link Plugin#getPluginId()}).
+	 */
 	public String id = "Unknown";
 
 	public boolean enabled = false;
 
+	/**
+	 * File path to the plugin jar file.
+	 */
 	public String path = "Unknown";
+
+	/**
+	 * Detector enabled state for this plugin.
+	 * Like {@link AbstractSettings#detectors}.
+	 */
+	public Map<String, Boolean> detectors = New.map();
 
 	@Override
 	public int compareTo(@NotNull final PluginSettings o) {
@@ -34,6 +52,32 @@ public final class PluginSettings implements Comparable<PluginSettings> {
 			ret = path.compareTo(o.path);
 			if (ret == 0) {
 				ret = Boolean.valueOf(enabled).compareTo(o.enabled);
+				if (ret == 0) {
+					final Iterator<Map.Entry<String, Boolean>> a = detectors.entrySet().iterator();
+					final Iterator<Map.Entry<String, Boolean>> b = o.detectors.entrySet().iterator();
+					while (true) {
+						final boolean aHasNext = a.hasNext();
+						final boolean bHasNext = b.hasNext();
+						if (!aHasNext && !bHasNext) {
+							return 0;
+						} else if (aHasNext && bHasNext) {
+							final Map.Entry<String, Boolean> aNext = a.next();
+							final Map.Entry<String, Boolean> bNext = b.next();
+							ret = aNext.getValue().compareTo(bNext.getValue());
+							if (ret != 0) {
+								return ret;
+							}
+							ret = aNext.getValue().compareTo(bNext.getValue());
+							if (ret != 0) {
+								return ret;
+							}
+						} else if (aHasNext) {
+							return 1;
+						} else {
+							return -1;
+						}
+					}
+				}
 			}
 		}
 		return ret;
@@ -48,7 +92,8 @@ public final class PluginSettings implements Comparable<PluginSettings> {
 
 		if (enabled != settings.enabled) return false;
 		if (!id.equals(settings.id)) return false;
-		return path.equals(settings.path);
+		if (!path.equals(settings.path)) return false;
+		return detectors.equals(settings.detectors);
 
 	}
 
@@ -57,6 +102,7 @@ public final class PluginSettings implements Comparable<PluginSettings> {
 		int result = id.hashCode();
 		result = 31 * result + (enabled ? 1 : 0);
 		result = 31 * result + path.hashCode();
+		result = 31 * result + detectors.hashCode();
 		return result;
 	}
 }

@@ -27,17 +27,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.util.New;
-
-import java.util.Set;
 
 @State(
 		name = "FindBugs-IDEA",
-		storages = @Storage(value = "findbugs-46.xml", roamingType = RoamingType.DEFAULT) // TODO kick -XX number
+		storages = @Storage(value = "findbugs-51.xml", roamingType = RoamingType.DEFAULT) // TODO kick -XX number
 )
 public final class ProjectSettings extends AbstractSettings implements PersistentStateComponent<ProjectSettings> {
-
-	public Set<PluginSettings> plugins = New.set();
 
 	@Nullable
 	@Override

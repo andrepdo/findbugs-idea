@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -20,16 +20,8 @@ package org.twodividedbyzero.idea.findbugs.common;
 
 import java.io.File;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
- * @since 0.0.1
- */
 @SuppressWarnings({"HardCodedStringLiteral"})
-public class FindBugsPluginConstants {
+public final class FindBugsPluginConstants {
 
 	public static final String PLUGIN_NAME = "FindBugs-IDEA";
 	public static final String TOOL_WINDOW_ID = PLUGIN_NAME;
@@ -49,22 +41,11 @@ public class FindBugsPluginConstants {
 
 	public static final String ACTION_GROUP_UTILS = "FindBugs.ToolBarActions.utils";
 
-	public static final String ACTION_GROUP_GUTTER = "FindBugs.GutterPopup.group";
-
-	public static final String CURRENT_FILE_ACTION = "FindBugs.CurrentFileAction";
-
-	public static final String CLOSE_ACTION = "FindBugs.CloseAction";
-
-	public static final String STOP_ACTION = "FindBugs.StopAction";
-
-	public static final String HELP_ACTION = "FindBugs.HelpAction";
-
-	public static final String ACTIVE_CHANGELIST_ACTION = "FindBugs.ActiveChangeListAction";
-
 	public static final String FILE_SEPARATOR = File.separator;
 
 	public static final String FINDBUGS_EXTERNAL_HELP_URI = "http://findbugs.sourceforge.net/manual/filter.html";
 
+	public static final String FINDBUGS_CORE_PLUGIN_ID = "edu.umd.cs.findbugs.plugins.core";
 
 	private FindBugsPluginConstants() {
 	}

@@ -22,14 +22,17 @@ import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
-import org.twodividedbyzero.idea.findbugs.core.DetectorSettings;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
+import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -64,10 +67,10 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 	@NotNull
 	static AbstractDetectorNode buildRoot(
 			final boolean addHidden,
-			@NotNull final Map<String, DetectorSettings> detectorSettings
+			@NotNull final Map<String, Map<String, Boolean>> detectors
 	) {
 
-		final Map<String, List<DetectorNode>> byProvider = buildByProvider(addHidden, detectorSettings);
+		final Map<String, List<DetectorNode>> byProvider = buildByProvider(addHidden, detectors);
 
 		final Comparator<DetectorNode> nodeComparator = new Comparator<DetectorNode>() {
 			@Override
@@ -94,7 +97,7 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 	@NotNull
 	private static Map<String, List<DetectorNode>> buildByProvider(
 			final boolean addHidden,
-			@NotNull final Map<String, DetectorSettings> detectorSettings
+			@NotNull final Map<String, Map<String, Boolean>> detectors
 	) {
 
 		final Iterator<DetectorFactory> iterator = DetectorFactoryCollection.instance().factoryIterator();
@@ -108,71 +111,107 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 				} else if (provider.endsWith(" project")) {
 					provider = provider.substring(0, provider.length() - " project".length());
 				}
-				List<DetectorNode> detectors = byProvider.get(provider);
-				if (detectors == null) {
-					detectors = New.arrayList();
-					byProvider.put(provider, detectors);
+				List<DetectorNode> detectorNodes = byProvider.get(provider);
+				if (detectorNodes == null) {
+					detectorNodes = New.arrayList();
+					byProvider.put(provider, detectorNodes);
 				}
-				final Boolean enabled = isEnabled(detectorSettings, factory);
-				detectors.add(create(factory, enabled));
+				final Boolean enabled = isEnabled(detectors, factory);
+				detectorNodes.add(create(factory, enabled));
 			}
 		}
 		return byProvider;
 	}
 
-	static void fillEnabledSet(
+	@NotNull
+	static Map<String, Map<String, Boolean>> createEnabledMap(
+			@NotNull final AbstractSettings settings
+	) {
+		final Map<String, Map<String, Boolean>> ret = New.map();
+		if (!settings.detectors.isEmpty()) {
+			ret.put(FindBugsPluginConstants.FINDBUGS_CORE_PLUGIN_ID, new HashMap<String, Boolean>(settings.detectors));
+		}
+		for (final PluginSettings pluginSettings : settings.plugins) {
+			ret.put(pluginSettings.id, new HashMap<String, Boolean>(pluginSettings.detectors));
+		}
+		return ret;
+	}
+
+	static void fillSettings(
+			@NotNull final AbstractSettings settings,
+			@NotNull final Map<String, Map<String, Boolean>> detectors
+	) {
+		apply(detectors.get(FindBugsPluginConstants.FINDBUGS_CORE_PLUGIN_ID), settings.detectors);
+		for (final PluginSettings pluginSettings : settings.plugins) {
+			apply(detectors.get(pluginSettings.id), pluginSettings.detectors);
+		}
+	}
+
+	static void apply(
+			@Nullable final Map<String, Boolean> from,
+			@NotNull final Map<String, Boolean> to
+	) {
+		to.clear();
+		if (from != null) {
+			for (final Map.Entry<String, Boolean> entry : from.entrySet()) {
+				to.put(entry.getKey(), entry.getValue());
+			}
+		}
+	}
+
+	static void fillEnabledMap(
 			@NotNull final AbstractDetectorNode node,
-			@NotNull final Map<String, DetectorSettings> detectorSettings
+			@NotNull final Map<String, Map<String, Boolean>> detectors
 	) {
 		for (int i = 0; i < node.getChildCount(); i++) {
-			fillEnabledSet((AbstractDetectorNode) node.getChildAt(i), detectorSettings);
+			fillEnabledMap((AbstractDetectorNode) node.getChildAt(i), detectors);
 		}
 		if (!node.isGroup()) {
 			final DetectorNode detectorNode = (DetectorNode) node;
-			remove(detectorSettings, detectorNode.getDetector());
+			remove(detectors, detectorNode.getDetector());
 			if (detectorNode.isEnabledDefaultDifferent()) {
-				add(detectorSettings, detectorNode.getDetector(), detectorNode.getEnabled());
+				add(detectors, detectorNode.getDetector(), detectorNode.getEnabled());
 			}
 		}
 	}
 
 	@Nullable
 	private static Boolean isEnabled(
-			@NotNull final Map<String, DetectorSettings> detectorSettings,
+			@NotNull final Map<String, Map<String, Boolean>> detectors,
 			@NotNull final DetectorFactory detector
 	) {
-		final DetectorSettings settings = detectorSettings.get(detector.getPlugin().getPluginId());
+		final Map<String, Boolean> settings = detectors.get(detector.getPlugin().getPluginId());
 		if (settings != null) {
-			return settings.enabled.get(detector.getShortName());
+			return settings.get(detector.getShortName());
 		}
 		return null;
 	}
 
 	private static void remove(
-			@NotNull final Map<String, DetectorSettings> detectorSettings,
+			@NotNull final Map<String, Map<String, Boolean>> detectors,
 			@NotNull final DetectorFactory detector
 	) {
 		final String pluginId = detector.getPlugin().getPluginId();
-		final DetectorSettings settings = detectorSettings.get(pluginId);
+		final Map<String, Boolean> settings = detectors.get(pluginId);
 		if (settings != null) {
-			settings.enabled.remove(detector.getShortName());
-			if (settings.enabled.isEmpty()) {
-				detectorSettings.remove(pluginId);
+			settings.remove(detector.getShortName());
+			if (settings.isEmpty()) {
+				detectors.remove(pluginId);
 			}
 		}
 	}
 
 	private static void add(
-			@NotNull final Map<String, DetectorSettings> detectorSettings,
+			@NotNull final Map<String, Map<String, Boolean>> detectors,
 			@NotNull final DetectorFactory detector,
 			final boolean enabled
 	) {
 		final String pluginId = detector.getPlugin().getPluginId();
-		DetectorSettings settings = detectorSettings.get(pluginId);
+		Map<String, Boolean> settings = detectors.get(pluginId);
 		if (settings == null) {
-			settings = new DetectorSettings();
-			detectorSettings.put(pluginId, settings);
+			settings = New.map();
+			detectors.put(pluginId, settings);
 		}
-		settings.enabled.put(detector.getShortName(), enabled);
+		settings.put(detector.getShortName(), enabled);
 	}
 }

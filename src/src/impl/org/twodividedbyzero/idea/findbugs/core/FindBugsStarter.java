@@ -180,13 +180,9 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 			userPrefs.setExcludeBugsFiles(new HashMap<String, Boolean>(settings.excludeBugsFiles));
 			userPrefs.setExcludeFilterFiles(new HashMap<String, Boolean>(settings.excludeFilterFiles));
 
-			for (final Map.Entry<String, DetectorSettings> detectorSettings : settings.detectors.entrySet()) {
-				for (final Map.Entry<String, Boolean> enabled : detectorSettings.getValue().enabled.entrySet()) {
-					final DetectorFactory detectorFactory = detectorFactoryCollection.getFactory(enabled.getKey());
-					if (detectorFactory != null) {
-						userPrefs.enableDetector(detectorFactory, enabled.getValue());
-					}
-				}
+			configureDetectors(settings.detectors, detectorFactoryCollection, userPrefs);
+			for (final PluginSettings pluginSettings : settings.plugins) {
+				configureDetectors(pluginSettings.detectors, detectorFactoryCollection, userPrefs);
 			}
 		}
 
@@ -273,6 +269,19 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 	@Override
 	public final void analysisAborting() {
 		_cancellingByUser.set(true);
+	}
+
+	private static void configureDetectors(
+			@NotNull final Map<String, Boolean> detectors,
+			@NotNull final DetectorFactoryCollection detectorFactoryCollection,
+			@NotNull final UserPreferences userPreferences
+	) {
+		for (final Map.Entry<String, Boolean> enabled : detectors.entrySet()) {
+			final DetectorFactory detectorFactory = detectorFactoryCollection.getFactory(enabled.getKey());
+			if (detectorFactory != null) {
+				userPreferences.enableDetector(detectorFactory, enabled.getValue());
+			}
+		}
 	}
 
 	private static void configureFilter(@NotNull final FindBugs2 engine, @NotNull final Project project, @NotNull final UserPreferences userPrefs) {

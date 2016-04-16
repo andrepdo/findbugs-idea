@@ -30,7 +30,6 @@ import com.intellij.util.ui.tree.TreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
-import org.twodividedbyzero.idea.findbugs.core.DetectorSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JPanel;
@@ -90,20 +89,26 @@ final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSe
 
 	@Override
 	public boolean isModified(@NotNull final AbstractSettings settings) {
-		final Map<String, DetectorSettings> detectorSettings = New.map();
-		AbstractDetectorNode.fillEnabledSet(getRootNode(), detectorSettings);
-		// TODO should not return true if settings contains an unknown detector!
-		return !settings.detectors.equals(detectorSettings);
+		final Map<String, Map<String, Boolean>> currentDetectors = New.map();
+		AbstractDetectorNode.fillEnabledMap(getRootNode(), currentDetectors);
+		final Map<String, Map<String, Boolean>> settingsDetectors = AbstractDetectorNode.createEnabledMap(settings);
+		return !settingsDetectors.equals(currentDetectors);
 	}
 
 	@Override
 	public void apply(@NotNull final AbstractSettings settings) throws ConfigurationException {
-		AbstractDetectorNode.fillEnabledSet(getRootNode(), settings.detectors);
+		final Map<String, Map<String, Boolean>> detectors = New.map();
+		AbstractDetectorNode.fillEnabledMap(
+				getRootNode(),
+				detectors
+		);
+		AbstractDetectorNode.fillSettings(settings, detectors);
 	}
 
 	@Override
 	public void reset(@NotNull final AbstractSettings settings) {
-		model.setRoot(DetectorNode.buildRoot(!filterHidden.selected, settings.detectors));
+		final Map<String, Map<String, Boolean>> detectors = AbstractDetectorNode.createEnabledMap(settings);
+		model.setRoot(DetectorNode.buildRoot(!filterHidden.selected, detectors));
 		TreeUtil.expandAll(table.getTree());
 	}
 
@@ -127,10 +132,10 @@ final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSe
 		@Override
 		public void setSelected(final AnActionEvent e, final boolean state) {
 			selected = state;
-			final Map<String, DetectorSettings> detectorSettings = New.map();
-			AbstractDetectorNode.fillEnabledSet(getRootNode(), detectorSettings);
+			final Map<String, Map<String, Boolean>> detectors = New.map();
+			AbstractDetectorNode.fillEnabledMap(getRootNode(), detectors);
 			final TreeState treeState = TreeState.createOn(table.getTree(), getRootNode());
-			model.setRoot(DetectorNode.buildRoot(!state, detectorSettings));
+			model.setRoot(DetectorNode.buildRoot(!state, detectors));
 			TreeUtil.expandAll(table.getTree()); // because TreeState does not work
 			treeState.applyTo(table.getTree());
 		}
