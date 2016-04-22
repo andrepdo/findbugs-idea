@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.common.util;
 
 import edu.umd.cs.findbugs.DetectorFactory;
@@ -31,14 +30,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-
-/**
- * $Date: 2014-06-02 00:44:00 +0100 (Mo, 02 June 2014) $
- *
- * @author Reto Merz<reto.merz@gmail.com>
- * @version $Revision: 308 $
- * @since 0.9.993
- */
 public final class FindBugsCustomPluginUtil {
 
 
@@ -50,16 +41,15 @@ public final class FindBugsCustomPluginUtil {
 		return plugin.exists() && plugin.canRead();
 	}
 
-
+	@NotNull
 	public static String getAsString(@NotNull final Plugin plugin) {
 		return getAsURL(plugin).toExternalForm();
 	}
 
-
+	@NotNull
 	private static URL getAsURL(@NotNull final Plugin plugin) {
 		return plugin.getPluginLoader().getURL();
 	}
-
 
 	public static String getAsString(@NotNull final File plugin) throws MalformedURLException {
 		return getAsURL(plugin).toExternalForm();

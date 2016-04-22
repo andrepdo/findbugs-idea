@@ -39,7 +39,7 @@ import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.gui.common.VerticalFlowLayout;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.BrowseAction.BrowseActionCallback;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
-import org.twodividedbyzero.idea.findbugs.plugins.AbstractPluginLoader;
+import org.twodividedbyzero.idea.findbugs.plugins.AbstractPluginLoaderLegacy;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
@@ -257,7 +257,7 @@ public class PluginConfiguration implements ConfigurationPage {
 	}
 
 
-	private class PluginLoaderImpl extends AbstractPluginLoader {
+	private class PluginLoaderImpl extends AbstractPluginLoaderLegacy {
 
 		private Project _currentProject;
 		private JPanel _lastPluginComponent;

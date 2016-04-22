@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.plugins;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
@@ -31,35 +30,38 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 
-
-/**
- * $Date: 2014-06-01 23:40:00 +0100 (So, 01 June 2014) $
- *
- * @author Reto Merz<reto.merz@gmail.com>
- * @since 0.9.993
- */
 public enum Plugins {
 
 	// https://code.google.com/p/findbugs-for-android/
-	AndroidFindbugs_0_5("AndroidFindbugs_0.5.jar", true),
+	AndroidFindbugs_0_5("AndroidFindbugs_0.5.jar", "jp.f.dev.findbugs.detect.android", true),
 
 	// http://fb-contrib.sourceforge.net/
-	fb_contrib_6_2_1("fb-contrib-6.2.1.jar", false, "fb-contrib-6.0.0.jar", "fb-contrib-5.2.1.jar"),
+	fb_contrib_6_2_1("fb-contrib-6.2.1.jar", "com.mebigfatguy.fbcontrib", false, "fb-contrib-6.0.0.jar", "fb-contrib-5.2.1.jar"),
 
 	// http://h3xstream.github.io/find-sec-bugs/
-	findsecbugs_plugin_1_4_1("findsecbugs-plugin-1.4.1.jar", false, "findsecbugs-plugin-1.4.0.jar", "findsecbugs-plugin-1.3.0.jar", "findsecbugs-plugin-1.2.1.jar", "findsecbugs-plugin-1.2.0.jar");
-
-	public static final String PLUGIN_ID_ANDROID = "jp.f.dev.findbugs.detect.android";
+	findsecbugs_plugin_1_4_1("findsecbugs-plugin-1.4.1.jar", "com.h3xstream.findsecbugs", false, "findsecbugs-plugin-1.4.0.jar", "findsecbugs-plugin-1.3.0.jar", "findsecbugs-plugin-1.2.1.jar", "findsecbugs-plugin-1.2.0.jar");
 
 	private static final Logger LOGGER = Logger.getInstance(Plugins.class.getName());
 
+	@NotNull
 	private final String _jarName;
+
+	@NotNull
+	public final String id;
+
 	private final boolean _needsJava7OrLater;
+
+	@NotNull
 	private final String[] _legacyJarNames;
 
-
-	Plugins(@NotNull final String jarName, boolean needsJava7OrLater, @NotNull final String... legacyJarNames) {
+	Plugins(
+			@NotNull final String jarName,
+			@NotNull final String id,
+			boolean needsJava7OrLater,
+			@NotNull final String... legacyJarNames
+	) {
 		_jarName = jarName;
+		this.id = id;
 		_needsJava7OrLater = needsJava7OrLater;
 		_legacyJarNames = legacyJarNames;
 	}

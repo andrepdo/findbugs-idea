@@ -32,7 +32,7 @@ import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.StringUtil;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.AnnotationType;
-import org.twodividedbyzero.idea.findbugs.plugins.AbstractPluginLoader;
+import org.twodividedbyzero.idea.findbugs.plugins.AbstractPluginLoaderLegacy;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -914,7 +914,7 @@ public class FindBugsPreferences extends Properties {
 	}
 
 
-	private static class PluginLoaderImpl extends AbstractPluginLoader {
+	private static class PluginLoaderImpl extends AbstractPluginLoaderLegacy {
 
 		private final Map<String, String> _detectors;
 

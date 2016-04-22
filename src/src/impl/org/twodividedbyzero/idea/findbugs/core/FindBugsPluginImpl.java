@@ -70,7 +70,7 @@ import org.twodividedbyzero.idea.findbugs.gui.preferences.AnnotationType;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.ConfigurationPanel;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
-import org.twodividedbyzero.idea.findbugs.plugins.AbstractPluginLoader;
+import org.twodividedbyzero.idea.findbugs.plugins.AbstractPluginLoaderLegacy;
 import org.twodividedbyzero.idea.findbugs.plugins.Plugins;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
@@ -626,7 +626,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 	}
 
 
-	private class PluginLoaderImpl extends AbstractPluginLoader {
+	private class PluginLoaderImpl extends AbstractPluginLoaderLegacy {
 
 		protected PluginLoaderImpl() {
 			super(false);

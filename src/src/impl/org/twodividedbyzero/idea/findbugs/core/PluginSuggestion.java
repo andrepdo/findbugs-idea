@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,9 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.core;
-
 
 import com.intellij.CommonBundle;
 import com.intellij.facet.Facet;
@@ -44,11 +42,6 @@ import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import javax.swing.event.HyperlinkEvent;
 import java.util.Set;
 
-
-/**
- * @author Reto Merz<reto.merz@gmail.com>
- * @since 0.9.998
- */
 final class PluginSuggestion {
 
 	private static final String A_HREF_DISABLE_ANCHOR = "#disable";
@@ -70,7 +63,7 @@ final class PluginSuggestion {
 		if (!NotificationUtil.isGroupEnabled(FindBugsPluginImpl.NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION)) {
 			return;
 		}
-		if (isPluginEnabled(Plugins.PLUGIN_ID_ANDROID, preferences)) {
+		if (isPluginEnabled(Plugins.AndroidFindbugs_0_5.id, preferences)) {
 			return;
 		}
 		final Set<Suggestion> suggestions = collectSuggestions(project, preferences);
@@ -98,7 +91,7 @@ final class PluginSuggestion {
 			@SuppressWarnings("ConstantConditions")
 			@Override
 			public void run() {
-				final ConfigurationPanel panel = ((ConfigurationPanel)findBugsPlugin.createComponent());
+				final ConfigurationPanel panel = ((ConfigurationPanel) findBugsPlugin.createComponent());
 				panel.showConfigPage(panel.getPluginConfig());
 			}
 		});
@@ -195,10 +188,10 @@ final class PluginSuggestion {
 		for (final Facet facet : facets) {
 			facetTypeId = facet.getTypeId();
 			if (facetTypeId != null) {
-				if (!isPluginEnabled(Plugins.PLUGIN_ID_ANDROID, preferences)) {
+				if (!isPluginEnabled(Plugins.AndroidFindbugs_0_5.id, preferences)) {
 					if ("AndroidFacetType".equals(facetTypeId.getClass().getSimpleName()) ||
 							"android".equalsIgnoreCase(facetTypeId.toString())) {
-						suggestions.add(new Suggestion(Plugins.PLUGIN_ID_ANDROID, "Android FindBugs"));
+						suggestions.add(new Suggestion(Plugins.AndroidFindbugs_0_5.id, "Android FindBugs"));
 					}
 				}
 			}

@@ -70,7 +70,9 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 			@NotNull final Map<String, Map<String, Boolean>> detectors
 	) {
 
-		final Map<String, List<DetectorNode>> byProvider = buildByProvider(addHidden, detectors);
+		final Map<String, List<DetectorNode>> byProvider = New.map();
+		final Iterator<DetectorFactory> detectorFactoryIterator = DetectorFactoryCollection.instance().factoryIterator();
+		fillByProvider(addHidden, detectorFactoryIterator, byProvider, detectors);
 
 		final Comparator<DetectorNode> nodeComparator = new Comparator<DetectorNode>() {
 			@Override
@@ -95,13 +97,13 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 	}
 
 	@NotNull
-	private static Map<String, List<DetectorNode>> buildByProvider(
+	private static Map<String, List<DetectorNode>> fillByProvider(
 			final boolean addHidden,
-			@NotNull final Map<String, Map<String, Boolean>> detectors
+			@NotNull final Iterator<DetectorFactory> iterator,
+			@NotNull final Map<String, List<DetectorNode>> byProvider,
+			@NotNull final Map<String, Map<String, Boolean>> enabledMap
 	) {
 
-		final Iterator<DetectorFactory> iterator = DetectorFactoryCollection.instance().factoryIterator();
-		final Map<String, List<DetectorNode>> byProvider = New.map();
 		while (iterator.hasNext()) {
 			final DetectorFactory factory = iterator.next();
 			if (!factory.isHidden() || addHidden) {
@@ -116,7 +118,7 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 					detectorNodes = New.arrayList();
 					byProvider.put(provider, detectorNodes);
 				}
-				final Boolean enabled = isEnabled(detectors, factory);
+				final Boolean enabled = isEnabled(enabledMap, factory);
 				detectorNodes.add(create(factory, enabled));
 			}
 		}
@@ -132,7 +134,9 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 			ret.put(FindBugsPluginConstants.FINDBUGS_CORE_PLUGIN_ID, new HashMap<String, Boolean>(settings.detectors));
 		}
 		for (final PluginSettings pluginSettings : settings.plugins) {
-			ret.put(pluginSettings.id, new HashMap<String, Boolean>(pluginSettings.detectors));
+			if (!pluginSettings.detectors.isEmpty()) {
+				ret.put(pluginSettings.id, new HashMap<String, Boolean>(pluginSettings.detectors));
+			}
 		}
 		return ret;
 	}

@@ -19,15 +19,11 @@
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import edu.umd.cs.findbugs.Plugin;
-import edu.umd.cs.findbugs.PluginException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
 import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
-import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
-import java.io.File;
-import java.net.MalformedURLException;
+import java.util.Comparator;
 
 final class PluginInfo {
 	@NotNull
@@ -64,12 +60,27 @@ final class PluginInfo {
 		this.error = error;
 	}
 
+
 	@NotNull
-	static PluginInfo create(@NotNull final File path, @NotNull final Plugin plugin) throws MalformedURLException, PluginException {
+	static PluginInfo create(@NotNull final PluginSettings settings, @NotNull final Plugin plugin) {
+		return new PluginInfo(
+				settings,
+				plugin.getShortDescription(),
+				plugin.getDetailedDescription(),
+				plugin.getWebsite(),
+				null,
+				null
+		);
+	}
+
+	/*
+	@NotNull
+	static PluginInfo createUser(@NotNull final Plugin plugin) throws MalformedURLException, PluginException {
 		final PluginSettings settings = new PluginSettings();
 		settings.id = plugin.getPluginId();
+		settings.bundled = false;
 		settings.enabled = true; // enable ; do not use plugin.isEnabledByDefault();
-		settings.path = path.getPath();
+		settings.url = FindBugsCustomPluginUtil.getAsString(plugin);
 		return new PluginInfo(
 				settings,
 				plugin.getShortDescription(),
@@ -120,5 +131,20 @@ final class PluginInfo {
 				errorMessage,
 				error
 		);
-	}
+	}*/
+
+	public static final Comparator<PluginInfo> ByShortDescription = new Comparator<PluginInfo>() {
+		@Override
+		public int compare(final PluginInfo o1, final PluginInfo o2) {
+			String a = o1.shortDescription;
+			if (a == null) {
+				a = "";
+			}
+			String b = o2.shortDescription;
+			if (b == null) {
+				b = "";
+			}
+			return a.compareToIgnoreCase(b);
+		}
+	};
 }

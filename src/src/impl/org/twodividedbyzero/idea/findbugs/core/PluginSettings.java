@@ -18,12 +18,15 @@
  */
 package org.twodividedbyzero.idea.findbugs.core;
 
+import com.intellij.openapi.util.text.StringUtil;
 import edu.umd.cs.findbugs.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.util.MapUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 public final class PluginSettings implements Comparable<PluginSettings> {
 
@@ -35,9 +38,15 @@ public final class PluginSettings implements Comparable<PluginSettings> {
 	public boolean enabled = false;
 
 	/**
-	 * File path to the plugin jar file.
+	 * True if this settings belongs to a bundled plugin ({@link org.twodividedbyzero.idea.findbugs.plugins.Plugins}).
+	 * Note that {@code url} is {@code null} for bundled plugins.
 	 */
-	public String path = "Unknown";
+	public boolean bundled;
+
+	/**
+	 * URL of plugin jar file. {@code null} if this settings belongs to a bundled plugin.
+	 */
+	public String url;
 
 	/**
 	 * Detector enabled state for this plugin.
@@ -49,33 +58,13 @@ public final class PluginSettings implements Comparable<PluginSettings> {
 	public int compareTo(@NotNull final PluginSettings o) {
 		int ret = id.compareTo(o.id);
 		if (ret == 0) {
-			ret = path.compareTo(o.path);
+			ret = Boolean.valueOf(bundled).compareTo(o.bundled); // LATER: use Boolean.compare when JRE 1.6 support is gone
 			if (ret == 0) {
-				ret = Boolean.valueOf(enabled).compareTo(o.enabled);
+				ret = StringUtil.compare(url, o.url, false);
 				if (ret == 0) {
-					final Iterator<Map.Entry<String, Boolean>> a = detectors.entrySet().iterator();
-					final Iterator<Map.Entry<String, Boolean>> b = o.detectors.entrySet().iterator();
-					while (true) {
-						final boolean aHasNext = a.hasNext();
-						final boolean bHasNext = b.hasNext();
-						if (!aHasNext && !bHasNext) {
-							return 0;
-						} else if (aHasNext && bHasNext) {
-							final Map.Entry<String, Boolean> aNext = a.next();
-							final Map.Entry<String, Boolean> bNext = b.next();
-							ret = aNext.getValue().compareTo(bNext.getValue());
-							if (ret != 0) {
-								return ret;
-							}
-							ret = aNext.getValue().compareTo(bNext.getValue());
-							if (ret != 0) {
-								return ret;
-							}
-						} else if (aHasNext) {
-							return 1;
-						} else {
-							return -1;
-						}
+					ret = Boolean.valueOf(enabled).compareTo(o.enabled); // LATER: use Boolean.compare when JRE 1.6 support is gone
+					if (ret == 0) {
+						ret = MapUtil.compare(detectors, o.detectors);
 					}
 				}
 			}
@@ -88,12 +77,13 @@ public final class PluginSettings implements Comparable<PluginSettings> {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		final PluginSettings settings = (PluginSettings) o;
+		final PluginSettings that = (PluginSettings) o;
 
-		if (enabled != settings.enabled) return false;
-		if (!id.equals(settings.id)) return false;
-		if (!path.equals(settings.path)) return false;
-		return detectors.equals(settings.detectors);
+		if (enabled != that.enabled) return false;
+		if (bundled != that.bundled) return false;
+		if (!id.equals(that.id)) return false;
+		if (url != null ? !url.equals(that.url) : that.url != null) return false;
+		return detectors.equals(that.detectors);
 
 	}
 
@@ -101,8 +91,22 @@ public final class PluginSettings implements Comparable<PluginSettings> {
 	public int hashCode() {
 		int result = id.hashCode();
 		result = 31 * result + (enabled ? 1 : 0);
-		result = 31 * result + path.hashCode();
+		result = 31 * result + (bundled ? 1 : 0);
+		result = 31 * result + (url != null ? url.hashCode() : 0);
 		result = 31 * result + detectors.hashCode();
 		return result;
 	}
+
+	@Nullable
+	public static PluginSettings findBundledById(@NotNull final Set<PluginSettings> plugins, @NotNull final String id) {
+		for (final PluginSettings plugin : plugins) {
+			if (plugin.bundled) {
+				if (id.equals(plugin.id)) {
+					return plugin;
+				}
+			}
+		}
+		return null;
+	}
+
 }

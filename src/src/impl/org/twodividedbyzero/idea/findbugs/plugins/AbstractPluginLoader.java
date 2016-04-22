@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 Andre Pfeiler
+ * Copyright 2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.plugins;
 
 import com.intellij.notification.Notification;
@@ -31,41 +30,32 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
+import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
-/**
- * $Date: 2014-06-19 00:29:00 +0100 (Do, 19 June 2014) $
- *
- * @author Reto Merz<reto.merz@gmail.com>
- * @version $Revision: 311 $
- * @since 0.9.993
- */
 public abstract class AbstractPluginLoader {
 
-	private static final Logger LOGGER = Logger.getInstance(AbstractPluginLoader.class.getName());
+	private static final Logger LOGGER = Logger.getInstance(AbstractPluginLoader.class);
 
 	private final boolean _treatErrorsAsWarnings;
 	private final List<String> _errorMessages;
-
 
 	protected AbstractPluginLoader(final boolean treatErrorsAsWarnings) {
 		_treatErrorsAsWarnings = treatErrorsAsWarnings;
 		_errorMessages = new ArrayList<String>();
 	}
 
-
-	public void load(final Collection<String> userPluginsUrls, final Collection<String> disabledUserPluginIds, final Collection<String> enabledBundledPluginIds, final Collection<String> disabledBundledPluginIds) {
+	public void load(@NotNull final Set<PluginSettings> settings) {
 
 		// 1. unload plugins
-		for (Plugin plugin : Plugin.getAllPlugins()) {
+		for (final Plugin plugin : Plugin.getAllPlugins()) {
 			if (plugin.isCorePlugin()) {
 				seenCorePlugin(plugin);
 			} else {
@@ -76,7 +66,7 @@ public abstract class AbstractPluginLoader {
 
 		// 2. load bundled plugins and unload
 		final File[] bundledPlugins = Plugins.getDirectory(FindBugsPluginUtil.getIdeaPluginDescriptor()).listFiles();
-		final Set<String> enabledBundledPluginUrls = new HashSet<String>();
+		final Set<String> enabledBundledPluginUrls = New.set();
 		if (bundledPlugins != null) {
 			for (final File pluginFile : bundledPlugins) {
 				if (!pluginFile.getName().endsWith(".jar")) {
@@ -89,10 +79,18 @@ public abstract class AbstractPluginLoader {
 							handleError("Could not load plugin: " + pluginFile.getPath());
 							continue;
 						}
-						seenBundledPlugin(plugin);
-						if (!disabledBundledPluginIds.contains(plugin.getPluginId()) && enabledBundledPluginIds.contains(plugin.getPluginId())) {
+						PluginSettings pluginSettings = PluginSettings.findBundledById(settings, plugin.getPluginId());
+						if (pluginSettings == null) {
+							pluginSettings = new PluginSettings();
+							pluginSettings.id = plugin.getPluginId();
+							pluginSettings.bundled = true;
+							pluginSettings.enabled = false;
+							pluginSettings.url = FindBugsCustomPluginUtil.getAsString(plugin);
+						}
+						if (pluginSettings.enabled) {
 							enabledBundledPluginUrls.add(FindBugsCustomPluginUtil.getAsString(plugin));
 						}
+						seenPlugin(pluginSettings, plugin, true);
 						FindBugsCustomPluginUtil.unload(plugin);
 					} else {
 						handleError("Plugin '" + pluginFile.getPath() + "' not loaded. Archive inaccessible.");
@@ -106,7 +104,11 @@ public abstract class AbstractPluginLoader {
 
 		// 3. load user plugins and unload
 		final Set<String> enabledUserPluginUrls = new HashSet<String>();
-		for (final String pluginUrl : userPluginsUrls) {
+		for (final PluginSettings pluginSettings : settings) {
+			if (pluginSettings.bundled) {
+				continue;
+			}
+			final String pluginUrl = pluginSettings.url;
 			try {
 				final File pluginFile = FindBugsCustomPluginUtil.getAsFile(pluginUrl);
 				if (FindBugsCustomPluginUtil.check(pluginFile)) {
@@ -115,8 +117,8 @@ public abstract class AbstractPluginLoader {
 						handleError("Could not load plugin: " + pluginUrl);
 						continue;
 					}
-					seenUserPlugin(plugin);
-					if (!disabledUserPluginIds.contains(plugin.getPluginId())) {
+					seenPlugin(pluginSettings, plugin, false);
+					if (pluginSettings.enabled) {
 						enabledUserPluginUrls.add(pluginUrl);
 					}
 					FindBugsCustomPluginUtil.unload(plugin);
@@ -136,8 +138,7 @@ public abstract class AbstractPluginLoader {
 		loadPluginsPermanently(enabledUserPluginUrls, true);
 	}
 
-
-	private void loadPluginsPermanently(final Set<String> pluginUrls, final boolean userPlugins) {
+	private void loadPluginsPermanently(@NotNull final Set<String> pluginUrls, final boolean userPlugins) {
 		for (final String pluginUrl : pluginUrls) {
 			try {
 				final Plugin plugin = FindBugsCustomPluginUtil.loadPermanently(pluginUrl);
@@ -146,32 +147,24 @@ public abstract class AbstractPluginLoader {
 					continue;
 				}
 				pluginPermanentlyLoaded(plugin, userPlugins);
-			} catch (MalformedURLException e) {
+			} catch (final MalformedURLException e) {
 				handleError("Could not load plugin: " + pluginUrl, e);
-			} catch (PluginException e) {
+			} catch (final PluginException e) {
 				handleError("Could not load plugin: " + pluginUrl, e);
 			}
 		}
 	}
 
-
-	protected void seenCorePlugin(final Plugin plugin) {
+	protected void seenCorePlugin(@NotNull final Plugin plugin) {
 	}
 
-
-	protected void seenBundledPlugin(final Plugin plugin) {
+	protected void seenPlugin(@NotNull final PluginSettings settings, @NotNull final Plugin plugin, final boolean bundled) {
 	}
 
-
-	protected void seenUserPlugin(final Plugin plugin) {
+	protected void pluginPermanentlyLoaded(@NotNull final Plugin plugin, final boolean userPlugin) {
 	}
 
-
-	protected void pluginPermanentlyLoaded(final Plugin plugin, final boolean userPlugin) {
-	}
-
-
-	protected void handleError(final String message) {
+	protected void handleError(@NotNull final String message) {
 		if (_treatErrorsAsWarnings) {
 			LOGGER.warn(message);
 		} else {
@@ -180,8 +173,7 @@ public abstract class AbstractPluginLoader {
 		_errorMessages.add(message);
 	}
 
-
-	protected void handleError(final String message, @Nullable final Throwable exception) {
+	protected void handleError(@NotNull final String message, @Nullable final Throwable exception) {
 		if (_treatErrorsAsWarnings) {
 			LOGGER.warn(message, exception);
 		} else {
@@ -189,7 +181,6 @@ public abstract class AbstractPluginLoader {
 		}
 		_errorMessages.add(message);
 	}
-
 
 	@Nullable
 	public String makeErrorMessage() {
@@ -206,7 +197,6 @@ public abstract class AbstractPluginLoader {
 		return null;
 	}
 
-
 	public void showErrorBalloonIfNecessary(@Nullable final Project project) {
 		final String errorMessage = makeErrorMessage();
 		if (errorMessage != null) {
@@ -215,7 +205,6 @@ public abstract class AbstractPluginLoader {
 			UIUtil.invokeLaterIfNeeded(new RunnableErrorNotification(project, errorMessage));
 		}
 	}
-
 
 	private static class RunnableErrorNotification implements Runnable {
 		private final Project _project;

@@ -93,7 +93,7 @@ final class PluginPane extends JPanel {
 			website.setVisible(true);
 			website.setText(plugin.website);
 		}
-		url.setText(plugin.settings.path);
+		url.setText(plugin.settings.url);
 	}
 
 	@NotNull

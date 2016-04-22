@@ -42,6 +42,7 @@ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.plugins.AbstractPluginLoader;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JPanel;
@@ -55,6 +56,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -143,19 +145,22 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 
 		final VirtualFile[] files = FileChooser.chooseFiles(descriptor, this, project, null);
 		if (files.length > 0) {
+			final Set<PluginSettings> settings = New.set();
+			for (final PluginInfo plugin : getModel().rows) {
+				settings.add(plugin.settings);
+			}
 			StringBuilder errors = new StringBuilder();
 			for (final VirtualFile virtualFile : files) {
 				final File file = VfsUtilCore.virtualToIoFile(virtualFile);
 				Plugin plugin = null;
 				try {
 					plugin = FindBugsCustomPluginUtil.loadTemporary(file);
-					final PluginInfo pluginInfo = PluginInfo.create(file, plugin);
-					for (final PluginInfo other : getModel().rows) {
-						if (other.settings.id.equals(pluginInfo.settings.id)) {
-							pluginInfo.settings.enabled = false;
-						}
-					}
-					getModel().rows.add(pluginInfo); // LATER: sort
+					final PluginSettings pluginSettings = new PluginSettings();
+					pluginSettings.id = plugin.getPluginId();
+					pluginSettings.bundled = false;
+					pluginSettings.enabled = true; // enable ; do not use plugin.isEnabledByDefault();
+					pluginSettings.url = FindBugsCustomPluginUtil.getAsString(plugin);
+					settings.add(pluginSettings);
 				} catch (final Exception e) {
 					LOGGER.warn(String.valueOf(file), e);
 					errors.append("\n    - ").append(e.getMessage());
@@ -165,7 +170,7 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 					}
 				}
 			}
-			getModel().fireTableDataChanged();
+			load(settings);
 			if (errors.length() > 0) {
 				Messages.showErrorDialog(
 						this,
@@ -218,10 +223,16 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 	@Override
 	public void reset(@NotNull final ProjectSettings settings) {
 		lastPluginError = null;
+		load(settings.plugins);
+	}
+
+	private void load(@NotNull final Set<PluginSettings> settings) {
 		getModel().rows.clear();
-		for (final PluginSettings pluginSettings : settings.plugins) {
-			getModel().rows.add(PluginInfo.load(pluginSettings));
-		}
+		final PluginLoaderImpl pluginLoader = new PluginLoaderImpl(true);
+		pluginLoader.load(settings);
+		Collections.sort(pluginLoader.infos, PluginInfo.ByShortDescription);
+		getModel().rows.addAll(pluginLoader.infos);
+		getModel().fireTableDataChanged();
 	}
 
 	private class Model extends AbstractTableModel {
@@ -294,6 +305,20 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 				}
 				rows.get(rowIndex).settings.enabled = enabled;
 			}
+		}
+	}
+
+	private class PluginLoaderImpl extends AbstractPluginLoader {
+		private final List<PluginInfo> infos;
+
+		PluginLoaderImpl(final boolean treatErrorsAsWarnings) {
+			super(treatErrorsAsWarnings);
+			infos = New.arrayList();
+		}
+
+		@Override
+		protected void seenPlugin(@NotNull final PluginSettings settings, @NotNull final Plugin plugin, final boolean bundled) {
+			infos.add(PluginInfo.create(settings, plugin));
 		}
 	}
 }

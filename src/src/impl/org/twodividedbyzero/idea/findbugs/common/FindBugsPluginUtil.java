@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,28 +16,19 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.common;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.extensions.PluginId;
+import org.jetbrains.annotations.NotNull;
 
-
-/**
- * $Date: 2014-06-04 01:01:00 +0100 (Wed, 04 June 2014) $
- *
- * @author Reto Merz<reto.merz@gmail.com>
- * @version $Revision: 311 $
- * @since 0.9.993
- */
 public class FindBugsPluginUtil {
-
 
 	private FindBugsPluginUtil() {
 	}
 
-
+	@NotNull
 	public static IdeaPluginDescriptor getIdeaPluginDescriptor() {
 		final IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FindBugsPluginConstants.PLUGIN_NAME));
 		if (plugin == null) {
