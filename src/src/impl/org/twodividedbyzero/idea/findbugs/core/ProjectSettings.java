@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 @State(
 		name = "FindBugs-IDEA",
-		storages = @Storage(value = "findbugs-52.xml", roamingType = RoamingType.DEFAULT) // TODO kick -XX number
+		storages = @Storage(value = "findbugs-62.xml", roamingType = RoamingType.DEFAULT) // TODO kick -XX number
 )
 public final class ProjectSettings extends AbstractSettings implements PersistentStateComponent<ProjectSettings> {
 

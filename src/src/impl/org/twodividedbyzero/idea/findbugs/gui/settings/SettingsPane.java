@@ -81,6 +81,9 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		//add(tabs);
 
 		detectorTab.getTablePane().getTable().setBugCategory(reportTab.getBugCategory());
+		if (generalTab.getPluginTablePane() != null) {
+			generalTab.getPluginTablePane().setDetectorTablePane(detectorTab.getTablePane());
+		}
 	}
 
 	@NotNull

@@ -19,6 +19,9 @@
 package org.twodividedbyzero.idea.findbugs.core;
 
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.util.xmlb.annotations.Attribute;
+import com.intellij.util.xmlb.annotations.MapAnnotation;
+import com.intellij.util.xmlb.annotations.Tag;
 import edu.umd.cs.findbugs.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,30 +31,44 @@ import org.twodividedbyzero.idea.findbugs.common.util.New;
 import java.util.Map;
 import java.util.Set;
 
+@Tag(value = "plugin")
 public final class PluginSettings implements Comparable<PluginSettings> {
 
 	/**
 	 * Plugin id ({@link Plugin#getPluginId()}).
 	 */
+	@Attribute
 	public String id = "Unknown";
 
+	@Attribute
 	public boolean enabled = false;
 
 	/**
 	 * True if this settings belongs to a bundled plugin ({@link org.twodividedbyzero.idea.findbugs.plugins.Plugins}).
 	 * Note that {@code url} is {@code null} for bundled plugins.
 	 */
+	@Attribute
 	public boolean bundled;
 
 	/**
 	 * URL of plugin jar file. {@code null} if this settings belongs to a bundled plugin.
 	 */
+	@Tag
 	public String url;
 
 	/**
 	 * Detector enabled state for this plugin.
 	 * Like {@link AbstractSettings#detectors}.
 	 */
+	@Tag(value = "detectors")
+	@MapAnnotation(
+			surroundWithTag = false,
+			surroundValueWithTag = false,
+			surroundKeyWithTag = false,
+			entryTagName = "detector",
+			keyAttributeName = "name",
+			valueAttributeName = "enabled"
+	)
 	public Map<String, Boolean> detectors = New.map();
 
 	@Override

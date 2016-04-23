@@ -112,6 +112,16 @@ final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSe
 		TreeUtil.expandAll(table.getTree());
 	}
 
+	public void reload() {
+		final Map<String, Map<String, Boolean>> detectors = New.map();
+		AbstractDetectorNode.fillEnabledMap(
+				getRootNode(),
+				detectors
+		);
+		model.setRoot(DetectorNode.buildRoot(!filterHidden.selected, detectors));
+		TreeUtil.expandAll(table.getTree());
+	}
+
 	private class FilterHidden extends ToggleActionButton {
 		private boolean selected = true;
 

@@ -22,6 +22,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.HAlignment;
@@ -109,6 +110,11 @@ final class GeneralTab extends JPanel implements SettingsOwner<AbstractSettings>
 		if (settings instanceof ProjectSettings && plugin != null) {
 			plugin.reset((ProjectSettings) settings);
 		}
+	}
+
+	@Nullable
+	PluginTablePane getPluginTablePane() {
+		return plugin;
 	}
 
 	@NotNull

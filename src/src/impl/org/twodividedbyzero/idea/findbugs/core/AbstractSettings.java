@@ -18,6 +18,8 @@
  */
 package org.twodividedbyzero.idea.findbugs.core;
 
+import com.intellij.util.xmlb.Constants;
+import com.intellij.util.xmlb.annotations.AbstractCollection;
 import com.intellij.util.xmlb.annotations.MapAnnotation;
 import com.intellij.util.xmlb.annotations.Tag;
 import edu.umd.cs.findbugs.BugRanker;
@@ -31,30 +33,38 @@ import java.util.Set;
 
 public abstract class AbstractSettings {
 
+	@Tag
 	public boolean compileBeforeAnalyze = true;
 
+	@Tag
 	public boolean analyzeAfterCompile = false;
 
+	@Tag
 	public boolean analyzeAfterAutoMake = false;
 
+	@Tag
 	public boolean runInBackground = false;
 
+	@Tag
 	public boolean toolWindowToFront = true;
 
 	/**
 	 * @see AnalysisEffort
 	 * @see edu.umd.cs.findbugs.config.UserPreferences#setEffort(String)
 	 */
+	@Tag
 	public String analysisEffort = AnalysisEffort.DEFAULT.getEffortLevel();
 
 	/**
 	 * @see ProjectFilterSettings#setMinRank(int)
 	 */
+	@Tag
 	public int minRank = BugRanker.VISIBLE_RANK_MIN;
 
 	/**
 	 * @see ProjectFilterSettings#setMinPriority(String)
 	 */
+	@Tag
 	public String minPriority = ProjectFilterSettings.DEFAULT_PRIORITY;
 
 	/**
@@ -62,6 +72,8 @@ public abstract class AbstractSettings {
 	 * @see ProjectFilterSettings#removeCategory(String)
 	 * @see ProjectFilterSettings#containsCategory(String)
 	 */
+	@Tag(value = "hiddenBugCategory")
+	@AbstractCollection(surroundWithTag = false, elementTag = "category", elementValueAttribute = "name")
 	public Set<String> hiddenBugCategory = New.asSet("NOISE");
 
 	/**
@@ -69,21 +81,50 @@ public abstract class AbstractSettings {
 	 *
 	 * @see FindBugsCustomPluginUtil
 	 */
+	@Tag(value = "plugins")
+	@AbstractCollection(surroundWithTag = false, elementTag = Constants.SET)
 	public Set<PluginSettings> plugins = New.set();
 
 	/**
 	 * @see edu.umd.cs.findbugs.config.UserPreferences#setIncludeFilterFiles(Map)
 	 */
+	@Tag(value = "includeFilterFiles")
+	@MapAnnotation(
+			surroundWithTag = false,
+			surroundValueWithTag = false,
+			surroundKeyWithTag = false,
+			entryTagName = "filter",
+			keyAttributeName = "file",
+			valueAttributeName = "enabled"
+	)
 	public Map<String, Boolean> includeFilterFiles = New.map();
 
 	/**
 	 * @see edu.umd.cs.findbugs.config.UserPreferences#setExcludeFilterFiles(Map)
 	 */
+	@Tag(value = "excludeFilterFiles")
+	@MapAnnotation(
+			surroundWithTag = false,
+			surroundValueWithTag = false,
+			surroundKeyWithTag = false,
+			entryTagName = "filter",
+			keyAttributeName = "file",
+			valueAttributeName = "enabled"
+	)
 	public Map<String, Boolean> excludeFilterFiles = New.map();
 
 	/**
 	 * @see edu.umd.cs.findbugs.config.UserPreferences#setExcludeBugsFiles(Map)
 	 */
+	@Tag(value = "excludeBugsFiles")
+	@MapAnnotation(
+			surroundWithTag = false,
+			surroundValueWithTag = false,
+			surroundKeyWithTag = false,
+			entryTagName = "bugs",
+			keyAttributeName = "file",
+			valueAttributeName = "enabled"
+	)
 	public Map<String, Boolean> excludeBugsFiles = New.map();
 
 	/**

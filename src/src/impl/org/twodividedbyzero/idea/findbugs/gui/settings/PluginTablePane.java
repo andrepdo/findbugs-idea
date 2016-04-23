@@ -66,6 +66,7 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 	private JBTable table;
 	private JScrollPane scrollPane;
 	private String lastPluginError;
+	private DetectorTablePane detectorTablePane;
 
 	PluginTablePane() {
 		super(new BorderLayout());
@@ -171,6 +172,9 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 				}
 			}
 			load(settings);
+			if (detectorTablePane != null) {
+				detectorTablePane.reload();
+			}
 			if (errors.length() > 0) {
 				Messages.showErrorDialog(
 						this,
@@ -182,6 +186,7 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 	}
 
 	private void doRemove() {
+		// TODO
 		final int[] index = table.getSelectedRows();
 		if (index != null && index.length > 0) {
 			final Set<PluginInfo> toRemove = New.set();
@@ -233,6 +238,10 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 		Collections.sort(pluginLoader.infos, PluginInfo.ByShortDescription);
 		getModel().rows.addAll(pluginLoader.infos);
 		getModel().fireTableDataChanged();
+	}
+
+	void setDetectorTablePane(@Nullable final DetectorTablePane detectorTablePane) {
+		this.detectorTablePane = detectorTablePane;
 	}
 
 	private class Model extends AbstractTableModel {
