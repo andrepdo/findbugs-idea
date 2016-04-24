@@ -18,24 +18,28 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
+import com.intellij.openapi.util.text.StringUtil;
+import edu.umd.cs.findbugs.BugPattern;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
+import edu.umd.cs.findbugs.I18N;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
-import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 	AbstractDetectorNode(@NotNull final String text) {
@@ -66,13 +70,14 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 
 	@NotNull
 	static AbstractDetectorNode buildRoot(
+			@NotNull final DetectorTablePane.GroupBy groupBy,
 			final boolean addHidden,
 			@NotNull final Map<String, Map<String, Boolean>> detectors
 	) {
 
-		final Map<String, List<DetectorNode>> byProvider = New.map();
+		final Map<String, List<DetectorNode>> byGroup = New.map();
 		final Iterator<DetectorFactory> detectorFactoryIterator = DetectorFactoryCollection.instance().factoryIterator();
-		fillByProvider(addHidden, detectorFactoryIterator, byProvider, detectors);
+		fillByGroup(groupBy, addHidden, detectorFactoryIterator, byGroup, detectors);
 
 		final Comparator<DetectorNode> nodeComparator = new Comparator<DetectorNode>() {
 			@Override
@@ -81,48 +86,96 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 			}
 		};
 
-		final AbstractDetectorNode root = createGroup(ResourcesLoader.getString("settings.detector"));
-		final ArrayList<String> providerSorted = new ArrayList<String>(byProvider.keySet());
-		Collections.sort(providerSorted);
-		for (final String provider : providerSorted) {
-			final AbstractDetectorNode group = createGroup(provider);
-			root.add(group);
-			final List<DetectorNode> nodes = new ArrayList<DetectorNode>(byProvider.get(provider));
+		final AbstractDetectorNode root = createGroup(groupBy.displayName);
+		final ArrayList<String> groupSorted = new ArrayList<String>(byGroup.keySet());
+		Collections.sort(groupSorted);
+		for (final String group : groupSorted) {
+			final AbstractDetectorNode groupNode = createGroup(group);
+			root.add(groupNode);
+			final List<DetectorNode> nodes = new ArrayList<DetectorNode>(byGroup.get(group));
 			Collections.sort(nodes, nodeComparator);
 			for (final DetectorNode node : nodes) {
-				group.add(node);
+				groupNode.add(node);
 			}
 		}
 		return root;
 	}
 
 	@NotNull
-	private static Map<String, List<DetectorNode>> fillByProvider(
+	private static Map<String, List<DetectorNode>> fillByGroup(
+			@NotNull final DetectorTablePane.GroupBy groupBy,
 			final boolean addHidden,
 			@NotNull final Iterator<DetectorFactory> iterator,
-			@NotNull final Map<String, List<DetectorNode>> byProvider,
+			@NotNull final Map<String, List<DetectorNode>> byGroup,
 			@NotNull final Map<String, Map<String, Boolean>> enabledMap
 	) {
 
 		while (iterator.hasNext()) {
 			final DetectorFactory factory = iterator.next();
 			if (!factory.isHidden() || addHidden) {
-				String provider = factory.getPlugin().getProvider();
-				if (provider == null) {
-					provider = "Unknown";
-				} else if (provider.endsWith(" project")) {
-					provider = provider.substring(0, provider.length() - " project".length());
+
+				String group;
+				switch (groupBy) {
+					case Provider:
+						group = factory.getPlugin().getProvider();
+						if (group == null) {
+							group = "Unknown";
+						} else if (group.endsWith(" project")) {
+							group = group.substring(0, group.length() - " project".length());
+						}
+						addNode(factory, group, byGroup, enabledMap);
+						break;
+					case Speed:
+						group = factory.getSpeed();
+						if (group == null) {
+							group = "Unknown";
+						}
+						addNode(factory, group, byGroup, enabledMap);
+						break;
+					case BugCategory:
+						final Collection<BugPattern> patterns = factory.getReportedBugPatterns();
+						final Set<String> categories = New.set();
+						for (final BugPattern bugPattern : patterns) {
+							final String category = bugPattern.getCategory();
+							if (!StringUtil.isEmptyOrSpaces(category)) {
+								categories.add(category);
+							}
+						}
+						if (categories.isEmpty()) {
+							group = "Unknown";
+							addNode(factory, group, byGroup, enabledMap);
+						} else {
+							for (final String category : categories) {
+								group = I18N.instance().getBugCategoryDescription(category);
+								if (StringUtil.isEmptyOrSpaces(group)) {
+									group = category;
+								}
+								addNode(factory, group, byGroup, enabledMap);
+							}
+						}
+						break;
+					default:
+						throw new UnsupportedOperationException("Unsupported " + groupBy);
 				}
-				List<DetectorNode> detectorNodes = byProvider.get(provider);
-				if (detectorNodes == null) {
-					detectorNodes = New.arrayList();
-					byProvider.put(provider, detectorNodes);
-				}
-				final Boolean enabled = isEnabled(enabledMap, factory);
-				detectorNodes.add(create(factory, enabled));
+
 			}
 		}
-		return byProvider;
+		return byGroup;
+	}
+
+	private static void addNode(
+			@NotNull final DetectorFactory factory,
+			@NotNull final String group,
+			@NotNull final Map<String, List<DetectorNode>> byGroup,
+			@NotNull final Map<String, Map<String, Boolean>> enabledMap
+	) {
+		List<DetectorNode> detectorNodes = byGroup.get(group);
+		if (detectorNodes == null) {
+			detectorNodes = New.arrayList();
+			byGroup.put(group, detectorNodes);
+		}
+		final Boolean enabled = isEnabled(enabledMap, factory);
+		detectorNodes.add(create(factory, enabled));
 	}
 
 	@NotNull
