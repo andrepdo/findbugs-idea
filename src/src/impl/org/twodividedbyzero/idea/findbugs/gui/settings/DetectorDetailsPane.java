@@ -25,9 +25,9 @@ import com.intellij.ui.HintHint;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.util.ui.UIUtil;
+import edu.umd.cs.findbugs.BugPattern;
 import edu.umd.cs.findbugs.DetectorFactory;
 import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.StringUtil;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
@@ -39,6 +39,7 @@ import java.awt.BorderLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.io.StringReader;
+import java.util.Set;
 
 final class DetectorDetailsPane extends JPanel {
 	@NonNls
@@ -68,9 +69,9 @@ final class DetectorDetailsPane extends JPanel {
 		description.setEnabled(enabled);
 	}
 
-	private void setDescription(@NotNull final String html) {
+	void load(@Nullable final DetectorFactory detector) {
+		final String html = detector != null ? detector.getDetailHTML() : EMPTY_HTML;
 		try {
-
 			String body = null;
 			int pos = html.indexOf("<BODY>");
 			if (-1 != pos) {
@@ -81,6 +82,11 @@ final class DetectorDetailsPane extends JPanel {
 					body = StringUtil.trim(body, ' ', '\n', '\r', '\t');
 					if (body.startsWith("<p>")) {
 						body = body.substring("<p>".length());
+						body = StringUtil.trim(body, ' ', '\n', '\r', '\t');
+						if (body.endsWith("<p></p>")) {
+							body = body.substring(0, body.length() - "<p></p>".length());
+						}
+						body = StringUtil.trim(body, ' ', '\n', '\r', '\t');
 						if (body.endsWith("</p>")) {
 							body = body.substring(0, body.length() - "</p>".length());
 						}
@@ -91,7 +97,32 @@ final class DetectorDetailsPane extends JPanel {
 				}
 			}
 
-			// TODO pattern etc
+			if (detector != null && body != null) {
+				final StringBuilder s = new StringBuilder();
+				s.append("\n\n<table border=1>");
+				s.append("<tr><td>").append(ResourcesLoader.getString("detector.details.plugin")).append("</td><td>").append(detector.getPlugin().getShortDescription()).append("</td></tr>");
+				s.append("<tr><td>").append(ResourcesLoader.getString("detector.details.pluginId")).append("</td><td>").append(detector.getPlugin().getPluginId()).append("</td></tr>");
+				s.append("<tr><td>").append(ResourcesLoader.getString("detector.details.detectorName")).append("</td><td>").append(detector.getShortName()).append("</td></tr>");
+				s.append("</table>");
+				final Set<BugPattern> bugPatterns = detector.getReportedBugPatterns();
+				if (bugPatterns.isEmpty()) {
+					s.append("\n<b>").append(ResourcesLoader.getString("detector.details.noReportedPatterns")).append("</b>");
+				} else {
+					s.append("\n").append(ResourcesLoader.getString("detector.details.reportedPatterns")).append(":");
+					s.append("<table border=1>");
+					for (final BugPattern pattern : bugPatterns) {
+						s.append("<tr>")
+								.append("<td>").append(pattern.getCategory()).append("</td>")
+								.append("<td>").append(pattern.getAbbrev()).append("</td>")
+								.append("<td>").append(pattern.getType()).append("</td>")
+								.append("<td>").append(pattern.getShortDescription()).append("</td>")
+								.append("</tr>");
+
+					}
+					s.append("</table>");
+				}
+				body += s.toString();
+			}
 
 			final HintHint hintHint = new HintHint(description, new Point(0, 0));
 			hintHint.setFont(UIUtil.getLabelFont());
@@ -100,14 +131,6 @@ final class DetectorDetailsPane extends JPanel {
 
 		} catch (final Exception ignored) {
 			Logger.getInstance(DetectorTab.class).error("Could not load HTML:\n" + html, ignored);
-		}
-	}
-
-	void load(@Nullable final DetectorFactory detector) {
-		if (detector == null) {
-			setDescription(EMPTY_HTML);
-		} else {
-			setDescription(detector.getDetailHTML());
 		}
 	}
 }
