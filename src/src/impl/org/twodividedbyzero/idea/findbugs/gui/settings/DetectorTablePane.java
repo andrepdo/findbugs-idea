@@ -21,7 +21,6 @@ package org.twodividedbyzero.idea.findbugs.gui.settings;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.CommonActionsManager;
 import com.intellij.ide.DefaultTreeExpander;
-import com.intellij.ide.util.treeView.TreeState;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
@@ -38,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.PropertyKey;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
+import org.twodividedbyzero.idea.findbugs.gui.common.TreeState;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JComponent;
@@ -147,10 +147,9 @@ final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSe
 	void reload() {
 		final Map<String, Map<String, Boolean>> detectors = New.map();
 		AbstractDetectorNode.fillEnabledMap(getRootNode(), detectors);
-		final TreeState treeState = TreeState.createOn(table.getTree(), getRootNode());
+		final TreeState treeState = TreeState.create(table.getTree());
 		model.setRoot(DetectorNode.buildRoot(groupBy, !filterHidden.selected, detectors));
-		TreeUtil.expandAll(table.getTree()); // TODO ; TreeState does not work
-		treeState.applyTo(table.getTree());
+		treeState.restore();
 	}
 
 	private class FilterHidden extends ToggleActionButton {
