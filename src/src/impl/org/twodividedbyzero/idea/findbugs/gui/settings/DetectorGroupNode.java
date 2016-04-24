@@ -21,7 +21,7 @@ package org.twodividedbyzero.idea.findbugs.gui.settings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-final class DetectorGroupNode extends AbstractDetectorNode {
+class DetectorGroupNode extends AbstractDetectorNode {
 
 	DetectorGroupNode(@NotNull final String text) {
 		super(text);

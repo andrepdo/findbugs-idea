@@ -35,7 +35,6 @@ import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.tree.TreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.PropertyKey;
-import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.TreeState;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
@@ -107,8 +106,8 @@ final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSe
 	}
 
 	@NotNull
-	private AbstractDetectorNode getRootNode() {
-		return (AbstractDetectorNode) model.getRoot();
+	private DetectorRootNode getRootNode() {
+		return (DetectorRootNode) model.getRoot();
 	}
 
 	@Override
@@ -121,19 +120,14 @@ final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSe
 
 	@Override
 	public boolean isModified(@NotNull final AbstractSettings settings) {
-		final Map<String, Map<String, Boolean>> currentDetectors = New.map();
-		AbstractDetectorNode.fillEnabledMap(getRootNode(), currentDetectors);
+		final Map<String, Map<String, Boolean>> currentDetectors = getRootNode().getEnabledMap();
 		final Map<String, Map<String, Boolean>> settingsDetectors = AbstractDetectorNode.createEnabledMap(settings);
 		return !settingsDetectors.equals(currentDetectors);
 	}
 
 	@Override
 	public void apply(@NotNull final AbstractSettings settings) throws ConfigurationException {
-		final Map<String, Map<String, Boolean>> detectors = New.map();
-		AbstractDetectorNode.fillEnabledMap(
-				getRootNode(),
-				detectors
-		);
+		final Map<String, Map<String, Boolean>> detectors = getRootNode().getEnabledMap();
 		AbstractDetectorNode.fillSettings(settings, detectors);
 	}
 
@@ -145,8 +139,7 @@ final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSe
 	}
 
 	void reload() {
-		final Map<String, Map<String, Boolean>> detectors = New.map();
-		AbstractDetectorNode.fillEnabledMap(getRootNode(), detectors);
+		final Map<String, Map<String, Boolean>> detectors = getRootNode().getEnabledMap();
 		final TreeState treeState = TreeState.create(table.getTree());
 		model.setRoot(DetectorNode.buildRoot(groupBy, !filterHidden.selected, detectors));
 		treeState.restore();

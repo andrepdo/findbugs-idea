@@ -54,8 +54,13 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 	abstract void setEnabled(@Nullable Boolean enabled);
 
 	@NotNull
-	private static DetectorNode create(@NotNull final DetectorFactory detector, @Nullable final Boolean enabled) {
-		return new DetectorNode(detector, enabled == null ? detector.isDefaultEnabled() : enabled);
+	private static AbstractDetectorNode createRoot(@NotNull final String text, @NotNull final Map<String, Map<String, Boolean>> enabled) {
+		return new DetectorRootNode(text, enabled);
+	}
+
+	@NotNull
+	private static DetectorNode create(@NotNull final DetectorFactory detector, @NotNull final Map<String, Map<String, Boolean>> enabled) {
+		return new DetectorNode(detector, enabled);
 	}
 
 	@NotNull
@@ -86,7 +91,7 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 			}
 		};
 
-		final AbstractDetectorNode root = createGroup(groupBy.displayName);
+		final AbstractDetectorNode root = createRoot(groupBy.displayName, detectors);
 		final ArrayList<String> groupSorted = new ArrayList<String>(byGroup.keySet());
 		Collections.sort(groupSorted);
 		for (final String group : groupSorted) {
@@ -174,8 +179,7 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 			detectorNodes = New.arrayList();
 			byGroup.put(group, detectorNodes);
 		}
-		final Boolean enabled = isEnabled(enabledMap, factory);
-		detectorNodes.add(create(factory, enabled));
+		detectorNodes.add(create(factory, enabledMap));
 	}
 
 	@NotNull
@@ -214,61 +218,5 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 				to.put(entry.getKey(), entry.getValue());
 			}
 		}
-	}
-
-	static void fillEnabledMap(
-			@NotNull final AbstractDetectorNode node,
-			@NotNull final Map<String, Map<String, Boolean>> detectors
-	) {
-		for (int i = 0; i < node.getChildCount(); i++) {
-			fillEnabledMap((AbstractDetectorNode) node.getChildAt(i), detectors);
-		}
-		if (!node.isGroup()) {
-			final DetectorNode detectorNode = (DetectorNode) node;
-			remove(detectors, detectorNode.getDetector());
-			if (detectorNode.isEnabledDefaultDifferent()) {
-				add(detectors, detectorNode.getDetector(), detectorNode.getEnabled());
-			}
-		}
-	}
-
-	@Nullable
-	private static Boolean isEnabled(
-			@NotNull final Map<String, Map<String, Boolean>> detectors,
-			@NotNull final DetectorFactory detector
-	) {
-		final Map<String, Boolean> settings = detectors.get(detector.getPlugin().getPluginId());
-		if (settings != null) {
-			return settings.get(detector.getShortName());
-		}
-		return null;
-	}
-
-	private static void remove(
-			@NotNull final Map<String, Map<String, Boolean>> detectors,
-			@NotNull final DetectorFactory detector
-	) {
-		final String pluginId = detector.getPlugin().getPluginId();
-		final Map<String, Boolean> settings = detectors.get(pluginId);
-		if (settings != null) {
-			settings.remove(detector.getShortName());
-			if (settings.isEmpty()) {
-				detectors.remove(pluginId);
-			}
-		}
-	}
-
-	private static void add(
-			@NotNull final Map<String, Map<String, Boolean>> detectors,
-			@NotNull final DetectorFactory detector,
-			final boolean enabled
-	) {
-		final String pluginId = detector.getPlugin().getPluginId();
-		Map<String, Boolean> settings = detectors.get(pluginId);
-		if (settings == null) {
-			settings = New.map();
-			detectors.put(pluginId, settings);
-		}
-		settings.put(detector.getShortName(), enabled);
 	}
 }

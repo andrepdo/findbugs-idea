@@ -18,10 +18,9 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
-import com.intellij.ide.util.treeView.TreeState;
 import com.intellij.ui.treeStructure.treetable.TreeTableModel;
-import com.intellij.util.ui.tree.TreeUtil;
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.gui.common.TreeState;
 
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
@@ -82,10 +81,9 @@ final class DetectorModel extends DefaultTreeModel implements TreeTableModel {
 		if (column == IS_ENABLED_COLUMN) {
 			node.setEnabled((Boolean) aValue);
 
-			final TreeState treeState = TreeState.createOn(tree, node);
+			final TreeState treeState = TreeState.create(tree);
 			nodeStructureChanged((AbstractDetectorNode) tree.getModel().getRoot());
-			TreeUtil.expandAll(tree); // because TreeState does not work
-			treeState.applyTo(tree);
+			treeState.restore();
 		}
 	}
 

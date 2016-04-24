@@ -21,17 +21,21 @@ package org.twodividedbyzero.idea.findbugs.gui.settings;
 import edu.umd.cs.findbugs.DetectorFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
+
+import java.util.Map;
 
 final class DetectorNode extends AbstractDetectorNode {
 
 	@NotNull
 	private final DetectorFactory detector;
 
-	private boolean enabled;
+	@NotNull
+	private final Map<String, Map<String, Boolean>> enabled;
 
 	DetectorNode(
 			@NotNull final DetectorFactory detector,
-			final boolean enabled
+			@NotNull final Map<String, Map<String, Boolean>> enabled
 	) {
 		super(detector.getShortName());
 		this.detector = detector;
@@ -46,16 +50,36 @@ final class DetectorNode extends AbstractDetectorNode {
 	@Override
 	@Nullable
 	Boolean getEnabled() {
-		return enabled;
+		final Map<String, Boolean> enabledMap = enabled.get(detector.getPlugin().getPluginId());
+		if (enabledMap != null) {
+			final Boolean ret = enabledMap.get(detector.getShortName());
+			if (ret != null) {
+				return ret;
+			}
+		}
+		return detector.isDefaultEnabled();
 	}
 
 	@Override
 	void setEnabled(@Nullable final Boolean enabled) {
-		this.enabled = null != enabled && enabled;
-	}
-
-	boolean isEnabledDefaultDifferent() {
-		return enabled != detector.isDefaultEnabled();
+		final boolean e = null != enabled && enabled;
+		final String pluginId = detector.getPlugin().getPluginId();
+		if (e != detector.isDefaultEnabled()) {
+			Map<String, Boolean> settings = this.enabled.get(pluginId);
+			if (settings == null) {
+				settings = New.map();
+				this.enabled.put(pluginId, settings);
+			}
+			settings.put(detector.getShortName(), e);
+		} else {
+			final Map<String, Boolean> settings = this.enabled.get(pluginId);
+			if (settings != null) {
+				settings.remove(detector.getShortName());
+				if (settings.isEmpty()) {
+					this.enabled.remove(pluginId);
+				}
+			}
+		}
 	}
 
 	@NotNull
