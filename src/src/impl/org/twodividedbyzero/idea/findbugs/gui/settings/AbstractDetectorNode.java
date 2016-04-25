@@ -70,7 +70,7 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 
 	@NotNull
 	static AbstractDetectorNode notLoaded() {
-		return createGroup("not loaded");
+		return createRoot("not loaded", Collections.<String, Map<String, Boolean>>emptyMap());
 	}
 
 	@NotNull

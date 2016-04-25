@@ -146,10 +146,21 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 
 		final VirtualFile[] files = FileChooser.chooseFiles(descriptor, this, project, null);
 		if (files.length > 0) {
+
+			// collect current plugin settings
 			final Set<PluginSettings> settings = New.set();
 			for (final PluginInfo plugin : getModel().rows) {
 				settings.add(plugin.settings);
 			}
+
+			// unload all plugin
+			for (final Plugin plugin : Plugin.getAllPlugins()) {
+				if (!plugin.isCorePlugin()) {
+					FindBugsCustomPluginUtil.unload(plugin);
+				}
+			}
+
+			// load choosed plugins
 			StringBuilder errors = new StringBuilder();
 			for (final VirtualFile virtualFile : files) {
 				final File file = VfsUtilCore.virtualToIoFile(virtualFile);
@@ -161,6 +172,11 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 					pluginSettings.bundled = false;
 					pluginSettings.enabled = true; // enable ; do not use plugin.isEnabledByDefault();
 					pluginSettings.url = FindBugsCustomPluginUtil.getAsString(plugin);
+					for (final PluginSettings other : settings) {
+						if (other.id.equals(pluginSettings.id)) {
+							pluginSettings.enabled = false;
+						}
+					}
 					settings.add(pluginSettings);
 				} catch (final Exception e) {
 					LOGGER.warn(String.valueOf(file), e);
@@ -171,10 +187,9 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 					}
 				}
 			}
+
+			// reload all plugins
 			load(settings);
-			if (detectorTablePane != null) {
-				detectorTablePane.reload();
-			}
 			if (errors.length() > 0) {
 				Messages.showErrorDialog(
 						this,
@@ -186,15 +201,16 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 	}
 
 	private void doRemove() {
-		// TODO
 		final int[] index = table.getSelectedRows();
 		if (index != null && index.length > 0) {
-			final Set<PluginInfo> toRemove = New.set();
-			for (final int idx : index) {
-				toRemove.add(getModel().rows.get(idx));
+			final Set<PluginSettings> settings = New.set();
+			for (final PluginInfo plugin : getModel().rows) {
+				settings.add(plugin.settings);
 			}
-			getModel().rows.removeAll(toRemove);
-			getModel().fireTableDataChanged();
+			for (final int idx : index) {
+				settings.remove(getModel().rows.get(idx).settings);
+			}
+			load(settings);
 		}
 	}
 
@@ -238,6 +254,9 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 		Collections.sort(pluginLoader.infos, PluginInfo.ByShortDescription);
 		getModel().rows.addAll(pluginLoader.infos);
 		getModel().fireTableDataChanged();
+		if (detectorTablePane != null) {
+			detectorTablePane.reload();
+		}
 	}
 
 	void setDetectorTablePane(@Nullable final DetectorTablePane detectorTablePane) {

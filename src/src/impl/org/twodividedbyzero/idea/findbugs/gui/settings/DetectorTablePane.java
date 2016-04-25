@@ -134,8 +134,9 @@ final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSe
 	@Override
 	public void reset(@NotNull final AbstractSettings settings) {
 		final Map<String, Map<String, Boolean>> detectors = AbstractDetectorNode.createEnabledMap(settings);
+		final TreeState treeState = TreeState.create(table.getTree());
 		model.setRoot(DetectorNode.buildRoot(groupBy, !filterHidden.selected, detectors));
-		TreeUtil.expandAll(table.getTree());
+		treeState.restore();
 	}
 
 	void reload() {
