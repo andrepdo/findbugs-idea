@@ -110,7 +110,7 @@ public final class PluginSettings implements Comparable<PluginSettings> {
 		result = 31 * result + (enabled ? 1 : 0);
 		result = 31 * result + (bundled ? 1 : 0);
 		result = 31 * result + (url != null ? url.hashCode() : 0);
-		result = 31 * result + detectors.hashCode();
+		//result = 31 * result + detectors.hashCode(); do not do this
 		return result;
 	}
 

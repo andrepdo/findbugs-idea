@@ -18,19 +18,25 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.ui.popup.ListPopup;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.AnActionButtonRunnable;
-import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
 import edu.umd.cs.findbugs.Plugin;
@@ -46,9 +52,7 @@ import org.twodividedbyzero.idea.findbugs.plugins.AbstractPluginLoader;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.BorderLayout;
@@ -64,9 +68,9 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 	private static final Logger LOGGER = Logger.getInstance(PluginTablePane.class);
 
 	private JBTable table;
-	private JScrollPane scrollPane;
 	private String lastPluginError;
 	private DetectorTablePane detectorTablePane;
+	private List<PluginInfo> bundled;
 
 	PluginTablePane() {
 		super(new BorderLayout());
@@ -82,6 +86,7 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 					}
 				}
 		);
+		// TODO
 		//table.setCellSelectionEnabled(false);
 		//table.setRowSelectionAllowed(false);
 		table.getColumnModel().getColumn(Model.NAME_COLUMN).setCellRenderer(new TableCellRenderer() {
@@ -97,12 +102,11 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 			}
 		});
 
-		final JPanel toolbar = ToolbarDecorator.createDecorator(table)
+		final JPanel tablePane = ToolbarDecorator.createDecorator(table)
 				.setAddAction(new AnActionButtonRunnable() {
 					@Override
 					public void run(@NotNull final AnActionButton anActionButton) {
-						final Project project = IdeaUtilImpl.getProject(anActionButton.getDataContext());
-						doAdd(project);
+						doAdd(anActionButton);
 					}
 				})
 				.setRemoveAction(new AnActionButtonRunnable() {
@@ -113,11 +117,7 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 				})
 				.setAsUsualTopToolbar().createPanel();
 
-		scrollPane = ScrollPaneFactory.createScrollPane(table);
-		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-		add(toolbar, BorderLayout.NORTH);
-		add(scrollPane);
+		add(tablePane);
 	}
 
 	@NotNull
@@ -133,7 +133,54 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 		getModel().fireTableDataChanged();
 	}
 
-	private void doAdd(@Nullable final Project project) {
+	private void doAdd(@NotNull final AnActionButton anActionButton) {
+		final Project project = IdeaUtilImpl.getProject(anActionButton.getDataContext());
+		if (bundled.isEmpty()) {
+			doAddWithFileChooser(project);
+		} else {
+			// like com.intellij.codeInsight.template.impl.TemplateListPanel#addTemplateOrGroup
+			final DefaultActionGroup group = new DefaultActionGroup();
+			for (final PluginInfo pluginInfo : bundled) {
+				group.add(new DumbAwareAction(ResourcesLoader.getString("plugins.add", pluginInfo.shortDescription)) {
+					@Override
+					public void actionPerformed(@NotNull final AnActionEvent e) {
+						final Set<PluginSettings> settings = New.set();
+						pluginInfo.settings.enabled = true;
+						for (final PluginInfo other : getModel().rows) {
+							settings.add(other.settings);
+							if (other.settings.enabled) {
+								if (other.settings.id.equals(pluginInfo.settings.id)) {
+									pluginInfo.settings.enabled = false;
+									break;
+								}
+							}
+						}
+						bundled.remove(pluginInfo);
+						settings.add(pluginInfo.settings);
+						load(settings);
+					}
+				});
+			}
+			group.add(new DumbAwareAction(ResourcesLoader.getString("plugins.addFromDisk")) {
+				@Override
+				public void actionPerformed(@NotNull AnActionEvent e) {
+					doAddWithFileChooser(project);
+				}
+			});
+			final DataContext context = DataManager.getInstance().getDataContext(anActionButton.getContextComponent());
+			final ListPopup popup = JBPopupFactory.getInstance().createActionGroupPopup(
+					null,
+					group,
+					context,
+					JBPopupFactory.ActionSelectionAid.ALPHA_NUMBERING,
+					true,
+					null
+			);
+			popup.show(anActionButton.getPreferredPopupPoint());
+		}
+	}
+
+	private void doAddWithFileChooser(@Nullable final Project project) {
 		final FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, true, true, false, true);
 		descriptor.setTitle(ResourcesLoader.getString("plugins.choose.title"));
 		descriptor.setDescription(ResourcesLoader.getString("plugins.choose.description"));
@@ -218,7 +265,6 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 	public void setEnabled(final boolean enabled) {
 		super.setEnabled(enabled);
 		table.setEnabled(enabled);
-		scrollPane.setEnabled(enabled);
 	}
 
 	@Override
@@ -251,8 +297,10 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 		getModel().rows.clear();
 		final PluginLoaderImpl pluginLoader = new PluginLoaderImpl(true);
 		pluginLoader.load(settings);
-		Collections.sort(pluginLoader.infos, PluginInfo.ByShortDescription);
-		getModel().rows.addAll(pluginLoader.infos);
+		Collections.sort(pluginLoader.configured, PluginInfo.ByShortDescription);
+		Collections.sort(pluginLoader.bundled, PluginInfo.ByShortDescription);
+		bundled = pluginLoader.bundled;
+		getModel().rows.addAll(pluginLoader.configured);
 		getModel().fireTableDataChanged();
 		if (detectorTablePane != null) {
 			detectorTablePane.reload();
@@ -337,16 +385,27 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 	}
 
 	private class PluginLoaderImpl extends AbstractPluginLoader {
-		private final List<PluginInfo> infos;
+
+		@NotNull
+		private final List<PluginInfo> configured;
+
+		@NotNull
+		private final List<PluginInfo> bundled;
 
 		PluginLoaderImpl(final boolean treatErrorsAsWarnings) {
 			super(treatErrorsAsWarnings);
-			infos = New.arrayList();
+			configured = New.arrayList();
+			bundled = New.arrayList();
 		}
 
 		@Override
-		protected void seenPlugin(@NotNull final PluginSettings settings, @NotNull final Plugin plugin, final boolean bundled) {
-			infos.add(PluginInfo.create(settings, plugin));
+		protected void seenBundledPlugin(@NotNull final PluginSettings settings, @NotNull final Plugin plugin) {
+			bundled.add(PluginInfo.create(settings, plugin));
+		}
+
+		@Override
+		protected void seenConfiguredPlugin(@NotNull final PluginSettings settings, @NotNull final Plugin plugin, final boolean bundled) {
+			configured.add(PluginInfo.create(settings, plugin));
 		}
 	}
 }

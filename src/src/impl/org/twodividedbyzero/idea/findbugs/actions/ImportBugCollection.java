@@ -34,7 +34,6 @@ import com.intellij.util.Processor;
 import com.intellij.util.containers.TransferToEDTQueue;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.BugInstance;
-import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.ProjectStats;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -43,10 +42,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
-import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
@@ -54,7 +51,6 @@ import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
 import org.twodividedbyzero.idea.findbugs.gui.common.ImportFileDialog;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.tasks.BackgroundableTask;
 
 import java.io.File;
@@ -153,10 +149,9 @@ public final class ImportBugCollection extends AbstractAction {
 				SortedBugCollection importBugCollection = null;
 				try {
 					final SortedBugCollection bugCollection = new SortedBugCollection();
-					final FindBugsPlugin pluginComponent = IdeaUtilImpl.getPluginComponent(project);
 					importBugCollection = bugCollection.createEmptyCollectionWithMetadata();
 					final edu.umd.cs.findbugs.Project importProject = importBugCollection.getProject();
-					importProject.setGuiCallback(new PluginGuiCallback(pluginComponent));
+					importProject.setGuiCallback(new PluginGuiCallback(project));
 					importBugCollection.setDoNotUseCloud(true);
 					//for (final Plugin plugin : Plugin.getAllPlugins()) { TODO
 					//	importProject.setPluginStatusTrinary(plugin.getPluginId(), !preferences.isPluginDisabled(plugin.getPluginId()));

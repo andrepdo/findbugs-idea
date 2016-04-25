@@ -29,7 +29,6 @@ import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.AnActionButtonRunnable;
-import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
@@ -41,8 +40,6 @@ import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.table.AbstractTableModel;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -50,6 +47,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * TODO: collapse
@@ -64,7 +62,6 @@ import java.util.Map;
 final class FilterPane extends JPanel {
 	private final String title;
 	private JBTable table;
-	private JScrollPane scrollPane;
 
 	FilterPane(@NotNull @PropertyKey(resourceBundle = ResourcesLoader.BUNDLE) final String titleKey) {
 		super(new BorderLayout());
@@ -81,7 +78,7 @@ final class FilterPane extends JPanel {
 				}
 		);
 
-		final JPanel toolbar = ToolbarDecorator.createDecorator(table)
+		final JPanel tablePane = ToolbarDecorator.createDecorator(table)
 				.setAddAction(new AnActionButtonRunnable() {
 					@Override
 					public void run(final AnActionButton anActionButton) {
@@ -97,11 +94,7 @@ final class FilterPane extends JPanel {
 				})
 				.setAsUsualTopToolbar().createPanel();
 
-		scrollPane = ScrollPaneFactory.createScrollPane(table);
-		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-		add(toolbar, BorderLayout.NORTH);
-		add(scrollPane);
+		add(tablePane);
 	}
 
 	@NotNull
@@ -139,14 +132,21 @@ final class FilterPane extends JPanel {
 	}
 
 	private void doRemove() {
-		// TODO
+		final int[] index = table.getSelectedRows();
+		if (index != null && index.length > 0) {
+			final Set<Item> toRemove = New.set();
+			for (final int idx : index) {
+				toRemove.add(getModel().rows.get(idx));
+			}
+			getModel().rows.removeAll(toRemove);
+			getModel().fireTableDataChanged();
+		}
 	}
 
 	@Override
 	public void setEnabled(final boolean enabled) {
 		super.setEnabled(enabled);
 		table.setEnabled(enabled);
-		scrollPane.setEnabled(enabled);
 	}
 
 	boolean isModified(@NotNull final Map<String, Boolean> map) {

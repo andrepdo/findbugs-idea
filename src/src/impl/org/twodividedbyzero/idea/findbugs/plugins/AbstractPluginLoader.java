@@ -18,6 +18,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.plugins;
 
+import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.diagnostic.Logger;
@@ -40,6 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+// TODO
 public abstract class AbstractPluginLoader {
 
 	private static final Logger LOGGER = Logger.getInstance(AbstractPluginLoader.class);
@@ -65,7 +67,9 @@ public abstract class AbstractPluginLoader {
 
 
 		// 2. load bundled plugins and unload
-		final File[] bundledPlugins = Plugins.getDirectory(FindBugsPluginUtil.getIdeaPluginDescriptor()).listFiles();
+		final IdeaPluginDescriptor ideaPluginDescriptor = FindBugsPluginUtil.getIdeaPluginDescriptor();
+		Plugins.deploy(ideaPluginDescriptor);
+		final File[] bundledPlugins = Plugins.getDirectory(ideaPluginDescriptor).listFiles();
 		final Set<String> enabledBundledPluginUrls = New.set();
 		if (bundledPlugins != null) {
 			for (final File pluginFile : bundledPlugins) {
@@ -86,11 +90,13 @@ public abstract class AbstractPluginLoader {
 							pluginSettings.bundled = true;
 							pluginSettings.enabled = false;
 							pluginSettings.url = FindBugsCustomPluginUtil.getAsString(plugin);
+							seenBundledPlugin(pluginSettings, plugin);
+						} else {
+							seenConfiguredPlugin(pluginSettings, plugin, true);
 						}
 						if (pluginSettings.enabled) {
 							enabledBundledPluginUrls.add(FindBugsCustomPluginUtil.getAsString(plugin));
 						}
-						seenPlugin(pluginSettings, plugin, true);
 						FindBugsCustomPluginUtil.unload(plugin);
 					} else {
 						handleError("Plugin '" + pluginFile.getPath() + "' not loaded. Archive inaccessible.");
@@ -117,7 +123,7 @@ public abstract class AbstractPluginLoader {
 						handleError("Could not load plugin: " + pluginUrl);
 						continue;
 					}
-					seenPlugin(pluginSettings, plugin, false);
+					seenConfiguredPlugin(pluginSettings, plugin, false);
 					if (pluginSettings.enabled) {
 						enabledUserPluginUrls.add(pluginUrl);
 					}
@@ -158,7 +164,10 @@ public abstract class AbstractPluginLoader {
 	protected void seenCorePlugin(@NotNull final Plugin plugin) {
 	}
 
-	protected void seenPlugin(@NotNull final PluginSettings settings, @NotNull final Plugin plugin, final boolean bundled) {
+	protected void seenBundledPlugin(@NotNull final PluginSettings settings, @NotNull final Plugin plugin) {
+	}
+
+	protected void seenConfiguredPlugin(@NotNull final PluginSettings settings, @NotNull final Plugin plugin, final boolean bundled) {
 	}
 
 	protected void pluginPermanentlyLoaded(@NotNull final Plugin plugin, final boolean userPlugin) {

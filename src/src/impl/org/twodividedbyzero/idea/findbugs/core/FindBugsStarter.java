@@ -37,6 +37,7 @@ import com.intellij.util.Consumer;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import edu.umd.cs.findbugs.FindBugs2;
+import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import edu.umd.cs.findbugs.config.UserPreferences;
@@ -46,6 +47,7 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
 import org.twodividedbyzero.idea.findbugs.messages.AnalysisAbortingListener;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
 
@@ -60,7 +62,10 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 
 	private static final Logger LOGGER = Logger.getInstance(FindBugsStarter.class);
 
+	@NotNull
 	private final Project _project;
+
+	@NotNull
 	private final String _title;
 
 	@NotNull
@@ -189,11 +194,20 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		final FindBugsProject findBugsProject = new FindBugsProject();
 		{
 			findBugsProject.setProjectName(_project.getName());
-			// TODO
-			//for (final Plugin plugin : Plugin.getAllPlugins()) {
-			//	findBugsProject.setPluginStatusTrinary(plugin.getPluginId(), !_preferences.isPluginDisabled(plugin.getPluginId()));
-			//}
-			//findBugsProject.setGuiCallback(new PluginGuiCallback(_findBugsPlugin));
+			for (final Plugin plugin : Plugin.getAllPlugins()) {
+				if (!plugin.isCorePlugin()) {
+					boolean enabled = false;
+					for (final PluginSettings pluginSettings : settings.plugins) {
+						if (plugin.getPluginId().equals(pluginSettings.id)) {
+							if (pluginSettings.enabled) {
+								enabled = true; // do not break loop here ; maybe there are multiple plugins (with same plugin id) configured and one is enabled
+							}
+						}
+					}
+					findBugsProject.setPluginStatusTrinary(plugin.getPluginId(), enabled);
+				}
+			}
+			findBugsProject.setGuiCallback(new PluginGuiCallback(_project));
 		}
 
 		final SortedBugCollection bugCollection = new SortedBugCollection(findBugsProject);
@@ -288,28 +302,34 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		// TODO merz test it
 		final Map<String, Boolean> excludeFilterFiles = userPrefs.getExcludeFilterFiles();
 		for (final Map.Entry<String, Boolean> excludeFileName : excludeFilterFiles.entrySet()) {
-			try {
-				engine.addFilter(IdeaUtilImpl.expandPathMacro(project, excludeFileName.getKey()), false);
-			} catch (final IOException e) {
-				LOGGER.error("ExcludeFilter configuration failed.", e);
+			if (excludeFileName.getValue()) {
+				try {
+					engine.addFilter(IdeaUtilImpl.expandPathMacro(project, excludeFileName.getKey()), false);
+				} catch (final IOException e) {
+					LOGGER.error("ExcludeFilter configuration failed.", e);
+				}
 			}
 		}
 		final Map<String, Boolean> includeFilterFiles = userPrefs.getIncludeFilterFiles();
 		for (final Map.Entry<String, Boolean> includeFileName : includeFilterFiles.entrySet()) {
-			try {
-				engine.addFilter(IdeaUtilImpl.expandPathMacro(project, includeFileName.getKey()), true);
-			} catch (final IOException e) {
-				LOGGER.error("IncludeFilter configuration failed.", e);
+			if (includeFileName.getValue()) {
+				try {
+					engine.addFilter(IdeaUtilImpl.expandPathMacro(project, includeFileName.getKey()), true);
+				} catch (final IOException e) {
+					LOGGER.error("IncludeFilter configuration failed.", e);
+				}
 			}
 		}
 		final Map<String, Boolean> excludeBugFiles = userPrefs.getExcludeBugsFiles();
 		for (final Map.Entry<String, Boolean> excludeBugFile : excludeBugFiles.entrySet()) {
-			try {
-				engine.excludeBaselineBugs(IdeaUtilImpl.expandPathMacro(project, excludeBugFile.getKey()));
-			} catch (final IOException e) {
-				LOGGER.error("ExcludeBaseLineBug files configuration failed.", e);
-			} catch (final DocumentException e) {
-				LOGGER.error("ExcludeBaseLineBug files configuration failed.", e);
+			if (excludeBugFile.getValue()) {
+				try {
+					engine.excludeBaselineBugs(IdeaUtilImpl.expandPathMacro(project, excludeBugFile.getKey()));
+				} catch (final IOException e) {
+					LOGGER.error("ExcludeBaseLineBug files configuration failed.", e);
+				} catch (final DocumentException e) {
+					LOGGER.error("ExcludeBaseLineBug files configuration failed.", e);
+				}
 			}
 		}
 	}
