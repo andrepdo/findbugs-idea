@@ -22,6 +22,7 @@ import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.StringUtil;
+import org.twodividedbyzero.idea.findbugs.plugins.PluginInfo;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -82,7 +83,6 @@ final class PluginPane extends JPanel {
 		add(bottom, BorderLayout.SOUTH);
 	}
 
-	// TODO load error
 	void load(@NotNull final PluginInfo plugin) {
 		title.setText(plugin.shortDescription);
 		id.setText("(" + plugin.settings.id + ")");

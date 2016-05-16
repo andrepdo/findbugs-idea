@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.twodividedbyzero.idea.findbugs.gui.settings;
+package org.twodividedbyzero.idea.findbugs.plugins;
 
 import edu.umd.cs.findbugs.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -25,41 +25,35 @@ import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
 
 import java.util.Comparator;
 
-final class PluginInfo {
+public final class PluginInfo {
 	@NotNull
-	final PluginSettings settings;
+	public final PluginSettings settings;
 
 	@Nullable
-	final String shortDescription;
+	public final String shortDescription;
 
 	@Nullable
-	final String detailedDescription;
+	public final String detailedDescription;
 
 	@Nullable
-	final String website;
+	public final String website;
 
 	@Nullable
-	final String errorMessage;
-
-	@Nullable
-	final Throwable error;
+	public final String errorMessage;
 
 	private PluginInfo(
 			@NotNull final PluginSettings settings,
 			@Nullable final String shortDescription,
 			@Nullable final String detailedDescription,
 			@Nullable final String website,
-			@Nullable final String errorMessage,
-			@Nullable final Throwable error
+			@Nullable final String errorMessage
 	) {
 		this.settings = settings;
 		this.shortDescription = shortDescription;
 		this.detailedDescription = detailedDescription;
 		this.website = website;
 		this.errorMessage = errorMessage;
-		this.error = error;
 	}
-
 
 	@NotNull
 	static PluginInfo create(@NotNull final PluginSettings settings, @NotNull final Plugin plugin) {
@@ -68,8 +62,18 @@ final class PluginInfo {
 				plugin.getShortDescription(),
 				plugin.getDetailedDescription(),
 				plugin.getWebsite(),
-				null,
 				null
+		);
+	}
+
+	@NotNull
+	static PluginInfo create(@NotNull final PluginSettings settings, @NotNull final String error) {
+		return new PluginInfo(
+				settings,
+				null,
+				null,
+				null,
+				error
 		);
 	}
 

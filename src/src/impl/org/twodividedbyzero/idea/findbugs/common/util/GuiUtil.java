@@ -258,7 +258,12 @@ public final class GuiUtil {
 			final int checkboxColumn,
 			@NotNull final ActionListener swapEnabled
 	) {
-		final JBTable ret = new JBTable();
+		final JBTable ret = new JBTable() {
+			@Override
+			public void setRowHeight(final int rowHeight) {
+				// do not allow this ; JTable#initializeLocalVars set a default value which will set JBTable#myRowHeightIsExplicitlySet
+			}
+		};
 		ret.setModel(model);
 		ret.setShowGrid(false);
 		ret.setIntercellSpacing(new Dimension(0, 0));
@@ -275,7 +280,7 @@ public final class GuiUtil {
 						final int[] rows = ret.getSelectedRows();
 						if (rows.length > 0) {
 							swapEnabled.actionPerformed(e);
-							final int lastRow = rows[rows.length-1];
+							final int lastRow = rows[rows.length - 1];
 							ret.setRowSelectionInterval(lastRow, lastRow);
 						}
 					}

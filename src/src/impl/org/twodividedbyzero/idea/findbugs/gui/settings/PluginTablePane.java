@@ -49,6 +49,7 @@ import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.plugins.AbstractPluginLoader;
+import org.twodividedbyzero.idea.findbugs.plugins.PluginInfo;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JPanel;
@@ -75,7 +76,6 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 	PluginTablePane() {
 		super(new BorderLayout());
 		setBorder(GuiUtil.createTitledBorder(ResourcesLoader.getString("plugins.title")));
-		table = new JBTable();
 		table = GuiUtil.createCheckboxTable(
 				new Model(New.<PluginInfo>arrayList()),
 				Model.IS_ENABLED_COLUMN,
@@ -91,14 +91,24 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 		//table.setRowSelectionAllowed(false);
 		table.getColumnModel().getColumn(Model.NAME_COLUMN).setCellRenderer(new TableCellRenderer() {
 			private PluginPane pane;
+			private PluginErrorPane errorPane;
 
 			@Override
 			public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
-				if (pane == null) {
-					pane = new PluginPane();
+				final PluginInfo pluginInfo = (PluginInfo) value;
+				if (pluginInfo.errorMessage != null) {
+					if (errorPane == null) {
+						errorPane = new PluginErrorPane();
+					}
+					errorPane.load(pluginInfo);
+					return errorPane;
+				} else {
+					if (pane == null) {
+						pane = new PluginPane();
+					}
+					pane.load(pluginInfo);
+					return pane;
 				}
-				pane.load((PluginInfo) value);
-				return pane;
 			}
 		});
 
@@ -399,13 +409,13 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 		}
 
 		@Override
-		protected void seenBundledPlugin(@NotNull final PluginSettings settings, @NotNull final Plugin plugin) {
-			bundled.add(PluginInfo.create(settings, plugin));
+		protected void seenBundledPlugin(@NotNull final PluginInfo plugin) {
+			bundled.add(plugin);
 		}
 
 		@Override
-		protected void seenConfiguredPlugin(@NotNull final PluginSettings settings, @NotNull final Plugin plugin, final boolean bundled) {
-			configured.add(PluginInfo.create(settings, plugin));
+		protected void seenConfiguredPlugin(@NotNull final PluginInfo plugin) {
+			configured.add(plugin);
 		}
 	}
 }

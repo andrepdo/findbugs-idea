@@ -33,6 +33,7 @@ import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
+import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -41,7 +42,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-// TODO
 public abstract class AbstractPluginLoader {
 
 	private static final Logger LOGGER = Logger.getInstance(AbstractPluginLoader.class);
@@ -76,33 +76,31 @@ public abstract class AbstractPluginLoader {
 				if (!pluginFile.getName().endsWith(".jar")) {
 					continue;
 				}
+				if (!pluginFile.isFile()) {
+					continue;
+				}
+				if (!pluginFile.canRead()) {
+					continue;
+				}
 				try {
-					if (FindBugsCustomPluginUtil.check(pluginFile)) {
-						Plugin plugin = FindBugsCustomPluginUtil.loadTemporary(pluginFile);
-						if (plugin == null) {
-							handleError("Could not load plugin: " + pluginFile.getPath());
-							continue;
-						}
-						PluginSettings pluginSettings = PluginSettings.findBundledById(settings, plugin.getPluginId());
-						if (pluginSettings == null) {
-							pluginSettings = new PluginSettings();
-							pluginSettings.id = plugin.getPluginId();
-							pluginSettings.bundled = true;
-							pluginSettings.enabled = false;
-							pluginSettings.url = FindBugsCustomPluginUtil.getAsString(plugin);
-							seenBundledPlugin(pluginSettings, plugin);
-						} else {
-							seenConfiguredPlugin(pluginSettings, plugin, true);
-						}
-						if (pluginSettings.enabled) {
-							enabledBundledPluginUrls.add(FindBugsCustomPluginUtil.getAsString(plugin));
-						}
-						FindBugsCustomPluginUtil.unload(plugin);
+					Plugin plugin = FindBugsCustomPluginUtil.loadTemporary(pluginFile);
+					PluginSettings pluginSettings = PluginSettings.findBundledById(settings, plugin.getPluginId());
+					if (pluginSettings == null) {
+						pluginSettings = new PluginSettings();
+						pluginSettings.id = plugin.getPluginId();
+						pluginSettings.bundled = true;
+						pluginSettings.enabled = false;
+						pluginSettings.url = FindBugsCustomPluginUtil.getAsString(plugin);
+						seenBundledPlugin(PluginInfo.create(pluginSettings, plugin));
 					} else {
-						handleError("Plugin '" + pluginFile.getPath() + "' not loaded. Archive inaccessible.");
+						seenConfiguredPlugin(PluginInfo.create(pluginSettings, plugin));
 					}
-				} catch (final Throwable e) {
-					handleError("Could not load custom findbugs plugin: " + pluginFile.getPath(), e);
+					if (pluginSettings.enabled) {
+						enabledBundledPluginUrls.add(FindBugsCustomPluginUtil.getAsString(plugin));
+					}
+					FindBugsCustomPluginUtil.unload(plugin);
+				} catch (final Exception e) {
+					LOGGER.warn("Could not load plugin: " + pluginFile, e);
 				}
 			}
 		}
@@ -117,24 +115,27 @@ public abstract class AbstractPluginLoader {
 			final String pluginUrl = pluginSettings.url;
 			try {
 				final File pluginFile = FindBugsCustomPluginUtil.getAsFile(pluginUrl);
-				if (FindBugsCustomPluginUtil.check(pluginFile)) {
-					final Plugin plugin = FindBugsCustomPluginUtil.loadTemporary(pluginUrl);
-					if (plugin == null) {
-						handleError("Could not load plugin: " + pluginUrl);
-						continue;
-					}
-					seenConfiguredPlugin(pluginSettings, plugin, false);
-					if (pluginSettings.enabled) {
-						enabledUserPluginUrls.add(pluginUrl);
-					}
-					FindBugsCustomPluginUtil.unload(plugin);
-				} else {
-					handleError("Plugin '" + pluginUrl + "' not loaded. Archive '" + pluginFile.getPath() + "' inaccessible or not exists.");
+				if (!pluginFile.exists()) {
+					seenConfiguredPlugin(PluginInfo.create(pluginSettings, ResourcesLoader.getString("error.path.exists", pluginFile.getPath())));
+					continue;
 				}
-			} catch (MalformedURLException e) {
-				handleError("Could not load plugin: " + pluginUrl, e);
-			} catch (PluginException e) {
-				handleError("Could not load plugin: " + pluginUrl, e);
+				if (!pluginFile.isFile()) {
+					seenConfiguredPlugin(PluginInfo.create(pluginSettings, ResourcesLoader.getString("error.path.type", pluginFile.getPath())));
+					continue;
+				}
+				if (!pluginFile.canRead()) {
+					seenConfiguredPlugin(PluginInfo.create(pluginSettings, ResourcesLoader.getString("error.file.readable", pluginFile.getPath())));
+					continue;
+				}
+				final Plugin plugin = FindBugsCustomPluginUtil.loadTemporary(pluginUrl);
+				seenConfiguredPlugin(PluginInfo.create(pluginSettings, plugin));
+				if (pluginSettings.enabled) {
+					enabledUserPluginUrls.add(pluginUrl);
+				}
+				FindBugsCustomPluginUtil.unload(plugin);
+			} catch (final Exception e) {
+				seenConfiguredPlugin(PluginInfo.create(pluginSettings, ResourcesLoader.getString("plugins.load.error.text.path", pluginUrl)));
+				LOGGER.warn("Could not load plugin " + pluginUrl, e);
 			}
 		}
 
@@ -164,10 +165,10 @@ public abstract class AbstractPluginLoader {
 	protected void seenCorePlugin(@NotNull final Plugin plugin) {
 	}
 
-	protected void seenBundledPlugin(@NotNull final PluginSettings settings, @NotNull final Plugin plugin) {
+	protected void seenBundledPlugin(@NotNull final PluginInfo plugin) {
 	}
 
-	protected void seenConfiguredPlugin(@NotNull final PluginSettings settings, @NotNull final Plugin plugin, final boolean bundled) {
+	protected void seenConfiguredPlugin(@NotNull final PluginInfo plugin) {
 	}
 
 	protected void pluginPermanentlyLoaded(@NotNull final Plugin plugin, final boolean userPlugin) {
