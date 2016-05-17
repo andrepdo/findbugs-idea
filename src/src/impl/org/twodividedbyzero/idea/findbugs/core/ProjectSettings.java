@@ -27,6 +27,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.gui.preferences.LegacyProjectSettings;
 
 @State(
 		name = "FindBugs-IDEA",
@@ -45,7 +46,13 @@ public final class ProjectSettings extends AbstractSettings implements Persisten
 		XmlSerializerUtil.copyBean(state, this);
 	}
 
+	@NotNull
 	public static ProjectSettings getInstance(@NotNull final Project project) {
-		return ServiceManager.getService(project, ProjectSettings.class);
+		final LegacyProjectSettings legacy = LegacyProjectSettings.getInstance(project);
+		final ProjectSettings ret = ServiceManager.getService(project, ProjectSettings.class);
+		if (legacy != null) {
+			legacy.applyTo(ret);
+		}
+		return ret;
 	}
 }
