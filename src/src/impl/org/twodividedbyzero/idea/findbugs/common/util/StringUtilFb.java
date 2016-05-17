@@ -22,16 +22,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jsoup.Jsoup;
 
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
- * @since 0.9.97
- */
-public class StringUtil extends com.intellij.openapi.util.text.StringUtil { // TODO split
+public final class StringUtilFb {
 
-	private StringUtil() {
+	private StringUtilFb() {
 	}
 
 
@@ -82,7 +75,7 @@ public class StringUtil extends com.intellij.openapi.util.text.StringUtil { // T
 				final char lastChar = text.charAt(text.length() - 1);
 				for (final char c : chars) {
 					if (c == lastChar) {
-						text = text.substring(0, text.length()-1);
+						text = text.substring(0, text.length() - 1);
 						break;
 					}
 				}

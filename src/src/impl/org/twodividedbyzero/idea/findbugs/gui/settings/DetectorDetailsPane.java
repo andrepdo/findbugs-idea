@@ -29,7 +29,7 @@ import edu.umd.cs.findbugs.BugPattern;
 import edu.umd.cs.findbugs.DetectorFactory;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.util.StringUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.StringUtilFb;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JEditorPane;
@@ -79,19 +79,19 @@ final class DetectorDetailsPane extends JPanel {
 				pos = body.indexOf("</BODY>");
 				if (-1 != pos) {
 					body = body.substring(0, pos);
-					body = StringUtil.trim(body, ' ', '\n', '\r', '\t');
+					body = StringUtilFb.trim(body, ' ', '\n', '\r', '\t');
 					if (body.startsWith("<p>")) {
 						body = body.substring("<p>".length());
-						body = StringUtil.trim(body, ' ', '\n', '\r', '\t');
+						body = StringUtilFb.trim(body, ' ', '\n', '\r', '\t');
 						if (body.endsWith("<p></p>")) {
 							body = body.substring(0, body.length() - "<p></p>".length());
 						}
-						body = StringUtil.trim(body, ' ', '\n', '\r', '\t');
+						body = StringUtilFb.trim(body, ' ', '\n', '\r', '\t');
 						if (body.endsWith("</p>")) {
 							body = body.substring(0, body.length() - "</p>".length());
 						}
 					}
-					body = StringUtil.trim(body, ' ', '\n', '\r', '\t');
+					body = StringUtilFb.trim(body, ' ', '\n', '\r', '\t');
 				} else {
 					body = null;
 				}

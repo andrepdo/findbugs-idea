@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.common.util.StringUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.StringUtilFb;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.AnnotationType;
 import org.twodividedbyzero.idea.findbugs.plugins.AbstractPluginLoaderLegacy;
 
@@ -871,7 +871,7 @@ public class FindBugsPreferences extends Properties {
 
 
 	public void setAnnotationSuppressWarningsClass(final String annotationSuppressWarningsClass) {
-		_annotationSuppressWarningsClass = StringUtil.isEmpty(annotationSuppressWarningsClass) ? DEFAULT_ANNOTATION_CLASS_NAME : annotationSuppressWarningsClass;
+		_annotationSuppressWarningsClass = StringUtilFb.isEmpty(annotationSuppressWarningsClass) ? DEFAULT_ANNOTATION_CLASS_NAME : annotationSuppressWarningsClass;
 		setProperty(ANNOTATION_SUPPRESS_WARNING_CLASS, _annotationSuppressWarningsClass);
 	}
 

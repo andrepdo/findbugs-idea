@@ -18,10 +18,11 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.util.StringUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.StringUtilFb;
 import org.twodividedbyzero.idea.findbugs.plugins.PluginInfo;
 
 import javax.swing.BorderFactory;
@@ -105,6 +106,6 @@ final class PluginPane extends JPanel {
 			text = text.substring("<p>".length());
 			text = text.substring(0, text.length() - "</p>".length());
 		}
-		return StringUtil.trim(text, '\r', '\n', '\t');
+		return StringUtilFb.trim(text, '\r', '\n', '\t');
 	}
 }

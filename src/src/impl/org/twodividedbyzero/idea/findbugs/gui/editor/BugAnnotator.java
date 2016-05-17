@@ -35,7 +35,7 @@ import edu.umd.cs.findbugs.Detector;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
-import org.twodividedbyzero.idea.findbugs.common.util.StringUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.StringUtilFb;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
@@ -205,15 +205,15 @@ public final class BugAnnotator implements Annotator {
 		for (//noinspection LocalCanBeFinal
 				int i = 0, problemDescriptorsSize = problemDescriptors.size(); i < problemDescriptorsSize; i++) {
 			final ExtendedProblemDescriptor problemDescriptor = problemDescriptors.get(i);
-			buffer.append(ResourcesLoader.getString("findbugs.name")).append(": ").append(StringUtil.html2text(BugInstanceUtil.getBugPatternShortDescription(problemDescriptor.getBugInstance()))).append('\n');
-			buffer.append(StringUtil.html2text(BugInstanceUtil.getDetailText(problemDescriptor.getBugInstance())));
+			buffer.append(ResourcesLoader.getString("findbugs.name")).append(": ").append(StringUtilFb.html2text(BugInstanceUtil.getBugPatternShortDescription(problemDescriptor.getBugInstance()))).append('\n');
+			buffer.append(StringUtilFb.html2text(BugInstanceUtil.getDetailText(problemDescriptor.getBugInstance())));
 			if (i < problemDescriptors.size() - 1) {
 				//noinspection HardcodedLineSeparator
 				buffer.append("\n\n");
 			}
 		}
 
-		return StringUtil.addLineSeparatorAt(buffer, 250).toString();
+		return StringUtilFb.addLineSeparatorAt(buffer, 250).toString();
 	}
 
 	/*private static class AnonymousInnerClassMayBeStaticVisitor extends BaseInspectionVisitor {
