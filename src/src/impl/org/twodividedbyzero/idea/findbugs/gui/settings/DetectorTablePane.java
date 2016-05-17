@@ -21,6 +21,8 @@ package org.twodividedbyzero.idea.findbugs.gui.settings;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.CommonActionsManager;
 import com.intellij.ide.DefaultTreeExpander;
+import com.intellij.ide.ui.search.SearchableOptionsRegistrar;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
@@ -29,11 +31,17 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.ui.FilterComponent;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.ToggleActionButton;
+import com.intellij.util.Processor;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.tree.TreeUtil;
+import edu.umd.cs.findbugs.BugPattern;
+import edu.umd.cs.findbugs.DetectorFactory;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.PropertyKey;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.TreeState;
@@ -44,9 +52,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSettings> {
+final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSettings>, Disposable {
+
+	private FilterComponentImpl filterComponent;
 	private FilterHidden filterHidden;
 	private DetectorModel model;
 	private DetectorTable table;
@@ -68,7 +81,15 @@ final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSe
 		scrollPane = ScrollPaneFactory.createScrollPane(table);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-		add(createActionToolbar().getComponent(), BorderLayout.NORTH);
+		filterComponent = new FilterComponentImpl();
+		final ActionToolbar actionToolbar = createActionToolbar();
+
+		final JPanel topPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		topPane.add(filterComponent);
+		topPane.add(actionToolbar.getComponent());
+		add(topPane, BorderLayout.NORTH);
+
+		add(topPane, BorderLayout.NORTH);
 		add(scrollPane);
 	}
 
@@ -135,15 +156,30 @@ final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSe
 	public void reset(@NotNull final AbstractSettings settings) {
 		final Map<String, Map<String, Boolean>> detectors = AbstractDetectorNode.createEnabledMap(settings);
 		final TreeState treeState = TreeState.create(table.getTree());
-		model.setRoot(DetectorNode.buildRoot(groupBy, !filterHidden.selected, detectors));
+		model.setRoot(DetectorNode.buildRoot(groupBy, new AcceptorImpl(), detectors));
 		treeState.restore();
 	}
 
 	void reload() {
 		final Map<String, Map<String, Boolean>> detectors = getRootNode().getEnabledMap();
 		final TreeState treeState = TreeState.create(table.getTree());
-		model.setRoot(DetectorNode.buildRoot(groupBy, !filterHidden.selected, detectors));
+		model.setRoot(DetectorNode.buildRoot(groupBy, new AcceptorImpl(), detectors));
 		treeState.restore();
+	}
+
+	void setFilter(String filter) {
+		if (filterComponent != null) {
+			filterComponent.setFilter(filter);
+			filterComponent.filter();
+		}
+	}
+
+	@Override
+	public void dispose() {
+		if (filterComponent != null) {
+			filterComponent.dispose();
+			filterComponent = null;
+		}
 	}
 
 	private class FilterHidden extends ToggleActionButton {
@@ -207,6 +243,73 @@ final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSe
 		public void update(final AnActionEvent e) {
 			super.update(e);
 			e.getPresentation().setText(groupBy.displayName);
+		}
+	}
+
+	private class FilterComponentImpl extends FilterComponent {
+		private FilterComponentImpl() {
+			super("FINDBUGS_SETTINGS_SEARCH_HISTORY", 10);
+		}
+
+		@Override
+		public void filter() {
+			reload();
+		}
+	}
+
+	private class AcceptorImpl implements Processor<DetectorFactory> {
+
+		@Nullable
+		private final String filter;
+
+		@Nullable
+		private Set<String> search;
+
+		@Nullable
+		private SearchableOptionsRegistrar searchableOptionsRegistrar;
+
+		AcceptorImpl() {
+			this.filter = filterComponent.getFilter();
+			if (!StringUtil.isEmptyOrSpaces(filter)) {
+				searchableOptionsRegistrar = SearchableOptionsRegistrar.getInstance();
+				search = searchableOptionsRegistrar.getProcessedWords(filter);
+			}
+		}
+
+		@Override
+		public boolean process(final DetectorFactory detector) {
+			if (!detector.isHidden() || !filterHidden.selected) {
+				if (search == null) {
+					return true;
+				}
+				if (isAccepted(search, filter, detector.getShortName())) {
+					return true;
+				}
+				if (isAccepted(search, filter, detector.getFullName())) {
+					return true;
+				}
+				final Set<BugPattern> patterns = detector.getReportedBugPatterns();
+				for (final BugPattern pattern : patterns) {
+					if (isAccepted(search, filter, pattern.getType())) {
+						return true;
+					}
+					if (isAccepted(search, filter, pattern.getShortDescription())) {
+						return true;
+					}
+					if (isAccepted(search, filter, pattern.getLongDescription())) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		private boolean isAccepted(@NotNull final Set<String> search, @NotNull final String filter, @Nullable final String description) {
+			if (null == description) return false;
+			if (StringUtil.containsIgnoreCase(description, filter)) return true;
+			final HashSet<String> descriptionSet = new HashSet<String>(search);
+			descriptionSet.removeAll(searchableOptionsRegistrar.getProcessedWords(description));
+			return descriptionSet.isEmpty();
 		}
 	}
 }

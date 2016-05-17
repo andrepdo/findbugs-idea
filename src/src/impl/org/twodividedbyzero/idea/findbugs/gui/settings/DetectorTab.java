@@ -18,8 +18,10 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.MessageType;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.treeStructure.treetable.TreeTableTree;
 import edu.umd.cs.findbugs.DetectorFactory;
@@ -38,7 +40,7 @@ import java.awt.FlowLayout;
 /**
  * Some code here is based on {@link com.intellij.profile.codeInspection.ui.SingleInspectionProfilePanel}.
  */
-final class DetectorTab extends JPanel implements SettingsOwner<AbstractSettings> {
+final class DetectorTab extends JPanel implements SettingsOwner<AbstractSettings>, Disposable {
 	private JLabel hintLabel;
 	private DetectorTablePane tablePane;
 	private JBSplitter splitter;
@@ -124,5 +126,19 @@ final class DetectorTab extends JPanel implements SettingsOwner<AbstractSettings
 	@Override
 	public void reset(@NotNull final AbstractSettings settings) {
 		getTablePane().reset(settings);
+	}
+
+	void setFilter(String filter) {
+		if (tablePane != null) {
+			tablePane.setFilter(filter);
+		}
+	}
+
+	@Override
+	public void dispose() {
+		if (tablePane != null) {
+			Disposer.dispose(tablePane);
+			tablePane = null;
+		}
 	}
 }

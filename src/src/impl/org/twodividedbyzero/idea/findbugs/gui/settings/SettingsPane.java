@@ -22,11 +22,9 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.ui.FilterComponent;
-import com.intellij.ui.TabbedPaneWrapper;
+import com.intellij.ui.components.JBTabbedPane;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
@@ -40,7 +38,6 @@ import java.awt.FlowLayout;
 
 abstract class SettingsPane extends JPanel implements Disposable {
 
-	private FilterComponentImpl filterComponent;
 	private GeneralTab generalTab;
 	private ReportTab reportTab;
 	private FilterTab filterTab;
@@ -50,7 +47,6 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	SettingsPane() {
 		super(new BorderLayout());
 
-		filterComponent = new FilterComponentImpl();
 		generalTab = createGeneralTab();
 		reportTab = new ReportTab();
 		filterTab = new FilterTab();
@@ -58,18 +54,16 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		shareTab = createShareTab();
 
 		final JPanel topPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		topPane.add(filterComponent);
 		topPane.add(createToolbar().getComponent());
 		topPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
 		add(topPane, BorderLayout.NORTH);
 
 		/**
-		 * LATER: Switch to TabbedPaneWrapper but
-		 * com.intellij.ide.ui.search.SearchUtil#traverseComponentsTree
-		 * must be fixed first.
+		 * LATER: Switch to TabbedPaneWrapper after
+		 * https://github.com/JetBrains/intellij-community/pull/398
 		 */
-		final TabbedPaneWrapper tabs = new TabbedPaneWrapper(this);
-		//final JBTabbedPane tabs = new JBTabbedPane();
+		//final TabbedPaneWrapper tabs = new TabbedPaneWrapper(this);
+		final JBTabbedPane tabs = new JBTabbedPane();
 		tabs.addTab(ResourcesLoader.getString("settings.general"), generalTab);
 		tabs.addTab(ResourcesLoader.getString("settings.report"), reportTab);
 		tabs.addTab(ResourcesLoader.getString("settings.filter"), filterTab);
@@ -77,8 +71,8 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		if (shareTab != null) {
 			tabs.addTab(ResourcesLoader.getString("settings.share"), shareTab);
 		}
-		add(tabs.getComponent()); // see comment above
-		//add(tabs);
+		//add(tabs.getComponent()); // see comment above
+		add(tabs);
 
 		detectorTab.getTablePane().getTable().setBugCategory(reportTab.getBugCategory());
 		if (generalTab.getPluginTablePane() != null) {
@@ -88,9 +82,7 @@ abstract class SettingsPane extends JPanel implements Disposable {
 
 	@NotNull
 	private ActionToolbar createToolbar() {
-		final DefaultActionGroup actions = new DefaultActionGroup();
-		actions.add(new AdvancedSettingsAction(this));
-
+		final AdvancedSettingsAction actions = new AdvancedSettingsAction(this);
 		final ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, true);
 		actionToolbar.setTargetComponent(this);
 		return actionToolbar;
@@ -139,30 +131,20 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	}
 
 	void setFilter(String filter) {
-		filterComponent.setFilter(filter);
+		if (detectorTab != null) {
+			detectorTab.setFilter(filter);
+		}
 	}
 
 	@Override
 	public void dispose() {
-		if (filterComponent != null) {
-			filterComponent.dispose();
-			filterComponent = null;
+		if (detectorTab != null) {
+			Disposer.dispose(detectorTab);
+			detectorTab = null;
 		}
 		if (shareTab != null) {
 			Disposer.dispose(shareTab);
 			shareTab = null;
-		}
-	}
-
-	private class FilterComponentImpl extends FilterComponent {
-		private FilterComponentImpl() {
-			super("FINDBUGS_SETTINGS_SEARCH_HISTORY", 10);
-		}
-
-		@Override
-		public void filter() {
-			final String filter = getFilter();
-			System.out.println("TODO: " + filter); // TODO
 		}
 	}
 }

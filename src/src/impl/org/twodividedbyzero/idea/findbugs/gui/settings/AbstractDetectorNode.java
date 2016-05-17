@@ -19,6 +19,7 @@
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.util.Processor;
 import edu.umd.cs.findbugs.BugPattern;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
@@ -76,13 +77,13 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 	@NotNull
 	static AbstractDetectorNode buildRoot(
 			@NotNull final DetectorTablePane.GroupBy groupBy,
-			final boolean addHidden,
+			@NotNull final Processor<DetectorFactory> acceptor,
 			@NotNull final Map<String, Map<String, Boolean>> detectors
 	) {
 
 		final Map<String, List<DetectorNode>> byGroup = New.map();
 		final Iterator<DetectorFactory> detectorFactoryIterator = DetectorFactoryCollection.instance().factoryIterator();
-		fillByGroup(groupBy, addHidden, detectorFactoryIterator, byGroup, detectors);
+		fillByGroup(groupBy, acceptor, detectorFactoryIterator, byGroup, detectors);
 
 		final Comparator<DetectorNode> nodeComparator = new Comparator<DetectorNode>() {
 			@Override
@@ -109,7 +110,7 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 	@NotNull
 	private static Map<String, List<DetectorNode>> fillByGroup(
 			@NotNull final DetectorTablePane.GroupBy groupBy,
-			final boolean addHidden,
+			@NotNull final Processor<DetectorFactory> acceptor,
 			@NotNull final Iterator<DetectorFactory> iterator,
 			@NotNull final Map<String, List<DetectorNode>> byGroup,
 			@NotNull final Map<String, Map<String, Boolean>> enabledMap
@@ -117,7 +118,7 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 
 		while (iterator.hasNext()) {
 			final DetectorFactory factory = iterator.next();
-			if (!factory.isHidden() || addHidden) {
+			if (acceptor.process(factory)) {
 
 				String group;
 				switch (groupBy) {
