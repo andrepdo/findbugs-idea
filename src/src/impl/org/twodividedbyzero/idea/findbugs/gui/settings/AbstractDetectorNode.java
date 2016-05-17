@@ -76,7 +76,7 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 
 	@NotNull
 	static AbstractDetectorNode buildRoot(
-			@NotNull final DetectorTablePane.GroupBy groupBy,
+			@NotNull final DetectorGroupBy groupBy,
 			@NotNull final Processor<DetectorFactory> acceptor,
 			@NotNull final Map<String, Map<String, Boolean>> detectors
 	) {
@@ -109,7 +109,7 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 
 	@NotNull
 	private static Map<String, List<DetectorNode>> fillByGroup(
-			@NotNull final DetectorTablePane.GroupBy groupBy,
+			@NotNull final DetectorGroupBy groupBy,
 			@NotNull final Processor<DetectorFactory> acceptor,
 			@NotNull final Iterator<DetectorFactory> iterator,
 			@NotNull final Map<String, List<DetectorNode>> byGroup,

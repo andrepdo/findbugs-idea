@@ -42,6 +42,7 @@ import java.awt.FlowLayout;
  */
 final class DetectorTab extends JPanel implements SettingsOwner<AbstractSettings>, Disposable {
 	private JLabel hintLabel;
+	private DetectorTableHeaderPane tableHeaderPane;
 	private DetectorTablePane tablePane;
 	private JBSplitter splitter;
 	private DetectorDetailsPane details;
@@ -54,13 +55,17 @@ final class DetectorTab extends JPanel implements SettingsOwner<AbstractSettings
 		hintPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 0));
 		hintPane.add(getHintLabel());
 
+		final JPanel topPane = new JPanel(new BorderLayout());
+		topPane.add(hintPane, BorderLayout.NORTH);
+		topPane.add(getTableHeaderPane(), BorderLayout.SOUTH);
+
 		splitter = new JBSplitter(false, 0.5f, 0.01f, 0.99f);
 		splitter.setSplitterProportionKey("DetectorTab.VERTICAL_DIVIDER_PROPORTION_23"); // TODO remove _23
 		splitter.setFirstComponent(getTablePane());
 		splitter.setSecondComponent(getDetails());
 		splitter.setHonorComponentsMinimumSize(false);
 
-		add(hintPane, BorderLayout.NORTH);
+		add(topPane, BorderLayout.NORTH);
 		add(splitter);
 	}
 
@@ -73,6 +78,12 @@ final class DetectorTab extends JPanel implements SettingsOwner<AbstractSettings
 			hintLabel.setIcon(MessageType.INFO.getDefaultIcon());
 		}
 		return hintLabel;
+	}
+
+	@NotNull
+	private DetectorTableHeaderPane getTableHeaderPane() {
+		getTablePane();
+		return tableHeaderPane;
 	}
 
 	@NotNull
@@ -92,6 +103,8 @@ final class DetectorTab extends JPanel implements SettingsOwner<AbstractSettings
 					getDetails().load(detector);
 				}
 			});
+			tableHeaderPane = new DetectorTableHeaderPane(tablePane);
+			tablePane.setHeaderPane(tableHeaderPane);
 		}
 		return tablePane;
 	}
@@ -108,6 +121,7 @@ final class DetectorTab extends JPanel implements SettingsOwner<AbstractSettings
 	public void setEnabled(final boolean enabled) {
 		super.setEnabled(enabled);
 		getHintLabel().setEnabled(enabled);
+		getTableHeaderPane().setEnabled(enabled);
 		getTablePane().setEnabled(enabled);
 		splitter.setEnabled(enabled);
 		getDetails().setEnabled(enabled);
@@ -129,16 +143,16 @@ final class DetectorTab extends JPanel implements SettingsOwner<AbstractSettings
 	}
 
 	void setFilter(String filter) {
-		if (tablePane != null) {
-			tablePane.setFilter(filter);
+		if (tableHeaderPane != null) {
+			tableHeaderPane.setFilter(filter);
 		}
 	}
 
 	@Override
 	public void dispose() {
-		if (tablePane != null) {
-			Disposer.dispose(tablePane);
-			tablePane = null;
+		if (tableHeaderPane != null) {
+			Disposer.dispose(tableHeaderPane);
+			tableHeaderPane = null;
 		}
 	}
 }
