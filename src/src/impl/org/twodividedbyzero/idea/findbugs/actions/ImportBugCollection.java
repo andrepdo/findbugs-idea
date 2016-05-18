@@ -95,7 +95,7 @@ public final class ImportBugCollection extends AbstractAction {
 		dialogBuilder.setTitle("Import previous saved bug collection xml");
 
 		final WorkspaceSettings workspaceSettings = WorkspaceSettings.getInstance(project);
-		String exportDir = StringUtil.isEmptyOrSpaces(workspaceSettings.exportDirectory) ? FindBugsPluginConstants.DEFAULT_EXPORT_DIR : workspaceSettings.exportDirectory;
+		String exportDir = StringUtil.isEmptyOrSpaces(workspaceSettings.exportBugCollectionDirectory) ? FindBugsPluginConstants.DEFAULT_EXPORT_DIR : workspaceSettings.exportBugCollectionDirectory;
 		exportDir += File.separatorChar + project.getName();
 
 		final ImportFileDialog importFileDialog = new ImportFileDialog(exportDir, dialogBuilder);

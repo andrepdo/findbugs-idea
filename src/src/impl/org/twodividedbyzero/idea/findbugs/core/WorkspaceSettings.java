@@ -35,15 +35,30 @@ import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
 )
 public final class WorkspaceSettings implements PersistentStateComponent<WorkspaceSettings> {
 
-	/** TODO
-	 * export settings (path, type etc) should use PropertiesComponent.getInstance().getValue("export.settings.path", DEFAULT_PATH)
-	 * like IDEA export settings dialog, see com.intellij.ide.actions.ChooseComponentsToExportDialog
+	/**
+	 * Last used export directory for "Export Bug Collection".
 	 */
-	public String exportDirectory;
+	public String exportBugCollectionDirectory;
 
-	public boolean exportAsXml = true;
+	/**
+	 * Last used setting for "Export Bug Collection".
+	 */
+	public boolean exportBugCollectionAsXml = true;
 
-	public boolean exportAsHtml = true;
+	/**
+	 * Last used setting for "Export Bug Collection".
+	 */
+	public boolean exportBugCollectionAsHtml = true;
+
+	/**
+	 * Last used setting for "Export Bug Collection".
+	 */
+	public boolean exportBugCollectionCreateSubDirectory = false;
+
+	/**
+	 * Last used setting for "Export Bug Collection".
+	 */
+	public boolean openExportedHtmlBugCollectionInBrowser = true;
 
 	public String importFilePath;
 

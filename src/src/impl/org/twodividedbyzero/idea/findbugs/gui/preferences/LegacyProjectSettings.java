@@ -35,6 +35,7 @@ import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.plugins.AbstractPluginLoaderLegacy;
 import org.twodividedbyzero.idea.findbugs.plugins.Plugins;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
@@ -69,18 +70,18 @@ public final class LegacyProjectSettings implements PersistentStateComponent<Per
 		return ServiceManager.getService(project, LegacyProjectSettings.class);
 	}
 
-	void applyTo(@NotNull final ProjectSettings settings) {
+	void applyTo(@NotNull final ProjectSettings settings, @NotNull final WorkspaceSettings workspaceSettings) {
 		if (state == null) {
 			return;
 		}
 		LOGGER.info("Start convert legacy findbugs-idea settings");
-		applyBasePreferencesTo(settings);
+		applyBasePreferencesTo(settings, workspaceSettings);
 		applyBugCategoriesTo(settings);
 		applyFileFiltersTo(settings);
 		applyDetectorsAndPluginsTo(settings);
 	}
 
-	private void applyBasePreferencesTo(@NotNull final ProjectSettings settings) {
+	private void applyBasePreferencesTo(@NotNull final ProjectSettings settings, @NotNull final WorkspaceSettings workspaceSettings) {
 		final Map<String, String> basePreferences = state.getBasePreferences();
 		if (basePreferences == null || basePreferences.isEmpty()) {
 			return;
@@ -112,6 +113,27 @@ public final class LegacyProjectSettings implements PersistentStateComponent<Per
 		final String minPriority = state.getBasePreferences().get(FindBugsPreferences.MIN_PRIORITY_TO_REPORT);
 		if (!StringUtil.isEmptyOrSpaces(minPriority)) {
 			settings.minPriority = minPriority;
+		}
+
+		final String exportBaseDir = state.getBasePreferences().get(FindBugsPreferences.EXPORT_BASE_DIR);
+		if (!StringUtil.isEmptyOrSpaces(exportBaseDir)) {
+			workspaceSettings.exportBugCollectionDirectory = exportBaseDir;
+		}
+		final String exportAsHtml = state.getBasePreferences().get(FindBugsPreferences.EXPORT_AS_HTML);
+		if (!StringUtil.isEmptyOrSpaces(exportAsHtml)) {
+			workspaceSettings.exportBugCollectionAsHtml = Boolean.valueOf(exportAsHtml);
+		}
+		final String exportAsXml = state.getBasePreferences().get(FindBugsPreferences.EXPORT_AS_XML);
+		if (!StringUtil.isEmptyOrSpaces(exportAsXml)) {
+			workspaceSettings.exportBugCollectionAsXml = Boolean.valueOf(exportAsXml);
+		}
+		final String exportCreateArchiveDir = state.getBasePreferences().get(FindBugsPreferences.EXPORT_CREATE_ARCHIVE_DIR);
+		if (!StringUtil.isEmptyOrSpaces(exportCreateArchiveDir)) {
+			workspaceSettings.exportBugCollectionCreateSubDirectory = Boolean.valueOf(exportCreateArchiveDir);
+		}
+		final String exportOpenBrowser = state.getBasePreferences().get(FindBugsPreferences.EXPORT_OPEN_BROWSER);
+		if (!StringUtil.isEmptyOrSpaces(exportOpenBrowser)) {
+			workspaceSettings.openExportedHtmlBugCollectionInBrowser = Boolean.valueOf(exportOpenBrowser);
 		}
 	}
 

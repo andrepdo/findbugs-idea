@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -18,53 +18,21 @@
  */
 package org.twodividedbyzero.idea.findbugs.common.util;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
- * @since 0.9.96
- */
-final class FileUtil {
+public final class FileUtil {
 
 	private FileUtil() {
 	}
 
-
-	@SuppressWarnings({"IOResourceOpenedButNotSafelyClosed", "HardCodedStringLiteral"})
-	public static String fileToString(final File file) throws IOException {
-		FileInputStream in = null;
-		int size = 0;
-		if (file.exists()) {
-			in = new FileInputStream(file);
-			size = (int) file.length();
-		}
-
-		try {
-			int fRead = 0;
-			final byte[] fBuffer = new byte[size];
-			while (fRead < size) {
-				if (in != null) {
-					fRead += in.read(fBuffer, fRead, size - fRead);
-				}
-			}
-			if (in != null) {
-				in.close();
-			}
-			return new String(fBuffer, "UTF-8");
-		} catch (final IOException ex) {
-			throw new IOException("could not read configuration file '" + file.getPath() + "': " + ex.getMessage());
-		} finally {
-			if (in != null) {
-				in.close();
+	public static void mkdirs(@NotNull final File directory) throws IOException {
+		if (!directory.exists()) {
+			if (!directory.mkdirs()) {
+				throw new IOException("Can not create directory " + directory);
 			}
 		}
 	}
-
-
 }

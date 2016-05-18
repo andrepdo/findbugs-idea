@@ -22,6 +22,7 @@ import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 
 public final class LegacyProjectSettingsConverter extends AbstractProjectComponent {
 	public LegacyProjectSettingsConverter(@NotNull final Project project) {
@@ -32,8 +33,9 @@ public final class LegacyProjectSettingsConverter extends AbstractProjectCompone
 	public void projectOpened() {
 		final LegacyProjectSettings legacy = LegacyProjectSettings.getInstance(myProject);
 		final ProjectSettings current = ProjectSettings.getInstance(myProject);
+		final WorkspaceSettings currentWorkspace = WorkspaceSettings.getInstance(myProject);
 		if (legacy != null) {
-			legacy.applyTo(current);
+			legacy.applyTo(current, currentWorkspace);
 		}
 	}
 }

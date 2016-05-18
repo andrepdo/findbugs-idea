@@ -25,9 +25,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogBuilder;
-import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.ui.MessageType;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ToolWindow;
 import edu.umd.cs.findbugs.BugCollection;
@@ -39,21 +37,20 @@ import org.dom4j.io.DocumentSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
-import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.common.util.ErrorUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.FileUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IoUtil;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
-import org.twodividedbyzero.idea.findbugs.gui.common.ExportFileDialog;
+import org.twodividedbyzero.idea.findbugs.gui.export.ExportBugCollectionDialog;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
-import org.twodividedbyzero.idea.findbugs.tasks.BackgroundableTask;
+import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
@@ -65,25 +62,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.regex.Pattern;
 
-@SuppressWarnings({"HardCodedStringLiteral"})
 public final class ExportBugCollection extends AbstractAction {
 
-	private static final Logger LOGGER = Logger.getInstance(ExportBugCollection.class.getName());
-
+	private static final Logger LOGGER = Logger.getInstance(ExportBugCollection.class);
 	private static final String FINDBUGS_PLAIN_XSL = "plain.xsl";
-	private static final String FINDBUGS_RESULT_PREFIX = "FindBugsResult_";
-	private static final String FINDBUGS_RESULT_HTML_SUFFIX = ".html";
-	private static final String FINDBUGS_RESULT_RAW_SUFFIX = ".xml";
-	private static final Pattern PATTERN = Pattern.compile("[/ :]");
-
 
 	@Override
 	void updateImpl(
@@ -117,132 +105,75 @@ public final class ExportBugCollection extends AbstractAction {
 			@NotNull final AbstractSettings settings
 	) {
 
-		final BugCollection bugCollection = ToolWindowPanel.getInstance(project).getBugCollection();
-		if (bugCollection == null) {
-			FindBugsPluginImpl.showToolWindowNotifier(project, "No bug collection", MessageType.WARNING);
+		final ExportBugCollectionDialog dialog = new ExportBugCollectionDialog(project);
+		dialog.reset();
+		if (!dialog.showAndGet()) {
 			return;
 		}
+		dialog.apply();
 
 		final WorkspaceSettings workspaceSettings = WorkspaceSettings.getInstance(project);
-		String exportDir = workspaceSettings.exportDirectory;
-		boolean exportXml = workspaceSettings.exportAsXml;
-		boolean exportHtml = workspaceSettings.exportAsHtml;
-		boolean exportBoth = exportXml && exportHtml;
+		final String exportDir = workspaceSettings.exportBugCollectionDirectory;
+		final boolean exportXml = workspaceSettings.exportBugCollectionAsXml;
+		final boolean exportHtml = workspaceSettings.exportBugCollectionAsHtml;
+		final boolean createSubDir = workspaceSettings.exportBugCollectionCreateSubDirectory;
+		final boolean openInBrowser = workspaceSettings.openExportedHtmlBugCollectionInBrowser;
 
-		if (StringUtil.isEmptyOrSpaces(exportDir) || !exportXml && !exportHtml) {
-
-			//Ask the user for a export directory
-			final DialogBuilder dialogBuilder = new DialogBuilder(project);
-			dialogBuilder.addOkAction();
-			dialogBuilder.addCancelAction();
-			dialogBuilder.setTitle("Select directory to save the exported file");
-			final ExportFileDialog exportDialog = new ExportFileDialog(exportDir, dialogBuilder);
-			dialogBuilder.showModal(true);
-			if (dialogBuilder.getDialogWrapper().getExitCode() == DialogWrapper.CANCEL_EXIT_CODE) {
-				return;
-			}
-			final String path = exportDialog.getText();
-			if (path == null || path.trim().isEmpty()) {
-				return;
-			}
-
-			exportXml = exportDialog.isXml() != exportXml ? exportDialog.isXml() : exportXml;
-			exportHtml = exportDialog.isXml() == exportHtml ? !exportDialog.isXml() : exportHtml;
-			exportBoth = exportDialog.isBoth() != exportBoth ? exportDialog.isBoth() : exportBoth;
-			exportDir = path.trim();
+		if (StringUtil.isEmptyOrSpaces(exportDir)) {
+			showError(ResourcesLoader.getString("export.error.emptyPath"));
+			return;
 		}
-		//Create a unique file name by using time stamp
-		final Date currentDate = new Date();
-		final String timestamp = PATTERN.matcher(new SimpleDateFormat().format(currentDate)).replaceAll("_");
-		final String fileName = File.separatorChar + FINDBUGS_RESULT_PREFIX + timestamp;
+		final File exportDirPath = new File(exportDir);
+		if (exportDirPath.exists()) {
+			if (!exportDirPath.isDirectory()) {
+				showError(ResourcesLoader.getString("error.directory.type", exportDirPath));
+				return;
+			}
+		}
 
-		final boolean finalExportXml = exportXml;
-		final boolean finalExportHtml = exportHtml;
-		final boolean finalExportBoth = exportBoth;
-		final String finalExportDir = exportDir + File.separatorChar + project.getName();
+		final BugCollection bugCollection = ToolWindowPanel.getInstance(project).getBugCollection();
 
-		//Create a task to export the bug collection to html
-		final Task exportTask = new BackgroundableTask(project, "Exporting Findbugs Result", false) {
-			private ProgressIndicator _indicator;
-
-
-			@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"REC_CATCH_EXCEPTION"})
-			@SuppressWarnings({"IOResourceOpenedButNotSafelyClosed"})
+		new Task.Backgroundable(project, ResourcesLoader.getString("export.progress.title"), false) {
 			@Override
 			public void run(@NotNull final ProgressIndicator indicator) {
-				indicator.setText2(finalExportDir + File.separatorChar + fileName);
-				setProgressIndicator(indicator);
-				Writer writer = null;
+				final boolean withMessages = bugCollection.getWithMessages();
 				try {
-					createDirIfAbsent(project, finalExportDir);
-					String exportDir = finalExportDir;
-					final boolean createSubDir = false; // preferences.getBooleanProperty(FindBugsPreferences.EXPORT_CREATE_ARCHIVE_DIR, true); TODO UI Checkbox
+
+					FileUtil.mkdirs(exportDirPath);
+					File finalExportDir = exportDirPath;
+					final String currentTime = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.ENGLISH).format(new Date());
+					final String uniqueName = "findbugs-result-" + project.getName() + "_" + currentTime;
+					String filename = "result";
 					if (createSubDir) {
-						exportDir = finalExportDir + File.separatorChar + new SimpleDateFormat("yyyy_MM_dd", Locale.ENGLISH).format(currentDate);
-						createDirIfAbsent(project, exportDir);
+						finalExportDir = new File(exportDirPath, uniqueName);
+						FileUtil.mkdirs(finalExportDir);
+					} else {
+						filename = uniqueName;
 					}
 
 					bugCollection.setWithMessages(true);
-					final String exportDirAndFilenameWithoutSuffix = exportDir + fileName;
-					if (finalExportXml && !finalExportBoth) {
-						exportXml(bugCollection, exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_RAW_SUFFIX);
-					} else if (finalExportBoth) {
-						exportXml(bugCollection, exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_RAW_SUFFIX);
-						writer = exportHtml(bugCollection, exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_HTML_SUFFIX);
-					} else if (finalExportHtml) {
-						writer = exportHtml(bugCollection, exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_HTML_SUFFIX);
+					if (exportXml) {
+						final File xml = new File(finalExportDir, filename + ".xml");
+						exportXml(bugCollection, xml.getPath());
 					}
-					bugCollection.setWithMessages(false);
-
-					showToolWindowNotifier(project, "Exported bug collection to " + exportDir + '.', MessageType.INFO);
-					if ((!finalExportXml || finalExportBoth) /*&& preferences.getBooleanProperty(FindBugsPreferences.EXPORT_OPEN_BROWSER, true)*/) { // TODO "Open in Browser" Ui Checkbox
-						BrowserUtil.browse(new File(exportDirAndFilenameWithoutSuffix + FINDBUGS_RESULT_HTML_SUFFIX).getAbsolutePath());
+					if (exportHtml) {
+						final File html = new File(finalExportDir, filename + ".html");
+						exportHtml(bugCollection, html);
+						if (openInBrowser) {
+							openInBrowser(html);
+						}
 					}
 
-				} catch (final IOException e1) {
-					final String message = "Export failed";
-					showToolWindowNotifier(project, message, MessageType.ERROR);
-					LOGGER.error(message, e1);
-				} catch (final TransformerConfigurationException e1) {
-					final String message = "Transform to html failed due to configuration problems.";
-					showToolWindowNotifier(project, message, MessageType.ERROR);
-					LOGGER.error(message, e1);
-				} catch (final TransformerException e1) {
-					final String message = "Transformation to exportXml failed.";
-					showToolWindowNotifier(project, message, MessageType.ERROR);
-					LOGGER.error(message, e1);
 				} catch (final Exception e) {
-					showToolWindowNotifier(project, e.getMessage(), MessageType.ERROR);
-					LOGGER.error(e.getMessage(), e);
+					throw ErrorUtil.toUnchecked(e);
 				} finally {
-					IoUtil.safeClose(writer);
-					Thread.currentThread().interrupt();
+					bugCollection.setWithMessages(withMessages);
 				}
 			}
-
-
-			@Override
-			public void setProgressIndicator(@NotNull final ProgressIndicator indicator) {
-				_indicator = indicator;
-			}
-
-
-			@Override
-			public ProgressIndicator getProgressIndicator() {
-				return _indicator;
-			}
-		};
-
-		final File file = new File(exportDir + fileName);
-		if (file.getParentFile() == null) {
-			showToolWindowNotifier(project, "Exporting bug collection failed. not a directory. " + exportDir + fileName + '.', MessageType.ERROR);
-		} else {
-			exportTask.queue();
-		}
+		}.queue();
 	}
 
-
-	private void exportXml(@NotNull final BugCollection bugCollection, final String fileName) throws IOException {
+	private void exportXml(@NotNull final BugCollection bugCollection, @NotNull final String fileName) throws IOException {
 		// Issue 77: workaround internal FindBugs NPE
 		// As of my point of view, the NPE is a FindBugs bug
 		for (final BugInstance bugInstance : bugCollection) {
@@ -255,51 +186,53 @@ public final class ExportBugCollection extends AbstractAction {
 		bugCollection.writeXML(fileName);
 	}
 
-
-	@Nullable
-	private Writer exportHtml(@NotNull final BugCollection bugCollection, final String fileName) throws IOException, TransformerException {
+	private void exportHtml(@NotNull final BugCollection bugCollection, @NotNull final File file) throws IOException, TransformerException {
 		final Document document = bugCollection.toDocument();
-		final Source xsl = new StreamSource(getStylesheetStream(FINDBUGS_PLAIN_XSL));
-		xsl.setSystemId(FINDBUGS_PLAIN_XSL);
+		final InputStream stylesheet = getStylesheetStream(FINDBUGS_PLAIN_XSL);
+		try {
+			final Source xsl = new StreamSource(stylesheet);
+			xsl.setSystemId(FINDBUGS_PLAIN_XSL);
 
-		// Create a transformer using the stylesheet
-		final Transformer transformer = TransformerFactory.newInstance().newTransformer(xsl);
+			// Create a transformer using the stylesheet
+			final Transformer transformer = TransformerFactory.newInstance().newTransformer(xsl);
 
-		// Source document is the XML generated from the BugCollection
-		final Source source = new DocumentSource(document);
+			// Source document is the XML generated from the BugCollection
+			final Source source = new DocumentSource(document);
 
-		// Write result to output stream
-		final OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(fileName), Charset.forName("UTF-8").newEncoder());
-		final Result result = new StreamResult(writer);
-		// Do the transformation
-		transformer.transform(source, result);
-		return writer;
-
-	}
-
-
-	private static void createDirIfAbsent(final Project project, final String dir) {
-		final File exportDir = new File(dir);
-		if (!exportDir.exists()) {
-			if (!exportDir.mkdirs()) {
-				final String message = "Creating the export directory '" + exportDir + "' failed.";
-				showToolWindowNotifier(project, message, MessageType.ERROR);
-				LOGGER.error(message);
+			// Write result to output stream
+			final OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), Charset.forName("UTF-8").newEncoder());
+			try {
+				final Result result = new StreamResult(writer);
+				// Do the transformation
+				transformer.transform(source, result);
+			} finally {
+				IoUtil.safeClose(writer);
 			}
+		} finally {
+			IoUtil.safeClose(stylesheet);
 		}
 	}
 
-
-	private static void showToolWindowNotifier(final Project project, final String message, final MessageType type) {
+	private static void openInBrowser(@NotNull final File file) {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			@Override
 			public void run() {
-				FindBugsPluginImpl.showToolWindowNotifier(project, message, type);
+				BrowserUtil.browse(file);
 			}
 		});
 	}
 
+	private static void showError(@NotNull final String message) {
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				Messages.showErrorDialog(message, StringUtil.capitalizeWords(ResourcesLoader.getString("export.title"), true));
+			}
+		});
+	}
 
-	private static InputStream getStylesheetStream(final String stylesheet) throws IOException {
+	@NotNull
+	private static InputStream getStylesheetStream(@NotNull final String stylesheet) throws IOException {
 		try {
 			final URL url = new URL(stylesheet);
 			return url.openStream();
