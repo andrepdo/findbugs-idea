@@ -328,7 +328,6 @@ public class ImportExportConfiguration implements ConfigurationPage {
 
 
 	public void filter(final String filter) {
-		// TODO support search
 	}
 
 

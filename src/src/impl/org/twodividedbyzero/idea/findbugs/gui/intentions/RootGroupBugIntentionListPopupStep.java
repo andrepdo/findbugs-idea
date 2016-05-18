@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.gui.intentions;
 
 import com.intellij.openapi.ui.popup.PopupStep;
@@ -31,14 +30,6 @@ import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 import javax.swing.Icon;
 import java.util.List;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andre.pfeiler@gmail.com>
- * @version $Revision$
- * @since 0.9.97
- */
 public class RootGroupBugIntentionListPopupStep extends BaseListPopupStep<GroupBugIntentionListPopupStep> implements Iconable {
 
 	public RootGroupBugIntentionListPopupStep(final List<GroupBugIntentionListPopupStep> intentionGroups) {
@@ -73,8 +64,8 @@ public class RootGroupBugIntentionListPopupStep extends BaseListPopupStep<GroupB
 
 	@Override
 	public Icon getIconFor(final GroupBugIntentionListPopupStep aValue) {
-		// todo: combined icon
-		return hasSubstep(aValue) ?  GuiUtil.getCombinedIcon(aValue.getIntentionActions().get(0).getProblemDescriptor()) : aValue.getIcon(-1);
+		// FIXME: combined icon
+		return hasSubstep(aValue) ? GuiUtil.getCombinedIcon(aValue.getIntentionActions().get(0).getProblemDescriptor()) : aValue.getIcon(-1);
 	}
 
 

@@ -99,7 +99,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			final double rowsGap = 5;
 			final double colsGap = 10;
 			final double[][] size = {{border, TableLayoutConstants.FILL, border}, // Columns
-									 {border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
+					{border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 
 			final Container mainPanel = new JPanel(tbl);
@@ -133,7 +133,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 		}
 
 
-		// todo:
+		// FIXME:
 
 		/*
 		final Map<String,Map<String,String>> annotationTypeSettings = _preferences.getAnnotationTypeSettings();
@@ -164,7 +164,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			final double border = 5;
 			final double colsGap = 10;
 			final double[][] size = {{border, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.PREFERRED, border}, // Columns
-									 {border, TableLayoutConstants.PREFERRED, border}};// Rows
+					{border, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_annotationPathPanel = new JPanel(tbl);
 			_annotationPathPanel.setBorder(BorderFactory.createTitledBorder("FindBugs Annotation class (@SuppressFBWarnings). e.g. edu.umd.cs.findbugs.annotations.SuppressFBWarnings"));
@@ -174,7 +174,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 			final double rowsGap = 5;
 			final double[][] bPanelSize = {{border, TableLayoutConstants.PREFERRED}, // Columns
-										   {border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
+					{border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tableLayout = new TableLayout(bPanelSize);
 
 			final Container buttonPanel = new JPanel(tableLayout);
@@ -218,7 +218,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			final double colsGap = 10;
 			final double rowsGap = 15;
 			final double[][] size = {{border, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.PREFERRED, border}, // Columns
-									 {border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
+					{border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_markUpPanel = new JPanel(tbl) {
 				@Override
@@ -253,14 +253,14 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			final double colsGap = 10;
 			final double rowsGap = 5;
 			final double[][] size = {{border, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.PREFERRED, border}, // Columns
-									 {border, TableLayoutConstants.PREFERRED, 10, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
+					{border, TableLayoutConstants.PREFERRED, 10, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
 			final TableLayout tbl = new TableLayout(size);
 			_typeSettingsPanel = new JPanel(tbl);
 			_typeSettingsPanel.setBorder(BorderFactory.createTitledBorder("Annotation type settings"));
 
 			_typeSettingsPanel.add(getTextRangeMarkupCheckbox(), "1, 1, 3, 1"); // col ,row, col, row
 			_typeSettingsPanel.add(getAnnotationTypeList(), "1, 3, 1, 3");
-			_typeSettingsPanel.add(getAnnotationTypePanel() , "3, 3, 3, 3");
+			_typeSettingsPanel.add(getAnnotationTypePanel(), "3, 3, 3, 3");
 			getAnnotationTypeList().setSelectedIndex(0);
 
 		}
@@ -270,7 +270,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 	@NotNull
 	private JBList getAnnotationTypeList() {
 		if (_annotationTypeList == null) {
-			_annotationTypeList = new JBList((Object[])AnnotationType.values());
+			_annotationTypeList = new JBList((Object[]) AnnotationType.values());
 			_annotationTypeList.addListSelectionListener(new ListSelectionListener() {
 				@Override
 				public void valueChanged(final ListSelectionEvent e) {
@@ -349,7 +349,6 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 
 	public void filter(final String filter) {
-		// TODO support search
 	}
 
 
@@ -378,8 +377,8 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			final double border = 5;
 			final double colsGap = 10;
 			final double rowsGap = 5;
-			final double[][] size = {{border, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.FILL,  border}, // Columns
-									 {border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
+			final double[][] size = {{border, TableLayoutConstants.PREFERRED, colsGap, TableLayoutConstants.FILL, border}, // Columns
+					{border, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, rowsGap, TableLayoutConstants.PREFERRED, border}};// Rows
 			final LayoutManager tbl = new TableLayout(size);
 			setLayout(tbl);
 
@@ -387,7 +386,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			_plainBox = new JCheckBox("plain");
 			_plainBox.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
-					//TODO: implement
+					//FIXME: implement
 				}
 			});
 			fontPanel.add(_plainBox);
@@ -395,7 +394,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			_italicBox = new JCheckBox("italic");
 			_italicBox.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
-					//TODO: implement
+					//FIXME: implement
 				}
 			});
 			fontPanel.add(_italicBox);
@@ -403,7 +402,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			_boldBox = new JCheckBox("bold");
 			_boldBox.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
-					//TODO: implement
+					//FIXME: implement
 				}
 			});
 			fontPanel.add(_boldBox);
@@ -428,7 +427,7 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			_typeComboBox = new AaComboBox<EffectType>(EffectType.values());
 			_typeComboBox.addSelectionChangeListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
-					//TODO: implement
+					//FIXME: implement
 				}
 			});
 			_typeComboBox.setSelectedItem(_annotationType);
@@ -452,17 +451,17 @@ public class AnnotationConfiguration implements ConfigurationPage {
 
 			final int fontType = annotationType.getFont();
 			switch (fontType) {
-				case Font.BOLD :
+				case Font.BOLD:
 					_boldBox.setSelected(true);
 					_italicBox.setSelected(false);
 					_plainBox.setSelected(false);
 					break;
-				case Font.ITALIC :
+				case Font.ITALIC:
 					_boldBox.setSelected(false);
 					_italicBox.setSelected(true);
 					_plainBox.setSelected(false);
 					break;
-				case Font.PLAIN :
+				case Font.PLAIN:
 				default:
 					_boldBox.setSelected(false);
 					_italicBox.setSelected(false);
@@ -617,5 +616,4 @@ public class AnnotationConfiguration implements ConfigurationPage {
 			return _color;
 		}
 	}
-
 }

@@ -442,7 +442,7 @@ public class BugDetailsComponents {
 		html.append("</tr></table>");
 		html.append("</body></html>");
 
-		// todo: set Suppress actions hyperlink
+		// FIXME: set Suppress actions hyperlink
 
 		_bugDetailsPane.setText(html.toString());
 		scrollRectToVisible(_bugDetailsPane);

@@ -30,5 +30,5 @@ public interface NodeVisitor<VisitableTreeNode> {
 	void visitGroupNode(VisitableTreeNode node);
 
 	//public void visitLeafNode(T node);
-	// todo: visitor cache
+	// FIXME: visitor cache
 }

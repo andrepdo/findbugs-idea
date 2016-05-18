@@ -31,7 +31,7 @@ import org.twodividedbyzero.idea.findbugs.gui.tree.model.VisitableTreeNode;
  * @version $Revision$
  * @since 0.9.29-dev
  */
-public class RecurseNodeVisitor<T extends VisitableTreeNode> implements NodeVisitor<BugInstanceGroupNode> { // todo: rename recurseGroupVisitor
+public class RecurseNodeVisitor<T extends VisitableTreeNode> implements NodeVisitor<BugInstanceGroupNode> { // FIXME: rename recurseGroupVisitor
 
 	private final T _startNode;
 	private BugInstanceGroupNode _resultNode;

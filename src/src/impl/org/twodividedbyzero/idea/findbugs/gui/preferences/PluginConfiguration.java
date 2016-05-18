@@ -166,7 +166,7 @@ public class PluginConfiguration implements ConfigurationPage {
 
 	private void doAddPlugin(final File selectedFile) {
 		try {
-			// TODO CUSTOM_PLUGIN: check what happen when a plugin with same pluginId is already loaded ?
+			// FIXME CUSTOM_PLUGIN: check what happen when a plugin with same pluginId is already loaded ?
 			final Plugin plugin = FindBugsCustomPluginUtil.loadTemporary(selectedFile);
 			if (plugin == null) {
 				Messages.showErrorDialog(_parent, "Can not load plugin " + selectedFile.getPath(), "Plugin Loading");
@@ -206,7 +206,7 @@ public class PluginConfiguration implements ConfigurationPage {
 	@Override
 	public void setEnabled(final boolean enabled) {
 		getAddButton().setEnabled(enabled);
-		// TODO Plugin checkboxes
+		// FIXME Plugin checkboxes
 	}
 
 
@@ -230,7 +230,7 @@ public class PluginConfiguration implements ConfigurationPage {
 
 	@Override
 	public void filter(final String filter) {
-		// TODO support search
+		// FIXME support search
 	}
 
 

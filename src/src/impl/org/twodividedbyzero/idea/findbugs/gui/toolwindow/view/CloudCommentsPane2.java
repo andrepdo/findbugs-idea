@@ -186,7 +186,7 @@ public class CloudCommentsPane extends JPanel {
 					choice = UserDesignation.values()[index];
 				}
 				_bugInstance.setUserDesignationKey(choice.name(), _bugCollection);
-				//TODO: do in background
+				//FIXME: do in background
 				_bugInstance.setAnnotationText(comment, _bugCollection);
 
 				_commentBox.setText("My comment");
@@ -248,7 +248,7 @@ public class CloudCommentsPane extends JPanel {
 								final String oldCloudId = _bugCollection.getCloud().getPlugin().getId();
 								if (!oldCloudId.equals(newCloudId)) {
 									_bugCollection.getProject().setCloudId(newCloudId);
-									//TODO: execute in background so signin doesn't stall UI
+									//FIXME: execute in background so signin doesn't stall UI
 									_bugCollection.reinitializeCloud();
 									_toolWindowPanel.getBugDetailsComponents().issueUpdated(_bugInstance);
 								}

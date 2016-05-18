@@ -138,13 +138,13 @@ public enum GroupBy {
 		switch (groupBy) {
 
 			case BugCategory:
-				return new GroupBy[] {BugCategory, BugType, BugShortDescription}; // todo: 2:Package, 3:Class, 4:Priority
+				return new GroupBy[] {BugCategory, BugType, BugShortDescription}; // FIXME: 2:Package, 3:Class, 4:Priority
 			case Class:
-				return new GroupBy[] {Class, BugCategory, BugType, BugShortDescription}; // todo: 1:Package, 3:Priority
+				return new GroupBy[] {Class, BugCategory, BugType, BugShortDescription}; // FIXME: 1:Package, 3:Priority
 			case Package:
-				return new GroupBy[] {Package, BugCategory, BugType, BugShortDescription}; // todo: 2:Priority, 3:Class
+				return new GroupBy[] {Package, BugCategory, BugType, BugShortDescription}; // FIXME: 2:Priority, 3:Class
 			case Priority:
-				return new GroupBy[] {Priority, BugCategory, BugType, BugShortDescription}; // todo: 2:Package, 3:Class
+				return new GroupBy[] {Priority, BugCategory, BugType, BugShortDescription}; // FIXME: 2:Package, 3:Class
 			case BugRank:
 				return new GroupBy[] {BugRank, /*BugCategory,*/ BugType, BugShortDescription};
 			default:
@@ -152,7 +152,7 @@ public enum GroupBy {
 		}
 	}
 
-	// todo: getAvailGroupsForPrimaryGroup ??? static !!??
+	// FIXME: getAvailGroupsForPrimaryGroup ??? static !!??
 
 
 	public static GroupBy[] getAvailableGroups(final GroupBy[] currentGroupBy) {

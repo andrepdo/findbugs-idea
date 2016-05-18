@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -91,13 +91,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @since 0.0.1
- */
 @SuppressWarnings({"HardcodedFileSeparator"})
 public final class IdeaUtilImpl {
 
@@ -110,6 +103,7 @@ public final class IdeaUtilImpl {
 
 	private static final Set<String> SUPPORTED_FILE_TYPES_EXT = new THashSet<String>(Arrays.asList("java", "scala", "groovy", "gradle", "aj"));
 	public static final Set<FileType> SUPPORTED_FILE_TYPES;
+
 	static {
 		final THashSet<FileType> supported = new THashSet<FileType>(4);
 		supported.add(StdFileTypes.JAVA);
@@ -128,7 +122,9 @@ public final class IdeaUtilImpl {
 		}
 		SUPPORTED_FILE_TYPES = supported;
 	}
+
 	private static final Set<Language> SUPPORTED_LANGUAGES;
+
 	static {
 		final THashSet<Language> supported = new THashSet<Language>(3);
 		supported.add(JavaLanguage.INSTANCE);
@@ -146,6 +142,7 @@ public final class IdeaUtilImpl {
 		}
 		SUPPORTED_LANGUAGES = supported;
 	}
+
 	public static boolean isLanguageSupported(@NotNull final Language language) {
 		return language.isKindOf(JavaLanguage.INSTANCE) || language.isKindOf("Scala") || language.isKindOf("Groovy") || language.isKindOf("AspectJ");
 	}
@@ -293,7 +290,7 @@ public final class IdeaUtilImpl {
 			if (file != null) {
 				files[i] = file.getPresentableUrl();
 			} else {
-				files[i] = ""; // todo: remove -> crude, getProjectOutputPath(final Module module) returns always null
+				files[i] = ""; // FIXME: remove -> crude, getProjectOutputPath(final Module module) returns always null
 			}
 		}
 
@@ -319,7 +316,7 @@ public final class IdeaUtilImpl {
 				path = getProjectOutputPath(module);
 			}
 			vFiles[i] = path;
-			// TODO: facade
+			// FIXME: facade
 			//ModuleRootManager.getInstance(module).getCompilerOutputPath();
 		}
 
@@ -391,7 +388,7 @@ public final class IdeaUtilImpl {
 		final List<String> parentPath = new ArrayList<String>();
 		final String packageName = DirectoryIndex.getInstance(project).getPackageName(packagePath);
 		if (packageName != null && !packageName.isEmpty()) {
-			final String [] path = packageName.split("\\.");
+			final String[] path = packageName.split("\\.");
 			for (final String p : path) {
 				parentPath.add(FindBugsPluginConstants.FILE_SEPARATOR + p);
 			}
@@ -672,7 +669,7 @@ public final class IdeaUtilImpl {
 	public static String removeExtension(@NotNull final String name) {
 		int pos = name.lastIndexOf('.');
 		if (pos != -1) {
-			final String ext = name.substring(pos+1).toLowerCase();
+			final String ext = name.substring(pos + 1).toLowerCase();
 			if (SUPPORTED_FILE_TYPES_EXT.contains(ext)) {
 				return name.substring(0, pos);
 			}

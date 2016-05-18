@@ -42,7 +42,7 @@ import java.util.Set;
  */
 public enum AnnotationType {
 
-	// todo: name should be rank based scary scariest ...
+	// FIXME: name should be rank based scary scariest ...
 	HighPriority(HighlightSeverity.ERROR, JBColor.RED, JBColor.WHITE, JBColor.RED, EffectType.WAVE_UNDERSCORE, Font.BOLD),
 	NormalPriority(HighlightSeverity.WARNING, JBColor.BLACK, JBColor.WHITE, JBColor.YELLOW.darker(), EffectType.WAVE_UNDERSCORE, Font.ITALIC),
 	ExpPriority(HighlightSeverity.INFORMATION, JBColor.BLACK, JBColor.WHITE, JBColor.GRAY, EffectType.WAVE_UNDERSCORE, Font.PLAIN),

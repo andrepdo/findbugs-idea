@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.gui.intentions;
 
 import com.intellij.openapi.command.WriteCommandAction;
@@ -35,14 +34,6 @@ import javax.swing.Icon;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andre.pfeiler@gmail.com>
- * @version $Revision$
- * @since 0.9.97
- */
 public class GroupBugIntentionListPopupStep extends BaseListPopupStep<SuppressReportBugIntentionAction> implements Iconable {
 
 
@@ -68,7 +59,7 @@ public class GroupBugIntentionListPopupStep extends BaseListPopupStep<SuppressRe
 		ReadonlyStatusHandler.getInstance(project).ensureFilesWritable();
 
 
-		new WriteCommandAction.Simple/*<Object>*/(project,  "Add findbugs-idea Suppress warning", _psiElement.getContainingFile()) {
+		new WriteCommandAction.Simple/*<Object>*/(project, "Add findbugs-idea Suppress warning", _psiElement.getContainingFile()) {
 
 			@Override
 			protected void run() throws Throwable {
@@ -90,7 +81,7 @@ public class GroupBugIntentionListPopupStep extends BaseListPopupStep<SuppressRe
 	@NotNull
 	@Override
 	public String getTextFor(final SuppressReportBugIntentionAction value) {
-		return value.getText(); // todo:
+		return value.getText(); // FIXME:
 	}
 
 

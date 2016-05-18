@@ -107,11 +107,11 @@ public final class BugAnnotator implements Annotator {
 				if (psiElement instanceof PsiAnonymousClass) {
 					final PsiElement firstChild = psiElement.getFirstChild();
 					annotation = annotationHolder.createWarningAnnotation(firstChild == null ? psiElement : firstChild, getAnnotationText(matchingDescriptors));
-					// todo: use color from annotation configuration
+					// FIXME: use color from annotation configuration
 					annotation.setEnforcedTextAttributes(new TextAttributes(null, null, JBColor.RED.brighter(), EffectType.BOXED, Font.PLAIN));
 				} else {
 					annotation = annotationHolder.createWarningAnnotation(textRange, getAnnotationText(matchingDescriptors));
-					// todo: use color from annotation configuration
+					// FIXME: use color from annotation configuration
 					annotation.setEnforcedTextAttributes(new TextAttributes(null, null, JBColor.RED, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 				}
 
@@ -131,7 +131,7 @@ public final class BugAnnotator implements Annotator {
 					annotation = annotationHolder.createWarningAnnotation(textRange, getAnnotationText(matchingDescriptors));
 				}
 
-				// todo: use color from annotation configuration
+				// FIXME: use color from annotation configuration
 				annotation.setEnforcedTextAttributes(new TextAttributes(null, null, JBColor.YELLOW.darker(), EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 
 				annotation.registerFix(new SuppressReportBugIntentionAction(problemDescriptor), textRange);
@@ -150,7 +150,7 @@ public final class BugAnnotator implements Annotator {
 					annotation = annotationHolder.createWarningAnnotation(textRange, getAnnotationText(matchingDescriptors));
 				}
 
-				// todo: use color from annotation configuration
+				// FIXME: use color from annotation configuration
 				annotation.setEnforcedTextAttributes(new TextAttributes(null, null, JBColor.GRAY, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 
 				annotation.registerFix(new SuppressReportBugIntentionAction(problemDescriptor), textRange);
@@ -168,7 +168,7 @@ public final class BugAnnotator implements Annotator {
 					annotation = annotationHolder.createInfoAnnotation(textRange, getAnnotationText(matchingDescriptors));
 				}
 
-				// todo: use color from annotation configuration
+				// FIXME: use color from annotation configuration
 				annotation.setEnforcedTextAttributes(new TextAttributes(null, null, JBColor.GREEN, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 
 				annotation.registerFix(new SuppressReportBugIntentionAction(problemDescriptor), textRange);
@@ -186,7 +186,7 @@ public final class BugAnnotator implements Annotator {
 					annotation = annotationHolder.createWarningAnnotation(textRange, getAnnotationText(matchingDescriptors));
 				}
 
-				// todo: use color from annotation configuration
+				// FIXME: use color from annotation configuration
 				annotation.setEnforcedTextAttributes(new TextAttributes(null, null, JBColor.MAGENTA, EffectType.WAVE_UNDERSCORE, Font.PLAIN));
 
 				annotation.registerFix(new SuppressReportBugIntentionAction(problemDescriptor), textRange);

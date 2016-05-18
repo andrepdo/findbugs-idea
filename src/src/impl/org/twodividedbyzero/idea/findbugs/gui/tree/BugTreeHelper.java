@@ -220,7 +220,7 @@ public class BugTreeHelper {
 	}
 
 
-	// todo: fix me
+	// FIXME: fix me
 	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"BC_UNCONFIRMED_CAST_OF_RETURN_VALUE"})
 	@Nullable
 	private BugInstanceNode getPreviousBugInstanceLeafNode(@SuppressWarnings("TypeMayBeWeakened") final AbstractTreeNode<VisitableTreeNode> node) {
@@ -312,7 +312,7 @@ public class BugTreeHelper {
 	}
 
 
-	// todo:
+	// FIXME:
 	private void _buildElementsCache(final Object node, final TreePath path, final TreeModel model) {
 		/*if (_tree.isRootVisible() || path.getLastPathComponent() != _tree.getModel().getRoot()) {
 			//_elementsCache.add(path);

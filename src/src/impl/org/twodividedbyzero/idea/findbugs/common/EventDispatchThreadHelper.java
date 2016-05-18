@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.common;
 
 import com.intellij.openapi.application.ApplicationManager;
@@ -26,18 +25,10 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
- * @since 0.9.96-dev
- */
 public final class EventDispatchThreadHelper {
 
 	private static final Logger LOGGER = Logger.getInstance(EventDispatchThreadHelper.class.getName());
-	private static final boolean DEBUG_CHECK_EDT = true; // TODO
+	private static final boolean DEBUG_CHECK_EDT = true; // FIXME
 
 	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	public static void invokeAndWait(@NotNull final Operation operation) {
@@ -175,5 +166,4 @@ public final class EventDispatchThreadHelper {
 			super(message);
 		}
 	}
-
 }

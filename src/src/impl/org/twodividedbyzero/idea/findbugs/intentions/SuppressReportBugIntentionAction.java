@@ -150,7 +150,7 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 		if (!element.getLanguage().isKindOf(JavaLanguage.INSTANCE)) {
 			new Notification("FindBugs Missing Feature", "Not Supported", "Sorry, insert annotation not supported for this language.", NotificationType.INFORMATION).notify(project);
 			/**
-			 * TODO Scala Plugin:
+			 * FIXME Scala Plugin:
 			 * org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 			 * crash with PsiManager and ScalaPsiManager#instance always return null
 			 */

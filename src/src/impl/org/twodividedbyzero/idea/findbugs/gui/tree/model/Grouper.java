@@ -99,7 +99,7 @@ class Grouper<T> {
 			Collections.sort(groups, tComparator);
 			index = Collections.binarySearch(groups, comparable, tComparator);
 
-			// todo: make dynamic
+			// FIXME make dynamic
 			if (i == 0 && index < 0) { // if top 1st level group does not exists break iteration
 				depth = i;
 				break;
@@ -145,15 +145,15 @@ class Grouper<T> {
 			Collections.sort(groups, c);
 			parentIndex = Collections.binarySearch(groups, comparable, c);
 
-			// todo: multilevel comparator:  by depth-comparators.size(); for (int y = depth; y < comparators.size(); y++) {
+			// FIXME: multilevel comparator:  by depth-comparators.size(); for (int y = depth; y < comparators.size(); y++) {
 			final T parent = groups.get(parentIndex);
 			System.err.println("Parnet: " + parent);
 			_callback.startSubGroup(depth, comparable, parent);*/
 			final Comparator<T> c = _callback.currentGroupComparatorChain(depth - 1);
 
 			final List<T> groups = _callback.availableGroups(depth - 1, comparable);
-			Collections.sort(groups, c); // todo: comparators.get(depth-1) ???
-			parentIndex = Collections.binarySearch(groups, comparable, comparators.get(depth - 1)); // todo: comparators.get(depth-1) ???
+			Collections.sort(groups, c); // FIXME: comparators.get(depth-1) ???
+			parentIndex = Collections.binarySearch(groups, comparable, comparators.get(depth - 1)); // FIXME: comparators.get(depth-1) ???
 
 			if (LOGGER.isDebugEnabled()) {
 				System.err.println("\n== StartSubGroup ==\nindex: " + index + " depth: " + depth + " i: " + j);
@@ -192,11 +192,11 @@ class Grouper<T> {
 				System.err.println("PriorityTypeString: " + ((BugInstance) comparable).getPriorityTypeString());
 			}
 
-			final Comparator<T> c = _callback.currentGroupComparatorChain(depth); // todo: -1 ???
+			final Comparator<T> c = _callback.currentGroupComparatorChain(depth); // FIXME: -1 ???
 
-			final List<T> groups = _callback.availableGroups(depth, comparable); // todo: -1 ???
-			Collections.sort(groups, c); // todo: -1 ???
-			parentIndex = Collections.binarySearch(groups, comparable, c); // todo: -1 ???
+			final List<T> groups = _callback.availableGroups(depth, comparable); // FIXME: -1 ???
+			Collections.sort(groups, c); // FIXME: -1 ???
+			parentIndex = Collections.binarySearch(groups, comparable, c); // FIXME: -1 ???
 			final T parent = groups.get(parentIndex);
 
 			if (LOGGER.isDebugEnabled()) {

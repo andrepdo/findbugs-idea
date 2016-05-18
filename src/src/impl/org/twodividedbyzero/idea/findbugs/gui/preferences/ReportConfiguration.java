@@ -234,6 +234,5 @@ public final class ReportConfiguration implements ConfigurationPage {
 
 	@Override
 	public void filter(final String filter) {
-		// TODO support search
 	}
 }

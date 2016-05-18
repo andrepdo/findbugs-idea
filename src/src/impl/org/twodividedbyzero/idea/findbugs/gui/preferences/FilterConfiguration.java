@@ -370,7 +370,7 @@ public class FilterConfiguration implements ConfigurationPage {
 		getExcludeList().setEnabled(enabled);
 		getBaseLinePanel().setEnabled(enabled);
 		getBaselineList().setEnabled(enabled);
-		// TODO set state for add- and remove-button
+		// FIXME set state for add- and remove-button
 	}
 
 
@@ -394,7 +394,6 @@ public class FilterConfiguration implements ConfigurationPage {
 
 	@Override
 	public void filter(final String filter) {
-		// TODO support search
 	}
 
 

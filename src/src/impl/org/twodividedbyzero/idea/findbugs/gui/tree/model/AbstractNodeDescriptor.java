@@ -38,7 +38,7 @@ public abstract class AbstractNodeDescriptor<E> {
 	int _depthFromRoot;
 	String _simpleName;
 	String _groupName;
-	int _memberCount; // todo: ??? needed ???
+	int _memberCount; // FIXME: ??? needed ???
 	String _tooltip;
 
 	Icon _expandedIcon = GuiResources.TREENODE_OPEN_ICON;

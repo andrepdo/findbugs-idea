@@ -361,7 +361,6 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 	@SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "UnusedParameters"})
 	public static void processError(final Map<String, Map<String, Throwable>> status) {
-		// TODO
 	}
 
 
@@ -448,7 +447,6 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 	@Override
 	public void reset() {
-		//TODO: what??
 	}
 
 

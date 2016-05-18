@@ -90,13 +90,13 @@ public final class TreeOccurenceNavigator implements OccurenceNavigator {
 
 	public OccurenceInfo goNextOccurence() {
 		_tree.getTreeHelper().selectNextNode();
-		return null;  //TODO: implement
+		return null;  //FIXME: implement
 	}
 
 
 	public OccurenceInfo goPreviousOccurence() {
 		_tree.getTreeHelper().selectPreviousNode();
-		return null;  //TODO: implement
+		return null;  //FIXME: implement
 	}
 
 

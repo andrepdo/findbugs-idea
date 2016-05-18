@@ -57,6 +57,6 @@ public final class ShowPreferencesPage extends AbstractAction {
 			@NotNull final ProjectSettings projectSettings,
 			@NotNull final AbstractSettings settings
 	) {
-		ShowSettingsUtil.getInstance().showSettingsDialog(project, ProjectConfigurableImpl.DISPLAY_NAME); // TODO test it
+		ShowSettingsUtil.getInstance().showSettingsDialog(project, ProjectConfigurableImpl.DISPLAY_NAME);
 	}
 }

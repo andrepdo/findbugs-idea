@@ -125,7 +125,7 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 
 
 	public static String getJavaClassType(final BugInstance bugInstance) {
-		return "abstract|default";   // todo: ... icon
+		return "abstract|default";   // FIXME: ... icon
 	}
 
 

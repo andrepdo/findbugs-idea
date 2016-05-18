@@ -54,7 +54,7 @@ public class ScrollToSourceHandler extends com.intellij.ui.AutoScrollToSourceHan
 		onMouseClicked(_panel.getBugTree());
 	}
 
-	// todo: call super.install(JTree tree)
+	// FIXME: call super.install(JTree tree)
 
 
 }
