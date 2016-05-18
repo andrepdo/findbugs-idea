@@ -66,8 +66,6 @@ public final class WorkspaceSettings implements PersistentStateComponent<Workspa
 
 	public boolean annotationGutterIcon = true;
 
-	public String suppressWarningsClassName = "edu.umd.cs.findbugs.annotations.SuppressFBWarnings";
-
 	public boolean toolWindowScrollToSource = true;
 
 	public boolean toolWindowEditorPreview = true;

@@ -63,7 +63,7 @@ final class DetectorTab extends JPanel implements SettingsOwner<AbstractSettings
 		topPane.add(getTableHeaderPane(), BorderLayout.SOUTH);
 
 		splitter = new JBSplitter(false, 0.5f, 0.01f, 0.99f);
-		splitter.setSplitterProportionKey("DetectorTab.VERTICAL_DIVIDER_PROPORTION_23"); // TODO remove _23
+		splitter.setSplitterProportionKey("DetectorTab.VERTICAL_DIVIDER_PROPORTION");
 		splitter.setFirstComponent(getTablePane());
 		splitter.setSecondComponent(getDetails());
 		splitter.setHonorComponentsMinimumSize(false);

@@ -38,6 +38,7 @@ public final class SearchableOptionContributorImpl extends SearchableOptionContr
 		// TODO
 		index(processor, GeneralTab.getSearchPath(), GeneralTab.getSearchResourceKey());
 		index(processor, ReportTab.getSearchPath(), ReportTab.getSearchResourceKey());
+		index(processor, AnnotateTab.getSearchPath(), AnnotateTab.getSearchResourceKey());
 		index(processor, ShareTab.getSearchPath(), ShareTab.getSearchResourceKey());
 	}
 

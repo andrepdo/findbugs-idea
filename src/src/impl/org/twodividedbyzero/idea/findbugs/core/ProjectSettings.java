@@ -37,7 +37,7 @@ import java.util.Set;
 
 @State(
 		name = "FindBugs-IDEA",
-		storages = @Storage(value = "findbugs-63.xml", roamingType = RoamingType.DEFAULT) // TODO kick -XX number
+		storages = @Storage(value = "findbugs-64.xml", roamingType = RoamingType.DEFAULT) // TODO kick -XX number
 )
 public final class ProjectSettings extends AbstractSettings implements PersistentStateComponent<ProjectSettings> {
 
@@ -55,6 +55,9 @@ public final class ProjectSettings extends AbstractSettings implements Persisten
 
 	@Tag
 	public boolean toolWindowToFront = true;
+
+	@Tag
+	public String suppressWarningsClassName = "edu.umd.cs.findbugs.annotations.SuppressFBWarnings";
 
 	/**
 	 * Additional findbugs plugins.

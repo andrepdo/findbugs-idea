@@ -44,6 +44,7 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	private ReportTab reportTab;
 	private FilterTab filterTab;
 	private DetectorTab detectorTab;
+	private AnnotateTab annotateTab;
 	private ShareTab shareTab;
 
 	SettingsPane(@NotNull final Project project) {
@@ -53,6 +54,7 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		reportTab = new ReportTab();
 		filterTab = new FilterTab();
 		detectorTab = new DetectorTab(project);
+		annotateTab = createAnnotateTab();
 		shareTab = createShareTab();
 
 		final JPanel topPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -72,6 +74,9 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		tabs.addTab(ResourcesLoader.getString("settings.report"), reportTab);
 		tabs.addTab(ResourcesLoader.getString("settings.filter"), filterTab);
 		tabs.addTab(ResourcesLoader.getString("settings.detector"), detectorTab);
+		if (annotateTab != null) {
+			tabs.addTab(ResourcesLoader.getString("settings.annotate"), annotateTab);
+		}
 		if (shareTab != null) {
 			tabs.addTab(ResourcesLoader.getString("settings.share"), shareTab);
 		}
@@ -96,6 +101,9 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	abstract GeneralTab createGeneralTab();
 
 	@Nullable
+	abstract AnnotateTab createAnnotateTab();
+
+	@Nullable
 	abstract ShareTab createShareTab();
 
 	@NotNull
@@ -108,7 +116,8 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	}
 
 	final boolean isModifiedProject(@NotNull final ProjectSettings settings) {
-		return generalTab.isModified(settings);
+		return generalTab.isModified(settings) ||
+				annotateTab.isModified(settings);
 	}
 
 	final boolean isModifiedWorkspace(@NotNull final WorkspaceSettings settings) {
@@ -123,6 +132,7 @@ abstract class SettingsPane extends JPanel implements Disposable {
 
 	final void applyProject(@NotNull final ProjectSettings settings) throws ConfigurationException {
 		generalTab.apply(settings);
+		annotateTab.apply(settings);
 	}
 
 	final void applyWorkspace(@NotNull final WorkspaceSettings settings) throws ConfigurationException {
@@ -137,6 +147,7 @@ abstract class SettingsPane extends JPanel implements Disposable {
 
 	final void resetProject(@NotNull final ProjectSettings settings) {
 		generalTab.reset(settings);
+		annotateTab.reset(settings);
 	}
 
 	final void resetWorkspace(@NotNull final WorkspaceSettings settings) {

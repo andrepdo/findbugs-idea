@@ -53,7 +53,7 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.util.FileModificationServiceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
@@ -76,7 +76,7 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 		_bugPatternId = getBugId(problemDescriptor);
 
 		final Project project = IdeaUtilImpl.getProject(problemDescriptor.getPsiFile());
-		final WorkspaceSettings workspaceSettings = WorkspaceSettings.getInstance(project);
+		final ProjectSettings workspaceSettings = ProjectSettings.getInstance(project);
 		_suppressWarningsClassName = workspaceSettings.suppressWarningsClassName;
 	}
 

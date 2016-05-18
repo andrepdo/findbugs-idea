@@ -78,6 +78,12 @@ public final class ProjectConfigurableImpl implements SearchableConfigurable, Co
 
 				@Nullable
 				@Override
+				AnnotateTab createAnnotateTab() {
+					return new AnnotateTab(project);
+				}
+
+				@Nullable
+				@Override
 				ShareTab createShareTab() {
 					return new ShareTab();
 				}

@@ -71,6 +71,12 @@ public final class ModuleConfigurableImpl implements Configurable {
 
 				@Nullable
 				@Override
+				AnnotateTab createAnnotateTab() {
+					return null;
+				}
+
+				@Nullable
+				@Override
 				ShareTab createShareTab() {
 					return null;
 				}
