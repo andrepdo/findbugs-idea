@@ -185,13 +185,14 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 
 	@NotNull
 	static Map<String, Map<String, Boolean>> createEnabledMap(
-			@NotNull final AbstractSettings settings
+			@NotNull final AbstractSettings settings,
+			@NotNull final Set<PluginSettings> plugins
 	) {
 		final Map<String, Map<String, Boolean>> ret = New.map();
 		if (!settings.detectors.isEmpty()) {
 			ret.put(FindBugsPluginConstants.FINDBUGS_CORE_PLUGIN_ID, new HashMap<String, Boolean>(settings.detectors));
 		}
-		for (final PluginSettings pluginSettings : settings.plugins) {
+		for (final PluginSettings pluginSettings : plugins) {
 			if (!pluginSettings.detectors.isEmpty()) {
 				ret.put(pluginSettings.id, new HashMap<String, Boolean>(pluginSettings.detectors));
 			}
@@ -201,10 +202,11 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 
 	static void fillSettings(
 			@NotNull final AbstractSettings settings,
+			@NotNull final Set<PluginSettings> plugins,
 			@NotNull final Map<String, Map<String, Boolean>> detectors
 	) {
 		apply(detectors.get(FindBugsPluginConstants.FINDBUGS_CORE_PLUGIN_ID), settings.detectors);
-		for (final PluginSettings pluginSettings : settings.plugins) {
+		for (final PluginSettings pluginSettings : plugins) {
 			apply(detectors.get(pluginSettings.id), pluginSettings.detectors);
 		}
 	}

@@ -126,7 +126,7 @@ final class AdvancedSettingsAction extends DefaultActionGroup {
 			super(
 					"Export",
 					"Export Settings to file",
-					AllIcons.ToolbarDecorator.Export
+					AllIcons.Actions.Export
 			);
 		}
 

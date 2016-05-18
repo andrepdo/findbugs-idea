@@ -18,13 +18,11 @@
  */
 package org.twodividedbyzero.idea.findbugs.core;
 
-import com.intellij.util.xmlb.Constants;
 import com.intellij.util.xmlb.annotations.AbstractCollection;
 import com.intellij.util.xmlb.annotations.MapAnnotation;
 import com.intellij.util.xmlb.annotations.Tag;
 import edu.umd.cs.findbugs.BugRanker;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
-import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
 
@@ -32,21 +30,6 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractSettings {
-
-	@Tag
-	public boolean compileBeforeAnalyze = true;
-
-	@Tag
-	public boolean analyzeAfterCompile = false;
-
-	@Tag
-	public boolean analyzeAfterAutoMake = false;
-
-	@Tag
-	public boolean runInBackground = false;
-
-	@Tag
-	public boolean toolWindowToFront = true;
 
 	/**
 	 * @see AnalysisEffort
@@ -75,15 +58,6 @@ public abstract class AbstractSettings {
 	@Tag(value = "hiddenBugCategory")
 	@AbstractCollection(surroundWithTag = false, elementTag = "category", elementValueAttribute = "name")
 	public Set<String> hiddenBugCategory = New.asSet("NOISE");
-
-	/**
-	 * Additional findbugs plugins.
-	 *
-	 * @see FindBugsCustomPluginUtil
-	 */
-	@Tag(value = "plugins")
-	@AbstractCollection(surroundWithTag = false, elementTag = Constants.SET)
-	public Set<PluginSettings> plugins = New.set();
 
 	/**
 	 * @see edu.umd.cs.findbugs.config.UserPreferences#setIncludeFilterFiles(Map)

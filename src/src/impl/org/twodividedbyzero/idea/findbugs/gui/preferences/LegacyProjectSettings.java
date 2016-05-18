@@ -135,6 +135,19 @@ public final class LegacyProjectSettings implements PersistentStateComponent<Per
 		if (!StringUtil.isEmptyOrSpaces(exportOpenBrowser)) {
 			workspaceSettings.openExportedHtmlBugCollectionInBrowser = Boolean.valueOf(exportOpenBrowser);
 		}
+
+		final String toolwindowScrollToSource = state.getBasePreferences().get(FindBugsPreferences.TOOLWINDOW_SCROLL_TO_SOURCE);
+		if (!StringUtil.isEmptyOrSpaces(toolwindowScrollToSource)) {
+			workspaceSettings.toolWindowScrollToSource = Boolean.valueOf(toolwindowScrollToSource);
+		}
+		final String toolwindowEditorPreview = state.getBasePreferences().get(FindBugsPreferences.TOOLWINDOW_EDITOR_PREVIEW);
+		if (!StringUtil.isEmptyOrSpaces(toolwindowEditorPreview)) {
+			workspaceSettings.toolWindowEditorPreview = Boolean.valueOf(toolwindowEditorPreview);
+		}
+		final String toolwindowGroupBy = state.getBasePreferences().get(FindBugsPreferences.TOOLWINDOW_GROUP_BY);
+		if (!StringUtil.isEmptyOrSpaces(toolwindowGroupBy)) {
+			workspaceSettings.toolWindowGroupBy = toolwindowGroupBy;
+		}
 	}
 
 	private void applyBugCategoriesTo(@NotNull final ProjectSettings settings) {

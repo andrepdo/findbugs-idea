@@ -103,19 +103,19 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		_title = title;
 		this.projectSettings = projectSettings;
 		this.settings = settings;
-		_startInBackground = settings.runInBackground || forceStartInBackground;
+		_startInBackground = projectSettings.runInBackground || forceStartInBackground;
 		_cancellingByUser = new AtomicBoolean();
 		MessageBusManager.subscribe(project, this, AnalysisAbortingListener.TOPIC, this);
 	}
 
 	protected boolean isCompileBeforeAnalyze() {
-		return settings.compileBeforeAnalyze;
+		return projectSettings.compileBeforeAnalyze;
 	}
 
 	public final void start() {
 		EventDispatchThreadHelper.checkEDT();
 		if (isCompileBeforeAnalyze()) {
-			final boolean isAnalyzeAfterCompile = settings.analyzeAfterCompile;
+			final boolean isAnalyzeAfterCompile = projectSettings.analyzeAfterCompile;
 			final CompilerManager compilerManager = CompilerManager.getInstance(_project);
 			createCompileScope(compilerManager, new Consumer<CompileScope>() {
 				@Override
@@ -141,7 +141,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 	private void startImpl() {
 		MessageBusManager.publishAnalysisStarted(_project);
 
-		if (settings.toolWindowToFront) {
+		if (projectSettings.toolWindowToFront) {
 			final ToolWindow toolWindow = ToolWindowManager.getInstance(_project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
 			IdeaUtilImpl.activateToolWindow(toolWindow);
 		}
@@ -192,7 +192,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 			userPrefs.setExcludeFilterFiles(new HashMap<String, Boolean>(settings.excludeFilterFiles));
 
 			configureDetectors(settings.detectors, detectorFactoryCollection, userPrefs);
-			for (final PluginSettings pluginSettings : settings.plugins) {
+			for (final PluginSettings pluginSettings : projectSettings.plugins) {
 				configureDetectors(pluginSettings.detectors, detectorFactoryCollection, userPrefs);
 			}
 		}
@@ -203,7 +203,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 			for (final Plugin plugin : Plugin.getAllPlugins()) {
 				if (!plugin.isCorePlugin()) {
 					boolean enabled = false;
-					for (final PluginSettings pluginSettings : settings.plugins) {
+					for (final PluginSettings pluginSettings : projectSettings.plugins) {
 						if (plugin.getPluginId().equals(pluginSettings.id)) {
 							if (pluginSettings.enabled) {
 								enabled = true; // do not break loop here ; maybe there are multiple plugins (with same plugin id) configured and one is enabled

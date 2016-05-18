@@ -69,11 +69,11 @@ public final class ProjectConfigurableImpl implements SearchableConfigurable, Co
 	@Override
 	public JComponent createComponent() {
 		if (pane == null) {
-			pane = new SettingsPane() {
+			pane = new SettingsPane(project) {
 				@NotNull
 				@Override
 				GeneralTab createGeneralTab() {
-					return new GeneralTab(true);
+					return new GeneralTab();
 				}
 
 				@Nullable
@@ -94,19 +94,23 @@ public final class ProjectConfigurableImpl implements SearchableConfigurable, Co
 
 	@Override
 	public boolean isModified() {
-		return pane.isModified(settings) || pane.isModified(workspaceSettings);
+		return pane.isModified(settings) ||
+				pane.isModifiedProject(settings) ||
+				pane.isModifiedWorkspace(workspaceSettings);
 	}
 
 	@Override
 	public void apply() throws ConfigurationException {
 		pane.apply(settings);
-		pane.apply(workspaceSettings);
+		pane.applyProject(settings);
+		pane.applyWorkspace(workspaceSettings);
 	}
 
 	@Override
 	public void reset() {
 		pane.reset(settings);
-		pane.reset(workspaceSettings);
+		pane.resetProject(settings);
+		pane.resetWorkspace(workspaceSettings);
 	}
 
 	@Override

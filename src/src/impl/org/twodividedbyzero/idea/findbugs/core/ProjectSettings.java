@@ -24,15 +24,46 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.xmlb.Constants;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import com.intellij.util.xmlb.annotations.AbstractCollection;
+import com.intellij.util.xmlb.annotations.Tag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
+
+import java.util.Set;
 
 @State(
 		name = "FindBugs-IDEA",
-		storages = @Storage(value = "findbugs-62.xml", roamingType = RoamingType.DEFAULT) // TODO kick -XX number
+		storages = @Storage(value = "findbugs-63.xml", roamingType = RoamingType.DEFAULT) // TODO kick -XX number
 )
 public final class ProjectSettings extends AbstractSettings implements PersistentStateComponent<ProjectSettings> {
+
+	@Tag
+	public boolean compileBeforeAnalyze = true;
+
+	@Tag
+	public boolean analyzeAfterCompile = false;
+
+	@Tag
+	public boolean analyzeAfterAutoMake = false;
+
+	@Tag
+	public boolean runInBackground = false;
+
+	@Tag
+	public boolean toolWindowToFront = true;
+
+	/**
+	 * Additional findbugs plugins.
+	 *
+	 * @see FindBugsCustomPluginUtil
+	 */
+	@Tag(value = "plugins")
+	@AbstractCollection(surroundWithTag = false, elementTag = Constants.SET)
+	public Set<PluginSettings> plugins = New.set();
 
 	@Nullable
 	@Override

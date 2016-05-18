@@ -23,11 +23,13 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.components.JBTabbedPane;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
@@ -44,13 +46,13 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	private DetectorTab detectorTab;
 	private ShareTab shareTab;
 
-	SettingsPane() {
+	SettingsPane(@NotNull final Project project) {
 		super(new BorderLayout());
 
 		generalTab = createGeneralTab();
 		reportTab = new ReportTab();
 		filterTab = new FilterTab();
-		detectorTab = new DetectorTab();
+		detectorTab = new DetectorTab(project);
 		shareTab = createShareTab();
 
 		final JPanel topPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -64,7 +66,9 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		 */
 		//final TabbedPaneWrapper tabs = new TabbedPaneWrapper(this);
 		final JBTabbedPane tabs = new JBTabbedPane();
-		tabs.addTab(ResourcesLoader.getString("settings.general"), generalTab);
+		if (generalTab != null) {
+			tabs.addTab(ResourcesLoader.getString("settings.general"), generalTab);
+		}
 		tabs.addTab(ResourcesLoader.getString("settings.report"), reportTab);
 		tabs.addTab(ResourcesLoader.getString("settings.filter"), filterTab);
 		tabs.addTab(ResourcesLoader.getString("settings.detector"), detectorTab);
@@ -75,7 +79,7 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		add(tabs);
 
 		detectorTab.getTablePane().getTable().setBugCategory(reportTab.getBugCategory());
-		if (generalTab.getPluginTablePane() != null) {
+		if (generalTab != null) {
 			generalTab.getPluginTablePane().setDetectorTablePane(detectorTab.getTablePane());
 		}
 	}
@@ -88,7 +92,7 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		return actionToolbar;
 	}
 
-	@NotNull
+	@Nullable
 	abstract GeneralTab createGeneralTab();
 
 	@Nullable
@@ -97,40 +101,49 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	@NotNull
 	abstract AbstractSettings createSettings();
 
-	boolean isModified(@NotNull final AbstractSettings settings) {
-		return generalTab.isModified(settings) ||
-				reportTab.isModified(settings) ||
+	final boolean isModified(@NotNull final AbstractSettings settings) {
+		return reportTab.isModified(settings) ||
 				filterTab.isModified(settings) ||
 				detectorTab.isModified(settings);
 	}
 
-	boolean isModified(@NotNull final WorkspaceSettings settings) {
+	final boolean isModifiedProject(@NotNull final ProjectSettings settings) {
+		return generalTab.isModified(settings);
+	}
+
+	final boolean isModifiedWorkspace(@NotNull final WorkspaceSettings settings) {
 		return shareTab.isModified(settings);
 	}
 
-	void apply(@NotNull final AbstractSettings settings) throws ConfigurationException {
-		generalTab.apply(settings);
+	final void apply(@NotNull final AbstractSettings settings) throws ConfigurationException {
 		reportTab.apply(settings);
 		filterTab.apply(settings);
 		detectorTab.apply(settings);
 	}
 
-	void apply(@NotNull final WorkspaceSettings settings) throws ConfigurationException {
+	final void applyProject(@NotNull final ProjectSettings settings) throws ConfigurationException {
+		generalTab.apply(settings);
+	}
+
+	final void applyWorkspace(@NotNull final WorkspaceSettings settings) throws ConfigurationException {
 		shareTab.apply(settings);
 	}
 
-	void reset(@NotNull final AbstractSettings settings) {
-		generalTab.reset(settings);
+	final void reset(@NotNull final AbstractSettings settings) {
 		reportTab.reset(settings);
 		filterTab.reset(settings);
 		detectorTab.reset(settings);
 	}
 
-	void reset(@NotNull final WorkspaceSettings settings) {
+	final void resetProject(@NotNull final ProjectSettings settings) {
+		generalTab.reset(settings);
+	}
+
+	final void resetWorkspace(@NotNull final WorkspaceSettings settings) {
 		shareTab.reset(settings);
 	}
 
-	void setFilter(String filter) {
+	final void setFilter(String filter) {
 		if (detectorTab != null) {
 			detectorTab.setFilter(filter);
 		}

@@ -20,6 +20,7 @@ package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.JBSplitter;
@@ -41,14 +42,16 @@ import java.awt.FlowLayout;
  * Some code here is based on {@link com.intellij.profile.codeInspection.ui.SingleInspectionProfilePanel}.
  */
 final class DetectorTab extends JPanel implements SettingsOwner<AbstractSettings>, Disposable {
+	private final Project project;
 	private JLabel hintLabel;
 	private DetectorTableHeaderPane tableHeaderPane;
 	private DetectorTablePane tablePane;
 	private JBSplitter splitter;
 	private DetectorDetailsPane details;
 
-	DetectorTab() {
+	DetectorTab(@NotNull final Project project) {
 		super(new BorderLayout());
+		this.project = project;
 		setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
 		final JPanel hintPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -89,7 +92,7 @@ final class DetectorTab extends JPanel implements SettingsOwner<AbstractSettings
 	@NotNull
 	DetectorTablePane getTablePane() {
 		if (tablePane == null) {
-			tablePane = new DetectorTablePane();
+			tablePane = new DetectorTablePane(project);
 			final TreeTableTree tree = tablePane.getTable().getTree();
 			tree.addTreeSelectionListener(new TreeSelectionListener() {
 				@Override
