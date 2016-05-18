@@ -27,7 +27,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.gui.preferences.LegacyProjectSettings;
 
 @State(
 		name = "FindBugs-IDEA",
@@ -48,11 +47,6 @@ public final class ProjectSettings extends AbstractSettings implements Persisten
 
 	@NotNull
 	public static ProjectSettings getInstance(@NotNull final Project project) {
-		final LegacyProjectSettings legacy = LegacyProjectSettings.getInstance(project);
-		final ProjectSettings ret = ServiceManager.getService(project, ProjectSettings.class);
-		if (legacy != null) {
-			legacy.applyTo(ret);
-		}
-		return ret;
+		return ServiceManager.getService(project, ProjectSettings.class);
 	}
 }

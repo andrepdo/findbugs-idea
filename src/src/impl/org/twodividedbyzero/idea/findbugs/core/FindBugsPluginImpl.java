@@ -640,7 +640,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 
 		@Override
-		protected void seenUserPlugin(final Plugin plugin) {
+		protected void seenUserPlugin(@NotNull final String pluginUrl, final Plugin plugin) {
 			cleanupDetectorStates(plugin);
 		}
 

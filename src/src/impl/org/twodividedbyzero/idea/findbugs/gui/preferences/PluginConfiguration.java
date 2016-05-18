@@ -282,7 +282,7 @@ public class PluginConfiguration implements ConfigurationPage {
 
 
 		@Override
-		protected void seenUserPlugin(final Plugin plugin) {
+		protected void seenUserPlugin(@NotNull final String pluginUrl, final Plugin plugin) {
 			seenPlugin(plugin, true);
 		}
 

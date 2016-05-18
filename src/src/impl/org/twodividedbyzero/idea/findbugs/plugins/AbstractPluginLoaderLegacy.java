@@ -115,7 +115,7 @@ public abstract class AbstractPluginLoaderLegacy {
 						handleError("Could not load plugin: " + pluginUrl);
 						continue;
 					}
-					seenUserPlugin(plugin);
+					seenUserPlugin(pluginUrl, plugin);
 					if (!disabledUserPluginIds.contains(plugin.getPluginId())) {
 						enabledUserPluginUrls.add(pluginUrl);
 					}
@@ -163,7 +163,7 @@ public abstract class AbstractPluginLoaderLegacy {
 	}
 
 
-	protected void seenUserPlugin(final Plugin plugin) {
+	protected void seenUserPlugin(@NotNull final String pluginUrl, final Plugin plugin) {
 	}
 
 
