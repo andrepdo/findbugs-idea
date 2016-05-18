@@ -37,6 +37,8 @@ import java.util.List;
  * are all expanded. But we want to load/store *always* with marcos.
  * Otherwise we store with marco and after re-open IDEA the FindBugs settings are modified
  * because the paths are changed. So a dirty workaround is that we replace '$' with our '@'.
+ * <p>
+ * See <a href=https://intellij-support.jetbrains.com/hc/en-us/community/posts/207470105-How-to-disable-auto-expanding-of-PROJECT-DIR-etc-PathMacro-for-my-plugin-settings->this topic on jetbrains.com</a>.
  */
 public final class PathMacroManagerFb {
 	@NotNull
