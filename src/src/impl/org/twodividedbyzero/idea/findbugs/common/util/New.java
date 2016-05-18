@@ -18,11 +18,11 @@
  */
 package org.twodividedbyzero.idea.findbugs.common.util;
 
-
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,54 +35,45 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-
-/**
- * @author Reto Merz<reto.merz@gmail.com>
- * @version $Revision: 358 $
- * @since 0.9.995
- */
 public final class New {
-
 
 	private New() {
 	}
-
 
 	@NotNull
 	public static <V> AtomicReference<V> atomicRef(@Nullable V initialValue) {
 		return new AtomicReference<V>(initialValue);
 	}
 
-
 	@NotNull
 	public static <K, V> Map<K, V> map() {
 		return new HashMap<K, V>();
 	}
-
 
 	@NotNull
 	public static <K, V> Map<K, V> map(final int initialCapacity) {
 		return new HashMap<K, V>(initialCapacity);
 	}
 
-
 	@NotNull
 	public static <K, V> WeakHashMap<K, V> weakHashMap() {
 		return new WeakHashMap<K, V>();
 	}
 
+	@NotNull
+	public static <V> WeakReference<V> weakRef(@NotNull final V referent) {
+		return new WeakReference<V>(referent);
+	}
 
 	@NotNull
 	public static <K, V> ConcurrentMap<K, V> concurrentMap() {
 		return new ConcurrentHashMap<K, V>();
 	}
 
-
 	@NotNull
 	public static <E> Set<E> set() {
 		return new HashSet<E>();
 	}
-
 
 	@NotNull
 	public static <T> Set<T> asSet(@Nullable final T... elements) {
@@ -97,12 +88,10 @@ public final class New {
 		return ret;
 	}
 
-
 	@NotNull
 	public static <E> Set<E> tSet() {
 		return new THashSet<E>();
 	}
-
 
 	@NotNull
 	public static <E> List<E> arrayList() {

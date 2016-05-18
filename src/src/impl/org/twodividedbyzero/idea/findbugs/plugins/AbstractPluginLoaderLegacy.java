@@ -64,6 +64,8 @@ public abstract class AbstractPluginLoaderLegacy {
 
 	public void load(final Collection<String> userPluginsUrls, final Collection<String> disabledUserPluginIds, final Collection<String> enabledBundledPluginIds, final Collection<String> disabledBundledPluginIds) {
 
+		PluginLoader.invalidate();
+
 		// 1. unload plugins
 		for (Plugin plugin : Plugin.getAllPlugins()) {
 			if (plugin.isCorePlugin()) {

@@ -56,6 +56,8 @@ public abstract class AbstractPluginLoader {
 
 	public void load(@NotNull final Set<PluginSettings> settings) {
 
+		PluginLoader.invalidate();
+
 		// 1. unload plugins
 		for (final Plugin plugin : Plugin.getAllPlugins()) {
 			if (plugin.isCorePlugin()) {

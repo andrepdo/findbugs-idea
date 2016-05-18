@@ -50,6 +50,7 @@ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
 import org.twodividedbyzero.idea.findbugs.messages.AnalysisAbortingListener;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
+import org.twodividedbyzero.idea.findbugs.plugins.PluginLoader;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -163,6 +164,8 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 
 
 	private void asyncStart(@NotNull final ProgressIndicator indicator) {
+
+		PluginLoader.load(_project, projectSettings);
 
 		final DetectorFactoryCollection detectorFactoryCollection = DetectorFactoryCollection.instance();
 
