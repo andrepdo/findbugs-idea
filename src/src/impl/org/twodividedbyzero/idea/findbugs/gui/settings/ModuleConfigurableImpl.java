@@ -25,7 +25,6 @@ import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.util.PathMacroManagerFb;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.ModuleSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
@@ -63,7 +62,7 @@ public final class ModuleConfigurableImpl implements Configurable {
 	@Override
 	public JComponent createComponent() {
 		if (pane == null) {
-			pane = new SettingsPane(PathMacroManagerFb.create(module.getProject(), module)) {
+			pane = new SettingsPane() {
 				@NotNull
 				@Override
 				GeneralTab createGeneralTab() {

@@ -20,7 +20,6 @@ package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.openapi.options.ConfigurationException;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.common.util.PathMacroManagerFb;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 
 import javax.swing.BorderFactory;
@@ -33,13 +32,13 @@ final class FilterTab extends JPanel implements SettingsOwner<AbstractSettings> 
 	private FilterPane exclude;
 	private FilterPane bugs;
 
-	FilterTab(@NotNull final PathMacroManagerFb pathMacroManager) {
+	FilterTab() {
 		super(new BorderLayout());
 		setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
-		include = new FilterPane(pathMacroManager, "filter.include.title", "filter.choose.filterXml");
-		exclude = new FilterPane(pathMacroManager, "filter.exclude.title", "filter.choose.filterXml");
-		bugs = new FilterPane(pathMacroManager, "filter.exclude.bugs", "filter.choose.baselineBugsXml");
+		include = new FilterPane("filter.include.title", "filter.choose.filterXml");
+		exclude = new FilterPane("filter.exclude.title", "filter.choose.filterXml");
+		bugs = new FilterPane("filter.exclude.bugs", "filter.choose.baselineBugsXml");
 
 		final JPanel filters = new JPanel();
 		final BoxLayout filtersLayout = new BoxLayout(filters, BoxLayout.Y_AXIS);

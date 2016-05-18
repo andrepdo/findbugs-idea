@@ -48,7 +48,6 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.common.util.PathMacroManagerFb;
 import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
 import org.twodividedbyzero.idea.findbugs.messages.AnalysisAbortingListener;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
@@ -77,9 +76,6 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 	@NotNull
 	private final AbstractSettings settings;
 
-	@NotNull
-	private final PathMacroManagerFb pathMacroManager;
-
 	private final boolean _startInBackground;
 	private final AtomicBoolean _cancellingByUser;
 
@@ -107,7 +103,6 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		_title = title;
 		this.projectSettings = projectSettings;
 		this.settings = settings;
-		this.pathMacroManager = PathMacroManagerFb.create(project, module);
 		_startInBackground = settings.runInBackground || forceStartInBackground;
 		_cancellingByUser = new AtomicBoolean();
 		MessageBusManager.subscribe(project, this, AnalysisAbortingListener.TOPIC, this);
@@ -248,7 +243,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 			engine.setBugReporter(reporter);
 			engine.setProject(findBugsProject);
 			engine.setProgressCallback(reporter);
-			configureFilter(engine, userPrefs, pathMacroManager);
+			configureFilter(engine, userPrefs);
 			engine.setDetectorFactoryCollection(detectorFactoryCollection);
 			engine.setUserPreferences(userPrefs);
 		}
@@ -311,14 +306,13 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 
 	private static void configureFilter(
 			@NotNull final FindBugs2 engine,
-			@NotNull final UserPreferences userPrefs,
-			@NotNull final PathMacroManagerFb pathMacroManager
+			@NotNull final UserPreferences userPrefs
 	) {
 
 		final Map<String, Boolean> excludeFilterFiles = userPrefs.getExcludeFilterFiles();
 		for (final Map.Entry<String, Boolean> excludeFileName : excludeFilterFiles.entrySet()) {
 			if (excludeFileName.getValue()) {
-				final String filePath = pathMacroManager.expandPath(excludeFileName.getKey());
+				final String filePath = excludeFileName.getKey();
 				try {
 					engine.addFilter(filePath, false);
 				} catch (final IOException e) {
@@ -329,7 +323,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		final Map<String, Boolean> includeFilterFiles = userPrefs.getIncludeFilterFiles();
 		for (final Map.Entry<String, Boolean> includeFileName : includeFilterFiles.entrySet()) {
 			if (includeFileName.getValue()) {
-				final String filePath = pathMacroManager.expandPath(includeFileName.getKey());
+				final String filePath = includeFileName.getKey();
 				try {
 					engine.addFilter(filePath, true);
 				} catch (final IOException e) {
@@ -340,7 +334,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		final Map<String, Boolean> excludeBugFiles = userPrefs.getExcludeBugsFiles();
 		for (final Map.Entry<String, Boolean> excludeBugFile : excludeBugFiles.entrySet()) {
 			if (excludeBugFile.getValue()) {
-				final String filePath = pathMacroManager.expandPath(excludeBugFile.getKey());
+				final String filePath = excludeBugFile.getKey();
 				try {
 					engine.excludeBaselineBugs(filePath);
 				} catch (final IOException e) {

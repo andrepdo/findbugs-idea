@@ -25,6 +25,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -38,7 +39,6 @@ import org.jetbrains.annotations.PropertyKey;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
-import org.twodividedbyzero.idea.findbugs.common.util.PathMacroManagerFb;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JPanel;
@@ -58,9 +58,6 @@ import java.util.Set;
 final class FilterPane extends JPanel {
 
 	@NotNull
-	private final PathMacroManagerFb pathMacroManager;
-
-	@NotNull
 	@PropertyKey(resourceBundle = ResourcesLoader.BUNDLE)
 	private final String title;
 
@@ -71,12 +68,10 @@ final class FilterPane extends JPanel {
 	private JBTable table;
 
 	FilterPane(
-			@NotNull final PathMacroManagerFb pathMacroManager,
 			@NotNull @PropertyKey(resourceBundle = ResourcesLoader.BUNDLE) final String titleKey,
 			@NotNull @PropertyKey(resourceBundle = ResourcesLoader.BUNDLE) final String descriptionKey
 	) {
 		super(new BorderLayout());
-		this.pathMacroManager = pathMacroManager;
 		title = ResourcesLoader.getString(titleKey);
 		description = ResourcesLoader.getString(descriptionKey);
 		setBorder(GuiUtil.createTitledBorder(title));
@@ -138,7 +133,7 @@ final class FilterPane extends JPanel {
 		if (files.length > 0) {
 			for (final VirtualFile virtualFile : files) {
 				final File file = VfsUtilCore.virtualToIoFile(virtualFile);
-				getModel().rows.add(new Item(file.getAbsolutePath(), true));
+				getModel().rows.add(new Item(FileUtil.toSystemIndependentName(file.getAbsolutePath()), true));
 			}
 			getModel().fireTableDataChanged();
 		}
@@ -180,8 +175,7 @@ final class FilterPane extends JPanel {
 		map.clear();
 		StringBuilder error = null;
 		for (final Item row : getModel().rows) {
-			final String filePath = pathMacroManager.expandPath(row.path);
-			final File file = new File(filePath);
+			final File file = new File(row.path);
 			if (!file.exists()) {
 				if (error == null) {
 					error = new StringBuilder();
@@ -231,11 +225,7 @@ final class FilterPane extends JPanel {
 		private boolean enabled;
 
 		private Item(@NotNull final String path, final boolean enabled) {
-			/**
-			 * Always collapse path and not just in case of doAdd.
-			 * Because IDEA settings deserializer automatic expandPaths.
-			 */
-			this.path = pathMacroManager.collapsePath(path.replace(File.separatorChar, '/'));
+			this.path = path;
 			this.enabled = enabled;
 		}
 	}
@@ -283,7 +273,7 @@ final class FilterPane extends JPanel {
 				case IS_ENABLED_COLUMN:
 					return rows.get(rowIndex).enabled;
 				case NAME_COLUMN:
-					return rows.get(rowIndex).path;
+					return FileUtil.toSystemDependentName(rows.get(rowIndex).path);
 				default:
 					throw new IllegalArgumentException("Column " + columnIndex);
 			}

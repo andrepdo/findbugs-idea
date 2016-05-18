@@ -26,7 +26,6 @@ import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.util.PathMacroManagerFb;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
@@ -70,7 +69,7 @@ public final class ProjectConfigurableImpl implements SearchableConfigurable, Co
 	@Override
 	public JComponent createComponent() {
 		if (pane == null) {
-			pane = new SettingsPane(PathMacroManagerFb.create(project, null)) {
+			pane = new SettingsPane() {
 				@NotNull
 				@Override
 				GeneralTab createGeneralTab() {
