@@ -33,13 +33,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 public final class AnalyzeModuleFiles extends AbstractAnalyzeAction {
 
@@ -88,7 +86,7 @@ public final class AnalyzeModuleFiles extends AbstractAnalyzeAction {
 		}
 		final String outPath = compilerOutputPath.getPresentableUrl();
 
-		new FindBugsStarter(project, "Running FindBugs analysis for module'" + module.getName() + "'...", projectSettings, settings) {
+		new FindBugsStarter(project, module, "Running FindBugs analysis for module'" + module.getName() + "'...", projectSettings, settings) {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 				consumer.consume(compilerManager.createModuleCompileScope(module, true));

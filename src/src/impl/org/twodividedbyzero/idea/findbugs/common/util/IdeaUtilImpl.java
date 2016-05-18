@@ -752,13 +752,13 @@ public final class IdeaUtilImpl {
 		return rootFiles[0].getPath();
 	}
 
-
+	@Deprecated
 	public static String collapsePathMacro(final ComponentManager project, @NotNull final String path) {
 		final PathMacroManager macroManager = PathMacroManager.getInstance(project);
 		return macroManager.collapsePath(path);
 	}
 
-
+	@Deprecated
 	public static String expandPathMacro(final ComponentManager project, @NotNull final String path) {
 		final PathMacroManager macroManager = PathMacroManager.getInstance(project);
 		return macroManager.expandPath(path);

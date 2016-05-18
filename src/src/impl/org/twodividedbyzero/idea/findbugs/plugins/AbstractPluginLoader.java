@@ -122,7 +122,7 @@ public abstract class AbstractPluginLoader {
 					continue;
 				}
 				if (!pluginFile.isFile()) {
-					seenConfiguredPlugin(PluginInfo.create(pluginSettings, ResourcesLoader.getString("error.path.type", pluginFile.getPath())));
+					seenConfiguredPlugin(PluginInfo.create(pluginSettings, ResourcesLoader.getString("error.file.type", pluginFile.getPath())));
 					continue;
 				}
 				if (!pluginFile.canRead()) {

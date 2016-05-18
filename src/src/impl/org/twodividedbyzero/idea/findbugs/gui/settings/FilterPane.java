@@ -25,6 +25,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.AnActionButton;
@@ -37,6 +38,7 @@ import org.jetbrains.annotations.PropertyKey;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
+import org.twodividedbyzero.idea.findbugs.common.util.PathMacroManagerFb;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JPanel;
@@ -50,22 +52,33 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * TODO: collapse
- * PathMacroManager.getInstance
- * ModulePathMacroManager
- * <p>
- * TODO: edit
- * IDEA Sample:
- * "Path Variables"
- * TODO: validate
+ * LATER: add "edit" action to change path (see IDEA settings of "Path Variables" as an example)
+ * LATER: validate files on import? check file exists on settings open?
  */
 final class FilterPane extends JPanel {
+
+	@NotNull
+	private final PathMacroManagerFb pathMacroManager;
+
+	@NotNull
+	@PropertyKey(resourceBundle = ResourcesLoader.BUNDLE)
 	private final String title;
+
+	@NotNull
+	@PropertyKey(resourceBundle = ResourcesLoader.BUNDLE)
+	private final String description;
+
 	private JBTable table;
 
-	FilterPane(@NotNull @PropertyKey(resourceBundle = ResourcesLoader.BUNDLE) final String titleKey) {
+	FilterPane(
+			@NotNull final PathMacroManagerFb pathMacroManager,
+			@NotNull @PropertyKey(resourceBundle = ResourcesLoader.BUNDLE) final String titleKey,
+			@NotNull @PropertyKey(resourceBundle = ResourcesLoader.BUNDLE) final String descriptionKey
+	) {
 		super(new BorderLayout());
+		this.pathMacroManager = pathMacroManager;
 		title = ResourcesLoader.getString(titleKey);
+		description = ResourcesLoader.getString(descriptionKey);
 		setBorder(GuiUtil.createTitledBorder(title));
 		table = GuiUtil.createCheckboxTable(
 				new Model(New.<Item>arrayList()),
@@ -112,8 +125,8 @@ final class FilterPane extends JPanel {
 
 	private void doAdd(@Nullable final Project project) {
 		final FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createMultipleFilesNoJarsDescriptor();
-		descriptor.setTitle(title);
-		descriptor.setDescription(ResourcesLoader.getString("filter.choose"));
+		descriptor.setTitle(StringUtil.capitalizeWords(title, true));
+		descriptor.setDescription(description);
 		descriptor.withFileFilter(new Condition<VirtualFile>() {
 			@Override
 			public boolean value(final VirtualFile virtualFile) {
@@ -167,14 +180,16 @@ final class FilterPane extends JPanel {
 		map.clear();
 		StringBuilder error = null;
 		for (final Item row : getModel().rows) {
-			final File file = new File(row.path);
+			final String filePath = pathMacroManager.expandPath(row.path);
+			final File file = new File(filePath);
 			if (!file.exists()) {
 				if (error == null) {
 					error = new StringBuilder();
 				} else {
 					error.append("\n");
 				}
-				error.append(ResourcesLoader.getString("error.path.exists", row.path));
+				error.append(ResourcesLoader.getString("error.file.exists", row.path));
+				continue;
 			}
 			if (!file.isFile()) {
 				if (error == null) {
@@ -182,7 +197,8 @@ final class FilterPane extends JPanel {
 				} else {
 					error.append("\n");
 				}
-				error.append(ResourcesLoader.getString("error.path.type", row.path));
+				error.append(ResourcesLoader.getString("error.file.type", row.path));
+				continue;
 			}
 			if (!file.canRead()) {
 				if (error == null) {
@@ -191,6 +207,7 @@ final class FilterPane extends JPanel {
 					error.append("\n");
 				}
 				error.append(ResourcesLoader.getString("error.file.readable", row.path));
+				continue;
 			}
 			map.put(row.path, row.enabled);
 		}
@@ -214,7 +231,11 @@ final class FilterPane extends JPanel {
 		private boolean enabled;
 
 		private Item(@NotNull final String path, final boolean enabled) {
-			this.path = path;
+			/**
+			 * Always collapse path and not just in case of doAdd.
+			 * Because IDEA settings deserializer automatic expandPaths.
+			 */
+			this.path = pathMacroManager.collapsePath(path.replace(File.separatorChar, '/'));
 			this.enabled = enabled;
 		}
 	}

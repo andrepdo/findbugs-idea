@@ -136,13 +136,14 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 		uiOptions.ANALYZE_TEST_SOURCES = dlg.isInspectTestSources();
 		FileDocumentManager.getInstance().saveAllDocuments();
 
-		analyzeImpl(e, project, scope, projectSettings, settings);
+		analyzeImpl(e, project, module, scope, projectSettings, settings);
 	}
 
 
 	private void analyzeImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
+			@Nullable final Module module,
 			@NotNull final AnalysisScope scope,
 			@NotNull final ProjectSettings projectSettings,
 			@NotNull final AbstractSettings settings
@@ -151,7 +152,7 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
 		final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(e.getDataContext());
 
-		new FindBugsStarter(project, "Running FindBugs analysis...", projectSettings, settings) {
+		new FindBugsStarter(project, module, "Running FindBugs analysis...", projectSettings, settings) {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 				consumer.consume(compilerManager.createProjectCompileScope(project));

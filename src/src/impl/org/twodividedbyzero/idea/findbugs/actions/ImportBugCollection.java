@@ -34,6 +34,7 @@ import com.intellij.util.Processor;
 import com.intellij.util.containers.TransferToEDTQueue;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.BugInstance;
+import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.ProjectStats;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -46,15 +47,18 @@ import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
+import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
 import org.twodividedbyzero.idea.findbugs.gui.common.ImportFileDialog;
+import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
 import org.twodividedbyzero.idea.findbugs.tasks.BackgroundableTask;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -109,12 +113,19 @@ public final class ImportBugCollection extends AbstractAction {
 		}
 
 
-		final BugCollection bugCollection = null; // plugin.getToolWindowPanel().getBugCollection(); TODO
+		final BugCollection bugCollection = ToolWindowPanel.getInstance(project).getBugCollection();
 		if (bugCollection != null && !bugCollection.getCollection().isEmpty()) {
 			//noinspection DialogTitleCapitalization
-			final int result = Messages.showYesNoDialog(project, "Current result in the 'Found bugs view' will be deleted. Continue ?", "Delete found bugs?", Messages.getQuestionIcon());
+			final int result = Messages.showYesNoDialog(project, "Current result in the 'Found bugs view' will be cleared. Continue ?", "Clear found bugs?", Messages.getQuestionIcon());
 			if (result == 1) {
 				return;
+			}
+		}
+
+		final Set<String> enabledPluginIds = New.set();
+		for (final PluginSettings pluginSettings : ProjectSettings.getInstance(project).plugins) {
+			if (pluginSettings.enabled) {
+				enabledPluginIds.add(pluginSettings.id);
 			}
 		}
 
@@ -153,9 +164,9 @@ public final class ImportBugCollection extends AbstractAction {
 					final edu.umd.cs.findbugs.Project importProject = importBugCollection.getProject();
 					importProject.setGuiCallback(new PluginGuiCallback(project));
 					importBugCollection.setDoNotUseCloud(true);
-					//for (final Plugin plugin : Plugin.getAllPlugins()) { TODO
-					//	importProject.setPluginStatusTrinary(plugin.getPluginId(), !preferences.isPluginDisabled(plugin.getPluginId()));
-					//}
+					for (final Plugin plugin : Plugin.getAllPlugins()) {
+						importProject.setPluginStatusTrinary(plugin.getPluginId(), plugin.isCorePlugin() || enabledPluginIds.contains(plugin.getPluginId()));
+					}
 					importBugCollection.readXML(fileToImport);
 
 					final ProjectStats projectStats = importBugCollection.getProjectStats();

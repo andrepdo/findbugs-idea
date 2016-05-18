@@ -27,6 +27,7 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.components.JBTabbedPane;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.util.PathMacroManagerFb;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
@@ -44,12 +45,12 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	private DetectorTab detectorTab;
 	private ShareTab shareTab;
 
-	SettingsPane() {
+	SettingsPane(@NotNull final PathMacroManagerFb pathMacroManager) {
 		super(new BorderLayout());
 
 		generalTab = createGeneralTab();
 		reportTab = new ReportTab();
-		filterTab = new FilterTab();
+		filterTab = new FilterTab(pathMacroManager);
 		detectorTab = new DetectorTab();
 		shareTab = createShareTab();
 

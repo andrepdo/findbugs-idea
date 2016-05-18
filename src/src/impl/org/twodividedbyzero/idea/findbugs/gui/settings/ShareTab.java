@@ -116,7 +116,7 @@ final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>,
 				throw new ConfigurationException(ResourcesLoader.getString("error.path.exists", filePath));
 			}
 			if (!file.isFile()) {
-				throw new ConfigurationException(ResourcesLoader.getString("error.path.type", filePath));
+				throw new ConfigurationException(ResourcesLoader.getString("error.file.type", filePath));
 			}
 			if (!file.canRead()) {
 				throw new ConfigurationException(ResourcesLoader.getString("error.file.readable", filePath));

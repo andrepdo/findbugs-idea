@@ -89,7 +89,7 @@ public final class AnalyzePackageFiles extends AbstractAnalyzeAction {
 
 		if (outPath != null) {
 			final String output = outPath.getPresentableUrl() + packageUrl;
-			new FindBugsStarter(project, "Running FindBugs analysis for directory '" + output + "'...", projectSettings, settings) {
+			new FindBugsStarter(project, module, "Running FindBugs analysis for directory '" + output + "'...", projectSettings, settings) {
 				@Override
 				protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 					consumer.consume(compilerManager.createProjectCompileScope(project));

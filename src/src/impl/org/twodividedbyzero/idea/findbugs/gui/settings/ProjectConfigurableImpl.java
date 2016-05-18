@@ -26,6 +26,7 @@ import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.util.PathMacroManagerFb;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
@@ -37,6 +38,9 @@ public final class ProjectConfigurableImpl implements SearchableConfigurable, Co
 	public static final String DISPLAY_NAME = "FindBugs-IDEA";
 
 	@NotNull
+	private final Project project;
+
+	@NotNull
 	private final ProjectSettings settings;
 
 	@NotNull
@@ -45,6 +49,7 @@ public final class ProjectConfigurableImpl implements SearchableConfigurable, Co
 	private SettingsPane pane;
 
 	public ProjectConfigurableImpl(@NotNull final Project project) {
+		this.project = project;
 		settings = ProjectSettings.getInstance(project);
 		workspaceSettings = WorkspaceSettings.getInstance(project);
 	}
@@ -65,7 +70,7 @@ public final class ProjectConfigurableImpl implements SearchableConfigurable, Co
 	@Override
 	public JComponent createComponent() {
 		if (pane == null) {
-			pane = new SettingsPane() {
+			pane = new SettingsPane(PathMacroManagerFb.create(project, null)) {
 				@NotNull
 				@Override
 				GeneralTab createGeneralTab() {
