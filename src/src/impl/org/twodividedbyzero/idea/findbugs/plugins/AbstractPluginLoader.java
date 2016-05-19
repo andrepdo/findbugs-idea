@@ -20,6 +20,7 @@ package org.twodividedbyzero.idea.findbugs.plugins;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -33,8 +34,10 @@ import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
+import org.twodividedbyzero.idea.findbugs.gui.settings.ProjectConfigurableImpl;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
+import javax.swing.event.HyperlinkEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -46,12 +49,12 @@ public abstract class AbstractPluginLoader {
 
 	private static final Logger LOGGER = Logger.getInstance(AbstractPluginLoader.class);
 
-	private final boolean _treatErrorsAsWarnings;
-	private final List<String> _errorMessages;
+	private final boolean addEditSettingsLinkToErrorMessage;
+	private final List<String> errorMessages;
 
-	protected AbstractPluginLoader(final boolean treatErrorsAsWarnings) {
-		_treatErrorsAsWarnings = treatErrorsAsWarnings;
-		_errorMessages = new ArrayList<String>();
+	protected AbstractPluginLoader(final boolean addEditSettingsLinkToErrorMessage) {
+		this.addEditSettingsLinkToErrorMessage = addEditSettingsLinkToErrorMessage;
+		errorMessages = new ArrayList<String>();
 	}
 
 	public void load(@NotNull final Set<PluginSettings> settings) {
@@ -118,15 +121,21 @@ public abstract class AbstractPluginLoader {
 			try {
 				final File pluginFile = FindBugsCustomPluginUtil.getAsFile(pluginUrl);
 				if (!pluginFile.exists()) {
-					seenConfiguredPlugin(PluginInfo.create(pluginSettings, ResourcesLoader.getString("error.path.exists", pluginFile.getPath())));
+					final String error = ResourcesLoader.getString("error.path.exists", pluginFile.getPath());
+					seenConfiguredPlugin(PluginInfo.create(pluginSettings, error));
+					handleError(error);
 					continue;
 				}
 				if (!pluginFile.isFile()) {
-					seenConfiguredPlugin(PluginInfo.create(pluginSettings, ResourcesLoader.getString("error.file.type", pluginFile.getPath())));
+					final String error = ResourcesLoader.getString("error.file.type", pluginFile.getPath());
+					seenConfiguredPlugin(PluginInfo.create(pluginSettings, error));
+					handleError(error);
 					continue;
 				}
 				if (!pluginFile.canRead()) {
-					seenConfiguredPlugin(PluginInfo.create(pluginSettings, ResourcesLoader.getString("error.file.readable", pluginFile.getPath())));
+					final String error = ResourcesLoader.getString("error.file.readable", pluginFile.getPath());
+					seenConfiguredPlugin(PluginInfo.create(pluginSettings, error));
+					handleError(error);
 					continue;
 				}
 				final Plugin plugin = FindBugsCustomPluginUtil.loadTemporary(pluginUrl);
@@ -136,8 +145,9 @@ public abstract class AbstractPluginLoader {
 				}
 				FindBugsCustomPluginUtil.unload(plugin);
 			} catch (final Exception e) {
-				seenConfiguredPlugin(PluginInfo.create(pluginSettings, ResourcesLoader.getString("plugins.load.error.text.path", pluginUrl)));
-				LOGGER.warn("Could not load plugin " + pluginUrl, e);
+				final String error = ResourcesLoader.getString("plugins.load.error.text.path", pluginUrl);
+				seenConfiguredPlugin(PluginInfo.create(pluginSettings, error));
+				handleFatalError(error, e);
 			}
 		}
 
@@ -151,15 +161,15 @@ public abstract class AbstractPluginLoader {
 		for (final String pluginUrl : pluginUrls) {
 			try {
 				final Plugin plugin = FindBugsCustomPluginUtil.loadPermanently(pluginUrl);
-				if (plugin == null) {
-					handleError("Could not load plugin: " + pluginUrl);
-					continue;
+				if (plugin != null) {
+					pluginPermanentlyLoaded(plugin, userPlugins);
+				} else {
+					handleFatalError("Could not load plugin: " + pluginUrl, null);
 				}
-				pluginPermanentlyLoaded(plugin, userPlugins);
 			} catch (final MalformedURLException e) {
-				handleError("Could not load plugin: " + pluginUrl, e);
+				handleFatalError("Could not load plugin: " + pluginUrl, e);
 			} catch (final PluginException e) {
-				handleError("Could not load plugin: " + pluginUrl, e);
+				handleFatalError("Could not load plugin: " + pluginUrl, e);
 			}
 		}
 	}
@@ -177,65 +187,79 @@ public abstract class AbstractPluginLoader {
 	}
 
 	protected void handleError(@NotNull final String message) {
-		if (_treatErrorsAsWarnings) {
-			LOGGER.warn(message);
-		} else {
-			LOGGER.error(message);
-		}
-		_errorMessages.add(message);
+		LOGGER.error(message, (Throwable) null);
+		errorMessages.add(message);
 	}
 
-	protected void handleError(@NotNull final String message, @Nullable final Throwable exception) {
-		if (_treatErrorsAsWarnings) {
-			LOGGER.warn(message, exception);
-		} else {
-			LOGGER.error(message, exception);
-		}
-		_errorMessages.add(message);
+	protected void handleFatalError(@NotNull final String message, @Nullable final Throwable exception) {
+		LOGGER.error(message, exception);
+		errorMessages.add(message);
 	}
 
 	@Nullable
-	public String makeErrorMessage() {
-		if (!_errorMessages.isEmpty()) {
+	private String makeHtmlErrorMessage() {
+		if (!errorMessages.isEmpty()) {
 			final StringBuilder message = new StringBuilder();
-			for (final String errorMessage : _errorMessages) {
+			for (final String errorMessage : errorMessages) {
 				if (message.length() > 0) {
-					message.append("<b>");
+					message.append("<br>");
 				}
 				message.append(" - ").append(errorMessage);
+			}
+			if (addEditSettingsLinkToErrorMessage) {
+				message.append("<br><br>").append("<a href=edit>").append(ResourcesLoader.getString("edit.settings")).append("</a>");
 			}
 			return message.toString();
 		}
 		return null;
 	}
 
-	public void showErrorBalloonIfNecessary(@Nullable final Project project) {
-		final String errorMessage = makeErrorMessage();
+	public boolean showErrorNotificationIfNecessary(@Nullable final Project project) {
+		final String errorMessage = makeHtmlErrorMessage();
 		if (errorMessage != null) {
 			// do not use BalloonTipFactory here, at this point FindBugs tool window is not yet created
 			// code adapted from com.intellij.openapi.components.impl.stores.StorageUtil#notifyUnknownMacros
 			UIUtil.invokeLaterIfNeeded(new RunnableErrorNotification(project, errorMessage));
+			return false;
 		}
+		return true;
 	}
 
 	private static class RunnableErrorNotification implements Runnable {
-		private final Project _project;
-		private final String _message;
+		@Nullable
+		private final Project project;
 
+		@NotNull
+		private final String message;
 
 		RunnableErrorNotification(@Nullable final Project project, @NotNull String message) {
-			_project = project;
-			_message = message;
+			this.project = project;
+			this.message = message;
 		}
-
 
 		@Override
 		public void run() {
-			Project currentProject = _project;
-			if (_project == null) {
+			final Project currentProject;
+			if (project != null) {
+				currentProject = project;
+			} else {
 				currentProject = ProjectManager.getInstance().getDefaultProject();
 			}
-			new Notification("FindBugs Custom Plugin Load Error", "Error while loading custom FindBugs plugins", _message, NotificationType.ERROR).notify(currentProject);
+			new Notification(
+					"FindBugs Custom Plugin Load Error",
+					ResourcesLoader.getString("error.customPlugins.title"),
+					message,
+					NotificationType.ERROR,
+					new NotificationListener() {
+						@Override
+						public void hyperlinkUpdate(@NotNull final Notification notification, @NotNull final HyperlinkEvent event) {
+							if (HyperlinkEvent.EventType.ACTIVATED.equals(event.getEventType())) {
+								notification.hideBalloon();
+								ProjectConfigurableImpl.show(currentProject);
+							}
+						}
+					}
+			).notify(currentProject);
 		}
 	}
 }

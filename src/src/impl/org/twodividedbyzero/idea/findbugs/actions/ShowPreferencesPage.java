@@ -20,7 +20,6 @@ package org.twodividedbyzero.idea.findbugs.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import org.jetbrains.annotations.NotNull;
@@ -57,6 +56,6 @@ public final class ShowPreferencesPage extends AbstractAction {
 			@NotNull final ProjectSettings projectSettings,
 			@NotNull final AbstractSettings settings
 	) {
-		ShowSettingsUtil.getInstance().showSettingsDialog(project, ProjectConfigurableImpl.DISPLAY_NAME);
+		ProjectConfigurableImpl.show(project);
 	}
 }

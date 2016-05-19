@@ -157,7 +157,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 				indicator.setText("Configure FindBugs...");
 				try {
 					asyncStart(indicator);
-				} catch (final ProcessCanceledException e) {
+				} catch (final ProcessCanceledException ignore) {
 					MessageBusManager.publishAnalysisAbortedToEDT(_project);
 				}
 			}
@@ -172,7 +172,9 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 
 	private void asyncStart(@NotNull final ProgressIndicator indicator) {
 
-		PluginLoader.load(_project, projectSettings); // TODO: merz test show runtime error notifications
+		if (!PluginLoader.load(_project, projectSettings, true)) {
+			throw new ProcessCanceledException();
+		}
 
 		final DetectorFactoryCollection detectorFactoryCollection = DetectorFactoryCollection.instance();
 

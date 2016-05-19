@@ -20,7 +20,6 @@ package org.twodividedbyzero.idea.findbugs.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ToolWindow;
@@ -120,7 +119,7 @@ abstract class AbstractAnalyzeAction extends AbstractAction {
 					@Override
 					public void hyperlinkUpdate(@NotNull final HyperlinkEvent event) {
 						if (HyperlinkEvent.EventType.ACTIVATED.equals(event.getEventType())) {
-							ShowSettingsUtil.getInstance().showSettingsDialog(project, ProjectConfigurableImpl.DISPLAY_NAME);
+							ProjectConfigurableImpl.show(project);
 						}
 					}
 				});

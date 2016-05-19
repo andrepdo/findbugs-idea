@@ -35,17 +35,25 @@ public final class PluginLoader {
 		projectRef = null;
 	}
 
-	public synchronized static void load(@NotNull final Project project, @NotNull final ProjectSettings settings) {
+	public synchronized static boolean load(
+			@NotNull final Project project,
+			@NotNull final ProjectSettings settings,
+			final boolean addEditSettingsLinkToErrorMessage
+	) {
+
 		Project latestProject = projectRef == null ? null : projectRef.get();
 		if (latestProject != project) {
-			new PluginLoaderImpl().load(settings.plugins);
+			final PluginLoaderImpl pluginLoader = new PluginLoaderImpl(addEditSettingsLinkToErrorMessage);
+			pluginLoader.load(settings.plugins);
 			projectRef = New.weakRef(project);
+			return pluginLoader.showErrorNotificationIfNecessary(project);
 		}
+		return true;
 	}
 
 	private static class PluginLoaderImpl extends AbstractPluginLoader {
-		PluginLoaderImpl() {
-			super(false);
+		PluginLoaderImpl(final boolean addEditSettingsLinkToErrorMessage) {
+			super(addEditSettingsLinkToErrorMessage);
 		}
 	}
 }

@@ -21,6 +21,7 @@ package org.twodividedbyzero.idea.findbugs.gui.settings;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
+import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.Nls;
@@ -34,7 +35,7 @@ import javax.swing.JComponent;
 
 public final class ProjectConfigurableImpl implements SearchableConfigurable, Configurable.NoScroll {
 	public static final String ID = "settings.findbugs.project";
-	public static final String DISPLAY_NAME = "FindBugs-IDEA";
+	static final String DISPLAY_NAME = "FindBugs-IDEA";
 
 	@NotNull
 	private final Project project;
@@ -150,5 +151,9 @@ public final class ProjectConfigurableImpl implements SearchableConfigurable, Co
 				}
 			}
 		};
+	}
+
+	public static void show(@NotNull final Project project) {
+		ShowSettingsUtil.getInstance().showSettingsDialog(project, ProjectConfigurableImpl.DISPLAY_NAME);
 	}
 }

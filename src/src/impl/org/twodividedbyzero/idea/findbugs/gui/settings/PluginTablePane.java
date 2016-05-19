@@ -305,7 +305,7 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 
 	private void load(@NotNull final Set<PluginSettings> settings) {
 		getModel().rows.clear();
-		final PluginLoaderImpl pluginLoader = new PluginLoaderImpl(true);
+		final PluginLoaderImpl pluginLoader = new PluginLoaderImpl();
 		pluginLoader.load(settings);
 		Collections.sort(pluginLoader.configured, PluginInfo.ByShortDescription);
 		Collections.sort(pluginLoader.bundled, PluginInfo.ByShortDescription);
@@ -402,8 +402,8 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 		@NotNull
 		private final List<PluginInfo> bundled;
 
-		PluginLoaderImpl(final boolean treatErrorsAsWarnings) {
-			super(treatErrorsAsWarnings);
+		PluginLoaderImpl() {
+			super(false);
 			configured = New.arrayList();
 			bundled = New.arrayList();
 		}
@@ -416,6 +416,11 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 		@Override
 		protected void seenConfiguredPlugin(@NotNull final PluginInfo plugin) {
 			configured.add(plugin);
+		}
+
+		@Override
+		protected void handleError(@NotNull String message) {
+			// do not log ; PluginErrorPane is used in this case
 		}
 	}
 }
