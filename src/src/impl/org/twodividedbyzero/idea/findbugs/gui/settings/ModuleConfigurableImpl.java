@@ -31,6 +31,7 @@ import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JComponent;
 
+// TODO
 public final class ModuleConfigurableImpl implements Configurable {
 
 	@NotNull

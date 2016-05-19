@@ -95,7 +95,6 @@ public abstract class AbstractPluginLoader {
 						pluginSettings.id = plugin.getPluginId();
 						pluginSettings.bundled = true;
 						pluginSettings.enabled = false;
-						pluginSettings.url = FindBugsCustomPluginUtil.getAsString(plugin);
 						seenBundledPlugin(PluginInfo.create(pluginSettings, plugin));
 					} else {
 						seenConfiguredPlugin(PluginInfo.create(pluginSettings, plugin));
