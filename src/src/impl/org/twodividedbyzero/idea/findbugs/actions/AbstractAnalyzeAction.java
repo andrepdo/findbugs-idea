@@ -62,7 +62,7 @@ abstract class AbstractAnalyzeAction extends AbstractAction {
 
 		final String importFilePath = WorkspaceSettings.getInstance(project).importFilePath;
 		if (!StringUtil.isEmptyOrSpaces(importFilePath)) {
-			//AnalyzeUtil.importPreferences(plugin, importFilePath); // TODO
+			AnalyzeUtil.importPreferences(project, projectSettings, importFilePath);
 		}
 
 		if (areAllBugCategoriesDisabled(settings)) {

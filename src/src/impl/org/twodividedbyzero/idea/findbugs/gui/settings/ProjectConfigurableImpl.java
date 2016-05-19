@@ -128,7 +128,18 @@ public final class ProjectConfigurableImpl implements SearchableConfigurable, Co
 		};
 	}
 
+	private void requestFocusOnShareImportFile() {
+		createComponent();
+		pane.requestFocusOnShareImportFile();
+	}
+
 	public static void show(@NotNull final Project project) {
 		ShowSettingsUtil.getInstance().showSettingsDialog(project, ProjectConfigurableImpl.DISPLAY_NAME);
+	}
+
+	public static void showShare(@NotNull final Project project) {
+		final ProjectConfigurableImpl configurable = new ProjectConfigurableImpl(project);
+		configurable.requestFocusOnShareImportFile();
+		ShowSettingsUtil.getInstance().editConfigurable(project, configurable);
 	}
 }

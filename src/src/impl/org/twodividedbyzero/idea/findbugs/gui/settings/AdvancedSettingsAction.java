@@ -119,7 +119,7 @@ final class AdvancedSettingsAction extends DefaultActionGroup {
 
 						final boolean success = new SettingsImporter(project) {
 							@Override
-							public void handleError(@NotNull final String title, @NotNull final String message) {
+							protected void handleError(@NotNull final String title, @NotNull final String message) {
 								Messages.showErrorDialog(message, title);
 							}
 						}.doImport(in, settings);

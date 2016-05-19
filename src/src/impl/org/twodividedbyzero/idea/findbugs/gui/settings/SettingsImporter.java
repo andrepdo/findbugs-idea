@@ -112,7 +112,7 @@ public class SettingsImporter {
 		return false;
 	}
 
-	public void handleError(@NotNull final String title, @NotNull final String message) {
+	protected void handleError(@NotNull final String title, @NotNull final String message) {
 		// TODO make HTML with title
 		BalloonTipFactory.showToolWindowErrorNotifier(project, message);
 	}

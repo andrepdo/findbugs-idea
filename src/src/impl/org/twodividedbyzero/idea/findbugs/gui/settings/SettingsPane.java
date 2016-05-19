@@ -35,6 +35,7 @@ import java.awt.BorderLayout;
 
 abstract class SettingsPane extends JPanel implements Disposable {
 
+	private JBTabbedPane tabs;
 	private GeneralTab generalTab;
 	private ReportTab reportTab;
 	private FilterTab filterTab;
@@ -59,7 +60,7 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		 * https://github.com/JetBrains/intellij-community/pull/398
 		 */
 		//final TabbedPaneWrapper tabs = new TabbedPaneWrapper(this);
-		final JBTabbedPane tabs = new JBTabbedPane();
+		tabs = new JBTabbedPane();
 		if (generalTab != null) {
 			tabs.addTab(ResourcesLoader.getString("settings.general"), generalTab);
 		}
@@ -155,6 +156,11 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		if (detectorTab != null) {
 			detectorTab.setFilter(filter);
 		}
+	}
+
+	void requestFocusOnShareImportFile() {
+		tabs.setSelectedComponent(shareTab);
+		shareTab.requestFocusOnImportFile();
 	}
 
 	@Override

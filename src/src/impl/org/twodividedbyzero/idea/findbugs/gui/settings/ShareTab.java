@@ -48,7 +48,7 @@ import java.io.File;
 final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>, Disposable {
 	private JLabel description;
 	private HyperlinkLabel link;
-	private LabeledComponent<TextFieldWithBrowseButton> importPathLabel;
+	private LabeledComponent<TextFieldWithBrowseButton> importPathLabel; // TODO check PathMarco support
 
 	ShareTab() {
 		super(new VerticalFlowLayout(HAlignment.Left, VAlignment.Top, 0, 0, true, false));
@@ -132,6 +132,11 @@ final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>,
 
 	@Override
 	public void dispose() {
+	}
+
+	void requestFocusOnImportFile() {
+		// FIXME: does not work - use "whenDone"
+		importPathLabel.getComponent().getTextField().requestFocus();
 	}
 
 	@NotNull

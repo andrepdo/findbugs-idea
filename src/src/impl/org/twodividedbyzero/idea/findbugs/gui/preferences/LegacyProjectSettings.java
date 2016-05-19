@@ -107,6 +107,7 @@ public final class LegacyProjectSettings implements PersistentStateComponent<Per
 		to.analysisEffort = asString(p.get(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL), to.analysisEffort);
 		to.minPriority = asString(p.get(FindBugsPreferences.MIN_PRIORITY_TO_REPORT), to.minPriority);
 
+		toWorkspace.importFilePath = asString(p.get(FindBugsPreferences.IMPORT_FILE_PATH), toWorkspace.importFilePath); // TODO check PathMacro
 		toWorkspace.exportBugCollectionDirectory = asString(p.get(FindBugsPreferences.EXPORT_BASE_DIR), toWorkspace.exportBugCollectionDirectory);
 		toWorkspace.exportBugCollectionAsHtml = asBoolean(p.get(FindBugsPreferences.EXPORT_AS_HTML), toWorkspace.exportBugCollectionAsHtml);
 		toWorkspace.exportBugCollectionAsXml = asBoolean(p.get(FindBugsPreferences.EXPORT_AS_XML), toWorkspace.exportBugCollectionAsXml);
