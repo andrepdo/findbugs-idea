@@ -51,6 +51,10 @@ public final class PluginLoader {
 		return true;
 	}
 
+	public synchronized static boolean isLoaded(@NotNull final Project project) {
+		return projectRef != null && projectRef.get() == project;
+	}
+
 	private static class PluginLoaderImpl extends AbstractPluginLoader {
 		PluginLoaderImpl(final boolean addEditSettingsLinkToErrorMessage) {
 			super(addEditSettingsLinkToErrorMessage);

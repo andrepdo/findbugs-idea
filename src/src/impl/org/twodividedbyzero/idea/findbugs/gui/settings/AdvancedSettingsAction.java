@@ -47,6 +47,7 @@ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.IoUtil;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.Icon;
@@ -70,23 +71,26 @@ final class AdvancedSettingsAction extends DefaultActionGroup {
 	private class ResetToDefault extends AbstractAction {
 		ResetToDefault() {
 			super(
-					"Reset To Default",
-					"Set all settings to default",
+					StringUtil.capitalizeWords(ResourcesLoader.getString("settings.action.reset.title"), true),
+					ResourcesLoader.getString("settings.action.reset.description"),
 					AllIcons.Actions.Reset_to_default
 			);
 		}
 
 		@Override
 		public void actionPerformed(@NotNull final AnActionEvent e) {
-			settingsPane.reset(new ProjectSettings());
+			final ProjectSettings settings = new ProjectSettings();
+			settingsPane.reset(settings);
+			settingsPane.resetProject(settings);
+			settingsPane.resetWorkspace(new WorkspaceSettings());
 		}
 	}
 
 	private class ImportSettings extends AbstractAction {
 		ImportSettings() {
 			super(
-					"Import",
-					"Import Settings from file",
+					StringUtil.capitalizeWords(ResourcesLoader.getString("settings.action.import.title"), true),
+					ResourcesLoader.getString("settings.action.import.description"),
 					AllIcons.ToolbarDecorator.Import
 			);
 		}
@@ -124,8 +128,8 @@ final class AdvancedSettingsAction extends DefaultActionGroup {
 	private class ExportSettings extends AbstractAction {
 		ExportSettings() {
 			super(
-					"Export",
-					"Export Settings to file",
+					StringUtil.capitalizeWords(ResourcesLoader.getString("settings.action.export.title"), true),
+					ResourcesLoader.getString("settings.action.export.description"),
 					AllIcons.Actions.Export
 			);
 		}

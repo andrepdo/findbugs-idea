@@ -23,21 +23,27 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ToolWindow;
+import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.PropertyKey;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
+import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
+import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 import org.twodividedbyzero.idea.findbugs.gui.settings.ProjectConfigurableImpl;
+import org.twodividedbyzero.idea.findbugs.plugins.PluginLoader;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import java.util.Map;
 
 abstract class AbstractAnalyzeAction extends AbstractAction {
 
@@ -64,8 +70,9 @@ abstract class AbstractAnalyzeAction extends AbstractAction {
 			return;
 		}
 
-		if (areAllDetectorsDisabled(project, projectSettings, settings)) {
+		if (areAllDetectorsDisabled(project, projectSettings)) {
 			showSettingsWarning(project, "analysis.allDetectorsDisabled");
+			return;
 		}
 
 		analyze(
@@ -100,11 +107,36 @@ abstract class AbstractAnalyzeAction extends AbstractAction {
 
 	private static boolean areAllDetectorsDisabled(
 			@NotNull final Project project,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final ProjectSettings projectSettings
 	) {
 
-		return false; // TODO
+		if (!PluginLoader.isLoaded(project)) {
+			// PluginLoader.load is called outside EDT by FindBugsStarter which is nice because
+			// loading plugins is not very fast. So we skip the detector check if
+			// plugin state is invalid.
+			return false;
+		}
+		final Map<String, Map<String, Boolean>> byPluginId = New.map();
+		byPluginId.put(FindBugsPluginConstants.FINDBUGS_CORE_PLUGIN_ID, projectSettings.detectors);
+		for (final PluginSettings pluginSettings : projectSettings.plugins) {
+			byPluginId.put(pluginSettings.id, pluginSettings.detectors);
+		}
+		for (final DetectorFactory detector : DetectorFactoryCollection.instance().getFactories()) {
+			if (detector.isReportingDetector()) {
+				boolean enabled = detector.isDefaultEnabled();
+				final Map<String, Boolean> detectors = byPluginId.get(detector.getPlugin().getPluginId());
+				if (detectors != null) {
+					final Boolean userEnabled = detectors.get(detector.getShortName());
+					if (userEnabled != null) {
+						enabled = userEnabled;
+					}
+				}
+				if (enabled) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	private static void showSettingsWarning(
