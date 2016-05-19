@@ -408,9 +408,9 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 
 	@Override
 	public void dispose() {
-		if (_bugTreePanel != null) {
-			Disposer.dispose(_bugTreePanel);
-			_bugTreePanel = null;
+		if (_previewPanel != null) {
+			Disposer.dispose(_previewPanel);
+			_previewPanel = null;
 		}
 	}
 

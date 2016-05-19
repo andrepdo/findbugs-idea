@@ -18,7 +18,6 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.toolwindow.view;
 
-import com.intellij.openapi.Disposable;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
@@ -68,7 +67,7 @@ import java.util.Map;
 
 @SuppressFBWarnings("SE_BAD_FIELD")
 @SuppressWarnings({"AnonymousInnerClass"})
-public class BugTreePanel extends JPanel implements Disposable {
+public class BugTreePanel extends JPanel {
 
 	private final Project _project;
 
@@ -83,7 +82,6 @@ public class BugTreePanel extends JPanel implements Disposable {
 	private double _splitPaneVerticalWeight = 1.0;
 	private final double _splitPaneHorizontalWeight = 0.4;
 	private boolean _bugPreviewEnabled;
-	private Editor latestEditor;
 
 
 	BugTreePanel(@NotNull final ToolWindowPanel parent, @NotNull final Project project) {
@@ -178,12 +176,9 @@ public class BugTreePanel extends JPanel implements Disposable {
 				if (psiFile != null) {
 					final Document document = PsiDocumentManager.getInstance(_project).getDocument(psiFile);
 					if (document != null) {
-						if (latestEditor != null) {
-							EditorFactory.getInstance().releaseEditor(latestEditor);
-						}
-						latestEditor = createEditor(bugInstanceNode, psiFile, document);
-						_parent.setPreviewEditor(latestEditor, psiFile);
-						scrollToPreviewSource(bugInstanceNode, latestEditor);
+						final Editor editor = createEditor(bugInstanceNode, psiFile, document);
+						_parent.setPreviewEditor(editor, psiFile);
+						scrollToPreviewSource(bugInstanceNode, editor);
 						clear = false;
 					}
 				}
@@ -372,14 +367,5 @@ public class BugTreePanel extends JPanel implements Disposable {
 
 	public GroupTreeModel getGroupModel() {
 		return (GroupTreeModel) _bugTree.getModel();
-	}
-
-	@Override
-	public void dispose() {
-		if (latestEditor != null) {
-			// Otherwise IDEA will log a warning on IDEA shutdown (at least with IDEA 2016.1.2).
-			EditorFactory.getInstance().releaseEditor(latestEditor);
-			latestEditor = null;
-		}
 	}
 }

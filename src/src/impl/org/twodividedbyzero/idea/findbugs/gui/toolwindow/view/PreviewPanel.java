@@ -18,6 +18,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.toolwindow.view;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.psi.PsiFile;
@@ -38,16 +39,8 @@ import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
- * @since 0.9.96
- */
 @SuppressWarnings({"HardCodedStringLiteral", "AnonymousInnerClass"})
-class PreviewPanel {
+final class PreviewPanel implements Disposable {
 
 	private final JPanel _delegate;
 	private final JLabel _label;
@@ -69,7 +62,7 @@ class PreviewPanel {
 		final double border = 5;
 		final double colsGap = 2;
 		final double[][] size = {{border, TableLayout.PREFERRED, colsGap, TableLayout.PREFERRED, colsGap, TableLayout.FILL, border}, // Columns
-								 {border, TableLayout.PREFERRED, border}};// Rows
+				{border, TableLayout.PREFERRED, border}};// Rows
 		final LayoutManager tbl = new TableLayout(size);
 		_labelPanel = new JPanel(tbl);
 		_labelPanel.add(new JLabel("Preview"), "1, 1, 1, 1");
@@ -86,7 +79,7 @@ class PreviewPanel {
 		closeButton.setRolloverIcon(GuiResources.CLOSE_EDITOR_HOVER_ICON);
 		closeButton.setRolloverSelectedIcon(GuiResources.CLOSE_EDITOR_HOVER_ICON);
 		closeButton.setPressedIcon(GuiResources.CLOSE_EDITOR_HOVER_ICON);
-		
+
 		closeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				clear();
@@ -98,8 +91,7 @@ class PreviewPanel {
 		_delegate.add(_labelPanel, BorderLayout.NORTH);
 	}
 
-
-	public void add(final Editor editor, final PsiFile psiFile) {
+	void add(final Editor editor, final PsiFile psiFile) {
 		releaseEditor();
 		_delegate.setVisible(true);
 		_delegate.removeAll();
@@ -114,54 +106,46 @@ class PreviewPanel {
 		_delegate.repaint();
 	}
 
-
-	public void releaseEditor() {
-		if(_editor != null) {
+	private void releaseEditor() {
+		if (_editor != null) {
 			EditorFactory.getInstance().releaseEditor(_editor);
 			_editor = null;
 			_psiFile = null;
 		}
 	}
 
-
-	public void release() {
+	void release() {
 		releaseEditor();
 		_delegate.setVisible(false);
 		_delegate.removeAll();
 	}
 
-
 	@Nullable
-	public Editor getEditor() {
+	Editor getEditor() {
 		return _editor;
 	}
 
-
 	@Nullable
-	public PsiFile getPsiFile() {
+	PsiFile getPsiFile() {
 		return _psiFile;
 	}
-
 
 	void setLabelText(final String text) {
 		_label.setText(text);
 	}
 
-
-	public void adaptSize(final int width, final int height) {
+	void adaptSize(final int width, final int height) {
 		//final int newWidth = (int) (width * 0.4);
 		_delegate.setPreferredSize(new Dimension(width, height));
 		_delegate.setSize(new Dimension(width, height));
 		_delegate.validate();
 	}
 
-
-	public JComponent getComponent() {
+	JComponent getComponent() {
 		return _delegate;
 	}
 
-
-	public void clear() {
+	void clear() {
 		release();
 		_delegate.add(NO_BUG_SELECTED_LABEL, BorderLayout.CENTER);
 		final Dimension preferredSize = NO_BUG_SELECTED_LABEL.getPreferredSize();
@@ -170,5 +154,11 @@ class PreviewPanel {
 		_delegate.setVisible(true);
 		_delegate.revalidate();
 		_delegate.repaint();
+	}
+
+	@Override
+	public void dispose() {
+		// Otherwise IDEA will log a warning on IDEA shutdown (at least with IDEA 2016.1.2).
+		releaseEditor();
 	}
 }
