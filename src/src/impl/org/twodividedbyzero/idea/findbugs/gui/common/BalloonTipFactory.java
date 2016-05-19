@@ -36,15 +36,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
- * @since 0.9.29-dev
- */
-public class BalloonTipFactory {
+public final class BalloonTipFactory {
 
 	public enum Orientation {
 
@@ -65,13 +57,6 @@ public class BalloonTipFactory {
 			return _orientation;
 		}
 	}
-
-
-	public enum NotificationType {
-
-		INFO, WARNING, ERROR
-	}
-
 
 	public static void showToolWindowInfoNotifier(@NotNull final Project project, final String html) {
 		showToolWindowInfoNotifier(project, html, null);

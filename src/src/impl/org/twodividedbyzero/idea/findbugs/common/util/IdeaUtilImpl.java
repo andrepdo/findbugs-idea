@@ -18,7 +18,6 @@
  */
 package org.twodividedbyzero.idea.findbugs.common.util;
 
-import com.intellij.ide.plugins.PluginManager;
 import com.intellij.lang.Language;
 import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -28,7 +27,6 @@ import com.intellij.openapi.components.PathMacroManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
@@ -77,7 +75,6 @@ import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 
 import java.io.File;
@@ -653,18 +650,6 @@ public final class IdeaUtilImpl {
 
 		return element;
 	}
-
-
-	@SuppressWarnings("UnusedDeclaration")
-	@Nullable
-	public static String getPluginId() {
-		final PluginId pluginId = PluginManager.getPluginByClassName(FindBugsPluginImpl.class.getName()); // use PluginManager here for IDEA 12.1.x compatibility (PluginManagerCore extension was introduced with 13.x)
-		if (pluginId != null) {
-			return pluginId.getIdString();
-		}
-		return null;
-	}
-
 
 	@SuppressFBWarnings("DM_CONVERT_CASE")
 	@NotNull

@@ -22,18 +22,23 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ToolWindow;
+import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.PropertyKey;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
+import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 import org.twodividedbyzero.idea.findbugs.gui.settings.ProjectConfigurableImpl;
+import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
+
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 abstract class AbstractAnalyzeAction extends AbstractAction {
 
@@ -56,14 +61,12 @@ abstract class AbstractAnalyzeAction extends AbstractAction {
 		}
 
 		if (areAllBugCategoriesDisabled(settings)) {
-			FindBugsPluginImpl.showToolWindowNotifier(project, "All bug categories are disabled. Analysis aborted.", MessageType.WARNING);
-			ShowSettingsUtil.getInstance().showSettingsDialog(project, ProjectConfigurableImpl.DISPLAY_NAME);
+			showSettingsWarning(project, "analysis.allBugCategoriesDisabled");
 			return;
 		}
 
-		if (areAllDetectorsDisabled(settings)) {
-			FindBugsPluginImpl.showToolWindowNotifier(project, "All detectors are disabled. Analysis aborted.", MessageType.WARNING);
-			ShowSettingsUtil.getInstance().showSettingsDialog(project, ProjectConfigurableImpl.DISPLAY_NAME);
+		if (areAllDetectorsDisabled(project, projectSettings, settings)) {
+			showSettingsWarning(project, "analysis.allDetectorsDisabled");
 		}
 
 		analyze(
@@ -88,10 +91,38 @@ abstract class AbstractAnalyzeAction extends AbstractAction {
 	);
 
 	private static boolean areAllBugCategoriesDisabled(@NotNull final AbstractSettings settings) {
+		for (final String category : DetectorFactoryCollection.instance().getBugCategories()) {
+			if (!settings.hiddenBugCategory.contains(category)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private static boolean areAllDetectorsDisabled(
+			@NotNull final Project project,
+			@NotNull final ProjectSettings projectSettings,
+			@NotNull final AbstractSettings settings
+	) {
+
 		return false; // TODO
 	}
 
-	private static boolean areAllDetectorsDisabled(@NotNull final AbstractSettings settings) {
-		return false; // TODO
+	private static void showSettingsWarning(
+			@NotNull final Project project,
+			@NotNull @PropertyKey(resourceBundle = ResourcesLoader.BUNDLE) String messageKey
+	) {
+		BalloonTipFactory.showToolWindowWarnNotifier(project,
+				ResourcesLoader.getString(messageKey)
+						+ " " + ResourcesLoader.getString("analysis.aborted")
+						+ "<br>" + "<a href=edit>" + ResourcesLoader.getString("edit.settings") + "</a>",
+				new HyperlinkListener() {
+					@Override
+					public void hyperlinkUpdate(@NotNull final HyperlinkEvent event) {
+						if (HyperlinkEvent.EventType.ACTIVATED.equals(event.getEventType())) {
+							ShowSettingsUtil.getInstance().showSettingsDialog(project, ProjectConfigurableImpl.DISPLAY_NAME);
+						}
+					}
+				});
 	}
 }

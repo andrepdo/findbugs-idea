@@ -25,7 +25,6 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.text.StringUtil;
@@ -45,12 +44,12 @@ import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
+import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 import org.twodividedbyzero.idea.findbugs.gui.common.ImportFileDialog;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
@@ -201,7 +200,7 @@ public final class ImportBugCollection extends AbstractAction {
 					EventDispatchThreadHelper.invokeLater(new Runnable() {
 						public void run() {
 							transferToEDTQueue.drain();
-							FindBugsPluginImpl.showToolWindowNotifier(project, "Imported bug collection from '" + fileToImport + "'.", MessageType.INFO);
+							BalloonTipFactory.showToolWindowInfoNotifier(project, "Imported bug collection from '" + fileToImport + "'.");
 						}
 					});
 
@@ -211,13 +210,13 @@ public final class ImportBugCollection extends AbstractAction {
 				} catch (final IOException e1) {
 					MessageBusManager.publishAnalysisAbortedToEDT(project);
 					final String message = "Import failed";
-					showToolWindowNotifier(project, message, MessageType.ERROR);
+					showToolWindowErrorNotifier(project, message);
 					LOGGER.error(message, e1);
 
 				} catch (final DocumentException e1) {
 					MessageBusManager.publishAnalysisAbortedToEDT(project);
 					final String message = "Import failed";
-					showToolWindowNotifier(project, message, MessageType.ERROR);
+					showToolWindowErrorNotifier(project, message);
 					LOGGER.error(message, e1);
 
 				} finally {
@@ -244,10 +243,10 @@ public final class ImportBugCollection extends AbstractAction {
 		task.queue();
 	}
 
-	private static void showToolWindowNotifier(final Project project, final String message, final MessageType type) {
+	private static void showToolWindowErrorNotifier(@NotNull final Project project, final String message) {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
-				FindBugsPluginImpl.showToolWindowNotifier(project, message, type);
+				BalloonTipFactory.showToolWindowErrorNotifier(project, message);
 			}
 		});
 	}

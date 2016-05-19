@@ -30,7 +30,7 @@ import java.util.Locale;
 /**
  * @see UserPreferences#setEffort(String)
  */
-public enum AnalysisEffort { // TODO Cleanup unused
+public enum AnalysisEffort { // FIXME Cleanup unused
 
 	MIN(UserPreferences.EFFORT_MIN, "effort.minimal", "Minimal", 10),
 	DEFAULT(UserPreferences.EFFORT_DEFAULT, "effort.default", "Default", 20),
