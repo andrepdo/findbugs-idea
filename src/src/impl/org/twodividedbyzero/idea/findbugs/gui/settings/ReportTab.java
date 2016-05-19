@@ -20,11 +20,13 @@ package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.util.ui.UIUtil;
+import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.HAlignment;
 import org.twodividedbyzero.idea.findbugs.gui.common.VAlignment;
 import org.twodividedbyzero.idea.findbugs.gui.common.VerticalFlowLayout;
+import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.BorderFactory;
@@ -114,17 +116,57 @@ final class ReportTab extends JPanel implements SettingsOwner<AbstractSettings> 
 	@NotNull
 	static String[] getSearchResourceKey() {
 		return new String[]{
+
 				// AnalysisEffortPane
 				"effort.text",
 				"effort.description",
+
 				// MinRankPane
 				"minRank.text",
 				"minRank.description",
+
 				// MinPriorityPane
 				"minPriority.text",
 				"minPriority.description",
+
 				// BugCategoryPane
 				"bugCategory.title"
+		};
+	}
+
+	@NotNull
+	static String[] getSearchTexts() {
+		return new String[]{
+
+				//AnalysisEffortPane
+				AnalysisEffort.MIN.getEffortLevel(),
+				AnalysisEffort.MIN.getMessage(),
+				AnalysisEffort.DEFAULT.getEffortLevel(),
+				AnalysisEffort.DEFAULT.getMessage(),
+				AnalysisEffort.MAX.getEffortLevel(),
+				AnalysisEffort.MAX.getMessage(),
+
+				// MinRankPane
+				"Scariest",
+				"Scary",
+				"Troubling",
+				"Of Concern",
+
+				// MinPriorityPane
+				ProjectFilterSettings.HIGH_PRIORITY,
+				ProjectFilterSettings.MEDIUM_PRIORITY,
+				ProjectFilterSettings.LOW_PRIORITY,
+
+				// BugCategoryPane
+				"BAD_PRACTICE", "Bad practice",
+				"MALICIOUS_CODE", "Malicious code vulnerability",
+				"CORRECTNESS", "Correctness",
+				"PERFORMANCE", "Performance",
+				"SECURITY", "Security",
+				"STYLE", "Dodgy code",
+				"EXPERIMENTAL", "Experimental",
+				"MT_CORRECTNESS", "Multithreaded correctness",
+				"I18N", "Internationalization"
 		};
 	}
 }

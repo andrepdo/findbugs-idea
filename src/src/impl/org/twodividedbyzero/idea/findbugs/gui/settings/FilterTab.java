@@ -21,6 +21,7 @@ package org.twodividedbyzero.idea.findbugs.gui.settings;
 import com.intellij.openapi.options.ConfigurationException;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
+import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -76,5 +77,19 @@ final class FilterTab extends JPanel implements SettingsOwner<AbstractSettings> 
 		include.reset(settings.includeFilterFiles);
 		exclude.reset(settings.excludeFilterFiles);
 		bugs.reset(settings.excludeBugsFiles);
+	}
+
+	@NotNull
+	static String getSearchPath() {
+		return ResourcesLoader.getString("settings.filter");
+	}
+
+	@NotNull
+	static String[] getSearchResourceKey() {
+		return new String[]{
+				"filter.include.title",
+				"filter.exclude.title",
+				"filter.exclude.bugs"
+		};
 	}
 }

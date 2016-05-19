@@ -152,4 +152,17 @@ final class DetectorTab extends JPanel implements Disposable {
 			tableHeaderPane = null;
 		}
 	}
+
+	@NotNull
+	static String getSearchPath() {
+		return ResourcesLoader.getString("settings.detector");
+	}
+
+	@NotNull
+	static String[] getSearchResourceKey() {
+		return new String[]{
+				"detector.description.line1",
+				"detector.description.line2"
+		};
+	}
 }

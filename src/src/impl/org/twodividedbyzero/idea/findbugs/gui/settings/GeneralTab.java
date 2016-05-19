@@ -26,6 +26,7 @@ import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.HAlignment;
 import org.twodividedbyzero.idea.findbugs.gui.common.VAlignment;
 import org.twodividedbyzero.idea.findbugs.gui.common.VerticalFlowLayout;
+import org.twodividedbyzero.idea.findbugs.plugins.Plugins;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JPanel;
@@ -117,7 +118,30 @@ final class GeneralTab extends JPanel implements SettingsOwner<ProjectSettings> 
 				"general.analyzeAfterCompile.title",
 				"general.analyzeAfterAutoMake.title",
 				"general.runInBackground.title",
-				"general.toolWindowToFront.title"
+				"general.toolWindowToFront.title",
+				// PluginTablePane
+				"plugins.title",
+				"plugins.addFromDisk"
+		};
+	}
+
+	@NotNull
+	static String[] getSearchTexts() {
+		return new String[]{
+
+				Plugins.fb_contrib_6_2_1.id,
+				"fb-contrib plugin",
+				"This plugin contains FindBugs detectors from the fb-contrib project",
+				"http://fb-contrib.sourceforge.net",
+
+				Plugins.findsecbugs_plugin_1_4_1.id,
+				"Find Security Bugs",
+				"Find Security Bugs is a plugin that aims to help security audit.",
+				"https://github.com/h3xstream/find-sec-bugs",
+
+				Plugins.AndroidFindbugs_0_5.id,
+				"Findbugs plugin for Android",
+				"This plugin consist of FindBugs detectors for Android coding"
 		};
 	}
 }

@@ -137,6 +137,14 @@ final class AnnotateTab extends JPanel {
 		};
 	}
 
+	@NotNull
+	static String[] getSearchTexts() {
+		return new String[]{
+				"edu.umd.cs.findbugs.annotations.SuppressWarnings",
+				"edu.umd.cs.findbugs.annotations.SuppressFBWarnings"
+		};
+	}
+
 	private class Suppress extends ClassBrowser {
 		public Suppress(final Project project, final String title) {
 			super(project, title);
