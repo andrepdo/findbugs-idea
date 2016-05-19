@@ -127,6 +127,7 @@ final class AdvancedSettingsAction extends DefaultActionGroup {
 						if (success) {
 							settingsPane.reset(settings);
 							settingsPane.resetProject(settings);
+							settingsPane.resetWorkspace(WorkspaceSettings.getInstance(project)); // support legacy
 						}
 
 					} finally {

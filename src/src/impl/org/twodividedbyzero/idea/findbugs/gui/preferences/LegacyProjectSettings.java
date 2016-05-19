@@ -75,43 +75,56 @@ public final class LegacyProjectSettings implements PersistentStateComponent<Per
 			return;
 		}
 		LOGGER.info("Start convert legacy findbugs-idea settings");
-		applyBasePreferencesTo(settings, workspaceSettings);
-		applyBugCategoriesTo(settings);
-		applyFileFiltersTo(settings);
-		applyDetectorsAndPluginsTo(settings);
+		applyToImpl(state, settings, workspaceSettings);
 	}
 
-	private void applyBasePreferencesTo(@NotNull final ProjectSettings settings, @NotNull final WorkspaceSettings workspaceSettings) {
-		final Map<String, String> p = state.getBasePreferences();
+	public static void applyToImpl(
+			@NotNull final PersistencePreferencesBean from,
+			@NotNull final ProjectSettings to,
+			@NotNull final WorkspaceSettings toWorkspace
+	) {
+		applyBasePreferencesTo(from, to, toWorkspace);
+		applyBugCategoriesTo(from, to);
+		applyFileFiltersTo(from, to);
+		applyDetectorsAndPluginsTo(from, to);
+	}
+
+	private static void applyBasePreferencesTo(
+			@NotNull final PersistencePreferencesBean from,
+			@NotNull final ProjectSettings to,
+			@NotNull final WorkspaceSettings toWorkspace
+	) {
+
+		final Map<String, String> p = from.getBasePreferences();
 		if (p == null || p.isEmpty()) {
 			return;
 		}
-		workspaceSettings.compileBeforeAnalyze = asBoolean(p.get(FindBugsPreferences.COMPILE_BEFORE_ANALYZE), workspaceSettings.compileBeforeAnalyze);
-		workspaceSettings.analyzeAfterCompile = asBoolean(p.get(FindBugsPreferences.ANALYZE_AFTER_COMPILE), workspaceSettings.analyzeAfterCompile);
-		workspaceSettings.analyzeAfterAutoMake = asBoolean(p.get(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE), workspaceSettings.analyzeAfterAutoMake);
-		workspaceSettings.runInBackground = asBoolean(p.get(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND), workspaceSettings.runInBackground);
+		toWorkspace.compileBeforeAnalyze = asBoolean(p.get(FindBugsPreferences.COMPILE_BEFORE_ANALYZE), toWorkspace.compileBeforeAnalyze);
+		toWorkspace.analyzeAfterCompile = asBoolean(p.get(FindBugsPreferences.ANALYZE_AFTER_COMPILE), toWorkspace.analyzeAfterCompile);
+		toWorkspace.analyzeAfterAutoMake = asBoolean(p.get(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE), toWorkspace.analyzeAfterAutoMake);
+		toWorkspace.runInBackground = asBoolean(p.get(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND), toWorkspace.runInBackground);
 
-		settings.analysisEffort = asString(p.get(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL), settings.analysisEffort);
-		settings.minPriority = asString(p.get(FindBugsPreferences.MIN_PRIORITY_TO_REPORT), settings.minPriority);
+		to.analysisEffort = asString(p.get(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL), to.analysisEffort);
+		to.minPriority = asString(p.get(FindBugsPreferences.MIN_PRIORITY_TO_REPORT), to.minPriority);
 
-		workspaceSettings.exportBugCollectionDirectory = asString(p.get(FindBugsPreferences.EXPORT_BASE_DIR), workspaceSettings.exportBugCollectionDirectory);
-		workspaceSettings.exportBugCollectionAsHtml = asBoolean(p.get(FindBugsPreferences.EXPORT_AS_HTML), workspaceSettings.exportBugCollectionAsHtml);
-		workspaceSettings.exportBugCollectionAsXml = asBoolean(p.get(FindBugsPreferences.EXPORT_AS_XML), workspaceSettings.exportBugCollectionAsXml);
-		workspaceSettings.exportBugCollectionCreateSubDirectory = asBoolean(p.get(FindBugsPreferences.EXPORT_CREATE_ARCHIVE_DIR), workspaceSettings.exportBugCollectionCreateSubDirectory);
-		workspaceSettings.openExportedHtmlBugCollectionInBrowser = asBoolean(p.get(FindBugsPreferences.EXPORT_OPEN_BROWSER), workspaceSettings.openExportedHtmlBugCollectionInBrowser);
+		toWorkspace.exportBugCollectionDirectory = asString(p.get(FindBugsPreferences.EXPORT_BASE_DIR), toWorkspace.exportBugCollectionDirectory);
+		toWorkspace.exportBugCollectionAsHtml = asBoolean(p.get(FindBugsPreferences.EXPORT_AS_HTML), toWorkspace.exportBugCollectionAsHtml);
+		toWorkspace.exportBugCollectionAsXml = asBoolean(p.get(FindBugsPreferences.EXPORT_AS_XML), toWorkspace.exportBugCollectionAsXml);
+		toWorkspace.exportBugCollectionCreateSubDirectory = asBoolean(p.get(FindBugsPreferences.EXPORT_CREATE_ARCHIVE_DIR), toWorkspace.exportBugCollectionCreateSubDirectory);
+		toWorkspace.openExportedHtmlBugCollectionInBrowser = asBoolean(p.get(FindBugsPreferences.EXPORT_OPEN_BROWSER), toWorkspace.openExportedHtmlBugCollectionInBrowser);
 
-		workspaceSettings.toolWindowToFront = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_TO_FRONT), workspaceSettings.toolWindowToFront);
-		workspaceSettings.toolWindowScrollToSource = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_SCROLL_TO_SOURCE), workspaceSettings.toolWindowScrollToSource);
-		workspaceSettings.toolWindowEditorPreview = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_EDITOR_PREVIEW), workspaceSettings.toolWindowEditorPreview);
-		workspaceSettings.toolWindowGroupBy = asString(p.get(FindBugsPreferences.TOOLWINDOW_GROUP_BY), workspaceSettings.toolWindowGroupBy);
+		toWorkspace.toolWindowToFront = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_TO_FRONT), toWorkspace.toolWindowToFront);
+		toWorkspace.toolWindowScrollToSource = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_SCROLL_TO_SOURCE), toWorkspace.toolWindowScrollToSource);
+		toWorkspace.toolWindowEditorPreview = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_EDITOR_PREVIEW), toWorkspace.toolWindowEditorPreview);
+		toWorkspace.toolWindowGroupBy = asString(p.get(FindBugsPreferences.TOOLWINDOW_GROUP_BY), toWorkspace.toolWindowGroupBy);
 
-		settings.suppressWarningsClassName = asString(p.get(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS), settings.suppressWarningsClassName);
-		workspaceSettings.annotationGutterIcon = asBoolean(p.get(FindBugsPreferences.ANNOTATION_GUTTER_ICON_ENABLED), workspaceSettings.annotationGutterIcon);
-		workspaceSettings.annotationTextRangeMarkup = asBoolean(p.get(FindBugsPreferences.ANNOTATION_TEXT_RAGE_MARKUP_ENABLED), workspaceSettings.annotationTextRangeMarkup);
+		to.suppressWarningsClassName = asString(p.get(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS), to.suppressWarningsClassName);
+		toWorkspace.annotationGutterIcon = asBoolean(p.get(FindBugsPreferences.ANNOTATION_GUTTER_ICON_ENABLED), toWorkspace.annotationGutterIcon);
+		toWorkspace.annotationTextRangeMarkup = asBoolean(p.get(FindBugsPreferences.ANNOTATION_TEXT_RAGE_MARKUP_ENABLED), toWorkspace.annotationTextRangeMarkup);
 	}
 
-	private void applyBugCategoriesTo(@NotNull final ProjectSettings settings) {
-		final Map<String, String> bugCategories = state.getBugCategories();
+	private static void applyBugCategoriesTo(@NotNull final PersistencePreferencesBean from, @NotNull final ProjectSettings to) {
+		final Map<String, String> bugCategories = from.getBugCategories();
 		if (bugCategories == null || bugCategories.isEmpty()) {
 			return;
 		}
@@ -129,40 +142,40 @@ public final class LegacyProjectSettings implements PersistentStateComponent<Per
 			if (bugCategories.containsKey(category)) {
 				final String value = bugCategories.get(category);
 				if (!StringUtil.isEmptyOrSpaces(value) && !Boolean.valueOf(value)) {
-					settings.hiddenBugCategory.add(category);
+					to.hiddenBugCategory.add(category);
 				}
 			}
 		}
 	}
 
-	private void applyFileFiltersTo(@NotNull final ProjectSettings settings) {
-		final List<String> includeFilters = state.getIncludeFilters();
+	private static void applyFileFiltersTo(@NotNull final PersistencePreferencesBean from, @NotNull final ProjectSettings to) {
+		final List<String> includeFilters = from.getIncludeFilters();
 		if (includeFilters != null && !includeFilters.isEmpty()) {
 			for (final String includeFilter : includeFilters) {
-				settings.includeFilterFiles.put(includeFilter, true);
+				to.includeFilterFiles.put(includeFilter, true);
 			}
 		}
-		final List<String> excludeFilters = state.getExcludeFilters();
+		final List<String> excludeFilters = from.getExcludeFilters();
 		if (excludeFilters != null && !excludeFilters.isEmpty()) {
 			for (final String excludeFilter : excludeFilters) {
-				settings.excludeFilterFiles.put(excludeFilter, true);
+				to.excludeFilterFiles.put(excludeFilter, true);
 			}
 		}
-		final List<String> excludeBugsFiles = state.getExcludeBaselineBugs();
+		final List<String> excludeBugsFiles = from.getExcludeBaselineBugs();
 		if (excludeBugsFiles != null && !excludeBugsFiles.isEmpty()) {
 			for (final String excludeBugsFile : excludeBugsFiles) {
-				settings.excludeBugsFiles.put(excludeBugsFile, true);
+				to.excludeBugsFiles.put(excludeBugsFile, true);
 			}
 		}
 	}
 
-	private void applyDetectorsAndPluginsTo(@NotNull final ProjectSettings settings) {
+	private static void applyDetectorsAndPluginsTo(@NotNull final PersistencePreferencesBean from, @NotNull final ProjectSettings to) {
 		final LegacyPluginLoaderImpl legacyPluginLoader = new LegacyPluginLoaderImpl();
 		legacyPluginLoader.load(
-				state.getPlugins(),
-				state.getDisabledUserPluginIds(),
-				state.getEnabledBundledPluginIds(),
-				state.getDisabledBundledPluginIds()
+				from.getPlugins(),
+				from.getDisabledUserPluginIds(),
+				from.getEnabledBundledPluginIds(),
+				from.getDisabledBundledPluginIds()
 		);
 
 		final Map<String, Map<String, Boolean>> detectorDefaultEnabled = New.map();
@@ -176,7 +189,7 @@ public final class LegacyProjectSettings implements PersistentStateComponent<Per
 		}
 
 		// core detectors
-		apply(state.getDetectors(), settings.detectors, detectorDefaultEnabled.get(FindBugsPluginConstants.FINDBUGS_CORE_PLUGIN_ID));
+		apply(from.getDetectors(), to.detectors, detectorDefaultEnabled.get(FindBugsPluginConstants.FINDBUGS_CORE_PLUGIN_ID));
 
 		// bundled plugins and detectors
 		for (final String bundledPluginId : new String[]{
@@ -184,29 +197,29 @@ public final class LegacyProjectSettings implements PersistentStateComponent<Per
 				Plugins.fb_contrib_6_2_1.id,
 				Plugins.findsecbugs_plugin_1_4_1.id
 		}) {
-			final boolean enabled = state.getEnabledBundledPluginIds() != null && state.getEnabledBundledPluginIds().contains(bundledPluginId);
+			final boolean enabled = from.getEnabledBundledPluginIds() != null && from.getEnabledBundledPluginIds().contains(bundledPluginId);
 			final PluginSettings pluginSettings = new PluginSettings();
 			pluginSettings.id = bundledPluginId;
 			pluginSettings.enabled = enabled;
 			pluginSettings.bundled = true;
-			apply(state.getDetectors(), pluginSettings.detectors, detectorDefaultEnabled.get(bundledPluginId));
+			apply(from.getDetectors(), pluginSettings.detectors, detectorDefaultEnabled.get(bundledPluginId));
 			if (enabled || !pluginSettings.detectors.isEmpty()) {
-				settings.plugins.add(pluginSettings);
+				to.plugins.add(pluginSettings);
 			}
 		}
 
 		// user plugins and detectors
-		final List<String> plugins = state.getPlugins();
+		final List<String> plugins = from.getPlugins();
 		if (plugins != null && !plugins.isEmpty()) {
 			for (final String pluginUrl : plugins) {
 				final String pluginId = legacyPluginLoader.userPluginIdByPluginUrl.get(pluginUrl);
 				if (!StringUtil.isEmptyOrSpaces(pluginId)) {
 					final PluginSettings pluginSettings = new PluginSettings();
 					pluginSettings.id = pluginId;
-					pluginSettings.enabled = state.getDisabledUserPluginIds() == null || !state.getDisabledUserPluginIds().contains(pluginId);
+					pluginSettings.enabled = from.getDisabledUserPluginIds() == null || !from.getDisabledUserPluginIds().contains(pluginId);
 					pluginSettings.url = pluginUrl;
-					apply(state.getDetectors(), pluginSettings.detectors, detectorDefaultEnabled.get(pluginId));
-					settings.plugins.add(pluginSettings);
+					apply(from.getDetectors(), pluginSettings.detectors, detectorDefaultEnabled.get(pluginId));
+					to.plugins.add(pluginSettings);
 				}
 			}
 		}

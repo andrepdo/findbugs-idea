@@ -25,8 +25,11 @@ import com.intellij.util.xmlb.XmlSerializer;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
+import org.twodividedbyzero.idea.findbugs.gui.preferences.LegacyProjectSettings;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.importer.SonarProfileImporter;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
@@ -54,12 +57,22 @@ public class SettingsImporter {
 				}
 			}.doImport(root, settings);
 		} else {
-			if (isLegacy(root)) {
-				final PersistencePreferencesBean prefs = XmlSerializer.deserialize(root, PersistencePreferencesBean.class);
-				if (prefs.getBasePreferences().isEmpty()) {
-					// TODO ask continue;
+			boolean legacy = false;
+			PersistencePreferencesBean legacyPrefs = null;
+			Element legacyIdea = getLegacyIdea(root);
+			if (legacyIdea != null) {
+				legacy = true;
+				legacyPrefs = XmlSerializer.deserialize(legacyIdea, PersistencePreferencesBean.class);
+			} else if (isLegacyExport(root)) {
+				legacy = true;
+				legacyPrefs = XmlSerializer.deserialize(root, PersistencePreferencesBean.class);
+			}
+			if (legacy) {
+				if (legacyPrefs != null) {
+					LegacyProjectSettings.applyToImpl(legacyPrefs, settings, WorkspaceSettings.getInstance(project));
+				} else {
+					handleError(ResourcesLoader.getString("sonar.import.error.legacyInvalid.title"), ResourcesLoader.getString("sonar.import.error.legacyInvalid.text"));
 				}
-				System.out.println("TODO convert it"); // TODO convert it
 			} else {
 				new SmartSerializer().readExternal(settings, root);
 			}
@@ -68,13 +81,32 @@ public class SettingsImporter {
 		return success;
 	}
 
-	private static boolean isLegacy(@NotNull final Element element) {
-		if ("option".equalsIgnoreCase(element.getName()) && "_basePreferences".equalsIgnoreCase(element.getAttributeValue("name"))) {
-			return true;
+	@Nullable
+	private static Element getLegacyIdea(@NotNull final Element root) {
+		if ("project".equalsIgnoreCase(root.getName())) {
+			for (final Element component : root.getChildren()) {
+				if ("component".equalsIgnoreCase(component.getName())) {
+					if ("org.twodividedbyzero.idea.findbugs".equalsIgnoreCase(component.getAttributeValue("name"))) {
+						if (hasLegacyBasePreferencesChild(component)) {
+							return component;
+						}
+					}
+				}
+			}
 		}
-		for (final Element child : element.getChildren()) {
-			if (isLegacy(child)) {
-				return true;
+		return null;
+	}
+
+	private static boolean isLegacyExport(@NotNull final Element root) {
+		return "findbugs".equalsIgnoreCase(root.getName()) && hasLegacyBasePreferencesChild(root);
+	}
+
+	private static boolean hasLegacyBasePreferencesChild(@NotNull final Element parent) {
+		for (final Element child : parent.getChildren()) {
+			if ("option".equalsIgnoreCase(child.getName())) {
+				if ("_basePreferences".equalsIgnoreCase(child.getAttributeValue("name"))) {
+					return true;
+				}
 			}
 		}
 		return false;
