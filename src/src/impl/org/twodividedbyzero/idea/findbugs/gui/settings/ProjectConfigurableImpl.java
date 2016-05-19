@@ -69,11 +69,17 @@ public final class ProjectConfigurableImpl implements SearchableConfigurable, Co
 	@Override
 	public JComponent createComponent() {
 		if (pane == null) {
-			pane = new SettingsPane(project) {
+			pane = new SettingsPane() {
 				@NotNull
 				@Override
 				GeneralTab createGeneralTab() {
 					return new GeneralTab();
+				}
+
+				@Nullable
+				@Override
+				DetectorTab createDetectorTab() {
+					return new DetectorTab();
 				}
 
 				@Nullable

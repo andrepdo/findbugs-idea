@@ -19,13 +19,10 @@
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.tree.TreeUtil;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
-import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.TreeState;
 
@@ -34,18 +31,15 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import java.awt.BorderLayout;
 import java.util.Map;
-import java.util.Set;
 
-final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSettings> {
-	private final Project project;
+final class DetectorTablePane extends JPanel {
 	private DetectorTableHeaderPane headerPane;
 	private DetectorModel model;
 	private DetectorTable table;
 	private JScrollPane scrollPane;
 
-	DetectorTablePane(@NotNull final Project project) {
+	DetectorTablePane() {
 		super(new BorderLayout());
-		this.project = project;
 		model = new DetectorModel(DetectorNode.notLoaded());
 		table = new DetectorTable(model);
 		model.setTree(table.getTree());
@@ -83,33 +77,22 @@ final class DetectorTablePane extends JPanel implements SettingsOwner<AbstractSe
 		scrollPane.setEnabled(enabled);
 	}
 
-	@Override
-	public boolean isModified(@NotNull final AbstractSettings settings) {
+	boolean isModified(@NotNull final ProjectSettings settings) {
 		final Map<String, Map<String, Boolean>> currentDetectors = getRootNode().getEnabledMap();
-		final Map<String, Map<String, Boolean>> settingsDetectors = AbstractDetectorNode.createEnabledMap(settings, getPlugins(settings));
+		final Map<String, Map<String, Boolean>> settingsDetectors = AbstractDetectorNode.createEnabledMap(settings);
 		return !settingsDetectors.equals(currentDetectors);
 	}
 
-	@Override
-	public void apply(@NotNull final AbstractSettings settings) throws ConfigurationException {
+	void apply(@NotNull final ProjectSettings settings) throws ConfigurationException {
 		final Map<String, Map<String, Boolean>> detectors = getRootNode().getEnabledMap();
-		AbstractDetectorNode.fillSettings(settings, getPlugins(settings), detectors);
+		AbstractDetectorNode.fillSettings(settings, detectors);
 	}
 
-	@Override
-	public void reset(@NotNull final AbstractSettings settings) {
-		final Map<String, Map<String, Boolean>> detectors = AbstractDetectorNode.createEnabledMap(settings, getPlugins(settings));
+	void reset(@NotNull final ProjectSettings settings) {
+		final Map<String, Map<String, Boolean>> detectors = AbstractDetectorNode.createEnabledMap(settings);
 		final TreeState treeState = TreeState.create(table.getTree());
 		model.setRoot(DetectorNode.buildRoot(headerPane.getGroupBy(), headerPane.createAcceptor(), detectors));
 		treeState.restore();
-	}
-
-	@NotNull
-	private Set<PluginSettings> getPlugins(@NotNull final AbstractSettings settings) {
-		if (settings instanceof ProjectSettings) {
-			return ((ProjectSettings) settings).plugins;
-		}
-		return ProjectSettings.getInstance(project).plugins;
 	}
 
 	void reload() {

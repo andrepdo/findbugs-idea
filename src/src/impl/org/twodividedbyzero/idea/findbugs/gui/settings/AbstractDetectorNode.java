@@ -28,8 +28,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
-import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.ArrayList;
@@ -185,14 +185,13 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 
 	@NotNull
 	static Map<String, Map<String, Boolean>> createEnabledMap(
-			@NotNull final AbstractSettings settings,
-			@NotNull final Set<PluginSettings> plugins
+			@NotNull final ProjectSettings settings
 	) {
 		final Map<String, Map<String, Boolean>> ret = New.map();
 		if (!settings.detectors.isEmpty()) {
 			ret.put(FindBugsPluginConstants.FINDBUGS_CORE_PLUGIN_ID, new HashMap<String, Boolean>(settings.detectors));
 		}
-		for (final PluginSettings pluginSettings : plugins) {
+		for (final PluginSettings pluginSettings : settings.plugins) {
 			if (!pluginSettings.detectors.isEmpty()) {
 				ret.put(pluginSettings.id, new HashMap<String, Boolean>(pluginSettings.detectors));
 			}
@@ -201,12 +200,11 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 	}
 
 	static void fillSettings(
-			@NotNull final AbstractSettings settings,
-			@NotNull final Set<PluginSettings> plugins,
+			@NotNull final ProjectSettings settings,
 			@NotNull final Map<String, Map<String, Boolean>> detectors
 	) {
 		apply(detectors.get(FindBugsPluginConstants.FINDBUGS_CORE_PLUGIN_ID), settings.detectors);
-		for (final PluginSettings pluginSettings : plugins) {
+		for (final PluginSettings pluginSettings : settings.plugins) {
 			apply(detectors.get(pluginSettings.id), pluginSettings.detectors);
 		}
 	}

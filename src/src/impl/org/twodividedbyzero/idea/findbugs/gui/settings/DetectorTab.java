@@ -20,14 +20,13 @@ package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.treeStructure.treetable.TreeTableTree;
 import edu.umd.cs.findbugs.DetectorFactory;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.BorderFactory;
@@ -41,17 +40,15 @@ import java.awt.FlowLayout;
 /**
  * Some code here is based on {@link com.intellij.profile.codeInspection.ui.SingleInspectionProfilePanel}.
  */
-final class DetectorTab extends JPanel implements SettingsOwner<AbstractSettings>, Disposable {
-	private final Project project;
+final class DetectorTab extends JPanel implements Disposable {
 	private JLabel hintLabel;
 	private DetectorTableHeaderPane tableHeaderPane;
 	private DetectorTablePane tablePane;
 	private JBSplitter splitter;
 	private DetectorDetailsPane details;
 
-	DetectorTab(@NotNull final Project project) {
+	DetectorTab() {
 		super(new BorderLayout());
-		this.project = project;
 		setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 
 		final JPanel hintPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -92,7 +89,7 @@ final class DetectorTab extends JPanel implements SettingsOwner<AbstractSettings
 	@NotNull
 	DetectorTablePane getTablePane() {
 		if (tablePane == null) {
-			tablePane = new DetectorTablePane(project);
+			tablePane = new DetectorTablePane();
 			final TreeTableTree tree = tablePane.getTable().getTree();
 			tree.addTreeSelectionListener(new TreeSelectionListener() {
 				@Override
@@ -130,18 +127,15 @@ final class DetectorTab extends JPanel implements SettingsOwner<AbstractSettings
 		getDetails().setEnabled(enabled);
 	}
 
-	@Override
-	public boolean isModified(@NotNull final AbstractSettings settings) {
+	boolean isModified(@NotNull final ProjectSettings settings) {
 		return getTablePane().isModified(settings);
 	}
 
-	@Override
-	public void apply(@NotNull final AbstractSettings settings) throws ConfigurationException {
+	void apply(@NotNull final ProjectSettings settings) throws ConfigurationException {
 		getTablePane().apply(settings);
 	}
 
-	@Override
-	public void reset(@NotNull final AbstractSettings settings) {
+	void reset(@NotNull final ProjectSettings settings) {
 		getTablePane().reset(settings);
 	}
 

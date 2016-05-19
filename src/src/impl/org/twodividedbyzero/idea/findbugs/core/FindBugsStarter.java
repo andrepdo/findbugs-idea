@@ -195,7 +195,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 			userPrefs.setExcludeBugsFiles(new HashMap<String, Boolean>(settings.excludeBugsFiles));
 			userPrefs.setExcludeFilterFiles(new HashMap<String, Boolean>(settings.excludeFilterFiles));
 
-			configureDetectors(settings.detectors, detectorFactoryCollection, userPrefs);
+			configureDetectors(projectSettings.detectors, detectorFactoryCollection, userPrefs);
 			for (final PluginSettings pluginSettings : projectSettings.plugins) {
 				configureDetectors(pluginSettings.detectors, detectorFactoryCollection, userPrefs);
 			}

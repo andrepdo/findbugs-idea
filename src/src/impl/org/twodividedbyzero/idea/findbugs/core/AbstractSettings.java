@@ -100,25 +100,4 @@ public abstract class AbstractSettings {
 			valueAttributeName = "enabled"
 	)
 	public Map<String, Boolean> excludeBugsFiles = New.map();
-
-	/**
-	 * Note that the map only contains detectors from the core plugin and
-	 * only enabled state which are not equal to the default enable state
-	 * {@link edu.umd.cs.findbugs.DetectorFactory#isDefaultEnabled()}.
-	 * <p>
-	 * Key = {@link edu.umd.cs.findbugs.DetectorFactory#getShortName()}
-	 * (like {@link edu.umd.cs.findbugs.config.UserPreferences#detectorEnablementMap})
-	 * <p>
-	 * Value = Enabled state
-	 */
-	@Tag(value = "detectors")
-	@MapAnnotation(
-			surroundWithTag = false,
-			surroundValueWithTag = false,
-			surroundKeyWithTag = false,
-			entryTagName = "detector",
-			keyAttributeName = "name",
-			valueAttributeName = "enabled"
-	)
-	public Map<String, Boolean> detectors = New.map();
 }

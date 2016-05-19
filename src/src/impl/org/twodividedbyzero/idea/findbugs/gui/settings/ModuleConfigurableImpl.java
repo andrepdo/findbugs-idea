@@ -62,10 +62,16 @@ public final class ModuleConfigurableImpl implements Configurable {
 	@Override
 	public JComponent createComponent() {
 		if (pane == null) {
-			pane = new SettingsPane(module.getProject()) {
+			pane = new SettingsPane() {
 				@Nullable
 				@Override
 				GeneralTab createGeneralTab() {
+					return null;
+				}
+
+				@Nullable
+				@Override
+				DetectorTab createDetectorTab() {
 					return null;
 				}
 

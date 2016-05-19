@@ -23,7 +23,6 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.components.JBTabbedPane;
 import org.jetbrains.annotations.NotNull;
@@ -47,13 +46,13 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	private AnnotateTab annotateTab;
 	private ShareTab shareTab;
 
-	SettingsPane(@NotNull final Project project) {
+	SettingsPane() {
 		super(new BorderLayout());
 
 		generalTab = createGeneralTab();
 		reportTab = new ReportTab();
 		filterTab = new FilterTab();
-		detectorTab = new DetectorTab(project);
+		detectorTab = createDetectorTab();
 		annotateTab = createAnnotateTab();
 		shareTab = createShareTab();
 
@@ -73,7 +72,9 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		}
 		tabs.addTab(ResourcesLoader.getString("settings.report"), reportTab);
 		tabs.addTab(ResourcesLoader.getString("settings.filter"), filterTab);
-		tabs.addTab(ResourcesLoader.getString("settings.detector"), detectorTab);
+		if (detectorTab != null) {
+			tabs.addTab(ResourcesLoader.getString("settings.detector"), detectorTab);
+		}
 		if (annotateTab != null) {
 			tabs.addTab(ResourcesLoader.getString("settings.annotate"), annotateTab);
 		}
@@ -83,7 +84,9 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		//add(tabs.getComponent()); // see comment above
 		add(tabs);
 
-		detectorTab.getTablePane().getTable().setBugCategory(reportTab.getBugCategory());
+		if (detectorTab != null) {
+			detectorTab.getTablePane().getTable().setBugCategory(reportTab.getBugCategory());
+		}
 		if (generalTab != null) {
 			generalTab.getPluginTablePane().setDetectorTablePane(detectorTab.getTablePane());
 		}
@@ -101,6 +104,9 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	abstract GeneralTab createGeneralTab();
 
 	@Nullable
+	abstract DetectorTab createDetectorTab();
+
+	@Nullable
 	abstract AnnotateTab createAnnotateTab();
 
 	@Nullable
@@ -111,12 +117,12 @@ abstract class SettingsPane extends JPanel implements Disposable {
 
 	final boolean isModified(@NotNull final AbstractSettings settings) {
 		return reportTab.isModified(settings) ||
-				filterTab.isModified(settings) ||
-				detectorTab.isModified(settings);
+				filterTab.isModified(settings);
 	}
 
 	final boolean isModifiedProject(@NotNull final ProjectSettings settings) {
 		return generalTab.isModified(settings) ||
+				detectorTab.isModified(settings) ||
 				annotateTab.isModifiedProject(settings);
 	}
 
@@ -128,11 +134,11 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	final void apply(@NotNull final AbstractSettings settings) throws ConfigurationException {
 		reportTab.apply(settings);
 		filterTab.apply(settings);
-		detectorTab.apply(settings);
 	}
 
 	final void applyProject(@NotNull final ProjectSettings settings) throws ConfigurationException {
 		generalTab.apply(settings);
+		detectorTab.apply(settings);
 		annotateTab.applyProject(settings);
 	}
 
@@ -144,11 +150,11 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	final void reset(@NotNull final AbstractSettings settings) {
 		reportTab.reset(settings);
 		filterTab.reset(settings);
-		detectorTab.reset(settings);
 	}
 
 	final void resetProject(@NotNull final ProjectSettings settings) {
 		generalTab.reset(settings);
+		detectorTab.reset(settings);
 		annotateTab.resetProject(settings);
 	}
 
