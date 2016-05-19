@@ -25,6 +25,7 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.components.StoragePathMacros;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import com.intellij.util.xmlb.annotations.Tag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
@@ -38,38 +39,49 @@ public final class WorkspaceSettings implements PersistentStateComponent<Workspa
 	/**
 	 * Last used export directory for "Export Bug Collection".
 	 */
+	@Tag
 	public String exportBugCollectionDirectory;
 
 	/**
 	 * Last used setting for "Export Bug Collection".
 	 */
+	@Tag
 	public boolean exportBugCollectionAsXml = true;
 
 	/**
 	 * Last used setting for "Export Bug Collection".
 	 */
+	@Tag
 	public boolean exportBugCollectionAsHtml = true;
 
 	/**
 	 * Last used setting for "Export Bug Collection".
 	 */
+	@Tag
 	public boolean exportBugCollectionCreateSubDirectory = false;
 
 	/**
 	 * Last used setting for "Export Bug Collection".
 	 */
+	@Tag
 	public boolean openExportedHtmlBugCollectionInBrowser = true;
 
+	@Tag
 	public String importFilePath;
 
-	public boolean annotationTextRangeMarkup = true; // TODO UI
+	@Tag
+	public boolean annotationTextRangeMarkup = true;
 
+	@Tag
 	public boolean annotationGutterIcon = true;
 
+	@Tag
 	public boolean toolWindowScrollToSource = true;
 
+	@Tag
 	public boolean toolWindowEditorPreview = true;
 
+	@Tag
 	public String toolWindowGroupBy = GroupBy.BugCategory.name();
 
 	@Nullable

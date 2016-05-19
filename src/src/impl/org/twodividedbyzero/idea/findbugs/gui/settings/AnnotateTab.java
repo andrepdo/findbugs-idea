@@ -29,23 +29,31 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.ui.EditorTextFieldWithBrowseButton;
+import com.intellij.ui.components.JBCheckBox;
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
+import org.twodividedbyzero.idea.findbugs.gui.common.HAlignment;
+import org.twodividedbyzero.idea.findbugs.gui.common.VAlignment;
+import org.twodividedbyzero.idea.findbugs.gui.common.VerticalFlowLayout;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import java.awt.BorderLayout;
 
-final class AnnotateTab extends JPanel implements SettingsOwner<ProjectSettings> {
+final class AnnotateTab extends JPanel {
 
 	private final Project project;
 	private LabeledComponent<EditorTextFieldWithBrowseButton> annotationClassField;
+	private JBCheckBox gutterIconCheckbox;
+	private JBCheckBox textRangeMarkupCheckbox;
 
 	AnnotateTab(@NotNull final Project project) {
-		super(new BorderLayout());
+		super(new VerticalFlowLayout(HAlignment.Left, VAlignment.Top, 0, UIUtil.DEFAULT_HGAP, true, false));
+		setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 		this.project = project;
-
 
 		final EditorTextFieldWithBrowseButton field = new EditorTextFieldWithBrowseButton(project, true, new JavaCodeFragment.VisibilityChecker() {
 			@Override
@@ -64,32 +72,55 @@ final class AnnotateTab extends JPanel implements SettingsOwner<ProjectSettings>
 		annotationClassField.setComponent(field);
 		//noinspection unchecked
 		new Suppress(project, ResourcesLoader.getString("annotate.suppressClass.text")).setField(annotationClassField.getComponent());
-		add(annotationClassField, BorderLayout.NORTH);
+		add(annotationClassField);
+
+		gutterIconCheckbox = new JBCheckBox(ResourcesLoader.getString("annotate.gutterIcon.text"));
+		add(gutterIconCheckbox);
+
+		textRangeMarkupCheckbox = new JBCheckBox(ResourcesLoader.getString("annotate.textRange.text"));
+		add(textRangeMarkupCheckbox);
 	}
 
 	@Override
 	public void setEnabled(final boolean enabled) {
 		super.setEnabled(enabled);
 		annotationClassField.setEnabled(enabled);
+		gutterIconCheckbox.setEnabled(enabled);
+		textRangeMarkupCheckbox.setEnabled(enabled);
 	}
 
-	@Override
-	public boolean isModified(@NotNull final ProjectSettings settings) {
+	boolean isModifiedProject(@NotNull final ProjectSettings settings) {
 		return !StringUtil.equals(settings.suppressWarningsClassName, annotationClassField.getComponent().getText());
 	}
 
-	@Override
-	public void apply(@NotNull final ProjectSettings settings) throws ConfigurationException {
-		final String suppressWarningsClassName = annotationClassField.getComponent().getText();
-		if (IdeaUtilImpl.findJavaPsiClass(project, suppressWarningsClassName) == null) {
-			throw new ConfigurationException(ResourcesLoader.getString("annotate.suppressClass.error", suppressWarningsClassName));
-		}
-		settings.suppressWarningsClassName = suppressWarningsClassName;
+	boolean isModifiedWorkspace(@NotNull final WorkspaceSettings settings) {
+		return settings.annotationGutterIcon != gutterIconCheckbox.isSelected() ||
+				settings.annotationTextRangeMarkup != textRangeMarkupCheckbox.isSelected();
 	}
 
-	@Override
-	public void reset(@NotNull final ProjectSettings settings) {
+	@SuppressWarnings("UnnecessaryLocalVariable")
+	void applyProject(@NotNull final ProjectSettings settings) throws ConfigurationException {
+		final String suppressWarningsClassName = annotationClassField.getComponent().getText();
+		settings.suppressWarningsClassName = suppressWarningsClassName;
+		// Do not throw any configuration exception at the moment because it
+		// is impossible to save settings otherwise.
+		//if (IdeaUtilImpl.findJavaPsiClass(project, suppressWarningsClassName) == null) {
+		//	throw new RuntimeConfigurationWarning(ResourcesLoader.getString("annotate.suppressClass.error", suppressWarningsClassName));
+		//}
+	}
+
+	void applyWorkspace(@NotNull final WorkspaceSettings settings) throws ConfigurationException {
+		settings.annotationGutterIcon = gutterIconCheckbox.isSelected();
+		settings.annotationTextRangeMarkup = textRangeMarkupCheckbox.isSelected();
+	}
+
+	void resetProject(@NotNull final ProjectSettings settings) {
 		annotationClassField.getComponent().setText(settings.suppressWarningsClassName);
+	}
+
+	void resetWorkspace(@NotNull final WorkspaceSettings settings) {
+		gutterIconCheckbox.setSelected(settings.annotationGutterIcon);
+		textRangeMarkupCheckbox.setSelected(settings.annotationTextRangeMarkup);
 	}
 
 	@NotNull
@@ -100,7 +131,9 @@ final class AnnotateTab extends JPanel implements SettingsOwner<ProjectSettings>
 	@NotNull
 	static String[] getSearchResourceKey() {
 		return new String[]{
-				"annotate.suppressClass.text"
+				"annotate.suppressClass.text",
+				"annotate.gutterIcon.text",
+				"annotate.textRange.text"
 		};
 	}
 

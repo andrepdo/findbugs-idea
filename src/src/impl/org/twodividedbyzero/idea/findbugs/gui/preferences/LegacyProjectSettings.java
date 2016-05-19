@@ -82,72 +82,31 @@ public final class LegacyProjectSettings implements PersistentStateComponent<Per
 	}
 
 	private void applyBasePreferencesTo(@NotNull final ProjectSettings settings, @NotNull final WorkspaceSettings workspaceSettings) {
-		final Map<String, String> basePreferences = state.getBasePreferences();
-		if (basePreferences == null || basePreferences.isEmpty()) {
+		final Map<String, String> p = state.getBasePreferences();
+		if (p == null || p.isEmpty()) {
 			return;
 		}
-		final String compileBeforeAnalyze = state.getBasePreferences().get(FindBugsPreferences.COMPILE_BEFORE_ANALYZE);
-		if (!StringUtil.isEmptyOrSpaces(compileBeforeAnalyze)) {
-			settings.compileBeforeAnalyze = Boolean.valueOf(compileBeforeAnalyze);
-		}
-		final String analyzeAfterCompile = state.getBasePreferences().get(FindBugsPreferences.ANALYZE_AFTER_COMPILE);
-		if (!StringUtil.isEmptyOrSpaces(analyzeAfterCompile)) {
-			settings.analyzeAfterCompile = Boolean.valueOf(analyzeAfterCompile);
-		}
-		final String analyzeAfterAutoMake = state.getBasePreferences().get(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE);
-		if (!StringUtil.isEmptyOrSpaces(analyzeAfterAutoMake)) {
-			settings.analyzeAfterAutoMake = Boolean.valueOf(analyzeAfterAutoMake);
-		}
-		final String runInBackground = state.getBasePreferences().get(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND);
-		if (!StringUtil.isEmptyOrSpaces(runInBackground)) {
-			settings.runInBackground = Boolean.valueOf(runInBackground);
-		}
-		final String toolWindowToFront = state.getBasePreferences().get(FindBugsPreferences.TOOLWINDOW_TO_FRONT);
-		if (!StringUtil.isEmptyOrSpaces(toolWindowToFront)) {
-			settings.toolWindowToFront = Boolean.valueOf(toolWindowToFront);
-		}
-		final String analysisEffort = state.getBasePreferences().get(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL);
-		if (!StringUtil.isEmptyOrSpaces(analysisEffort)) {
-			settings.analysisEffort = analysisEffort;
-		}
-		final String minPriority = state.getBasePreferences().get(FindBugsPreferences.MIN_PRIORITY_TO_REPORT);
-		if (!StringUtil.isEmptyOrSpaces(minPriority)) {
-			settings.minPriority = minPriority;
-		}
+		settings.compileBeforeAnalyze = asBoolean(p.get(FindBugsPreferences.COMPILE_BEFORE_ANALYZE), settings.compileBeforeAnalyze);
+		settings.analyzeAfterCompile = asBoolean(p.get(FindBugsPreferences.ANALYZE_AFTER_COMPILE), settings.analyzeAfterCompile);
+		settings.analyzeAfterAutoMake = asBoolean(p.get(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE), settings.analyzeAfterAutoMake);
+		settings.runInBackground = asBoolean(p.get(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND), settings.runInBackground);
+		settings.toolWindowToFront = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_TO_FRONT), settings.toolWindowToFront);
+		settings.analysisEffort = asString(p.get(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL), settings.analysisEffort);
+		settings.minPriority = asString(p.get(FindBugsPreferences.MIN_PRIORITY_TO_REPORT), settings.minPriority);
 
-		final String exportBaseDir = state.getBasePreferences().get(FindBugsPreferences.EXPORT_BASE_DIR);
-		if (!StringUtil.isEmptyOrSpaces(exportBaseDir)) {
-			workspaceSettings.exportBugCollectionDirectory = exportBaseDir;
-		}
-		final String exportAsHtml = state.getBasePreferences().get(FindBugsPreferences.EXPORT_AS_HTML);
-		if (!StringUtil.isEmptyOrSpaces(exportAsHtml)) {
-			workspaceSettings.exportBugCollectionAsHtml = Boolean.valueOf(exportAsHtml);
-		}
-		final String exportAsXml = state.getBasePreferences().get(FindBugsPreferences.EXPORT_AS_XML);
-		if (!StringUtil.isEmptyOrSpaces(exportAsXml)) {
-			workspaceSettings.exportBugCollectionAsXml = Boolean.valueOf(exportAsXml);
-		}
-		final String exportCreateArchiveDir = state.getBasePreferences().get(FindBugsPreferences.EXPORT_CREATE_ARCHIVE_DIR);
-		if (!StringUtil.isEmptyOrSpaces(exportCreateArchiveDir)) {
-			workspaceSettings.exportBugCollectionCreateSubDirectory = Boolean.valueOf(exportCreateArchiveDir);
-		}
-		final String exportOpenBrowser = state.getBasePreferences().get(FindBugsPreferences.EXPORT_OPEN_BROWSER);
-		if (!StringUtil.isEmptyOrSpaces(exportOpenBrowser)) {
-			workspaceSettings.openExportedHtmlBugCollectionInBrowser = Boolean.valueOf(exportOpenBrowser);
-		}
+		workspaceSettings.exportBugCollectionDirectory = asString(p.get(FindBugsPreferences.EXPORT_BASE_DIR), workspaceSettings.exportBugCollectionDirectory);
+		workspaceSettings.exportBugCollectionAsHtml = asBoolean(p.get(FindBugsPreferences.EXPORT_AS_HTML), workspaceSettings.exportBugCollectionAsHtml);
+		workspaceSettings.exportBugCollectionAsXml = asBoolean(p.get(FindBugsPreferences.EXPORT_AS_XML), workspaceSettings.exportBugCollectionAsXml);
+		workspaceSettings.exportBugCollectionCreateSubDirectory = asBoolean(p.get(FindBugsPreferences.EXPORT_CREATE_ARCHIVE_DIR), workspaceSettings.exportBugCollectionCreateSubDirectory);
+		workspaceSettings.openExportedHtmlBugCollectionInBrowser = asBoolean(p.get(FindBugsPreferences.EXPORT_OPEN_BROWSER), workspaceSettings.openExportedHtmlBugCollectionInBrowser);
 
-		final String toolwindowScrollToSource = state.getBasePreferences().get(FindBugsPreferences.TOOLWINDOW_SCROLL_TO_SOURCE);
-		if (!StringUtil.isEmptyOrSpaces(toolwindowScrollToSource)) {
-			workspaceSettings.toolWindowScrollToSource = Boolean.valueOf(toolwindowScrollToSource);
-		}
-		final String toolwindowEditorPreview = state.getBasePreferences().get(FindBugsPreferences.TOOLWINDOW_EDITOR_PREVIEW);
-		if (!StringUtil.isEmptyOrSpaces(toolwindowEditorPreview)) {
-			workspaceSettings.toolWindowEditorPreview = Boolean.valueOf(toolwindowEditorPreview);
-		}
-		final String toolwindowGroupBy = state.getBasePreferences().get(FindBugsPreferences.TOOLWINDOW_GROUP_BY);
-		if (!StringUtil.isEmptyOrSpaces(toolwindowGroupBy)) {
-			workspaceSettings.toolWindowGroupBy = toolwindowGroupBy;
-		}
+		workspaceSettings.toolWindowScrollToSource = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_SCROLL_TO_SOURCE), workspaceSettings.toolWindowScrollToSource);
+		workspaceSettings.toolWindowEditorPreview = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_EDITOR_PREVIEW), workspaceSettings.toolWindowEditorPreview);
+		workspaceSettings.toolWindowGroupBy = asString(p.get(FindBugsPreferences.TOOLWINDOW_GROUP_BY), workspaceSettings.toolWindowGroupBy);
+
+		settings.suppressWarningsClassName = asString(p.get(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS), settings.suppressWarningsClassName);
+		workspaceSettings.annotationGutterIcon = asBoolean(p.get(FindBugsPreferences.ANNOTATION_GUTTER_ICON_ENABLED), workspaceSettings.annotationGutterIcon);
+		workspaceSettings.annotationTextRangeMarkup = asBoolean(p.get(FindBugsPreferences.ANNOTATION_TEXT_RAGE_MARKUP_ENABLED), workspaceSettings.annotationTextRangeMarkup);
 	}
 
 	private void applyBugCategoriesTo(@NotNull final ProjectSettings settings) {
@@ -272,6 +231,24 @@ public final class LegacyProjectSettings implements PersistentStateComponent<Per
 				}
 			}
 		}
+	}
+
+	@SuppressWarnings("SimplifiableIfStatement")
+	private static boolean asBoolean(@Nullable final String value, final boolean defaultValue) {
+		if ("true".equalsIgnoreCase(value)) {
+			return true;
+		}
+		if ("false".equalsIgnoreCase(value)) {
+			return false;
+		}
+		return defaultValue;
+	}
+
+	private static String asString(@Nullable final String value, final String defaultValue) {
+		if (StringUtil.isEmptyOrSpaces(value)) {
+			return defaultValue;
+		}
+		return value;
 	}
 
 	private static class LegacyPluginLoaderImpl extends AbstractPluginLoaderLegacy {
