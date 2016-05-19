@@ -27,7 +27,6 @@ import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 
@@ -70,35 +69,11 @@ public final class ProjectConfigurableImpl implements SearchableConfigurable, Co
 	@Override
 	public JComponent createComponent() {
 		if (pane == null) {
-			pane = new SettingsPane() {
+			pane = new ProjectSettingsPane() {
 				@NotNull
 				@Override
-				GeneralTab createGeneralTab() {
-					return new GeneralTab();
-				}
-
-				@Nullable
-				@Override
-				DetectorTab createDetectorTab() {
-					return new DetectorTab();
-				}
-
-				@Nullable
-				@Override
-				AnnotateTab createAnnotateTab() {
-					return new AnnotateTab(project);
-				}
-
-				@Nullable
-				@Override
-				ShareTab createShareTab() {
-					return new ShareTab();
-				}
-
-				@NotNull
-				@Override
-				AbstractSettings createSettings() {
-					return new ProjectSettings();
+				Project getProject() {
+					return project;
 				}
 			};
 		}

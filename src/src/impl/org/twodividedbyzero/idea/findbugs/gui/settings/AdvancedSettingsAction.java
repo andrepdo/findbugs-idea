@@ -45,7 +45,6 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.ErrorUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.IoUtil;
-import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
@@ -147,9 +146,10 @@ final class AdvancedSettingsAction extends DefaultActionGroup {
 				return;
 			}
 
-			final AbstractSettings settings = settingsPane.createSettings();
+			final ProjectSettings settings = new ProjectSettings();
 			try {
 				settingsPane.apply(settings);
+				settingsPane.applyProject(settings);
 			} catch (final ConfigurationException ex) {
 				Messages.showErrorDialog(settingsPane, ex.getMessage(), StringUtil.capitalizeWords(ResourcesLoader.getString("settings.invalid.title"), true));
 			}

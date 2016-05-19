@@ -19,9 +19,6 @@
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionPlaces;
-import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.components.JBTabbedPane;
@@ -32,10 +29,9 @@ import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
-import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 
 abstract class SettingsPane extends JPanel implements Disposable {
 
@@ -56,10 +52,7 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		annotateTab = createAnnotateTab();
 		shareTab = createShareTab();
 
-		final JPanel topPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		topPane.add(createToolbar().getComponent());
-		topPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-		add(topPane, BorderLayout.NORTH);
+		add(createHeaderPane(), BorderLayout.NORTH);
 
 		/**
 		 * LATER: Switch to TabbedPaneWrapper after
@@ -93,12 +86,7 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	}
 
 	@NotNull
-	private ActionToolbar createToolbar() {
-		final AdvancedSettingsAction actions = new AdvancedSettingsAction(this);
-		final ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, true);
-		actionToolbar.setTargetComponent(this);
-		return actionToolbar;
-	}
+	abstract JComponent createHeaderPane();
 
 	@Nullable
 	abstract GeneralTab createGeneralTab();
@@ -111,9 +99,6 @@ abstract class SettingsPane extends JPanel implements Disposable {
 
 	@Nullable
 	abstract ShareTab createShareTab();
-
-	@NotNull
-	abstract AbstractSettings createSettings();
 
 	final boolean isModified(@NotNull final AbstractSettings settings) {
 		return reportTab.isModified(settings) ||

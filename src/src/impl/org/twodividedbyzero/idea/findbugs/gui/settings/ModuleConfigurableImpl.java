@@ -25,13 +25,11 @@ import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.ModuleSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JComponent;
 
-// TODO
 public final class ModuleConfigurableImpl implements Configurable {
 
 	@NotNull
@@ -63,37 +61,7 @@ public final class ModuleConfigurableImpl implements Configurable {
 	@Override
 	public JComponent createComponent() {
 		if (pane == null) {
-			pane = new SettingsPane() {
-				@Nullable
-				@Override
-				GeneralTab createGeneralTab() {
-					return null;
-				}
-
-				@Nullable
-				@Override
-				DetectorTab createDetectorTab() {
-					return null;
-				}
-
-				@Nullable
-				@Override
-				AnnotateTab createAnnotateTab() {
-					return null;
-				}
-
-				@Nullable
-				@Override
-				ShareTab createShareTab() {
-					return null;
-				}
-
-				@NotNull
-				@Override
-				AbstractSettings createSettings() {
-					return new ModuleSettings();
-				}
-			};
+			pane = new ModuleSettingsPane();
 		}
 		return pane;
 	}
