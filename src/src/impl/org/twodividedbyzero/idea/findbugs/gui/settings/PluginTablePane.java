@@ -86,9 +86,6 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 					}
 				}
 		);
-		// TODO
-		//table.setCellSelectionEnabled(false);
-		//table.setRowSelectionAllowed(false);
 		table.getColumnModel().getColumn(Model.NAME_COLUMN).setCellRenderer(new TableCellRenderer() {
 			private PluginPane pane;
 			private PluginErrorPane errorPane;

@@ -23,6 +23,7 @@ import com.intellij.ui.components.JBCheckBox;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.HAlignment;
 import org.twodividedbyzero.idea.findbugs.gui.common.VAlignment;
 import org.twodividedbyzero.idea.findbugs.gui.common.VerticalFlowLayout;
@@ -32,7 +33,7 @@ import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 
-final class GeneralTab extends JPanel implements SettingsOwner<ProjectSettings> {
+final class GeneralTab extends JPanel {
 	private JBCheckBox compileBeforeAnalyze;
 	private JBCheckBox analyzeAfterCompile;
 	private JBCheckBox analyzeAfterAutoMake;
@@ -71,34 +72,40 @@ final class GeneralTab extends JPanel implements SettingsOwner<ProjectSettings> 
 		plugin.setEnabled(enabled);
 	}
 
-	@Override
-	public boolean isModified(@NotNull final ProjectSettings settings) {
+	boolean isModifiedProject(@NotNull final ProjectSettings settings) {
+		return plugin.isModified(settings);
+	}
+
+	boolean isModifiedWorkspace(@NotNull final WorkspaceSettings settings) {
 		return compileBeforeAnalyze.isSelected() != settings.compileBeforeAnalyze ||
 				analyzeAfterCompile.isSelected() != settings.analyzeAfterCompile ||
 				analyzeAfterAutoMake.isSelected() != settings.analyzeAfterAutoMake ||
 				runInBackground.isSelected() != settings.runInBackground ||
-				toolWindowToFront.isSelected() != settings.toolWindowToFront ||
-				plugin.isModified(settings);
+				toolWindowToFront.isSelected() != settings.toolWindowToFront;
 	}
 
-	@Override
-	public void apply(@NotNull final ProjectSettings settings) throws ConfigurationException {
+	void applyProject(@NotNull final ProjectSettings settings) throws ConfigurationException {
+		plugin.apply(settings);
+	}
+
+	void applyWorkspace(@NotNull final WorkspaceSettings settings) throws ConfigurationException {
 		settings.compileBeforeAnalyze = compileBeforeAnalyze.isSelected();
 		settings.analyzeAfterCompile = analyzeAfterCompile.isSelected();
 		settings.analyzeAfterAutoMake = analyzeAfterAutoMake.isSelected();
 		settings.runInBackground = runInBackground.isSelected();
 		settings.toolWindowToFront = toolWindowToFront.isSelected();
-		plugin.apply(settings);
 	}
 
-	@Override
-	public void reset(@NotNull final ProjectSettings settings) {
+	void resetProject(@NotNull final ProjectSettings settings) {
+		plugin.reset(settings);
+	}
+
+	void resetWorkspace(@NotNull final WorkspaceSettings settings) {
 		compileBeforeAnalyze.setSelected(settings.compileBeforeAnalyze);
 		analyzeAfterCompile.setSelected(settings.analyzeAfterCompile);
 		analyzeAfterAutoMake.setSelected(settings.analyzeAfterAutoMake);
 		runInBackground.setSelected(settings.runInBackground);
 		toolWindowToFront.setSelected(settings.toolWindowToFront);
-		plugin.reset(settings);
 	}
 
 	@NotNull

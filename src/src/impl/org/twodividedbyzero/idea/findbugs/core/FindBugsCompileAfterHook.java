@@ -190,9 +190,9 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		if (null == project) { // project reload, eg: open IDEA project with unknown JRE and fix it
 			return;
 		}
-		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
 
-		if (!projectSettings.analyzeAfterCompile) {
+		final WorkspaceSettings workspaceSettings = WorkspaceSettings.getInstance(project);
+		if (!workspaceSettings.analyzeAfterCompile) {
 			return;
 		}
 
@@ -205,7 +205,15 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 			auxFiles.addAll(Arrays.asList(files));
 		}
 
-		new FindBugsStarter(project, null, "Running FindBugs analysis for affected files...", projectSettings, projectSettings, true) {
+		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
+		new FindBugsStarter(
+				project,
+				null,
+				"Running FindBugs analysis for affected files...",
+				projectSettings,
+				projectSettings,
+				true
+		) {
 			@Override
 			protected boolean isCompileBeforeAnalyze() {
 				return false;
@@ -250,8 +258,8 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 	}
 
 	private static boolean isAfterAutoMakeEnabled(@NotNull final Project project) {
-		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
-		return projectSettings.analyzeAfterAutoMake;
+		final WorkspaceSettings settings = WorkspaceSettings.getInstance(project);
+		return settings.analyzeAfterAutoMake;
 	}
 
 	private static void initWorkerForAutoMake(@NotNull final Project project, @NotNull final Collection<VirtualFile> changed) {

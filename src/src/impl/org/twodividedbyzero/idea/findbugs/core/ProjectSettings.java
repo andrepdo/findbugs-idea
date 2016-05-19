@@ -39,24 +39,9 @@ import java.util.Set;
 
 @State(
 		name = "FindBugs-IDEA",
-		storages = @Storage(value = "findbugs-65.xml", roamingType = RoamingType.DEFAULT) // TODO kick -XX number
+		storages = @Storage(value = "findbugs-66.xml", roamingType = RoamingType.DEFAULT) // TODO kick -XX number
 )
 public final class ProjectSettings extends AbstractSettings implements PersistentStateComponent<ProjectSettings> {
-
-	@Tag
-	public boolean compileBeforeAnalyze = true;
-
-	@Tag
-	public boolean analyzeAfterCompile = false;
-
-	@Tag
-	public boolean analyzeAfterAutoMake = false;
-
-	@Tag
-	public boolean runInBackground = false;
-
-	@Tag
-	public boolean toolWindowToFront = true;
 
 	@Tag
 	public String suppressWarningsClassName = "edu.umd.cs.findbugs.annotations.SuppressFBWarnings";

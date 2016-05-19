@@ -86,11 +86,11 @@ public final class LegacyProjectSettings implements PersistentStateComponent<Per
 		if (p == null || p.isEmpty()) {
 			return;
 		}
-		settings.compileBeforeAnalyze = asBoolean(p.get(FindBugsPreferences.COMPILE_BEFORE_ANALYZE), settings.compileBeforeAnalyze);
-		settings.analyzeAfterCompile = asBoolean(p.get(FindBugsPreferences.ANALYZE_AFTER_COMPILE), settings.analyzeAfterCompile);
-		settings.analyzeAfterAutoMake = asBoolean(p.get(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE), settings.analyzeAfterAutoMake);
-		settings.runInBackground = asBoolean(p.get(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND), settings.runInBackground);
-		settings.toolWindowToFront = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_TO_FRONT), settings.toolWindowToFront);
+		workspaceSettings.compileBeforeAnalyze = asBoolean(p.get(FindBugsPreferences.COMPILE_BEFORE_ANALYZE), workspaceSettings.compileBeforeAnalyze);
+		workspaceSettings.analyzeAfterCompile = asBoolean(p.get(FindBugsPreferences.ANALYZE_AFTER_COMPILE), workspaceSettings.analyzeAfterCompile);
+		workspaceSettings.analyzeAfterAutoMake = asBoolean(p.get(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE), workspaceSettings.analyzeAfterAutoMake);
+		workspaceSettings.runInBackground = asBoolean(p.get(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND), workspaceSettings.runInBackground);
+
 		settings.analysisEffort = asString(p.get(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL), settings.analysisEffort);
 		settings.minPriority = asString(p.get(FindBugsPreferences.MIN_PRIORITY_TO_REPORT), settings.minPriority);
 
@@ -100,6 +100,7 @@ public final class LegacyProjectSettings implements PersistentStateComponent<Per
 		workspaceSettings.exportBugCollectionCreateSubDirectory = asBoolean(p.get(FindBugsPreferences.EXPORT_CREATE_ARCHIVE_DIR), workspaceSettings.exportBugCollectionCreateSubDirectory);
 		workspaceSettings.openExportedHtmlBugCollectionInBrowser = asBoolean(p.get(FindBugsPreferences.EXPORT_OPEN_BROWSER), workspaceSettings.openExportedHtmlBugCollectionInBrowser);
 
+		workspaceSettings.toolWindowToFront = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_TO_FRONT), workspaceSettings.toolWindowToFront);
 		workspaceSettings.toolWindowScrollToSource = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_SCROLL_TO_SOURCE), workspaceSettings.toolWindowScrollToSource);
 		workspaceSettings.toolWindowEditorPreview = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_EDITOR_PREVIEW), workspaceSettings.toolWindowEditorPreview);
 		workspaceSettings.toolWindowGroupBy = asString(p.get(FindBugsPreferences.TOOLWINDOW_GROUP_BY), workspaceSettings.toolWindowGroupBy);

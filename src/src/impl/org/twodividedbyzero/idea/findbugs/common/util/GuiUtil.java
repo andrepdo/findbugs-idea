@@ -58,13 +58,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @since 0.0.1
- */
 public final class GuiUtil {
 
 	private static final String DESKTOP_PROPERTY_AWT_FONT_DESKTOP_HINTS = "awt.font.desktophints";
@@ -269,7 +262,7 @@ public final class GuiUtil {
 		ret.setIntercellSpacing(new Dimension(0, 0));
 		ret.setTableHeader(null);
 		ret.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-		ret.setColumnSelectionAllowed(false);
+		ret.setCellSelectionEnabled(false);
 		final TableColumnModel columnModel = ret.getColumnModel();
 		final TableColumn column = columnModel.getColumn(checkboxColumn);
 		TableUtil.setupCheckboxColumn(column);

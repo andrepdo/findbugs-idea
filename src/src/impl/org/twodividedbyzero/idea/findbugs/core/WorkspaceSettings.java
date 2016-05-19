@@ -36,6 +36,18 @@ import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
 )
 public final class WorkspaceSettings implements PersistentStateComponent<WorkspaceSettings> {
 
+	@Tag
+	public boolean compileBeforeAnalyze = true;
+
+	@Tag
+	public boolean analyzeAfterCompile = false;
+
+	@Tag
+	public boolean analyzeAfterAutoMake = false;
+
+	@Tag
+	public boolean runInBackground = false;
+
 	/**
 	 * Last used export directory for "Export Bug Collection".
 	 */
@@ -74,6 +86,9 @@ public final class WorkspaceSettings implements PersistentStateComponent<Workspa
 
 	@Tag
 	public boolean annotationGutterIcon = true;
+
+	@Tag
+	public boolean toolWindowToFront = true;
 
 	@Tag
 	public boolean toolWindowScrollToSource = true;

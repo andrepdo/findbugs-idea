@@ -75,6 +75,9 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 	private final ProjectSettings projectSettings;
 
 	@NotNull
+	private final WorkspaceSettings workspaceSettings;
+
+	@NotNull
 	private final AbstractSettings settings;
 
 	private final boolean _startInBackground;
@@ -103,20 +106,21 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		_project = project;
 		_title = title;
 		this.projectSettings = projectSettings;
+		this.workspaceSettings = WorkspaceSettings.getInstance(project);
 		this.settings = settings;
-		_startInBackground = projectSettings.runInBackground || forceStartInBackground;
+		_startInBackground = workspaceSettings.runInBackground || forceStartInBackground;
 		_cancellingByUser = new AtomicBoolean();
 		MessageBusManager.subscribe(project, this, AnalysisAbortingListener.TOPIC, this);
 	}
 
 	protected boolean isCompileBeforeAnalyze() {
-		return projectSettings.compileBeforeAnalyze;
+		return workspaceSettings.compileBeforeAnalyze;
 	}
 
 	public final void start() {
 		EventDispatchThreadHelper.checkEDT();
 		if (isCompileBeforeAnalyze()) {
-			final boolean isAnalyzeAfterCompile = projectSettings.analyzeAfterCompile;
+			final boolean isAnalyzeAfterCompile = workspaceSettings.analyzeAfterCompile;
 			final CompilerManager compilerManager = CompilerManager.getInstance(_project);
 			createCompileScope(compilerManager, new Consumer<CompileScope>() {
 				@Override
@@ -143,7 +147,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		MessageBusManager.publishAnalysisStarted(_project);
 
 		final ToolWindow toolWindow = ToolWindowManager.getInstance(_project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
-		if (projectSettings.toolWindowToFront) {
+		if (workspaceSettings.toolWindowToFront) {
 			IdeaUtilImpl.activateToolWindow(toolWindow);
 		} else {
 			// Important: Make sure the tool window is initialized.
