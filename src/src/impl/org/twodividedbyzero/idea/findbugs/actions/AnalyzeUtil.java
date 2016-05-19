@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.actions;
 
 import com.intellij.analysis.AnalysisScope;
@@ -46,16 +45,11 @@ import java.io.FileInputStream;
 import java.lang.reflect.Field;
 import java.util.List;
 
-/**
- * @author Reto Merz<reto.merz@gmail.com>
- * @version $Revision$
- * @since 0.9.99
- */
 final class AnalyzeUtil {
 
 	static final DataKey<AnalysisScope> KEY;
 	private static final Logger LOGGER = Logger.getInstance(AnalyzeUtil.class);
-	private static final NotificationGroup NOTIFICATION_GROUP_ERROR = new NotificationGroup( "FindBugs: Analyze Error", NotificationDisplayType.STICKY_BALLOON, true );
+	private static final NotificationGroup NOTIFICATION_GROUP_ERROR = new NotificationGroup("FindBugs: Analyze Error", NotificationDisplayType.STICKY_BALLOON, true);
 	private static final String A_HREF_OPEN_IMPORT_SETTINGS = "#openImportSettings";
 
 	static {
@@ -144,7 +138,7 @@ final class AnalyzeUtil {
 
 		final PersistencePreferencesBean prefs;
 		if (SonarProfileImporter.isValid(document)) {
-			prefs = SonarProfileImporter.doImport(plugin.getProject(), document);
+			prefs = SonarProfileImporter.doImportLegacy(plugin.getProject(), document);
 			if (prefs == null) {
 				return;
 			}

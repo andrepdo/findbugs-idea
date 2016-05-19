@@ -592,7 +592,7 @@ public final class ConfigurationPanel extends JPanel {
 		try {
 			final Document document = JDOMUtil.loadDocument(files[0].getInputStream());
 			if (SonarProfileImporter.isValid(document)) {
-				prefs = SonarProfileImporter.doImport(getProject(), document);
+				prefs = SonarProfileImporter.doImportLegacy(getProject(), document);
 				if (prefs == null) {
 					return;
 				}

@@ -262,7 +262,7 @@ public final class GuiUtil {
 		ret.setIntercellSpacing(new Dimension(0, 0));
 		ret.setTableHeader(null);
 		ret.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-		ret.setCellSelectionEnabled(false);
+		ret.setColumnSelectionAllowed(false);
 		final TableColumnModel columnModel = ret.getColumnModel();
 		final TableColumn column = columnModel.getColumn(checkboxColumn);
 		TableUtil.setupCheckboxColumn(column);

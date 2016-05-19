@@ -112,8 +112,23 @@ final class AdvancedSettingsAction extends DefaultActionGroup {
 				try {
 					final InputStream in = file.getInputStream();
 					try {
-						final Element root = JDOMUtil.load(in);
-						System.out.println(); // TODO
+
+						final ProjectSettings settings = new ProjectSettings();
+						settingsPane.apply(settings);
+						settingsPane.applyProject(settings);
+
+						final boolean success = new SettingsImporter(project) {
+							@Override
+							public void handleError(@NotNull final String title, @NotNull final String message) {
+								Messages.showErrorDialog(message, title);
+							}
+						}.doImport(in, settings);
+
+						if (success) {
+							settingsPane.reset(settings);
+							settingsPane.resetProject(settings);
+						}
+
 					} finally {
 						IoUtil.safeClose(in);
 					}
