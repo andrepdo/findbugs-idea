@@ -35,7 +35,6 @@ import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.intentions.GroupBugIntentionListPopupStep;
@@ -157,10 +156,10 @@ public final class BugsLineMarkerProvider implements LineMarkerProvider {
 
 		@Override
 		public void navigate(final MouseEvent e, final PsiElement psiElement) {
-			final FindBugsPlugin plugin = IdeaUtilImpl.getPluginComponent(psiElement.getProject());
+			final ToolWindowPanel toolWindowPanel = ToolWindowPanel.getInstance(psiElement.getProject());
 			for (final ExtendedProblemDescriptor descriptor : _descriptors) {
 				if (descriptor.getPsiElement() == psiElement) {
-					plugin.getToolWindowPanel().getBugTreePanel().getBugTree().gotoNode(descriptor.getBugInstance());
+					toolWindowPanel.getBugTreePanel().getBugTree().gotoNode(descriptor.getBugInstance());
 					break;
 				}
 			}

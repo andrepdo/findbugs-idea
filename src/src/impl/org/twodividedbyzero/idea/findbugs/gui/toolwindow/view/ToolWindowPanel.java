@@ -26,6 +26,7 @@ import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
@@ -35,6 +36,7 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.StatusBarWidget;
 import com.intellij.openapi.wm.ToolWindow;
@@ -78,15 +80,9 @@ import java.awt.event.ComponentListener;
 import java.util.List;
 import java.util.Map;
 
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @since 0.0.1
- */
 @SuppressWarnings({"HardCodedStringLiteral", "AnonymousInnerClass", "AnonymousInnerClassMayBeStatic"})
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SE_BAD_FIELD"})
-public final class ToolWindowPanel extends JPanel implements AnalysisStateListener {
+public final class ToolWindowPanel extends JPanel implements AnalysisStateListener, Disposable {
 
 	private static final String NOTIFICATION_GROUP_ID_ANALYSIS_FINISHED = "FindBugs: Analysis Finished";
 	private static final NotificationGroup NOTIFICATION_GROUP_ANALYSIS_FINISHED = NotificationGroup.toolWindowGroup(
@@ -410,6 +406,14 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		_bugTreePanel.updateRootNode(null);
 	}
 
+	@Override
+	public void dispose() {
+		if (_bugTreePanel != null) {
+			Disposer.dispose(_bugTreePanel);
+			_bugTreePanel = null;
+		}
+	}
+
 	@Nullable
 	public static ToolWindowPanel getInstance(@NotNull final Project project) {
 		final String id = "FindBugs-IDEA"; // see plugin.xml
@@ -420,7 +424,7 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		}
 		final JComponent component = content.getComponent();
 		if (component instanceof ToolWindowPanel) {
-			return (ToolWindowPanel)component;
+			return (ToolWindowPanel) component;
 		}
 		return null;
 	}

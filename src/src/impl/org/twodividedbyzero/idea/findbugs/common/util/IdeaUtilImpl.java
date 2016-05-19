@@ -151,11 +151,13 @@ public final class IdeaUtilImpl {
 	}
 
 
+	@Deprecated
 	public static FindBugsPlugin getPluginComponent(@NotNull final Project project) {
 		return project.getComponent(FindBugsPlugin.class);
 	}
 
 
+	@Deprecated
 	public static FindBugsPlugin getModuleComponent(@NotNull final Module module) {
 		return module.getComponent(FindBugsPlugin.class);
 	}

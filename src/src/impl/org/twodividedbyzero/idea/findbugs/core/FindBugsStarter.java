@@ -34,6 +34,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.openapi.wm.impl.ToolWindowImpl;
 import com.intellij.util.Consumer;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
@@ -141,9 +142,12 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 	private void startImpl() {
 		MessageBusManager.publishAnalysisStarted(_project);
 
+		final ToolWindow toolWindow = ToolWindowManager.getInstance(_project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
 		if (projectSettings.toolWindowToFront) {
-			final ToolWindow toolWindow = ToolWindowManager.getInstance(_project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
 			IdeaUtilImpl.activateToolWindow(toolWindow);
+		} else {
+			// Important: Make sure the tool window is initialized.
+			((ToolWindowImpl) toolWindow).ensureContentInitialized();
 		}
 
 		new Task.Backgroundable(_project, _title, true) {
