@@ -31,11 +31,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 
 public final class AnalyzePackageFiles extends AbstractAnalyzeAction {
@@ -44,11 +42,8 @@ public final class AnalyzePackageFiles extends AbstractAnalyzeAction {
 	void updateImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final FindBugsState state
 	) {
 
 		final VirtualFile[] selectedSourceFiles = IdeaUtilImpl.getVirtualFiles(e.getDataContext());
@@ -69,11 +64,8 @@ public final class AnalyzePackageFiles extends AbstractAnalyzeAction {
 	void analyze(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final FindBugsState state
 	) {
 
 		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
@@ -88,7 +80,7 @@ public final class AnalyzePackageFiles extends AbstractAnalyzeAction {
 
 		if (outPath != null) {
 			final String output = outPath.getPresentableUrl() + packageUrl;
-			new FindBugsStarter(project, "Running FindBugs analysis for directory '" + output + "'...", projectSettings, settings) {
+			new FindBugsStarter(project, "Running FindBugs analysis for directory '" + output + "'...") {
 				@Override
 				protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 					consumer.consume(compilerManager.createProjectCompileScope(project));

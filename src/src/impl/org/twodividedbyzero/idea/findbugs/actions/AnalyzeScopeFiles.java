@@ -58,11 +58,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.collectors.StatelessClassAdder;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 
 import javax.swing.Action;
 import java.util.ArrayList;
@@ -77,11 +75,8 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 	void updateImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final FindBugsState state
 	) {
 
 		e.getPresentation().setEnabled(state.isIdle());
@@ -93,14 +88,12 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 	void analyze(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final FindBugsState state
 	) {
 
 		final DataContext dataContext = e.getDataContext();
+		final Module module = e.getData(LangDataKeys.MODULE);
 		AnalysisScope scope = getInspectionScope(dataContext);
 		final boolean rememberScope = e.getPlace().equals(ActionPlaces.MAIN_MENU);
 		final AnalysisUIOptions uiOptions = AnalysisUIOptions.getInstance(project);
@@ -136,23 +129,20 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 		uiOptions.ANALYZE_TEST_SOURCES = dlg.isInspectTestSources();
 		FileDocumentManager.getInstance().saveAllDocuments();
 
-		analyzeImpl(e, project, module, scope, projectSettings, settings);
+		analyzeImpl(e, project, scope);
 	}
 
 
 	private void analyzeImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@Nullable final Module module,
-			@NotNull final AnalysisScope scope,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final AnalysisScope scope
 	) {
 
 		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
 		final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(e.getDataContext());
 
-		new FindBugsStarter(project, "Running FindBugs analysis...", projectSettings, settings) {
+		new FindBugsStarter(project, "Running FindBugs analysis...") {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 				consumer.consume(compilerManager.createProjectCompileScope(project));

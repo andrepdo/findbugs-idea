@@ -21,7 +21,6 @@ package org.twodividedbyzero.idea.findbugs.actions;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompilerManager;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -30,13 +29,10 @@ import com.intellij.psi.PsiClass;
 import com.intellij.util.Consumer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 
 public final class AnalyzeClassUnderCursor extends AbstractAnalyzeAction {
 
@@ -44,11 +40,8 @@ public final class AnalyzeClassUnderCursor extends AbstractAnalyzeAction {
 	void updateImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final FindBugsState state
 	) {
 
 		final VirtualFile[] selectedSourceFiles = IdeaUtilImpl.getVirtualFiles(e.getDataContext());
@@ -70,11 +63,8 @@ public final class AnalyzeClassUnderCursor extends AbstractAnalyzeAction {
 	void analyze(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final FindBugsState state
 	) {
 
 		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
@@ -82,7 +72,7 @@ public final class AnalyzeClassUnderCursor extends AbstractAnalyzeAction {
 		final VirtualFile[] selectedSourceFiles = new VirtualFile[]{selectedSourceFile};
 		final PsiClass psiClass = IdeaUtilImpl.getCurrentClass(e.getDataContext());
 
-		new FindBugsStarter(project, "Running FindBugs analysis for current class...", projectSettings, settings) {
+		new FindBugsStarter(project, "Running FindBugs analysis for current class...") {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 				consumer.consume(compilerManager.createFilesCompileScope(selectedSourceFiles));

@@ -21,7 +21,6 @@ package org.twodividedbyzero.idea.findbugs.actions;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompilerManager;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -29,13 +28,10 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.util.Consumer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 
 import java.util.List;
 
@@ -45,11 +41,8 @@ public final class AnalyzeAllModifiedFiles extends AbstractAnalyzeAction {
 	void updateImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final FindBugsState state
 	) {
 
 		boolean enable = false;
@@ -72,17 +65,14 @@ public final class AnalyzeAllModifiedFiles extends AbstractAnalyzeAction {
 	void analyze(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final FindBugsState state
 	) {
 
 		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
 		final List<VirtualFile> modifiedFiles = IdeaUtilImpl.getAllModifiedFiles(e.getDataContext());
 
-		new FindBugsStarter(project, "Running FindBugs analysis for modified files...", projectSettings, settings) {
+		new FindBugsStarter(project, "Running FindBugs analysis for modified files...") {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 				consumer.consume(createFilesCompileScope(modifiedFiles));

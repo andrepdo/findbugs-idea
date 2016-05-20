@@ -21,7 +21,6 @@ package org.twodividedbyzero.idea.findbugs.actions;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
@@ -35,14 +34,11 @@ import edu.umd.cs.findbugs.cloud.Cloud;
 import org.dom4j.Document;
 import org.dom4j.io.DocumentSource;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.ErrorUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FileUtilFb;
 import org.twodividedbyzero.idea.findbugs.common.util.IoUtil;
-import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.export.ExportBugCollectionDialog;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
@@ -77,11 +73,8 @@ public final class ExportBugCollection extends AbstractAction {
 	void updateImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final FindBugsState state
 	) {
 
 		boolean enable = false;
@@ -98,11 +91,8 @@ public final class ExportBugCollection extends AbstractAction {
 	void actionPerformedImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final FindBugsState state
 	) {
 
 		final ExportBugCollectionDialog dialog = new ExportBugCollectionDialog(project);

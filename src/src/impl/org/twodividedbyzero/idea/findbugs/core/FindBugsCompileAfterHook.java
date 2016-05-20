@@ -206,6 +206,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 			auxFiles.addAll(Arrays.asList(files));
 		}
 
+		// TODO
 		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
 		AbstractSettings settings = projectSettings;
 		if (modules.size() == 1) {
@@ -218,8 +219,6 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		new FindBugsStarter(
 				project,
 				"Running FindBugs analysis for affected files...",
-				projectSettings,
-				settings,
 				true
 		) {
 			@Override
@@ -291,7 +290,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new FindBugsStarter(project, "Running FindBugs analysis for affected files...", projectSettings, projectSettings, true) {
+				new FindBugsStarter(project, "Running FindBugs analysis for affected files...", true) {
 					@Override
 					protected boolean isCompileBeforeAnalyze() {
 						return false;

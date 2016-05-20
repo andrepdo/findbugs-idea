@@ -19,14 +19,11 @@
 package org.twodividedbyzero.idea.findbugs.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ToolWindow;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.PropertyKey;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
@@ -35,7 +32,6 @@ import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
-import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 import org.twodividedbyzero.idea.findbugs.gui.settings.ProjectConfigurableImpl;
 import org.twodividedbyzero.idea.findbugs.plugins.PluginLoader;
@@ -51,56 +47,48 @@ abstract class AbstractAnalyzeAction extends AbstractAction {
 	final void actionPerformedImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final FindBugsState state
 	) {
 
 		EventDispatchThreadHelper.checkEDT();
 
-		final String importFilePath = WorkspaceSettings.getInstance(project).importFilePath;
-		if (!StringUtil.isEmptyOrSpaces(importFilePath)) {
-			final boolean success = AnalyzeUtil.importSettings(project, projectSettings, importFilePath);
-			/**
-			 * Do continue analysis on import settings failure, but invalidate plugin state
-			 * on success because the plugins settings can change anytime.
-			 */
-			if (success) {
-				PluginLoader.invalidate();
-			}
-		}
-
-		if (areAllBugCategoriesDisabled(settings)) {
-			showSettingsWarning(project, "analysis.allBugCategoriesDisabled");
-			return;
-		}
-
-		if (areAllDetectorsDisabled(project, projectSettings)) {
-			showSettingsWarning(project, "analysis.allDetectorsDisabled");
-			return;
-		}
+// TODO
+//		final String importFilePath = WorkspaceSettings.getInstance(project).importFilePath;
+//		if (!StringUtil.isEmptyOrSpaces(importFilePath)) {
+//			final boolean success = AnalyzeUtil.importSettings(project, projectSettings, importFilePath);
+//			/**
+//			 * Do continue analysis on import settings failure, but invalidate plugin state
+//			 * on success because the plugins settings can change anytime.
+//			 */
+//			if (success) {
+//				PluginLoader.invalidate();
+//			}
+//		}
+//
+//		if (areAllBugCategoriesDisabled(settings)) {
+//			showSettingsWarning(project, "analysis.allBugCategoriesDisabled");
+//			return;
+//		}
+//
+//		if (areAllDetectorsDisabled(project, projectSettings)) {
+//			showSettingsWarning(project, "analysis.allDetectorsDisabled");
+//			return;
+//		}
 
 		analyze(
 				e,
 				project,
-				module,
 				toolWindow,
-				state,
-				projectSettings,
-				settings
+				state
 		);
 	}
 
 	abstract void analyze(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final FindBugsState state
 	);
 
 	private static boolean areAllBugCategoriesDisabled(@NotNull final AbstractSettings settings) {

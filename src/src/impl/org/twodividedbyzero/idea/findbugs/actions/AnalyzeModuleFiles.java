@@ -19,6 +19,7 @@
 package org.twodividedbyzero.idea.findbugs.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.module.Module;
@@ -31,11 +32,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 
 public final class AnalyzeModuleFiles extends AbstractAnalyzeAction {
@@ -44,15 +43,13 @@ public final class AnalyzeModuleFiles extends AbstractAnalyzeAction {
 	void updateImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final FindBugsState state
 	) {
 
 		boolean enable = false;
 		if (state.isIdle()) {
+			final Module module = getModule(e);
 			enable = null != module;
 		}
 
@@ -65,15 +62,13 @@ public final class AnalyzeModuleFiles extends AbstractAnalyzeAction {
 	void analyze(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final FindBugsState state
 	) {
 
+		final Module module = getModule(e);
 		if (module == null) {
-			BalloonTipFactory.showToolWindowWarnNotifier(project, "No current module");
+			BalloonTipFactory.showToolWindowWarnNotifier(project, "No or more than one current module");
 			return;
 		}
 		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
@@ -85,7 +80,7 @@ public final class AnalyzeModuleFiles extends AbstractAnalyzeAction {
 		}
 		final String outPath = compilerOutputPath.getPresentableUrl();
 
-		new FindBugsStarter(project, "Running FindBugs analysis for module'" + module.getName() + "'...", projectSettings, settings) {
+		new FindBugsStarter(project, "Running FindBugs analysis for module'" + module.getName() + "'...") {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 				consumer.consume(compilerManager.createModuleCompileScope(module, true));
@@ -98,5 +93,10 @@ public final class AnalyzeModuleFiles extends AbstractAnalyzeAction {
 				findBugsProject.configureOutputFiles(project, indicator, outPath);
 			}
 		}.start();
+	}
+
+	@Nullable
+	private static Module getModule(@NotNull final AnActionEvent e) {
+		return DataKeys.MODULE.getData(e.getDataContext());
 	}
 }

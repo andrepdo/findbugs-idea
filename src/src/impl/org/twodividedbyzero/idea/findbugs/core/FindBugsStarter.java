@@ -85,26 +85,22 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 
 	public FindBugsStarter(
 			@NotNull final Project project,
-			@NotNull final String title,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final String title
 	) {
-		this(project, title, projectSettings, settings, false);
+		this(project, title, false);
 	}
 
 
 	public FindBugsStarter(
 			@NotNull final Project project,
 			@NotNull final String title,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings,
 			final boolean forceStartInBackground
 	) {
 		_project = project;
 		_title = title;
-		this.projectSettings = projectSettings;
+		this.projectSettings = ProjectSettings.getInstance(project);
 		this.workspaceSettings = WorkspaceSettings.getInstance(project);
-		this.settings = settings;
+		this.settings = projectSettings; // TODO
 		_startInBackground = workspaceSettings.runInBackground || forceStartInBackground;
 		_cancellingByUser = new AtomicBoolean();
 		MessageBusManager.subscribe(project, this, AnalysisAbortingListener.TOPIC, this);

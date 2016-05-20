@@ -20,18 +20,13 @@ package org.twodividedbyzero.idea.findbugs.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.core.ModuleSettings;
-import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 
 abstract class AbstractAction extends AnAction {
 
@@ -49,34 +44,19 @@ abstract class AbstractAction extends AnAction {
 			e.getPresentation().setVisible(false);
 			return;
 		}
-		final Module module = getModule(e, project);
-		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
-		AbstractSettings settings = projectSettings;
-		if (module != null) {
-			final ModuleSettings moduleSettings = ModuleSettings.getInstance(module);
-			if (moduleSettings.overrideProjectSettings) {
-				settings = moduleSettings;
-			}
-		}
 		updateImpl(
 				e,
 				project,
-				module,
 				toolWindow,
-				FindBugsState.get(project),
-				projectSettings,
-				settings
+				FindBugsState.get(project)
 		);
 	}
 
 	abstract void updateImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final FindBugsState state
 	);
 
 	@Override
@@ -93,39 +73,18 @@ abstract class AbstractAction extends AnAction {
 			e.getPresentation().setVisible(false);
 			return;
 		}
-		final Module module = getModule(e, project);
-		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
-		AbstractSettings settings = projectSettings;
-		if (module != null) {
-			final ModuleSettings moduleSettings = ModuleSettings.getInstance(module);
-			if (moduleSettings.overrideProjectSettings) {
-				settings = moduleSettings;
-			}
-		}
 		actionPerformedImpl(
 				e,
 				project,
-				module,
 				toolWindow,
-				FindBugsState.get(project),
-				projectSettings,
-				settings
+				FindBugsState.get(project)
 		);
 	}
 
 	abstract void actionPerformedImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state,
-			@NotNull final ProjectSettings projectSettings,
-			@NotNull final AbstractSettings settings
+			@NotNull final FindBugsState state
 	);
-
-	@Nullable
-	private Module getModule(@NotNull final AnActionEvent e, @NotNull final Project project) {
-		// TODO
-		return IdeaUtilImpl.getModule(e.getDataContext(), project);
-	}
 }
