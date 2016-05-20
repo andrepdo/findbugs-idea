@@ -138,8 +138,16 @@ public final class ProjectConfigurableImpl implements SearchableConfigurable, Co
 	}
 
 	public static void showShare(@NotNull final Project project) {
+		/**
+		 * It is correct to create a configurable instance,
+		 * see java doc of ShowSettingsUtil#findProjectConfigurable (deprecated).
+		 */
 		final ProjectConfigurableImpl configurable = new ProjectConfigurableImpl(project);
-		configurable.requestFocusOnShareImportFile();
-		ShowSettingsUtil.getInstance().editConfigurable(project, configurable);
+		ShowSettingsUtil.getInstance().editConfigurable(project, configurable, new Runnable() {
+			@Override
+			public void run() {
+				configurable.requestFocusOnShareImportFile();
+			}
+		});
 	}
 }

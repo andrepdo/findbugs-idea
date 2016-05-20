@@ -62,7 +62,14 @@ abstract class AbstractAnalyzeAction extends AbstractAction {
 
 		final String importFilePath = WorkspaceSettings.getInstance(project).importFilePath;
 		if (!StringUtil.isEmptyOrSpaces(importFilePath)) {
-			AnalyzeUtil.importPreferences(project, projectSettings, importFilePath);
+			final boolean success = AnalyzeUtil.importSettings(project, projectSettings, importFilePath);
+			/**
+			 * Do continue analysis on import settings failure, but invalidate plugin state
+			 * on success because the plugins settings can change anytime.
+			 */
+			if (success) {
+				PluginLoader.invalidate();
+			}
 		}
 
 		if (areAllBugCategoriesDisabled(settings)) {

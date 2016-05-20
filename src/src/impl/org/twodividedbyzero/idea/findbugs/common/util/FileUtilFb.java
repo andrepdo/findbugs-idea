@@ -18,14 +18,18 @@
  */
 package org.twodividedbyzero.idea.findbugs.common.util;
 
+import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.util.text.StringUtil;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 
-public final class FileUtil {
+public final class FileUtilFb {
 
-	private FileUtil() {
+	private FileUtilFb() {
 	}
 
 	public static void mkdirs(@NotNull final File directory) throws IOException {
@@ -34,5 +38,21 @@ public final class FileUtil {
 				throw new IOException("Can not create directory " + directory);
 			}
 		}
+	}
+
+	@Nullable
+	public static String toSystemDependentName(@NonNls @Nullable final String fileName) {
+		if (StringUtil.isEmptyOrSpaces(fileName)) {
+			return null;
+		}
+		return FileUtil.toSystemDependentName(fileName);
+	}
+
+	@Nullable
+	public static String toSystemIndependentName(@NonNls @Nullable final String fileName) {
+		if (StringUtil.isEmptyOrSpaces(fileName)) {
+			return null;
+		}
+		return FileUtil.toSystemIndependentName(fileName);
 	}
 }

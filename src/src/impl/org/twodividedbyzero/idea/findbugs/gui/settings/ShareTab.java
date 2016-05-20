@@ -29,9 +29,11 @@ import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.ui.HyperlinkLabel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.util.FileUtilFb;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.HAlignment;
 import org.twodividedbyzero.idea.findbugs.gui.common.VAlignment;
@@ -48,7 +50,7 @@ import java.io.File;
 final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>, Disposable {
 	private JLabel description;
 	private HyperlinkLabel link;
-	private LabeledComponent<TextFieldWithBrowseButton> importPathLabel; // TODO check PathMarco support
+	private LabeledComponent<TextFieldWithBrowseButton> importPathLabel;
 
 	ShareTab() {
 		super(new VerticalFlowLayout(HAlignment.Left, VAlignment.Top, 0, 0, true, false));
@@ -91,7 +93,7 @@ final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>,
 		if (StringUtil.isEmptyOrSpaces(ret)) {
 			return null;
 		}
-		return ret.trim();
+		return FileUtilFb.toSystemIndependentName(ret.trim());
 	}
 
 	@Override
@@ -127,7 +129,7 @@ final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>,
 
 	@Override
 	public void reset(@NotNull final WorkspaceSettings settings) {
-		importPathLabel.getComponent().setText(settings.importFilePath);
+		importPathLabel.getComponent().setText(FileUtilFb.toSystemDependentName(settings.importFilePath));
 	}
 
 	@Override
@@ -135,8 +137,12 @@ final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>,
 	}
 
 	void requestFocusOnImportFile() {
-		// FIXME: does not work - use "whenDone"
-		importPathLabel.getComponent().getTextField().requestFocus();
+		IdeFocusManager.findInstance().doWhenFocusSettlesDown(new Runnable() {
+			@Override
+			public void run() {
+				IdeFocusManager.findInstance().requestFocus(importPathLabel.getComponent().getTextField(), true);
+			}
+		});
 	}
 
 	@NotNull

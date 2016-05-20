@@ -32,6 +32,7 @@ import edu.umd.cs.findbugs.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
+import org.twodividedbyzero.idea.findbugs.common.util.FileUtilFb;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
@@ -107,7 +108,7 @@ public final class LegacyProjectSettings implements PersistentStateComponent<Per
 		to.analysisEffort = asString(p.get(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL), to.analysisEffort);
 		to.minPriority = asString(p.get(FindBugsPreferences.MIN_PRIORITY_TO_REPORT), to.minPriority);
 
-		toWorkspace.importFilePath = asString(p.get(FindBugsPreferences.IMPORT_FILE_PATH), toWorkspace.importFilePath); // TODO check PathMacro
+		toWorkspace.importFilePath = FileUtilFb.toSystemIndependentName(asString(p.get(FindBugsPreferences.IMPORT_FILE_PATH), toWorkspace.importFilePath));
 		toWorkspace.exportBugCollectionDirectory = asString(p.get(FindBugsPreferences.EXPORT_BASE_DIR), toWorkspace.exportBugCollectionDirectory);
 		toWorkspace.exportBugCollectionAsHtml = asBoolean(p.get(FindBugsPreferences.EXPORT_AS_HTML), toWorkspace.exportBugCollectionAsHtml);
 		toWorkspace.exportBugCollectionAsXml = asBoolean(p.get(FindBugsPreferences.EXPORT_AS_XML), toWorkspace.exportBugCollectionAsXml);

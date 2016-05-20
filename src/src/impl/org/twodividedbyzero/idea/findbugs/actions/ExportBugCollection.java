@@ -38,7 +38,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.ErrorUtil;
-import org.twodividedbyzero.idea.findbugs.common.util.FileUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.FileUtilFb;
 import org.twodividedbyzero.idea.findbugs.common.util.IoUtil;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
@@ -139,14 +139,14 @@ public final class ExportBugCollection extends AbstractAction {
 				final boolean withMessages = bugCollection.getWithMessages();
 				try {
 
-					FileUtil.mkdirs(exportDirPath);
+					FileUtilFb.mkdirs(exportDirPath);
 					File finalExportDir = exportDirPath;
 					final String currentTime = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.ENGLISH).format(new Date());
 					final String uniqueName = "findbugs-result-" + project.getName() + "_" + currentTime;
 					String filename = "result";
 					if (createSubDir) {
 						finalExportDir = new File(exportDirPath, uniqueName);
-						FileUtil.mkdirs(finalExportDir);
+						FileUtilFb.mkdirs(finalExportDir);
 					} else {
 						filename = uniqueName;
 					}

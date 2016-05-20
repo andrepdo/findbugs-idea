@@ -28,7 +28,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
-import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.LegacyProjectSettings;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.importer.SonarProfileImporter;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
@@ -37,18 +36,18 @@ import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class SettingsImporter {
+public abstract class SettingsImporter {
 
 	@NotNull
 	private final Project project;
 
-	public SettingsImporter(@NotNull final Project project) {
+	protected SettingsImporter(@NotNull final Project project) {
 		this.project = project;
 	}
 
 	public final boolean doImport(@NotNull final InputStream input, @NotNull final ProjectSettings settings) throws JDOMException, IOException {
 		final Element root = JDOMUtil.load(input);
-		boolean success;
+		boolean success = false;
 		if (SonarProfileImporter.isValid(root)) {
 			success = new SonarProfileImporter() {
 				@Override
@@ -70,15 +69,39 @@ public class SettingsImporter {
 			if (legacy) {
 				if (legacyPrefs != null) {
 					LegacyProjectSettings.applyToImpl(legacyPrefs, settings, WorkspaceSettings.getInstance(project));
+					success = true;
 				} else {
 					handleError(ResourcesLoader.getString("sonar.import.error.legacyInvalid.title"), ResourcesLoader.getString("sonar.import.error.legacyInvalid.text"));
 				}
 			} else {
-				new SmartSerializer().readExternal(settings, root);
+				Element findBugsRoot = root;
+				if (!"findbugs".equalsIgnoreCase(root.getName())) {
+					findBugsRoot = getIdea(root);
+				}
+				if (findBugsRoot != null) {
+					new SmartSerializer().readExternal(settings, root);
+					success = true;
+				} else {
+					handleError(ResourcesLoader.getString("sonar.import.error.invalid.title"), ResourcesLoader.getString("sonar.import.error.invalid.text"));
+				}
+
 			}
-			success = true;
 		}
 		return success;
+	}
+
+	@Nullable
+	private static Element getIdea(@NotNull final Element root) {
+		if ("project".equalsIgnoreCase(root.getName())) {
+			for (final Element component : root.getChildren()) {
+				if ("component".equalsIgnoreCase(component.getName())) {
+					if ("FindBugs-IDEA".equalsIgnoreCase(component.getAttributeValue("name"))) {
+						return component;
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	@Nullable
@@ -112,8 +135,5 @@ public class SettingsImporter {
 		return false;
 	}
 
-	protected void handleError(@NotNull final String title, @NotNull final String message) {
-		// TODO make HTML with title
-		BalloonTipFactory.showToolWindowErrorNotifier(project, message);
-	}
+	protected abstract void handleError(@NotNull String title, @NotNull String message);
 }
