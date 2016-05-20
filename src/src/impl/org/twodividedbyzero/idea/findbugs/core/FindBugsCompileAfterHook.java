@@ -54,7 +54,6 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-// TODO think of ModuleSettings and ModuleManager.getInstance(project).getModules();
 public class FindBugsCompileAfterHook implements CompilationStatusListener, ProjectComponent {
 
 	private static final int DEFAULT_DELAY_MS = 30000;
@@ -199,19 +198,28 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		final CompileScope compileScope = compileContext.getCompileScope();
 		final VirtualFile[] affectedFiles = getAffectedFiles(compileScope);
 		final Collection<VirtualFile> auxFiles = new ArrayList<VirtualFile>();
+		final Set<Module> modules = New.set();
 		for (final VirtualFile affectedFile : affectedFiles) {
 			final Module module = compileContext.getModuleByFile(affectedFile);
+			modules.add(module);
 			final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(module);
 			auxFiles.addAll(Arrays.asList(files));
 		}
 
 		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
+		AbstractSettings settings = projectSettings;
+		if (modules.size() == 1) {
+			final ModuleSettings moduleSettings = ModuleSettings.getInstance(modules.iterator().next());
+			if (moduleSettings.overrideProjectSettings) {
+				settings = moduleSettings;
+			}
+		}
+
 		new FindBugsStarter(
 				project,
-				null,
 				"Running FindBugs analysis for affected files...",
 				projectSettings,
-				projectSettings,
+				settings,
 				true
 		) {
 			@Override
@@ -283,7 +291,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new FindBugsStarter(project, null, "Running FindBugs analysis for affected files...", projectSettings, projectSettings, true) {
+				new FindBugsStarter(project, "Running FindBugs analysis for affected files...", projectSettings, projectSettings, true) {
 					@Override
 					protected boolean isCompileBeforeAnalyze() {
 						return false;

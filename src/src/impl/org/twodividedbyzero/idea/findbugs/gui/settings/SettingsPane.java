@@ -25,6 +25,7 @@ import com.intellij.ui.components.JBTabbedPane;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
+import org.twodividedbyzero.idea.findbugs.core.ModuleSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
@@ -35,12 +36,25 @@ import java.awt.BorderLayout;
 
 abstract class SettingsPane extends JPanel implements Disposable {
 
+	@NotNull
 	private JBTabbedPane tabs;
+
+	@Nullable
 	private GeneralTab generalTab;
+
+	@NotNull
 	private ReportTab reportTab;
+
+	@NotNull
 	private FilterTab filterTab;
+
+	@Nullable
 	private DetectorTab detectorTab;
+
+	@Nullable
 	private AnnotateTab annotateTab;
+
+	@Nullable
 	private ShareTab shareTab;
 
 	SettingsPane() {
@@ -112,6 +126,10 @@ abstract class SettingsPane extends JPanel implements Disposable {
 				annotateTab.isModifiedProject(settings);
 	}
 
+	boolean isModifiedModule(@NotNull final ModuleSettings settings) {
+		return false;
+	}
+
 	final boolean isModifiedWorkspace(@NotNull final WorkspaceSettings settings) {
 		return generalTab.isModifiedWorkspace(settings) ||
 				annotateTab.isModifiedWorkspace(settings) ||
@@ -127,6 +145,9 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		generalTab.applyProject(settings);
 		detectorTab.apply(settings);
 		annotateTab.applyProject(settings);
+	}
+
+	void applyModule(@NotNull final ModuleSettings settings) {
 	}
 
 	final void applyWorkspace(@NotNull final WorkspaceSettings settings) throws ConfigurationException {
@@ -146,6 +167,9 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		annotateTab.resetProject(settings);
 	}
 
+	void resetModule(@NotNull final ModuleSettings settings) {
+	}
+
 	final void resetWorkspace(@NotNull final WorkspaceSettings settings) {
 		generalTab.resetWorkspace(settings);
 		annotateTab.resetWorkspace(settings);
@@ -161,6 +185,25 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	void requestFocusOnShareImportFile() {
 		tabs.setSelectedComponent(shareTab);
 		shareTab.requestFocusOnImportFile();
+	}
+
+	@Override
+	public void setEnabled(final boolean enabled) {
+		super.setEnabled(enabled);
+		if (generalTab != null) {
+			generalTab.setEnabled(enabled);
+		}
+		reportTab.setEnabled(enabled);
+		filterTab.setEnabled(enabled);
+		if (detectorTab != null) {
+			detectorTab.setEnabled(enabled);
+		}
+		if (annotateTab != null) {
+			annotateTab.setEnabled(enabled);
+		}
+		if (shareTab != null) {
+			shareTab.setEnabled(enabled);
+		}
 	}
 
 	@Override

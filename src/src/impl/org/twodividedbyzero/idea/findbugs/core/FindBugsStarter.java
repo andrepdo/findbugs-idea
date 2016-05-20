@@ -26,7 +26,6 @@ import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompileStatusNotification;
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
@@ -86,18 +85,16 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 
 	public FindBugsStarter(
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final String title,
 			@NotNull final ProjectSettings projectSettings,
 			@NotNull final AbstractSettings settings
 	) {
-		this(project, module, title, projectSettings, settings, false);
+		this(project, title, projectSettings, settings, false);
 	}
 
 
 	public FindBugsStarter(
 			@NotNull final Project project,
-			@Nullable final Module module,
 			@NotNull final String title,
 			@NotNull final ProjectSettings projectSettings,
 			@NotNull final AbstractSettings settings,

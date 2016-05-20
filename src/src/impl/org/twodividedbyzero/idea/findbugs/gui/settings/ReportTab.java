@@ -52,6 +52,15 @@ final class ReportTab extends JPanel implements SettingsOwner<AbstractSettings> 
 		add(bottomPane);
 	}
 
+	@Override
+	public void setEnabled(final boolean enabled) {
+		super.setEnabled(enabled);
+		getAnalysisEffort().setEnabled(enabled);
+		getMinRank().setEnabled(enabled);
+		getMinPriority().setEnabled(enabled);
+		getBugCategory().setEnabled(enabled);
+	}
+
 	@NotNull
 	private AnalysisEffortPane getAnalysisEffort() {
 		if (analysisEffort == null) {

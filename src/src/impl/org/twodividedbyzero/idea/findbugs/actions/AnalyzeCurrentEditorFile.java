@@ -83,7 +83,7 @@ public final class AnalyzeCurrentEditorFile extends AbstractAnalyzeAction {
 			return;
 		}
 
-		new FindBugsStarter(project, module, "Running FindBugs analysis for editor files...", projectSettings, settings) {
+		new FindBugsStarter(project, "Running FindBugs analysis for editor files...", projectSettings, settings) {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 				consumer.consume(compilerManager.createFilesCompileScope(selectedSourceFiles));

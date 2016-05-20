@@ -21,25 +21,56 @@ package org.twodividedbyzero.idea.findbugs.gui.settings;
 import com.intellij.ui.components.JBCheckBox;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.core.ModuleSettings;
+import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 final class ModuleSettingsPane extends SettingsPane {
 
-	private JBCheckBox test; // TODO support override project settings
+	private JBCheckBox overrideProjectSettingsCheckbox;
 
 	@NotNull
 	@Override
 	JComponent createHeaderPane() {
-		test = new JBCheckBox("Test23");
+		overrideProjectSettingsCheckbox = new JBCheckBox(ResourcesLoader.getString("settings.module.overrideProjectSettings"));
+		overrideProjectSettingsCheckbox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				updateControls();
+			}
+		});
 
 		final JPanel topPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		topPane.add(test);
+		topPane.add(overrideProjectSettingsCheckbox);
 		topPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
 		return topPane;
+	}
+
+	private void updateControls() {
+		super.setEnabled(overrideProjectSettingsCheckbox.isSelected());
+	}
+
+	@Override
+	boolean isModifiedModule(@NotNull final ModuleSettings settings) {
+		return settings.overrideProjectSettings != overrideProjectSettingsCheckbox.isSelected();
+	}
+
+	@Override
+	void applyModule(@NotNull final ModuleSettings settings) {
+		settings.overrideProjectSettings = overrideProjectSettingsCheckbox.isSelected();
+		updateControls();
+	}
+
+	@Override
+	void resetModule(@NotNull final ModuleSettings settings) {
+		overrideProjectSettingsCheckbox.setSelected(settings.overrideProjectSettings);
+		updateControls();
 	}
 
 	@Nullable

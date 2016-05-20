@@ -86,7 +86,7 @@ public final class AnalyzeChangelistFiles extends AbstractAnalyzeAction {
 		final ChangeList changeList = ChangeListManager.getInstance(project).getDefaultChangeList();
 		final Collection<VirtualFile> modifiedFiles = IdeaUtilImpl.getModifiedFilesByList(changeList, e.getDataContext());
 
-		new FindBugsStarter(project, module, "Running FindBugs analysis for changelist '" + changeList.getName() + "'...", projectSettings, settings) {
+		new FindBugsStarter(project, "Running FindBugs analysis for changelist '" + changeList.getName() + "'...", projectSettings, settings) {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 				consumer.consume(createFilesCompileScope(modifiedFiles));

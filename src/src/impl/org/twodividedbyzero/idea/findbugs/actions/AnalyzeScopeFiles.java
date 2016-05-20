@@ -152,7 +152,7 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
 		final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(e.getDataContext());
 
-		new FindBugsStarter(project, module, "Running FindBugs analysis...", projectSettings, settings) {
+		new FindBugsStarter(project, "Running FindBugs analysis...", projectSettings, settings) {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 				consumer.consume(compilerManager.createProjectCompileScope(project));

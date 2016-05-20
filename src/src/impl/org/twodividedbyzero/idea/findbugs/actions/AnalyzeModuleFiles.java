@@ -85,7 +85,7 @@ public final class AnalyzeModuleFiles extends AbstractAnalyzeAction {
 		}
 		final String outPath = compilerOutputPath.getPresentableUrl();
 
-		new FindBugsStarter(project, module, "Running FindBugs analysis for module'" + module.getName() + "'...", projectSettings, settings) {
+		new FindBugsStarter(project, "Running FindBugs analysis for module'" + module.getName() + "'...", projectSettings, settings) {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
 				consumer.consume(compilerManager.createModuleCompileScope(module, true));

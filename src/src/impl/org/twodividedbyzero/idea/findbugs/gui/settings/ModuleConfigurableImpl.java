@@ -68,17 +68,19 @@ public final class ModuleConfigurableImpl implements Configurable {
 
 	@Override
 	public boolean isModified() {
-		return pane.isModified(settings);
+		return pane.isModified(settings) || pane.isModifiedModule(settings);
 	}
 
 	@Override
 	public void apply() throws ConfigurationException {
 		pane.apply(settings);
+		pane.applyModule(settings);
 	}
 
 	@Override
 	public void reset() {
 		pane.reset(settings);
+		pane.resetModule(settings);
 	}
 
 	@Override

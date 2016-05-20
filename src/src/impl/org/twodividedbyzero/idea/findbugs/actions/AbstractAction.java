@@ -49,7 +49,7 @@ abstract class AbstractAction extends AnAction {
 			e.getPresentation().setVisible(false);
 			return;
 		}
-		final Module module = IdeaUtilImpl.getModule(e.getDataContext(), project);
+		final Module module = getModule(e, project);
 		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
 		AbstractSettings settings = projectSettings;
 		if (module != null) {
@@ -93,7 +93,7 @@ abstract class AbstractAction extends AnAction {
 			e.getPresentation().setVisible(false);
 			return;
 		}
-		final Module module = IdeaUtilImpl.getModule(e.getDataContext(), project);
+		final Module module = getModule(e, project);
 		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
 		AbstractSettings settings = projectSettings;
 		if (module != null) {
@@ -122,4 +122,10 @@ abstract class AbstractAction extends AnAction {
 			@NotNull final ProjectSettings projectSettings,
 			@NotNull final AbstractSettings settings
 	);
+
+	@Nullable
+	private Module getModule(@NotNull final AnActionEvent e, @NotNull final Project project) {
+		// TODO
+		return IdeaUtilImpl.getModule(e.getDataContext(), project);
+	}
 }
