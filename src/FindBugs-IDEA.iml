@@ -6,8 +6,6 @@
     <output-test url="file://$MODULE_DIR$/target/test" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/src/api" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/dev" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/impl" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
@@ -21,13 +19,42 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.3/findbugs-2.0.3/src/gui" />
-          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.3/findbugs-2.0.3/src/java" />
-          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.3/findbugs-2.0.3/src/junit" />
-          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.3/findbugs-2.0.3/src/tools" />
-          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.3/findbugs-2.0.3/src/antTask" />
-          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.3/findbugs-2.0.3/src/obsolete" />
-          <root url="file://$MODULE_DIR$/../../../findbugs-2.0.3/findbugs-2.0.3/src/infonodeJava" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/JSR305-testCases/src/main/java" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/NullPointerBenchmark/src/java" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/NullPointerBenchmark/src/junit" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/bluej/src" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/eclipsePlugin-test/defaultScenario" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/eclipsePlugin-test/jdtScenario" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/eclipsePlugin-test/multiQuickfixOutput" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/eclipsePlugin-test/multiQuickfixScenario" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/eclipsePlugin-test/quickfixOutput" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/eclipsePlugin-test/quickfixScenario" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/eclipsePlugin-test/secondSrcScenario" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/eclipsePlugin-test/src" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/eclipsePlugin/src" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/findbugsTestCases/src/fakeAnnotations" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/findbugsTestCases/src/fakeLibraries" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/findbugsTestCases/src/java" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/findbugsTestCases/src/java7" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/findbugs/src/antTask" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/findbugs/src/gui" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/findbugs/src/infonodeJava" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/findbugs/src/java" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/findbugs/src/junit" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/findbugs/src/tools" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/plugins/googlecode/src/java" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/plugins/googlecode/src/junit" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/plugins/jdbcCloudClient/src/java" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/plugins/jira/src/generated" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/plugins/jira/src/java" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/plugins/jira/src/junit" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/plugins/webCloudClient/src/java" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/plugins/webCloudClient/src/junit" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/sandbox/detectorTutorial/src/java" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/sandbox/detectorTutorial/src/testcases" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/sandbox/localCloud/src/java" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/sandbox/localCloud/src/junit" />
+          <root url="jar://$MODULE_DIR$/lib/source/findbugs-138e1a1024d1-jre6.zip!/findbugs-138e1a1024d1/webCloudProtocol/src/java" />
         </SOURCES>
         <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
       </library>
@@ -224,4 +251,3 @@
     </option>
   </component>
 </module>
-
