@@ -31,6 +31,7 @@ import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
@@ -299,14 +300,18 @@ public class BugTreePanel extends JPanel {
 	private void regroupTree() {
 		EventDispatchThreadHelper.checkEDT();
 		if (result != null) {
-			for (final Map.Entry<FindBugsProject, SortedBugCollection> entry : result.getResults().entrySet()) {
+			for (final Map.Entry<edu.umd.cs.findbugs.Project, SortedBugCollection> entry : result.getResults().entrySet()) {
+				Module module = null;
+				if (entry.getKey() instanceof FindBugsProject) {
+					module = ((FindBugsProject) entry.getKey()).getModule();
+				}
 				final Collection<BugInstance> instanceCollection = entry.getValue().getCollection();
 				if (instanceCollection != null && !instanceCollection.isEmpty()) {
 					_treeModel.clear();
 					for (final BugInstance bugInstance : instanceCollection) {
 						if (bugInstance != null) {
 							addNode(new Bug(
-									entry.getKey().getModule(),
+									module,
 									entry.getValue(),
 									bugInstance
 							));

@@ -23,6 +23,7 @@ import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.openapi.util.text.StringUtil;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsResult;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
@@ -61,13 +62,16 @@ public class AnalysisRunDetailsDialog {
 		html.append("<p><h2>").append(VersionManager.getName()).append(": <b>found ").append(bugCount).append(" bugs in ").append(numClasses).append(numClasses > 1 ? " classes" : " class").append("</b>").append("</h2></p>");
 		html.append("<p>").append("<font size='10px'>using ").append(VersionManager.getFullVersion()).append(" with Findbugs version ").append(FindBugsUtil.getFindBugsFullVersion()).append("</font>").append("</p>");
 
-		for (final FindBugsProject bugsProject : result.getProjects()) {
+		for (final edu.umd.cs.findbugs.Project bugsProject : result.getProjects()) {
 
 			html.append("<p><h2>").append(bugsProject.getProjectName()).append("</h3></p>");
 
 			final List<String> fileList = bugsProject.getFileList();
 			final List<String> auxClasspathEntries = bugsProject.getAuxClasspathEntryList();
-			final List<String> configuredOutputFiles = bugsProject.getConfiguredOutputFiles();
+			List<String> configuredOutputFiles = New.arrayList();
+			if (bugsProject instanceof FindBugsProject) {
+				configuredOutputFiles = ((FindBugsProject) bugsProject).getConfiguredOutputFiles();
+			} // else project was imported from XML
 
 			if (!configuredOutputFiles.isEmpty()) {
 				html.append("<p><h3>Configured Output Files/Paths - the analysis entry point").append(" <font color='gray'>(").append(configuredOutputFiles.size()).append(")</h3></p>");

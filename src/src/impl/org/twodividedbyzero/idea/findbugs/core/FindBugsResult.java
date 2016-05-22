@@ -18,6 +18,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.core;
 
+import edu.umd.cs.findbugs.Project;
 import edu.umd.cs.findbugs.ProjectStats;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +30,7 @@ import java.util.Map;
 
 public final class FindBugsResult {
 	@NotNull
-	private Map<FindBugsProject, SortedBugCollection> results;
+	private Map<Project, SortedBugCollection> results;
 
 	private int numClasses; // TODO kick this
 
@@ -37,7 +38,7 @@ public final class FindBugsResult {
 		this.results = New.map();
 	}
 
-	public void put(@Nullable final FindBugsProject project, @Nullable final SortedBugCollection bugCollection, int numClasses) {
+	public void put(@NotNull final Project project, @Nullable final SortedBugCollection bugCollection, int numClasses) {
 		if (results.put(project, bugCollection) != null) {
 			throw new IllegalStateException("Duplicate project " + project);
 		}
@@ -80,12 +81,12 @@ public final class FindBugsResult {
 	}
 
 	@NotNull
-	public Collection<FindBugsProject> getProjects() {
+	public Collection<Project> getProjects() {
 		return results.keySet();
 	}
 
 	@NotNull
-	public Map<FindBugsProject, SortedBugCollection> getResults() {
+	public Map<Project, SortedBugCollection> getResults() {
 		return results;
 	}
 }

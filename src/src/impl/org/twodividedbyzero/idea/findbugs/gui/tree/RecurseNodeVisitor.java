@@ -19,6 +19,7 @@
 package org.twodividedbyzero.idea.findbugs.gui.tree;
 
 import edu.umd.cs.findbugs.BugInstance;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.Bug;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceGroupNode;
@@ -54,9 +55,8 @@ public class RecurseNodeVisitor<T extends VisitableTreeNode> implements NodeVisi
 	}
 
 	@Override
-	public void visitGroupNode(final BugInstanceGroupNode node) {
-		// TODO check use Bug.equals instead of BugInstance.equals
-		if (_recurseVisitCriteria.getBugInstance().equals(node.getBugInstance()) && _recurseVisitCriteria.getDepth() == node.getDepth() && _recurseVisitCriteria.getGroupName().equals(node.getGroupName())) {
+	public void visitGroupNode(@NotNull final BugInstanceGroupNode node) {
+		if (_recurseVisitCriteria.getBug().equals(node.getBug()) && _recurseVisitCriteria.getDepth() == node.getDepth() && _recurseVisitCriteria.getGroupName().equals(node.getGroupName())) {
 			_resultNode = node;
 		} else {
 			_resultNode = node.findChildNode(_recurseVisitCriteria.getBug(), _recurseVisitCriteria.getDepth(), _recurseVisitCriteria.getGroupName());

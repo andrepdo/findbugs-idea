@@ -19,7 +19,6 @@
 package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 
 import com.intellij.ui.JBColor;
-import edu.umd.cs.findbugs.BugInstance;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
@@ -35,21 +34,18 @@ import javax.swing.tree.TreeNode;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings({"UnusedDeclaration"})
 public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements VisitableTreeNode {
+
+	private static final Icon EXPAND_ICON = new MaskIcon(ResourcesLoader.loadIcon("fb-idea-logo_16x16.png"), JBColor.BLACK);
+	private static final Icon COLLAPSE_ICON = EXPAND_ICON;
 
 	private int _bugCount;
 	private int _classesCount;
 	private final List<VisitableTreeNode> _childs;
-
-	private static final Icon EXPAND_ICON = new MaskIcon(ResourcesLoader.loadIcon("fb-idea-logo_16x16.png"), JBColor.BLACK);
-	private static final Icon COLLAPSE_ICON = EXPAND_ICON;
 	private final RecurseNodeVisitor<RootNode> _recurseNodeVisitor = new RecurseNodeVisitor<RootNode>(this);
 
 
 	public RootNode(final String simpleName) {
-
-		//noinspection AssignmentToNull
 		setParent(null);
 		_childs = new ArrayList<VisitableTreeNode>();
 		_simpleName = simpleName;
@@ -60,31 +56,17 @@ public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements Vis
 		setExpandedIcon(EXPAND_ICON);
 	}
 
-
-	public void setSimpleName(final String simpleName) {
-		_simpleName = simpleName;
-	}
-
-
 	public int getBugCount() {
 		return _bugCount;
 	}
-
 
 	public void setBugCount(final int bugCount) {
 		_bugCount = bugCount;
 	}
 
-
-	public void incrementMemberCount() {
-		++_memberCount;
-	}
-
-
 	public int getClassesCount() {
 		return _classesCount;
 	}
-
 
 	public String getLinkHtml() {
 		if (_bugCount > -1) {
@@ -93,93 +75,11 @@ public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements Vis
 		return "";
 	}
 
-
-	/**
-	 * Perfomrs a deep search. Get child BugInstanceGroupNode by BugInstance group name.
-	 *
-	 * @param groupName the group name to search for
-	 * @param depth
-	 * @return the BugInstanceGroupNode
-	 * @deprecated use {@link RootNode#findChildNode(Bug, int, String)}
-	 */
-	@Deprecated
 	@Nullable
-	public BugInstanceGroupNode getChildByGroupName(final String groupName, final int depth) {
-		BugInstanceGroupNode resultNode = null;
-
-		for (final TreeNode node : _childs) {
-			if (node instanceof BugInstanceGroupNode) {
-				final BugInstanceGroupNode groupNode = (BugInstanceGroupNode) node;
-				if (groupName.equals(groupNode.getGroupName()) && depth == groupNode.getDepth()) {
-					resultNode = groupNode;
-				} else {
-					resultNode = groupNode.getChildByGroupName(groupName, depth);
-				}
-
-				if (resultNode != null) {
-					break;
-				}
-
-			}
-		}
-
-		return resultNode;
-	}
-
-
-	/**
-	 * Perfomrs a deep search. Get child BugInstanceGroupNode by BugInstance object.
-	 *
-	 * @param bug   the findbugs buginstance to search for
-	 * @param depth the machting depth to search for
-	 * @return the BugInstanceGroupNode
-	 * @deprecated use {@link RootNode#findChildNode(Bug, int, String)}
-	 */
-	@Deprecated
-	@Nullable
-	public BugInstanceGroupNode getChildByBugInstance(@NotNull final Bug bug, final int depth) {
-		BugInstanceGroupNode resultNode = null;
-
-		for (final TreeNode node : _childs) {
-			if (node instanceof BugInstanceGroupNode) {
-				final BugInstanceGroupNode groupNode = (BugInstanceGroupNode) node;
-				if (bug.getInstance().equals(groupNode.getBugInstance()) && depth == groupNode.getDepth()) { // TODO change equals to Bug
-					resultNode = groupNode;
-				} else {
-					resultNode = groupNode.getChildByBugInstance(bug, depth);
-				}
-
-				if (resultNode != null) {
-					break;
-				}
-			}
-		}
-
-		return resultNode;
-	}
-
-
-	@Nullable
-	public BugInstanceGroupNode findChildNode(final Bug bug, final int depth, final String groupName) {
+	BugInstanceGroupNode findChildNode(final Bug bug, final int depth, final String groupName) {
 		final RecurseVisitCriteria criteria = new RecurseVisitCriteria(bug, depth, groupName);
 		return _recurseNodeVisitor.findChildNode(criteria);
 	}
-
-
-	@NotNull
-	public List<BugInstance> getChildBugInstances() {
-		final List<BugInstance> list = new ArrayList<BugInstance>();
-
-		for (final TreeNode child : _childs) {
-			if (child instanceof BugInstanceGroupNode) {
-				final BugInstance bugInstance = ((BugInstanceGroupNode) child).getBugInstance();
-				list.add(bugInstance);
-			}
-		}
-
-		return list;
-	}
-
 
 	@NotNull
 	List<Bug> getAllChildBugs() {
@@ -195,47 +95,41 @@ public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements Vis
 		return ret;
 	}
 
-
 	public void setClassesCount(final int classesCount) {
 		_classesCount = classesCount;
 	}
 
-
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append("RootNode");
-		sb.append("{_bugCount=").append(_bugCount);
-		sb.append(", _classesCount=").append(_classesCount);
-		sb.append(", _childs=").append(_childs);
-		sb.append(", _recurseNodeVisitor=").append(_recurseNodeVisitor);
-		sb.append('}');
-		return sb.toString();
+		return "RootNode" +
+				"{_bugCount=" + _bugCount +
+				", _classesCount=" + _classesCount +
+				", _childs=" + _childs +
+				", _recurseNodeVisitor=" + _recurseNodeVisitor +
+				'}';
 	}
-
 
 	@Override
 	public void accept(final NodeVisitor visitor) {
 		//visitor.visitGroupNode(this);
 	}
 
-
 	@Override
 	public List<VisitableTreeNode> getChildsList() {
 		return _childs;
 	}
 
-
+	@Override
 	public RootNode getTreeNode() {
 		return this;
 	}
 
-
+	@Override
 	public boolean getAllowsChildren() {
 		return true;
 	}
 
-
+	@Override
 	public boolean isLeaf() {
 		return _childs.isEmpty();
 	}

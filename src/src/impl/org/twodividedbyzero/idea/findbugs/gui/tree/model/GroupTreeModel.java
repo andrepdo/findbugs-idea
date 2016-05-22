@@ -21,7 +21,6 @@ package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
-import edu.umd.cs.findbugs.BugInstance;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
@@ -275,16 +274,14 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode, RootNod
 
 					final List<VisitableTreeNode> bugInstanceNodes = groupNode.getChildsList();
 					for (final VisitableTreeNode node : bugInstanceNodes) {
-						final BugInstance otherBug = ((BugInstanceNode) node).getBugInstance();
-						if (otherBug.equals(bug.getInstance())) { // TODO equals to Bug instead of BugINstance
+						final Bug otherBug = ((BugInstanceNode) node).getBug();
+						if (otherBug.equals(bug)) {
 							return (BugInstanceNode) node;
 						}
 					}
 				}
 			}
 		}
-
-
 		return null;
 	}
 

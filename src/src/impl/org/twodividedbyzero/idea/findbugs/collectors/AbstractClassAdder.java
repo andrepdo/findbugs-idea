@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -20,7 +20,6 @@ package org.twodividedbyzero.idea.findbugs.collectors;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassOwner;
@@ -33,14 +32,6 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 
-import java.io.File;
-
-
-/**
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
- * @since 0.0.1
- */
 public abstract class AbstractClassAdder {
 
 	private static final Logger LOGGER = Logger.getInstance(AbstractClassAdder.class.getName());
@@ -50,15 +41,12 @@ public abstract class AbstractClassAdder {
 	private final Project _project;
 	private final PsiManager _psiManager;
 
-
 	AbstractClassAdder(@NotNull final Project project) {
 		_project = project;
 		_psiManager = PsiManager.getInstance(_project);
 	}
 
-
 	abstract void put(@NotNull final String fqp, @NotNull final PsiElement element);
-
 
 	public final void addContainingClasses(@NotNull final VirtualFile virtualFile) {
 
@@ -81,21 +69,8 @@ public abstract class AbstractClassAdder {
 		}
 	}
 
-
 	// analyze class under cursor
-	public final void addContainingClasses(@NotNull final PsiClass selectedPsiClass) {
-		final VirtualFile virtualFile = IdeaUtilImpl.getVirtualFile(selectedPsiClass);
-
-		assert virtualFile != null;
-		final File file = VfsUtil.virtualToIoFile(virtualFile);
-		if (!file.getAbsoluteFile().exists()) {
-			return;
-		}
-
-		if (!IdeaUtilImpl.isValidFileType(virtualFile.getFileType())) {
-			return;
-		}
-
+	public final void addContainingClasses(@NotNull final VirtualFile virtualFile, @NotNull final PsiClass selectedPsiClass) {
 		final PsiFile psiFile = _psiManager.findFile(virtualFile);
 
 		if (psiFile instanceof PsiClassOwner) {
@@ -106,7 +81,6 @@ public abstract class AbstractClassAdder {
 
 				final String s = selectedPsiClass.getName();
 				final String s1 = psiClass.getName();
-				assert s != null;
 
 				final VirtualFile compilerOutputPath = IdeaUtilImpl.getCompilerOutputPath(virtualFile, _project);
 				if (compilerOutputPath == null) {
@@ -123,14 +97,11 @@ public abstract class AbstractClassAdder {
 				}
 			}
 		}
-
 	}
-
 
 	private void addInnerClasses(final PsiClass psiClass, final String fullQualifiedPath) {
 		addInnerClasses(psiClass, fullQualifiedPath, null);
 	}
-
 
 	private void addInnerClasses(final PsiClass psiClass, final String fullQualifiedPath, @Nullable final String findClass) {
 		final PsiClass[] psiClasses = psiClass.getInnerClasses();
@@ -155,11 +126,9 @@ public abstract class AbstractClassAdder {
 		}
 	}
 
-
 	private void addInnerClasses(final PsiElement psiElement, final String fullQualifiedPath, final int anonymousClassPrefix) {
 		addInnerClasses(psiElement, fullQualifiedPath, anonymousClassPrefix, null);
 	}
-
 
 	private void addInnerClasses(final PsiElement psiElement, final String fullQualifiedPath, final int anonymousClassPrefix, @Nullable final String findClass) {
 
@@ -189,11 +158,9 @@ public abstract class AbstractClassAdder {
 		}
 	}
 
-
 	private void addAnonymousClasses(final PsiElement psiElement, final String fullQualifiedPath) {
 		addAnonymousClasses(psiElement, fullQualifiedPath, null);
 	}
-
 
 	private void addAnonymousClasses(final PsiElement psiElement, final String fullQualifiedPath, @Nullable final String findClass) {
 
@@ -221,7 +188,6 @@ public abstract class AbstractClassAdder {
 		}
 	}
 
-
 	@NotNull
 	private static String buildFullQualifiedPath(@NotNull final String compileOutputDir, @NotNull final PsiClass psiClass) {
 		final String packageUrl = IdeaUtilImpl.getPackageUrl(psiClass);
@@ -238,7 +204,6 @@ public abstract class AbstractClassAdder {
 		fqn.append(psiClass.getName());
 		return fqn.toString();
 	}
-
 
 	/*public static String getParentClassNotation(final PsiClass psiClass) {
 		final StringBuilder fqn = new StringBuilder("");
@@ -257,6 +222,4 @@ public abstract class AbstractClassAdder {
 
 		return fqn.toString();
 	}*/
-
-
 }

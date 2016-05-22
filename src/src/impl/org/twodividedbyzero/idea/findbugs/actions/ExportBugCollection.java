@@ -30,6 +30,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.HTMLBugReporter;
+import edu.umd.cs.findbugs.SortedBugCollection;
 import edu.umd.cs.findbugs.cloud.Cloud;
 import org.dom4j.Document;
 import org.dom4j.io.DocumentSource;
@@ -38,6 +39,7 @@ import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.ErrorUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FileUtilFb;
 import org.twodividedbyzero.idea.findbugs.common.util.IoUtil;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsResult;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
@@ -64,6 +66,7 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 
 public final class ExportBugCollection extends AbstractAction {
 
@@ -127,41 +130,69 @@ public final class ExportBugCollection extends AbstractAction {
 		new Task.Backgroundable(project, ResourcesLoader.getString("export.progress.title"), false) {
 			@Override
 			public void run(@NotNull final ProgressIndicator indicator) {
-				/*final boolean withMessages = bugCollection.getWithMessages(); // TODO
 				try {
-
 					FileUtilFb.mkdirs(exportDirPath);
 					File finalExportDir = exportDirPath;
 					final String currentTime = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.ENGLISH).format(new Date());
-					final String uniqueName = "findbugs-result-" + project.getName() + "_" + currentTime;
-					String filename = "result";
 					if (createSubDir) {
-						finalExportDir = new File(exportDirPath, uniqueName);
+						final String dirName = "findbugs-result-" + project.getName() + "_" + currentTime;
+						finalExportDir = new File(exportDirPath, dirName);
 						FileUtilFb.mkdirs(finalExportDir);
-					} else {
-						filename = uniqueName;
 					}
+					final boolean multiModule = result.getResults().size() > 1;
 
-					bugCollection.setWithMessages(true);
-					if (exportXml) {
-						final File xml = new File(finalExportDir, filename + ".xml");
-						exportXml(bugCollection, xml.getPath());
-					}
-					if (exportHtml) {
-						final File html = new File(finalExportDir, filename + ".html");
-						exportHtml(bugCollection, html);
-						if (openInBrowser) {
-							openInBrowser(html);
+					for (final Map.Entry<edu.umd.cs.findbugs.Project, SortedBugCollection> entry : result.getResults().entrySet()) {
+						final String fileName;
+						if (createSubDir) {
+							if (multiModule && entry.getKey() instanceof FindBugsProject) {
+								fileName = ((FindBugsProject) entry.getKey()).getModule().getName();
+							} else {
+								fileName = "result";
+							}
+						} else {
+							fileName = "findbugs-result-" + entry.getKey().getProjectName() + "_" + currentTime;
 						}
+						exportImpl(
+								entry.getValue(),
+								finalExportDir,
+								fileName,
+								exportXml,
+								exportHtml,
+								openInBrowser
+						);
 					}
-
 				} catch (final Exception e) {
 					throw ErrorUtil.toUnchecked(e);
-				} finally {
-					bugCollection.setWithMessages(withMessages);
-				}*/
+				}
 			}
 		}.queue();
+	}
+
+	private void exportImpl(
+			@NotNull final SortedBugCollection bugCollection,
+			@NotNull final File exportDir,
+			@NotNull final String fileName,
+			final boolean exportXml,
+			final boolean exportHtml,
+			final boolean openInBrowser
+	) throws Exception {
+		final boolean withMessages = bugCollection.getWithMessages();
+		try {
+			bugCollection.setWithMessages(true);
+			if (exportXml) {
+				final File xml = new File(exportDir, fileName + ".xml");
+				exportXml(bugCollection, xml.getPath());
+			}
+			if (exportHtml) {
+				final File html = new File(exportDir, fileName + ".html");
+				exportHtml(bugCollection, html);
+				if (openInBrowser) {
+					openInBrowser(html);
+				}
+			}
+		} finally {
+			bugCollection.setWithMessages(withMessages);
+		}
 	}
 
 	private void exportXml(@NotNull final BugCollection bugCollection, @NotNull final String fileName) throws IOException {

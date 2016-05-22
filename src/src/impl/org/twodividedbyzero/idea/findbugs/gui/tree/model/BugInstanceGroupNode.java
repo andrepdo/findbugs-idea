@@ -22,6 +22,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.BugRankCategory;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
@@ -59,11 +60,9 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 	 * @param parent    the parent tree node
 	 * @param bug       the bug instance
 	 * @param depth     the category depth from root category
-	 * @param project
+	 * @param project   the idea project
 	 */
 	BugInstanceGroupNode(final GroupBy groupBy, final String groupName, final VisitableTreeNode parent, final Bug bug, final int depth, final Project project) {
-
-		//_parent = parent;
 		setParent(parent);
 		_project = project;
 		_bug = bug;
@@ -86,11 +85,8 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 	@Override
 	public void addChild(final VisitableTreeNode node) {
 		_childs.add(node);
-
 		if (node instanceof BugInstanceNode && node.isLeaf()) {
-
 			Collections.sort(_childs, new ChildComparator());
-
 			incrementMemberCount();
 			TreeNode treeNode = getParent();
 			while (treeNode != null && treeNode instanceof BugInstanceGroupNode) {
@@ -100,83 +96,11 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 		}
 	}
 
-	/**
-	 * Perfomrs a deep search. Get child BugInstanceGroupNode by BugInstance group name.
-	 *
-	 * @param groupName the group name to search for
-	 * @param depth
-	 * @return the BugInstanceGroupNode
-	 * @deprecated use {@link BugInstanceGroupNode#findChildNode(Bug, int, String)}
-	 */
-	@Deprecated
-	@Nullable
-	public BugInstanceGroupNode getChildByGroupName(final String groupName, final int depth) {
-
-		if (groupName.equals(_groupName) && depth == _depthFromRoot) {
-			return this;
-		}
-
-		BugInstanceGroupNode resultNode = null;
-		for (final TreeNode node : _childs) {
-			if (node instanceof BugInstanceGroupNode) {
-				final BugInstanceGroupNode groupNode = (BugInstanceGroupNode) node;
-				if (groupName.equals(groupNode.getGroupName()) && depth == groupNode.getDepth()) {
-					resultNode = groupNode;
-				} else {
-					resultNode = groupNode.getChildByGroupName(groupName, depth);
-				}
-
-				if (resultNode != null) {
-					break;
-				}
-			}
-		}
-
-		return resultNode;
-	}
-
-	/**
-	 * Perfomrs a deep search. Get child BugInstanceGroupNode by BugInstance object.
-	 *
-	 * @param bug   the findbugs buginstance to search for
-	 * @param depth the machting depth to search for
-	 * @return the BugInstanceGroupNode
-	 * @deprecated use {@link BugInstanceGroupNode#findChildNode(Bug, int, String)}
-	 */
-	@Deprecated
-	@Nullable
-	public BugInstanceGroupNode getChildByBugInstance(@NotNull final Bug bug, final int depth) {
-		if (bug.equals(_bug) && depth == _depthFromRoot) {
-			return this;
-		}
-
-		BugInstanceGroupNode resultNode = null;
-
-		for (final TreeNode node : _childs) {
-			if (node instanceof BugInstanceGroupNode) {
-				final BugInstanceGroupNode groupNode = (BugInstanceGroupNode) node;
-				if (bug.equals(groupNode.getBug()) && depth == groupNode.getDepth()) {
-					resultNode = groupNode;
-					//break;
-				} else {
-					resultNode = groupNode.getChildByBugInstance(bug, depth);
-				}
-
-				if (resultNode != null) {
-					break;
-				}
-			}
-		}
-
-		return resultNode;
-	}
-
 	@Nullable
 	public BugInstanceGroupNode findChildNode(final Bug bug, final int depth, final String groupName) {
 		if (bug.equals(_bug) && depth == _depthFromRoot && groupName.equals(_groupName)) {
 			return this;
 		}
-
 		final RecurseVisitCriteria criteria = new RecurseVisitCriteria(bug, depth, groupName);
 		return _recurseNodeVisitor.findChildNode(criteria);
 	}
@@ -184,19 +108,6 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 	@Override
 	public void accept(final NodeVisitor visitor) {
 		visitor.visitGroupNode(this);
-	}
-
-	public List<BugInstance> getChildBugInstances() {
-		final List<BugInstance> list = new ArrayList<BugInstance>();
-
-		for (final TreeNode child : _childs) {
-			if (child instanceof BugInstanceGroupNode) {
-				final BugInstance bugInstance = ((BugInstanceGroupNode) child).getBugInstance();
-				list.add(bugInstance);
-			}
-		}
-
-		return list;
 	}
 
 	@NotNull
@@ -214,15 +125,13 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 	}
 
 	public static TreePath getPath(TreeNode node) {
-		final List<TreeNode> list = new ArrayList<TreeNode>();
-
+		final List<TreeNode> list = New.arrayList();
 		while (node != null) {
 			list.add(node);
 			//noinspection AssignmentToMethodParameter
 			node = node.getParent();
 		}
 		Collections.reverse(list);
-
 		return new TreePath(list.toArray());
 	}
 
@@ -231,21 +140,18 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 		return getPath(path.size());
 	}
 
-	String[] getPath(final int depth) {
+	private String[] getPath(final int depth) {
 		final List<String> path = _getPath();
 		final String[] result = new String[depth];
-
 		for (int i = 0; i < depth; i++) {
 			final String str = path.get(i);
 			result[i] = str;
 		}
-
 		return result;
 	}
 
-	List<String> _getPath() {
-		final List<String> list = new ArrayList<String>();
-
+	private List<String> _getPath() {
+		final List<String> list = New.arrayList();
 		TreeNode node = this;
 		while (node != null) {
 			if (node instanceof BugInstanceGroupNode) {
@@ -253,8 +159,6 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 				node = node.getParent();
 			}
 		}
-		//Collections.reverse(list);
-
 		return list;
 	}
 
@@ -278,7 +182,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 		return _childs.isEmpty();
 	}
 
-	void incrementMemberCount() {
+	private void incrementMemberCount() {
 		++_memberCount;
 	}
 
@@ -291,9 +195,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 	}
 
 	private Icon getGroupByCollapsedIcon(final GroupBy groupBy) {
-
 		switch (groupBy) {
-
 			case BugCategory:
 				return GuiResources.GROUP_BY_CATEGORY_ICON;
 			case BugShortDescription:
@@ -323,9 +225,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 	}
 
 	private Icon getGroupByExpandedIcon(final GroupBy groupBy) {
-
 		switch (groupBy) {
-
 			case BugCategory:
 				return GuiResources.GROUP_BY_CATEGORY_ICON;
 			case BugShortDescription:
@@ -356,19 +256,15 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append("BugInstanceGroupNode");
-		sb.append("{_childs=").append(_childs);
-		sb.append(", _bug=").append(_bug);
-		sb.append(", _recurseNodeVisitor=").append(_recurseNodeVisitor);
-		sb.append('}');
-		return sb.toString();
+		return "BugInstanceGroupNode" +
+				"{_childs=" + _childs +
+				", _bug=" + _bug +
+				", _recurseNodeVisitor=" + _recurseNodeVisitor +
+				'}';
 	}
 
 	private static class ChildComparator implements Comparator<TreeNode> {
-		@edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
-				value = "BC_UNCONFIRMED_CAST",
-				justification = "")
+		@SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST")
 		public int compare(final TreeNode a, final TreeNode b) {
 			if (!(a instanceof BugInstanceNode) || !(b instanceof BugInstanceNode)) {
 				throw new IllegalArgumentException("argument not instance of BugInstanceNode.");

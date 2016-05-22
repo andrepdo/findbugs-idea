@@ -112,7 +112,6 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 	private final transient ToolWindow _parent;
 	private FindBugsResult result;
 
-
 	public ToolWindowPanel(@NotNull final Project project, final ToolWindow parent) {
 		_project = project;
 		_parent = parent;
@@ -134,7 +133,6 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 			}
 		});
 	}
-
 
 	private void initGui() {
 		setLayout(new NDockLayout());
@@ -172,7 +170,6 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		add(getMultiSplitPane(), NDockLayout.CENTER);
 	}
 
-
 	private MultiSplitPane getMultiSplitPane() {
 		if (_multiSplitPane == null) {
 			_multiSplitPane = new MultiSplitPane();
@@ -181,7 +178,6 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		return _multiSplitPane;
 	}
 
-
 	private void _updateMultiSplitLayout(final String layoutDef) {
 		final MultiSplitLayout.Node modelRoot = MultiSplitLayout.parseModel(layoutDef);
 		final MultiSplitLayout multiSplitLayout = getMultiSplitPane().getMultiSplitLayout();
@@ -189,7 +185,6 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		multiSplitLayout.setModel(modelRoot);
 		multiSplitLayout.setFloatingDividers(true);
 	}
-
 
 	private void updateLayout(final boolean enablePreviewLayout) {
 		EventDispatchThreadHelper.checkEDT();
@@ -218,7 +213,6 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		}
 	}
 
-
 	private PreviewPanel getPreviewPanel() {
 		if (_previewPanel == null) {
 			_previewPanel = new PreviewPanel();
@@ -226,8 +220,7 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		return _previewPanel;
 	}
 
-
-	public void setPreviewEditor(@Nullable final Editor editor, final PsiFile psiFile) {
+	void setPreviewEditor(@Nullable final Editor editor, final PsiFile psiFile) {
 		updateLayout(true);
 		if (editor != null) {
 			getPreviewPanel().add(editor, psiFile);
@@ -237,33 +230,27 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		resizeSplitNodes(this);
 	}
 
-
 	public void setPreviewEnabled(final boolean enabled) {
 		updateLayout(false);
 		_previewEnabled = enabled;
 		getBugTreePanel().setPreviewEnabled(enabled);
 	}
 
-
 	public boolean isPreviewEnabled() {
 		return _previewEnabled;
 	}
-
 
 	public Project getProject() {
 		return _project;
 	}
 
-
 	public FindBugsResult getResult() {
 		return result;
 	}
 
-
 	public Map<PsiFile, List<ExtendedProblemDescriptor>> getProblems() {
 		return _bugTreePanel.getProblems();
 	}
-
 
 	private void installListeners() {
 		if (_componentListener == null) {
@@ -271,7 +258,6 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		}
 		addComponentListener(_componentListener);
 	}
-
 
 	@Override
 	public void analysisStarted() {
@@ -281,18 +267,14 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		clear();
 	}
 
-
 	@Override
 	public void analysisAborting() {
 	}
 
-
 	@Override
 	public void analysisAborted() {
 		_bugTreePanel.setResult(null);
-		BalloonTipFactory.showToolWindowInfoNotifier(_project, "Analysis aborted");
 	}
-
 
 	@Override
 	public void analysisFinished(@NotNull final FindBugsResult result, @Nullable final Throwable error) {
@@ -357,11 +339,9 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		DaemonCodeAnalyzer.getInstance(_project).restart();
 	}
 
-
 	private ComponentListener createComponentListener() {
 		return new ToolWindowComponentAdapter(this);
 	}
-
 
 	private void resizeSplitNodes(final Component component) {
 		final int width = component.getWidth();
@@ -377,14 +357,12 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		_multiSplitPane.validate();
 	}
 
-
 	public BugTreePanel getBugTreePanel() {
 		if (_bugTreePanel == null) {
 			_bugTreePanel = new BugTreePanel(this, _project);
 		}
 		return _bugTreePanel;
 	}
-
 
 	public BugDetailsComponents getBugDetailsComponents() {
 		if (_bugDetailsComponents == null) {
@@ -393,8 +371,8 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		return _bugDetailsComponents;
 	}
 
-
 	private void clear() {
+		result = null;
 		_bugTreePanel.clear();
 		_bugTreePanel.updateRootNode(null);
 	}
@@ -426,11 +404,9 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 
 		private final ToolWindowPanel _toolWindowPanel;
 
-
 		private ToolWindowComponentAdapter(final ToolWindowPanel toolWindowPanel) {
 			_toolWindowPanel = toolWindowPanel;
 		}
-
 
 		@Override
 		public void componentShown(final ComponentEvent e) {
@@ -439,14 +415,12 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 			_toolWindowPanel.resizeSplitNodes(component);
 		}
 
-
 		@Override
 		public void componentResized(final ComponentEvent e) {
 			super.componentResized(e);
 			final Component component = e.getComponent();
 			_toolWindowPanel.resizeSplitNodes(component);
 		}
-
 
 		@Override
 		public void componentMoved(final ComponentEvent e) {
@@ -456,18 +430,15 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		}
 	}
 
-
 	private static abstract class AbstractListenerImpl {
 
 		protected final FindBugsResult result;
-		protected final ToolWindowPanel _toolWindowPanel;
-
+		final ToolWindowPanel _toolWindowPanel;
 
 		private AbstractListenerImpl(@NotNull final ToolWindowPanel toolWindowPanel, final FindBugsResult result) {
 			this.result = result;
 			_toolWindowPanel = toolWindowPanel;
 		}
-
 
 		final void openAnalysisRunDetailsDialog() {
 			final int bugCount = _toolWindowPanel.getBugTreePanel().getGroupModel().getBugCount();
@@ -476,14 +447,11 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		}
 	}
 
-
 	private static class NotificationListenerImpl extends AbstractListenerImpl implements NotificationListener {
-
 
 		private NotificationListenerImpl(@NotNull final ToolWindowPanel toolWindowPanel, final FindBugsResult result) {
 			super(toolWindowPanel, result);
 		}
-
 
 		@Override
 		public void hyperlinkUpdate(@NotNull final Notification notification, @NotNull final HyperlinkEvent e) {
@@ -512,7 +480,6 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 			}
 		}
 
-
 		@Override
 		public String toString() {
 			return "NotifierHyperlinkListener" +
@@ -522,17 +489,14 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		}
 	}
 
-
 	private static class BalloonErrorListenerImpl extends AbstractListenerImpl implements HyperlinkListener {
 
 		private final IdeMessagePanel _ideMessagePanel;
-
 
 		private BalloonErrorListenerImpl(@NotNull final ToolWindowPanel toolWindowPanel, final FindBugsResult result, @Nullable final IdeMessagePanel ideMessagePanel) {
 			super(toolWindowPanel, result);
 			_ideMessagePanel = ideMessagePanel;
 		}
-
 
 		@Override
 		public void hyperlinkUpdate(HyperlinkEvent e) {

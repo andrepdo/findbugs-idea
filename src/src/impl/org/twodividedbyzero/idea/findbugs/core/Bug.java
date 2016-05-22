@@ -58,4 +58,23 @@ public final class Bug {
 	public BugInstance getInstance() {
 		return instance;
 	}
+
+	@SuppressWarnings("SimplifiableIfStatement")
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Bug bug = (Bug) o;
+		if (module != null ? !module.equals(bug.module) : bug.module != null) return false;
+		if (!bugCollection.equals(bug.bugCollection)) return false;
+		return instance.equals(bug.instance);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = module != null ? module.hashCode() : 0;
+		result = 31 * result + bugCollection.hashCode();
+		result = 31 * result + instance.hashCode();
+		return result;
+	}
 }

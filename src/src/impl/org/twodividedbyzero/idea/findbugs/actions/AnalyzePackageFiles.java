@@ -90,7 +90,7 @@ public final class AnalyzePackageFiles extends AbstractAnalyzeAction {
 			}
 
 			@Override
-			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
+			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
 				final CompilerModuleExtension extension = CompilerModuleExtension.getInstance(module);
 				if (extension == null) {
 					throw new IllegalStateException("No compiler extension for module " + module.getName());

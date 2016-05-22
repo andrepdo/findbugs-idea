@@ -53,13 +53,11 @@ import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
 import org.twodividedbyzero.idea.findbugs.tasks.BackgroundableTask;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-// TODO test it
 public final class ImportBugCollection extends AbstractAction {
 
 	private static final Logger LOGGER = Logger.getInstance(ImportBugCollection.class);
@@ -92,7 +90,6 @@ public final class ImportBugCollection extends AbstractAction {
 
 		final WorkspaceSettings workspaceSettings = WorkspaceSettings.getInstance(project);
 		String exportDir = StringUtil.isEmptyOrSpaces(workspaceSettings.exportBugCollectionDirectory) ? FindBugsPluginConstants.DEFAULT_EXPORT_DIR : workspaceSettings.exportBugCollectionDirectory;
-		exportDir += File.separatorChar + project.getName();
 
 		final ImportFileDialog importFileDialog = new ImportFileDialog(exportDir, dialogBuilder);
 		dialogBuilder.showModal(true);
@@ -150,10 +147,12 @@ public final class ImportBugCollection extends AbstractAction {
 				indicator.setIndeterminate(false);
 				indicator.setText(fileToImport);
 				SortedBugCollection importBugCollection = null;
+				edu.umd.cs.findbugs.Project importProject = null;
+				boolean success = false;
 				try {
 					final SortedBugCollection bugCollection = new SortedBugCollection();
 					importBugCollection = bugCollection.createEmptyCollectionWithMetadata();
-					final edu.umd.cs.findbugs.Project importProject = importBugCollection.getProject();
+					importProject = importBugCollection.getProject();
 					importProject.setGuiCallback(new PluginGuiCallback(project));
 					importBugCollection.setDoNotUseCloud(true);
 					for (final Plugin plugin : Plugin.getAllPlugins()) {
@@ -202,23 +201,26 @@ public final class ImportBugCollection extends AbstractAction {
 					importBugCollection.setDoNotUseCloud(false);
 					importBugCollection.setTimestamp(System.currentTimeMillis());
 					importBugCollection.reinitializeCloud();
+					success = true;
 				} catch (final IOException e1) {
-					MessageBusManager.publishAnalysisAbortedToEDT(project);
 					final String message = "Import failed";
 					showToolWindowErrorNotifier(project, message);
 					LOGGER.error(message, e1);
 
 				} catch (final DocumentException e1) {
-					MessageBusManager.publishAnalysisAbortedToEDT(project);
 					final String message = "Import failed";
 					showToolWindowErrorNotifier(project, message);
 					LOGGER.error(message, e1);
 
 				} finally {
-					final FindBugsResult result = new FindBugsResult();
-					result.put(null, importBugCollection, importBugCollection.getProjectStats().getNumClasses());
-					MessageBusManager.publishAnalysisFinishedToEDT(project, result, null);
-					Thread.currentThread().interrupt();
+					if (success) {
+						final FindBugsResult result = new FindBugsResult();
+						result.put(importProject, importBugCollection, importBugCollection.getProjectStats().getNumClasses());
+						MessageBusManager.publishAnalysisFinishedToEDT(project, result, null);
+						Thread.currentThread().interrupt();
+					} else {
+						MessageBusManager.publishAnalysisAbortedToEDT(project);
+					}
 				}
 			}
 

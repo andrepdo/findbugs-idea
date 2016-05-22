@@ -32,7 +32,6 @@ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProjects;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 
 public final class AnalyzeSelectedFiles extends AbstractAnalyzeAction {
 
@@ -44,14 +43,14 @@ public final class AnalyzeSelectedFiles extends AbstractAnalyzeAction {
 			@NotNull final FindBugsState state
 	) {
 
-		final VirtualFile[] selectedSourceFiles = IdeaUtilImpl.getVirtualFiles(e.getDataContext());
+		final VirtualFile[] selectedFiles = IdeaUtilImpl.getVirtualFiles(e.getDataContext());
 
 		boolean enable = false;
 		if (state.isIdle()) {
-			enable = selectedSourceFiles != null &&
-					selectedSourceFiles.length > 0 &&
-					!selectedSourceFiles[0].isDirectory() &&
-					IdeaUtilImpl.isValidFileType(selectedSourceFiles[0].getFileType());
+			enable = selectedFiles != null &&
+					selectedFiles.length > 0 &&
+					!selectedFiles[0].isDirectory() &&
+					IdeaUtilImpl.isValidFileType(selectedFiles[0].getFileType());
 		}
 
 		e.getPresentation().setEnabled(enable);
@@ -68,10 +67,6 @@ public final class AnalyzeSelectedFiles extends AbstractAnalyzeAction {
 	) {
 
 		final VirtualFile[] selectedFiles = IdeaUtilImpl.getVirtualFiles(e.getDataContext());
-		if (selectedFiles == null) {
-			BalloonTipFactory.showToolWindowWarnNotifier(project, "No selected files");
-			return;
-		}
 
 		new FindBugsStarter(project, "Running FindBugs analysis for selected files...") {
 			@Override
@@ -80,9 +75,8 @@ public final class AnalyzeSelectedFiles extends AbstractAnalyzeAction {
 			}
 
 			@Override
-			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
-				projects.addFiles(selectedFiles);
-				return true;
+			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
+				return projects.addFiles(selectedFiles, !justCompiled);
 			}
 		}.start();
 	}

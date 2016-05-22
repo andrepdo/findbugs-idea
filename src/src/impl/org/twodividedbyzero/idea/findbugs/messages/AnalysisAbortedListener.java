@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -18,15 +18,8 @@
  */
 package org.twodividedbyzero.idea.findbugs.messages;
 
-
 import com.intellij.util.messages.Topic;
 
-
-/**
- * @author Reto Merz<reto.merz@gmail.com>
- * @version $Revision: 364 $
- * @since 0.9.995
- */
 public interface AnalysisAbortedListener {
 	Topic<AnalysisAbortedListener> TOPIC = Topic.create("FindBugs Analysis Aborted", AnalysisAbortedListener.class);
 
@@ -34,5 +27,4 @@ public interface AnalysisAbortedListener {
 	 * Invoked by EDT.
 	 */
 	void analysisAborted();
-
 }

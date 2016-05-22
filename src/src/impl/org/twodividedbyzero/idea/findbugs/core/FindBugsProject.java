@@ -18,31 +18,21 @@
  */
 package org.twodividedbyzero.idea.findbugs.core;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import edu.umd.cs.findbugs.Plugin;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.collectors.RecurseFileCollector;
 import org.twodividedbyzero.idea.findbugs.collectors.StatelessClassAdder;
-import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 public class FindBugsProject extends edu.umd.cs.findbugs.Project {
-
-	private static final Logger LOGGER = Logger.getInstance(FindBugsProject.class);
 
 	@NotNull
 	private final Project project;
@@ -72,72 +62,7 @@ public class FindBugsProject extends edu.umd.cs.findbugs.Project {
 		return classAdder;
 	}
 
-	public void _configureSourceDirectories(@NotNull final ProgressIndicator indicator, @NotNull final Collection<VirtualFile> sourceDirs) {
-		indicator.setText("Configure source directories...");
-		for (final VirtualFile file : sourceDirs) {
-			if (IdeaUtilImpl.isValidFileType(file.getFileType())) {
-				final VirtualFile parent = file.getParent();
-				if (parent != null && parent.isDirectory()) {
-					addSourceDir(parent.getPresentableUrl());
-				}
-			} else if (file.isDirectory()) { // package dir
-				addSourceDir(file.getPresentableUrl());
-			}
-		}
-	}
-
-
-	public void _configureSourceDirectories(@NotNull final ProgressIndicator indicator, @NotNull final VirtualFile[] sourceDirs) {
-		indicator.setText("Configure source directories...");
-		for (final VirtualFile file : sourceDirs) {
-			if (IdeaUtilImpl.isValidFileType(file.getFileType())) {
-				final VirtualFile parent = file.getParent();
-				if (parent != null && parent.isDirectory()) {
-					addSourceDir(parent.getPresentableUrl());
-				}
-			} else if (file.isDirectory()) { // package dir
-				addSourceDir(file.getPresentableUrl());
-			}
-		}
-	}
-
-	public void addSourceDirectoryOf(@NotNull final ProgressIndicator indicator, @NotNull final VirtualFile file) {
-		indicator.setText("Configure source directories...");
-		if (IdeaUtilImpl.isValidFileType(file.getFileType())) {
-			final VirtualFile parent = file.getParent();
-			if (parent != null && parent.isDirectory()) {
-				addSourceDir(parent.getPresentableUrl());
-			}
-		} else if (file.isDirectory()) { // package dir
-			addSourceDir(file.getPresentableUrl());
-		}
-	}
-
-
-	public void addAuxClasspathEntries(@NotNull final ProgressIndicator indicator, @NotNull final Collection<VirtualFile> classpathFiles) {
-		indicator.setText("Collecting auxiliary classpath entries...");
-		for (final VirtualFile file : classpathFiles) {
-			addAuxClasspathEntry(file.getPresentableUrl());
-		}
-	}
-
-
-	public void _addAuxClasspathEntries(@NotNull final ProgressIndicator indicator, @NotNull final VirtualFile[] classpathFiles) {
-		indicator.setText("Collecting auxiliary classpath entries...");
-		_addAuxClasspathEntries(classpathFiles);
-	}
-
-
-	public void _addAuxClasspathEntries(@NotNull final VirtualFile[] classpathFiles) {
-		for (final VirtualFile file : classpathFiles) {
-			addAuxClasspathEntry(file.getPresentableUrl());
-		}
-	}
-
-	public void addOutputFile(@NotNull final com.intellij.openapi.project.Project project, @NotNull final VirtualFile file) {
-		if (!IdeaUtilImpl.isValidFileType(file.getFileType())) {
-			return;
-		}
+	void addOutputFile(@NotNull final VirtualFile file) {
 		if (_outputFiles == null) {
 			_outputFiles = New.arrayList();
 		}
@@ -145,89 +70,17 @@ public class FindBugsProject extends edu.umd.cs.findbugs.Project {
 		getClassAdder().addContainingClasses(file);
 	}
 
-	public void _configureOutputFiles(@NotNull final com.intellij.openapi.project.Project project, @NotNull final Collection<VirtualFile> files) {
-		_outputFiles = asPathList(files);
-		final StatelessClassAdder sca = new StatelessClassAdder(this, project);
-		for (final VirtualFile file : files) {
-			if (IdeaUtilImpl.isValidFileType(file.getFileType())) {
-				sca.addContainingClasses(file);
-			}
+	public void addOutputFile(@NotNull final VirtualFile file, @NotNull final PsiClass psiClass) {
+		if (_outputFiles == null) {
+			_outputFiles = New.arrayList();
 		}
+		_outputFiles.add(file.getPath());
+		getClassAdder().addContainingClasses(file, psiClass);
 	}
-
-
-	public void _configureOutputFiles(@NotNull final com.intellij.openapi.project.Project project, @NotNull final VirtualFile[] files) {
-		_outputFiles = asPathList(files);
-		final StatelessClassAdder sca = new StatelessClassAdder(this, project);
-		for (final VirtualFile file : files) {
-			if (IdeaUtilImpl.isValidFileType(file.getFileType())) {
-				sca.addContainingClasses(file);
-			}
-		}
-	}
-
-
-	public void _configureOutputFile(@NotNull final com.intellij.openapi.project.Project project, final PsiClass psiClass) {
-		final VirtualFile vFile = IdeaUtilImpl.getVirtualFile(psiClass);
-		if (vFile != null) {
-			_outputFiles = Arrays.asList(vFile.getPath());
-			new StatelessClassAdder(this, project).addContainingClasses(psiClass);
-		}
-	}
-
-
-	public void _configureOutputFiles(@NotNull final com.intellij.openapi.project.Project project, @NotNull ProgressIndicator indicator, @NotNull final String path) {
-		final VirtualFile fileByPath = IdeaUtilImpl.findFileByPath(path);
-		if (fileByPath != null) {
-			_outputFiles = Arrays.asList(fileByPath.getPath());
-		} else {
-			LOGGER.error("Could not configure outputFiles! path=" + path);
-		}
-		indicator.setText("Collecting files for analysis...");
-		final int[] count = new int[1];
-		RecurseFileCollector.addFiles(project, indicator, this, new File(path), count);
-	}
-
-
-	public void _configureOutputFiles(@NotNull final com.intellij.openapi.project.Project project, @NotNull ProgressIndicator indicator, @NotNull final String[] paths) {
-		_outputFiles = new ArrayList<String>();
-		indicator.setText("Collecting files for analysis...");
-		final int[] count = new int[1];
-		for (final String path : paths) {
-			_outputFiles.add(path);
-			RecurseFileCollector.addFiles(project, indicator, this, new File(path), count);
-		}
-	}
-
 
 	@NotNull
 	public List<String> getConfiguredOutputFiles() {
 		return _outputFiles != null ? _outputFiles : Collections.<String>emptyList();
-	}
-
-
-	public void setConfiguredOutputFiles(@NotNull final List<String> files) {
-		_outputFiles = files;
-	}
-
-
-	@NotNull
-	private static List<String> asPathList(@NotNull final VirtualFile[] files) {
-		final List<String> ret = new ArrayList<String>(files.length);
-		for (final VirtualFile file : files) {
-			ret.add(file.getPath());
-		}
-		return ret;
-	}
-
-
-	@NotNull
-	private static List<String> asPathList(@NotNull final Collection<VirtualFile> files) {
-		final List<String> ret = new ArrayList<String>(files.size());
-		for (final VirtualFile file : files) {
-			ret.add(file.getPath());
-		}
-		return ret;
 	}
 
 	@NotNull

@@ -87,7 +87,7 @@ public final class AnalyzeModuleFiles extends AbstractAnalyzeAction {
 			}
 
 			@Override
-			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
+			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
 				indicator.setText("Collecting files for analysis...");
 				final FindBugsProject findBugsProject = projects.get(module);
 				final int[] count = new int[1];

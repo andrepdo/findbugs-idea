@@ -127,7 +127,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 							public void finished(final boolean aborted, final int errors, final int warnings, final CompileContext compileContext) {
 								if (!aborted && errors == 0 && !isAnalyzeAfterCompile) {
 									EventDispatchThreadHelper.checkEDT(); // see javadoc of CompileStatusNotification
-									startImpl();
+									startImpl(true);
 								}
 							}
 						});
@@ -135,11 +135,11 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 				}
 			});
 		} else {
-			startImpl();
+			startImpl(false);
 		}
 	}
 
-	private void startImpl() {
+	private void startImpl(final boolean justCompiled) {
 		MessageBusManager.publishAnalysisStarted(_project);
 
 		final ToolWindow toolWindow = ToolWindowManager.getInstance(_project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
@@ -156,7 +156,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 				indicator.setIndeterminate(true);
 				indicator.setText("Configure FindBugs...");
 				try {
-					asyncStart(indicator);
+					asyncStart(indicator, justCompiled);
 				} catch (final ProcessCanceledException ignore) {
 					MessageBusManager.publishAnalysisAbortedToEDT(_project);
 				}
@@ -170,14 +170,14 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 	}
 
 
-	private void asyncStart(@NotNull final ProgressIndicator indicator) {
+	private void asyncStart(@NotNull final ProgressIndicator indicator, final boolean justCompiled) {
 
 		final FindBugsProjects projects = new FindBugsProjects(_project);
 
 		boolean canceled = !ApplicationManager.getApplication().runReadAction(new Computable<Boolean>() {
 			@Override
 			public Boolean compute() {
-				return configure(indicator, projects);
+				return configure(indicator, projects, justCompiled);
 			}
 		});
 
@@ -305,7 +305,11 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		return new CompositeScope(scopes);
 	}
 
-	protected abstract boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects);
+	protected abstract boolean configure(
+			@NotNull final ProgressIndicator indicator,
+			@NotNull final FindBugsProjects projects,
+			final boolean justCompiled
+	);
 
 	@Override
 	public final void analysisAborting() {
@@ -367,7 +371,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		}
 	}
 
-	protected void showWarning(@NotNull final String message) {
+	protected final void showWarning(@NotNull final String message) {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			@Override
 			public void run() {

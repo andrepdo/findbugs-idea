@@ -78,9 +78,8 @@ public final class AnalyzeAllModifiedFiles extends AbstractAnalyzeAction {
 			}
 
 			@Override
-			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
-				projects.addFiles(modifiedFiles);
-				return true;
+			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
+				return projects.addFiles(modifiedFiles, !justCompiled);
 			}
 		}.start();
 	}

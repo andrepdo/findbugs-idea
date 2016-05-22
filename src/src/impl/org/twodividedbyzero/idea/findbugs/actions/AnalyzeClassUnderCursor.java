@@ -21,6 +21,8 @@ package org.twodividedbyzero.idea.findbugs.actions;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompilerManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -45,13 +47,11 @@ public final class AnalyzeClassUnderCursor extends AbstractAnalyzeAction {
 			@NotNull final FindBugsState state
 	) {
 
-		final VirtualFile[] selectedSourceFiles = IdeaUtilImpl.getVirtualFiles(e.getDataContext());
 		boolean enabled = false;
 		if (state.isIdle()) {
-			enabled = selectedSourceFiles != null &&
-					selectedSourceFiles.length > 0 &&
-					selectedSourceFiles[0].isValid() &&
-					IdeaUtilImpl.isValidFileType(selectedSourceFiles[0].getFileType()) &&
+			final VirtualFile selectedFile = IdeaUtilImpl.getVirtualFile(e.getDataContext());
+			enabled = selectedFile != null &&
+					IdeaUtilImpl.isValidFileType(selectedFile.getFileType()) &&
 					IdeaUtilImpl.getCurrentClass(e.getDataContext()) != null;
 		}
 
@@ -68,22 +68,23 @@ public final class AnalyzeClassUnderCursor extends AbstractAnalyzeAction {
 			@NotNull final FindBugsState state
 	) {
 
-		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
-		final VirtualFile selectedSourceFile = IdeaUtilImpl.getVirtualFile(e.getDataContext());
-		final VirtualFile[] selectedSourceFiles = new VirtualFile[]{selectedSourceFile};
+		final VirtualFile selectedFile = IdeaUtilImpl.getVirtualFile(e.getDataContext());
 		final PsiClass psiClass = IdeaUtilImpl.getCurrentClass(e.getDataContext());
 
 		new FindBugsStarter(project, "Running FindBugs analysis for current class...") {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
-				consumer.consume(compilerManager.createFilesCompileScope(selectedSourceFiles));
+				consumer.consume(compilerManager.createFilesCompileScope(new VirtualFile[]{selectedFile}));
 			}
 
 			@Override
-			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
-				/*projects.configureAuxClasspathEntries(indicator, files); TODO
-				projects.configureSourceDirectories(indicator, selectedSourceFiles);
-				projects.configureOutputFile(project, psiClass);*/
+			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
+				final Module module = ModuleUtilCore.findModuleForFile(selectedFile, project);
+				if (module == null) {
+					throw new IllegalStateException("No module found for " + selectedFile);
+				}
+				final FindBugsProject findBugsProject = projects.get(module);
+				findBugsProject.addOutputFile(selectedFile, psiClass);
 				return true;
 			}
 		}.start();

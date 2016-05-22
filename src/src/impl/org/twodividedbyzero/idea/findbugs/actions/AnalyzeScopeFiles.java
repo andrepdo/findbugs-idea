@@ -142,7 +142,7 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 			}
 
 			@Override
-			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
+			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
 				addClasses(indicator, project, scope, projects);
 				return true;
 			}
@@ -169,7 +169,7 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 					}
 					if (IdeaUtilImpl.SUPPORTED_FILE_TYPES.contains(file.getFileType())) {
 						final VirtualFile vf = file.getVirtualFile();
-						projects.addFile(vf); // LATER: profile this
+						projects.addFile(vf, false); // LATER: profile this
 						indicator.setText2("Files collected: " + ++count[0]);
 					}
 				}

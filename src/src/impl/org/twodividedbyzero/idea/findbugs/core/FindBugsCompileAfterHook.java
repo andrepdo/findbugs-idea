@@ -26,8 +26,6 @@ import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
@@ -44,10 +42,8 @@ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -197,24 +193,16 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 
 		final CompileScope compileScope = compileContext.getCompileScope();
 		final VirtualFile[] affectedFiles = getAffectedFiles(compileScope);
-		final Collection<VirtualFile> auxFiles = new ArrayList<VirtualFile>();
-		final Set<Module> modules = New.set();
-		for (final VirtualFile affectedFile : affectedFiles) {
-			final Module module = compileContext.getModuleByFile(affectedFile);
-			modules.add(module);
-			final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(module);
-			auxFiles.addAll(Arrays.asList(files));
-		}
 
 		// TODO
-		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
+		/*final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
 		AbstractSettings settings = projectSettings;
 		if (modules.size() == 1) {
 			final ModuleSettings moduleSettings = ModuleSettings.getInstance(modules.iterator().next());
 			if (moduleSettings.overrideProjectSettings) {
 				settings = moduleSettings;
 			}
-		}
+		}*/
 
 		new FindBugsStarter(
 				project,
@@ -232,10 +220,8 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 			}
 
 			@Override
-			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
-				/*projects.configureAuxClasspathEntries(indicator, auxFiles); TODO
-				projects.configureSourceDirectories(indicator, affectedFiles);
-				projects.configureOutputFiles(project, affectedFiles);*/
+			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
+				projects.addFiles(affectedFiles, false);
 				return true;
 			}
 		}.start();
@@ -280,14 +266,6 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 	}
 
 	private static void initWorkerForAutoMakeImpl(@NotNull final Project project, @NotNull final Collection<VirtualFile> changed) {
-
-		final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
-		final Module[] modules = ModuleManager.getInstance(project).getModules();
-		final List<VirtualFile> classPaths = new LinkedList<VirtualFile>();
-		for (final Module module : modules) {
-			IdeaUtilImpl.addProjectClasspath(module, classPaths);
-		}
-
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -303,10 +281,8 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 					}
 
 					@Override
-					protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
-						/*projects.configureAuxClasspathEntries(indicator, classPaths); TODO
-						projects.configureSourceDirectories(indicator, changed);
-						projects.configureOutputFiles(project, changed);*/
+					protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
+						projects.addFiles(changed, false);
 						return true;
 					}
 				}.start();

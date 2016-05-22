@@ -74,7 +74,7 @@ public final class AnalyzeProjectFiles extends AbstractAnalyzeAction {
 			}
 
 			@Override
-			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
+			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
 				final Module[] modules = ModuleManager.getInstance(project).getModules();
 				final Map<Module, VirtualFile> compilerOutputPaths = New.map();
 				for (final Module module : modules) {

@@ -32,7 +32,6 @@ import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProjects;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 
 public final class AnalyzeCurrentEditorFile extends AbstractAnalyzeAction {
 
@@ -67,10 +66,6 @@ public final class AnalyzeCurrentEditorFile extends AbstractAnalyzeAction {
 	) {
 
 		final VirtualFile[] selectedFiles = IdeaUtilImpl.getVirtualFiles(e.getDataContext());
-		if (selectedFiles == null) {
-			BalloonTipFactory.showToolWindowWarnNotifier(project, "No current files");
-			return;
-		}
 
 		new FindBugsStarter(project, "Running FindBugs analysis for editor files...") {
 			@Override
@@ -79,9 +74,8 @@ public final class AnalyzeCurrentEditorFile extends AbstractAnalyzeAction {
 			}
 
 			@Override
-			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
-				projects.addFiles(selectedFiles);
-				return true;
+			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
+				return projects.addFiles(selectedFiles, !justCompiled);
 			}
 		}.start();
 	}
