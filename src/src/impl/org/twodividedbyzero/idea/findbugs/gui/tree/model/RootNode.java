@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,13 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 
 import com.intellij.ui.JBColor;
 import edu.umd.cs.findbugs.BugInstance;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
+import org.twodividedbyzero.idea.findbugs.core.Bug;
 import org.twodividedbyzero.idea.findbugs.gui.tree.NodeVisitor;
 import org.twodividedbyzero.idea.findbugs.gui.tree.RecurseNodeVisitor;
 import org.twodividedbyzero.idea.findbugs.gui.tree.RecurseNodeVisitor.RecurseVisitCriteria;
@@ -34,12 +35,6 @@ import javax.swing.tree.TreeNode;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- * $Date$
- *
- * @version $Revision$
- */
 @SuppressWarnings({"UnusedDeclaration"})
 public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements VisitableTreeNode {
 
@@ -105,7 +100,7 @@ public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements Vis
 	 * @param groupName the group name to search for
 	 * @param depth
 	 * @return the BugInstanceGroupNode
-	 * @deprecated use {@link RootNode#findChildNode(edu.umd.cs.findbugs.BugInstance, int, String)}
+	 * @deprecated use {@link RootNode#findChildNode(Bug, int, String)}
 	 */
 	@Deprecated
 	@Nullable
@@ -135,23 +130,23 @@ public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements Vis
 	/**
 	 * Perfomrs a deep search. Get child BugInstanceGroupNode by BugInstance object.
 	 *
-	 * @param bugInstance the findbugs buginstance to search for
-	 * @param depth	   the machting depth to search for
+	 * @param bug   the findbugs buginstance to search for
+	 * @param depth the machting depth to search for
 	 * @return the BugInstanceGroupNode
-	 * @deprecated use {@link RootNode#findChildNode(edu.umd.cs.findbugs.BugInstance, int, String)}
+	 * @deprecated use {@link RootNode#findChildNode(Bug, int, String)}
 	 */
 	@Deprecated
 	@Nullable
-	public BugInstanceGroupNode getChildByBugInstance(final BugInstance bugInstance, final int depth) {
+	public BugInstanceGroupNode getChildByBugInstance(@NotNull final Bug bug, final int depth) {
 		BugInstanceGroupNode resultNode = null;
 
 		for (final TreeNode node : _childs) {
 			if (node instanceof BugInstanceGroupNode) {
 				final BugInstanceGroupNode groupNode = (BugInstanceGroupNode) node;
-				if (bugInstance.equals(groupNode.getBugInstance()) && depth == groupNode.getDepth()) {
+				if (bug.getInstance().equals(groupNode.getBugInstance()) && depth == groupNode.getDepth()) { // TODO change equals to Bug
 					resultNode = groupNode;
 				} else {
-					resultNode = groupNode.getChildByBugInstance(bugInstance, depth);
+					resultNode = groupNode.getChildByBugInstance(bug, depth);
 				}
 
 				if (resultNode != null) {
@@ -165,8 +160,8 @@ public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements Vis
 
 
 	@Nullable
-	public BugInstanceGroupNode findChildNode(final BugInstance bugInstance, final int depth, final String groupName) {
-		final RecurseVisitCriteria criteria = new RecurseVisitCriteria(bugInstance, depth, groupName);
+	public BugInstanceGroupNode findChildNode(final Bug bug, final int depth, final String groupName) {
+		final RecurseVisitCriteria criteria = new RecurseVisitCriteria(bug, depth, groupName);
 		return _recurseNodeVisitor.findChildNode(criteria);
 	}
 
@@ -187,19 +182,17 @@ public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements Vis
 
 
 	@NotNull
-	public List<BugInstance> getAllChildBugInstances() {
-		final List<BugInstance> list = new ArrayList<BugInstance>();
-
+	List<Bug> getAllChildBugs() {
+		final List<Bug> ret = New.arrayList();
 		for (final TreeNode child : _childs) {
 			if (child instanceof BugInstanceGroupNode) {
 				final BugInstanceGroupNode node = (BugInstanceGroupNode) child;
-				list.add(node.getBugInstance());
-				final List<BugInstance> bugInstances = node.getAllChildBugInstances();
-				list.addAll(list.size(), bugInstances);
+				ret.add(node.getBug());
+				final List<Bug> bugs = node.getAllChildBugs();
+				ret.addAll(ret.size(), bugs);
 			}
 		}
-
-		return list;
+		return ret;
 	}
 
 

@@ -19,6 +19,7 @@
 package org.twodividedbyzero.idea.findbugs.core;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
@@ -52,7 +53,13 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 	private static final Logger LOGGER = Logger.getInstance(Reporter.class.getName());
 	private static final String ANALYZING_CLASSES_i18N = "Analyzing classes: ";
 
+	@NotNull
 	private final Project _project;
+
+	@NotNull
+	private final Module module;
+
+	@NotNull
 	private final SortedBugCollection _bugCollection;
 
 	@NotNull
@@ -69,23 +76,28 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 	@NonNls
 	private String _currentStageName;
 	private boolean _canceled;
+	private int analyzedClassCountOffset;
 
 
 	Reporter(
 			@NotNull final Project project,
+			@NotNull final Module module,
 			@NotNull final SortedBugCollection bugCollection,
 			@NotNull final Set<String> hiddenBugCategory,
 			@NotNull final ProgressIndicator indicator,
-			@NotNull final AtomicBoolean cancellingByUser
+			@NotNull final AtomicBoolean cancellingByUser,
+			final int analyzedClassCountOffset
 	) {
 		_project = project;
+		this.module = module;
 		_bugCollection = bugCollection;
 		this.hiddenBugCategory = hiddenBugCategory;
 		_indicator = indicator;
 		_cancellingByUser = cancellingByUser;
+		this.analyzedClassCountOffset = analyzedClassCountOffset;
 		_transferToEDTQueue = new TransferToEDTQueue<Runnable>("Add New Bug Instance", new RunnableProcessor(), new Condition<Object>() {
 			@Override
-			public boolean value(Object o) {
+			public boolean value(final Object o) {
 				return project.isDisposed() || _cancellingByUser.get() || _indicator.isCanceled();
 			}
 		}, 500);
@@ -122,15 +134,17 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 		/**
 		 * Guarantee thread visibility *one* time.
 		 */
+		final AtomicReference<SortedBugCollection> bugCollectionRef = New.atomicRef(_bugCollection);
 		final AtomicReference<BugInstance> bugRef = New.atomicRef(bug);
-		final AtomicReference<ProjectStats> projectStatsRef = New.atomicRef(getProjectStats());
+		final int analyzedClassCount = analyzedClassCountOffset + getProjectStats().getNumClasses();
 		_transferToEDTQueue.offer(new Runnable() {
 			/**
 			 * Invoked by EDT.
 			 */
 			@Override
 			public void run() {
-				MessageBusManager.publishNewBugInstance(_project, bugRef.get(), projectStatsRef.get());
+				final Bug bug = new Bug(module, bugCollectionRef.get(), bugRef.get());
+				MessageBusManager.publishNewBug(_project, bug, analyzedClassCount);
 			}
 		});
 	}

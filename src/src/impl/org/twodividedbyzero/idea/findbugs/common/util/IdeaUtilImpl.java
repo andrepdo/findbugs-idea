@@ -605,6 +605,16 @@ public final class IdeaUtilImpl {
 		return findJavaPsiClass(project, dottedName, scope);
 	}
 
+	@Nullable
+	public static PsiClass findJavaPsiClass(@NotNull final Project project, @Nullable final Module module, @NotNull final String classname) {
+		if (module == null) {
+			return findJavaPsiClass(project, classname);
+		}
+		final String fqn = removeExtension(classname);
+		final String dottedName = fqn.contains("/") ? fqn.replace('/', '.') : fqn;
+		final GlobalSearchScope scope = GlobalSearchScope.moduleScope(module);
+		return findJavaPsiClass(project, dottedName, scope);
+	}
 
 	@Nullable
 	private static PsiClass findJavaPsiClass(final Project project, @NotNull final String dottedFqClassName, @NotNull final GlobalSearchScope searchScope) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -36,11 +36,11 @@ import com.intellij.ui.content.Content;
 import com.intellij.util.EditSourceOnDoubleClickHandler;
 import com.intellij.util.OpenSourceUtil;
 import com.intellij.util.ui.UIUtil;
-import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NonNls;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.core.Bug;
 import org.twodividedbyzero.idea.findbugs.gui.common.AnalysisRunDetailsDialog;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.BugTreePanel;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
@@ -66,25 +66,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
- * @since 0.9.8-dev
- */
 @SuppressFBWarnings("SE_BAD_FIELD")
 public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 
-	private static final Logger LOGGER = Logger.getInstance(BugTree.class.getName());
+	private static final Logger LOGGER = Logger.getInstance(BugTree.class);
 
 	private final BugTreePanel _bugTreePanel;
 	private final Project _project;
 	private BugTreeHelper _treeHelper;
 	private ScrollToSourceHandler _scrollToSourceHandler;
 	private final TreeOccurenceNavigator _occurenceNavigator;
-
 
 	public BugTree(final TreeModel treeModel, final BugTreePanel bugTreePanel, final Project project) {
 		super(treeModel);
@@ -93,7 +84,6 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 		_occurenceNavigator = new TreeOccurenceNavigator(this);
 		init();
 	}
-
 
 	public final void init() {
 		_treeHelper = BugTreeHelper.create(this, _project);
@@ -116,9 +106,7 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 		installHandlers();
 	}
 
-
 	private void installHandlers() {
-
 		final DefaultActionGroup defaultactiongroup = new DefaultActionGroup();
 		defaultactiongroup.add(ActionManager.getInstance().getAction("EditSource"));
 		defaultactiongroup.addSeparator();
@@ -130,7 +118,6 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 		_scrollToSourceHandler = new ScrollToSourceHandler(_bugTreePanel);
 		_scrollToSourceHandler.install(this);
 	}
-
 
 	private KeyAdapter createKeyAdapter() {
 		return new KeyAdapter() {
@@ -156,7 +143,7 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 		};
 	}
 
-
+	@Override
 	public Object getData(@NonNls final String s) {
 		final TreePath treepath = getSelectionPath();
 		if (treepath == null) {
@@ -209,7 +196,7 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 			final PsiFile psiFile = _treeHelper.getSelectedFile();
 			if (psiFile != null) {
 				LOGGER.debug("PsiFile: " + psiFile);
-				return new VirtualFile[] {psiFile.getVirtualFile()};
+				return new VirtualFile[]{psiFile.getVirtualFile()};
 			} else {
 				return VirtualFile.EMPTY_ARRAY;
 			}
@@ -222,65 +209,58 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 		return null;
 	}
 
-
 	public ScrollToSourceHandler getScrollToSourceHandler() {
 		return _scrollToSourceHandler;
 	}
 
-
-	public void gotoNode(final BugInstance bugInstance) {
-		_treeHelper.gotoNode(bugInstance);
+	public void gotoNode(final Bug bug) {
+		_treeHelper.gotoNode(bug);
 	}
-
 
 	public Project getProject() {
 		return _project;
 	}
 
-
 	public BugTreeHelper getTreeHelper() {
 		return _treeHelper;
 	}
 
-
+	@Override
 	public boolean hasNextOccurence() {
 		return _occurenceNavigator.hasNextOccurence();
 	}
 
-
+	@Override
 	public boolean hasPreviousOccurence() {
 		return _occurenceNavigator.hasPreviousOccurence();
 	}
 
-
+	@Override
 	public OccurenceInfo goNextOccurence() {
 		return _occurenceNavigator.goNextOccurence();
 	}
 
-
+	@Override
 	public OccurenceInfo goPreviousOccurence() {
 		return _occurenceNavigator.goPreviousOccurence();
 	}
 
-
+	@Override
 	public String getNextOccurenceActionName() {
 		return _occurenceNavigator.getNextOccurenceActionName();
 	}
 
-
+	@Override
 	public String getPreviousOccurenceActionName() {
 		return _occurenceNavigator.getPreviousOccurenceActionName();
 	}
 
-
 	private class MouseMotionListenerImpl extends MouseMotionAdapter {
-
-
 		@Override
 		public void mouseMoved(final MouseEvent e) {
-			if (_bugTreePanel.getBugCollection() != null && getRowForLocation(e.getX(), e.getY()) != 0) {
+			if (_bugTreePanel.getResult() != null && getRowForLocation(e.getX(), e.getY()) != 0) {
 				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			} else if (_bugTreePanel.getBugCollection() != null) {
+			} else if (_bugTreePanel.getResult() != null) {
 				final Object root = getModel().getRoot();
 				final Component rendererComponent = getCellRenderer().getTreeCellRendererComponent(BugTree.this, root, true, true, false, 0, true);
 				final int width = rendererComponent.getPreferredSize().width;
@@ -292,14 +272,15 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 		}
 	}
 
-
-	/** Listen for clicks and scroll to the error's source as necessary. */
+	/**
+	 * Listen for clicks and scroll to the error's source as necessary.
+	 */
 	private class MouseListenerImpl extends MouseAdapter {
 
 		@Override
 		public void mouseClicked(final MouseEvent e) {
 			if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() < 2) {
-				if (_bugTreePanel.getBugCollection() != null && getRowForLocation(e.getX(), e.getY()) == 0) {
+				if (_bugTreePanel.getResult() != null && getRowForLocation(e.getX(), e.getY()) == 0) {
 					final Object root = getModel().getRoot();
 					final Component rendererComponent = getCellRenderer().getTreeCellRendererComponent(BugTree.this, root, true, true, false, 0, true);
 					final int width = rendererComponent.getPreferredSize().width;
@@ -309,7 +290,12 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 						final Content content = toolWindow.getContentManager().getContent(0);
 						if (content != null) {
 							final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
-							final DialogBuilder dialog = AnalysisRunDetailsDialog.create(panel.getProject(), panel.getBugTreePanel().getGroupModel().getBugCount(), panel.getBugCollection().getProjectStats(), panel.getBugsProject());
+							final DialogBuilder dialog = AnalysisRunDetailsDialog.create(
+									panel.getProject(),
+									panel.getBugTreePanel().getGroupModel().getBugCount(),
+									panel.getResult().getNumClassesSafe(),
+									panel.getResult()
+							);
 							dialog.showModal(false);
 						}
 					}
@@ -317,17 +303,17 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 			}
 		}
 
-
 		@Override
 		public void mouseExited(final MouseEvent e) {
-			if (_bugTreePanel.getBugCollection() != null) {
+			if (_bugTreePanel.getResult() != null) {
 				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		}
 	}
 
-
-	/** Listen for tree selection events and scroll to the error's source as necessary. */
+	/**
+	 * Listen for tree selection events and scroll to the error's source as necessary.
+	 */
 	private class SelectionListenerImpl implements TreeSelectionListener {
 		@Override
 		public void valueChanged(final TreeSelectionEvent e) {

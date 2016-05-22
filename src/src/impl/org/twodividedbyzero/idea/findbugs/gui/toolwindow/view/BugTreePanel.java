@@ -36,9 +36,7 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.JBColor;
-import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.BugInstance;
-import edu.umd.cs.findbugs.ProjectStats;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
@@ -46,6 +44,9 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.core.Bug;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsResult;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
@@ -76,13 +77,12 @@ public class BugTreePanel extends JPanel {
 
 	private final RootNode _visibleRootNode;
 	private final GroupTreeModel _treeModel;
-	private SortedBugCollection _bugCollection;
+	private FindBugsResult result;
 	private GroupBy[] _groupBy;
 	private final ToolWindowPanel _parent;
 	private double _splitPaneVerticalWeight = 1.0;
 	private final double _splitPaneHorizontalWeight = 0.4;
 	private boolean _bugPreviewEnabled;
-
 
 	BugTreePanel(@NotNull final ToolWindowPanel parent, @NotNull final Project project) {
 		setLayout(new BorderLayout());
@@ -102,8 +102,7 @@ public class BugTreePanel extends JPanel {
 		add(treeScrollPane, BorderLayout.CENTER);
 	}
 
-
-	void addNode(@NotNull final BugInstance bugInstance) {
+	void addNode(@NotNull final Bug bug) {
 		/*if(isHiddenBugGroup(bugInstance)) {
 			return;
 		}*/
@@ -112,34 +111,27 @@ public class BugTreePanel extends JPanel {
 			_treeModel.setGroupBy(_groupBy);
 		}
 
-		_treeModel.addNode(bugInstance);
+		_treeModel.addNode(bug);
 	}
 
-
-	void updateRootNode(@Nullable final ProjectStats projectStats) {
+	void updateRootNode(@Nullable final Integer classCount) {
 		int numClasses = 0;
-
-		if (projectStats != null) {
-			numClasses = projectStats.getNumClasses();
+		if (classCount != null) {
+			numClasses = classCount;
 		}
-
-		_visibleRootNode.setBugCount(projectStats == null ? -1 : _treeModel.getBugCount());
+		_visibleRootNode.setBugCount(classCount == null ? -1 : _treeModel.getBugCount());
 		_visibleRootNode.setClassesCount(numClasses);
-
 		_treeModel.nodeChanged(_visibleRootNode);
 	}
 
-
 	void clear() {
-		_bugCollection = null;
+		result = null;
 		_treeModel.clear();
 	}
-
 
 	private GroupTreeModel getTreeModel() {
 		return _treeModel;
 	}
-
 
 	private static void scrollToPreviewSource(final BugInstanceNode bugInstanceNode, final Editor editor) {
 		final int line = bugInstanceNode.getSourceLines()[0] - 1;
@@ -153,7 +145,6 @@ public class BugTreePanel extends JPanel {
 		editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
 	}
 
-
 	void setPreviewEnabled(final boolean enabled) {
 		_bugPreviewEnabled = enabled;
 		if (enabled) {
@@ -161,11 +152,9 @@ public class BugTreePanel extends JPanel {
 		}
 	}
 
-
 	public boolean isPreviewEnabled() {
 		return _bugPreviewEnabled;
 	}
-
 
 	public void setPreview(@Nullable final TreePath treePath) {
 		boolean clear = true;
@@ -230,11 +219,9 @@ public class BugTreePanel extends JPanel {
 		return editor;
 	}
 
-
 	private static TreeNode getTreeNodeFromPath(final TreePath treePath) {
 		return (TreeNode) treePath.getLastPathComponent();
 	}
-
 
 	public void setDetails(@Nullable final TreePath treePath) {
 		boolean clear = true;
@@ -243,7 +230,7 @@ public class BugTreePanel extends JPanel {
 			if (treeNode instanceof BugInstanceNode) {
 				final BugInstanceNode bugNode = (BugInstanceNode) treeNode;
 				final BugInstance bugInstance = bugNode.getBugInstance();
-				_parent.getBugDetailsComponents().setBugExplanation(_bugCollection, bugInstance);
+				_parent.getBugDetailsComponents().setBugExplanation(bugNode.getBug().getBugCollection(), bugInstance);
 				_parent.getBugDetailsComponents().setBugsDetails(bugInstance);
 				clear = false;
 			}
@@ -252,7 +239,6 @@ public class BugTreePanel extends JPanel {
 			_parent.getBugDetailsComponents().clear();
 		}
 	}
-
 
 	/**
 	 * Should we scroll to the selected error in the editor automatically?
@@ -263,7 +249,6 @@ public class BugTreePanel extends JPanel {
 		_scrollToSource = scrollToSource;
 	}
 
-
 	/**
 	 * Should we scroll to the selected error in the editor automatically?
 	 *
@@ -273,14 +258,12 @@ public class BugTreePanel extends JPanel {
 		return _scrollToSource;
 	}
 
-
 	/**
 	 * Collapse the tree so that only the root node is visible.
 	 */
 	public void collapseTree() {
 		_bugTree.getTreeHelper().collapseTree();
 	}
-
 
 	/**
 	 * Expand the error tree to the fullest.
@@ -289,21 +272,17 @@ public class BugTreePanel extends JPanel {
 		_bugTree.getTreeHelper().expandTree(3);
 	}
 
-
-	public void setBugCollection(final BugCollection bugCollection) {
-		_bugCollection = (SortedBugCollection) bugCollection;
+	public void setResult(final FindBugsResult result) {
+		this.result = result;
 	}
 
-
-	public BugCollection getBugCollection() {
-		return _bugCollection;
+	public FindBugsResult getResult() {
+		return result;
 	}
-
 
 	public Map<PsiFile, List<ExtendedProblemDescriptor>> getProblems() {
 		return getTreeModel().getProblems();
 	}
-
 
 	public void setGroupBy(final GroupBy[] groupBy) {
 		EventDispatchThreadHelper.checkEDT();
@@ -313,34 +292,37 @@ public class BugTreePanel extends JPanel {
 		}
 	}
 
-
 	public GroupBy[] getGroupBy() {
 		return _groupBy.clone();
 	}
 
-
 	private void regroupTree() {
 		EventDispatchThreadHelper.checkEDT();
-		if (_bugCollection != null) {
-			final Collection<BugInstance> instanceCollection = _bugCollection.getCollection();
-			if (instanceCollection != null && !instanceCollection.isEmpty()) {
-				_treeModel.clear();
-				for (final BugInstance bugInstance : instanceCollection) {
-					if (bugInstance != null) {
-						addNode(bugInstance);
+		if (result != null) {
+			for (final Map.Entry<FindBugsProject, SortedBugCollection> entry : result.getResults().entrySet()) {
+				final Collection<BugInstance> instanceCollection = entry.getValue().getCollection();
+				if (instanceCollection != null && !instanceCollection.isEmpty()) {
+					_treeModel.clear();
+					for (final BugInstance bugInstance : instanceCollection) {
+						if (bugInstance != null) {
+							addNode(new Bug(
+									entry.getKey().getModule(),
+									entry.getValue(),
+									bugInstance
+							));
+						}
 					}
 				}
 			}
 		} else {
 			// may be a analysis is running, we need to regroup existing nodes
-			final Collection<BugInstance> existing = _treeModel.getBugInstances();
+			final Collection<Bug> existing = _treeModel.getBugs();
 			_treeModel.clear();
-			for (final BugInstance bugInstance : existing) {
-				addNode(bugInstance);
+			for (final Bug bug : existing) {
+				addNode(bug);
 			}
 		}
 	}
-
 
 	void adaptSize(final int width, final int height) {
 		//final int newWidth = (int) (width * _splitPaneHorizontalWeight);
@@ -349,21 +331,17 @@ public class BugTreePanel extends JPanel {
 		validate();
 	}
 
-
 	public double getSplitPaneVerticalWeight() {
 		return _splitPaneVerticalWeight;
 	}
-
 
 	public void setSplitPaneVerticalWeight(final double splitPaneVerticalWeight) {
 		_splitPaneVerticalWeight = splitPaneVerticalWeight;
 	}
 
-
 	public BugTree getBugTree() {
 		return _bugTree;
 	}
-
 
 	public GroupTreeModel getGroupModel() {
 		return (GroupTreeModel) _bugTree.getModel();

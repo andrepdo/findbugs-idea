@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -23,10 +23,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import edu.umd.cs.findbugs.BugInstance;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.core.Bug;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.AbstractTreeNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceGroupNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
@@ -41,17 +41,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
- * @since 0.9.8-dev
- */
 public class BugTreeHelper {
 
-	private static final Logger LOGGER = Logger.getInstance(BugTreeHelper.class.getName());
+	private static final Logger LOGGER = Logger.getInstance(BugTreeHelper.class);
 
 	private final JTree _tree;
 	private final Project _project;
@@ -62,11 +54,9 @@ public class BugTreeHelper {
 		_project = project;
 	}
 
-
 	public static BugTreeHelper create(final JTree tree, final Project project) {
 		return new BugTreeHelper(tree, project);
 	}
-
 
 	@Nullable
 	public PsiElement getSelectedElement() {
@@ -109,7 +99,6 @@ public class BugTreeHelper {
 		}
 	}
 
-
 	@Nullable
 	public PsiFile getSelectedFile() {
 		final TreePath treepath = _tree.getSelectionPath();
@@ -149,7 +138,6 @@ public class BugTreeHelper {
 		}
 	}
 
-
 	@Nullable
 	public BugInstanceNode selectPreviousNode() {
 		final TreePath treepath = _tree.getSelectionPath();
@@ -174,7 +162,6 @@ public class BugTreeHelper {
 
 		return bugInstanceNode;
 	}
-
 
 	@Nullable
 	public BugInstanceNode selectNextNode() {
@@ -202,7 +189,6 @@ public class BugTreeHelper {
 		return nextBugInstanceLeafNode;
 	}
 
-
 	@Nullable
 	private static BugInstanceNode getNextBugInstanceLeafNode(final AbstractTreeNode<VisitableTreeNode> node) {
 		if (node instanceof BugInstanceNode) {
@@ -218,7 +204,6 @@ public class BugTreeHelper {
 		}
 		return null;
 	}
-
 
 	// FIXME: fix me
 	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"BC_UNCONFIRMED_CAST_OF_RETURN_VALUE"})
@@ -237,7 +222,7 @@ public class BugTreeHelper {
 		for (final VisitableTreeNode childNode : childList) {
 			//noinspection ObjectEquality
 			if (childNode instanceof BugInstanceNode && childNode != node) {
-				return  (BugInstanceNode) childNode;
+				return (BugInstanceNode) childNode;
 			} else if (childNode instanceof BugInstanceGroupNode) {
 				//noinspection TailRecursion,unchecked
 				return getPreviousBugInstanceLeafNode((AbstractTreeNode<VisitableTreeNode>) childNode);
@@ -247,7 +232,6 @@ public class BugTreeHelper {
 		return null;
 	}
 
-
 	public void scrollPathToVisible(final TreePath path) {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			public void run() {
@@ -256,7 +240,6 @@ public class BugTreeHelper {
 			}
 		});
 	}
-
 
 	/**
 	 * Expand the given tree to the given level, starting from the given node
@@ -279,7 +262,6 @@ public class BugTreeHelper {
 		}
 	}
 
-
 	/**
 	 * Expand the error tree to the given level.
 	 *
@@ -289,14 +271,14 @@ public class BugTreeHelper {
 		expandNode((TreeNode) _tree.getModel().getRoot(), new TreePath(_tree.getModel().getRoot()), level);
 	}
 
-
-	/** Collapse the tree so that only the root node is visible. */
+	/**
+	 * Collapse the tree so that only the root node is visible.
+	 */
 	public void collapseTree() {
 		for (int i = 1; i < _tree.getRowCount(); ++i) {
 			_tree.collapseRow(i);
 		}
 	}
-
 
 	public static TreePath getPath(@Nullable TreeNode node) {
 		final List<TreeNode> list = new ArrayList<TreeNode>();
@@ -311,34 +293,14 @@ public class BugTreeHelper {
 		return new TreePath(list.toArray());
 	}
 
-
-	// FIXME:
-	private void _buildElementsCache(final Object node, final TreePath path, final TreeModel model) {
-		/*if (_tree.isRootVisible() || path.getLastPathComponent() != _tree.getModel().getRoot()) {
-			//_elementsCache.add(path);
-		}*/
-		for (int i = 0; i < model.getChildCount(node); i++) {
-			final Object childNode = model.getChild(node, i);
-			_buildElementsCache(childNode, path.pathByAddingChild(childNode), model);
-		}
-	}
-
-
-	public void gotoNode(final BugInstanceNode node) {
-		gotoNode(node.getBugInstance());
-	}
-
-
-	public void gotoNode(final BugInstance bugInstance) {
-		final AbstractTreeNode<VisitableTreeNode> node = findTreeNodeByBugInstance(bugInstance);
+	public void gotoNode(final Bug bug) {
+		final AbstractTreeNode<VisitableTreeNode> node = findTreeNodeByBugInstance(bug);
 		final TreePath path = getPath(node);
 		scrollPathToVisible(path);
 	}
 
-
 	@Nullable
-	private AbstractTreeNode<VisitableTreeNode> findTreeNodeByBugInstance(final BugInstance bugInstance) {
-		return ((GroupTreeModel) _tree.getModel()).findNodeByBugInstance(bugInstance);
+	private AbstractTreeNode<VisitableTreeNode> findTreeNodeByBugInstance(final Bug bug) {
+		return ((GroupTreeModel) _tree.getModel()).findNodeByBugInstance(bug);
 	}
-
 }

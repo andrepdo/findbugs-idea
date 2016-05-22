@@ -22,19 +22,29 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.CompilerModuleExtension;
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.impl.file.PsiDirectoryFactory;
 import com.intellij.util.Consumer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.collectors.RecurseFileCollector;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProjects;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
+
+import java.io.File;
 
 public final class AnalyzePackageFiles extends AbstractAnalyzeAction {
 
@@ -46,13 +56,10 @@ public final class AnalyzePackageFiles extends AbstractAnalyzeAction {
 			@NotNull final FindBugsState state
 	) {
 
-		final VirtualFile[] selectedSourceFiles = IdeaUtilImpl.getVirtualFiles(e.getDataContext());
 
 		boolean enable = false;
 		if (state.isIdle()) {
-			enable = selectedSourceFiles != null && selectedSourceFiles.length == 1 &&
-					(IdeaUtilImpl.isValidFileType(selectedSourceFiles[0].getFileType()) || selectedSourceFiles[0].isDirectory()) &&
-					null != getPackagePath(selectedSourceFiles, project);
+			enable = getDirectory(e, project) != null;
 		}
 
 		e.getPresentation().setEnabled(enable);
@@ -68,59 +75,69 @@ public final class AnalyzePackageFiles extends AbstractAnalyzeAction {
 			@NotNull final FindBugsState state
 	) {
 
-		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
-		final VirtualFile[] selectedSourceFiles = IdeaUtilImpl.getVirtualFiles(e.getDataContext());
-		final VirtualFile packagePath = getPackagePath(selectedSourceFiles, project);
-		if (packagePath == null) {
-			throw new IllegalStateException("No package path"); // see updateImpl
+		final VirtualFile directory = getDirectory(e, project);
+		final Module module = ModuleUtilCore.findModuleForFile(directory, project);
+		if (module == null) {
+			throw new IllegalStateException("No module found for " + directory);
 		}
-		final VirtualFile outPath = IdeaUtilImpl.getCompilerOutputPath(packagePath, project);
-		final String packageUrl = IdeaUtilImpl.getPackageAsPath(project, packagePath);
-		final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(e.getDataContext());
+		final ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
+		final String packageName = fileIndex.getPackageNameByDirectory(directory);
 
-		if (outPath != null) {
-			final String output = outPath.getPresentableUrl() + packageUrl;
-			new FindBugsStarter(project, "Running FindBugs analysis for directory '" + output + "'...") {
-				@Override
-				protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
-					consumer.consume(compilerManager.createProjectCompileScope(project));
+		new FindBugsStarter(project, "Running FindBugs analysis for package '" + packageName + "'...") {
+			@Override
+			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
+				consumer.consume(compilerManager.createProjectCompileScope(project));
+			}
+
+			@Override
+			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
+				final CompilerModuleExtension extension = CompilerModuleExtension.getInstance(module);
+				if (extension == null) {
+					throw new IllegalStateException("No compiler extension for module " + module.getName());
 				}
-
-				@Override
-				protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
-					findBugsProject.configureAuxClasspathEntries(indicator, files);
-					findBugsProject.configureSourceDirectories(indicator, sourceRoots);
-					findBugsProject.configureOutputFiles(project, indicator, output);
+				final VirtualFile compilerOutputPath = extension.getCompilerOutputPath();
+				if (compilerOutputPath == null) {
+					showWarning("Source is not compiled.");
+					return false;
 				}
-			}.start();
-
-		} else {
-			BalloonTipFactory.showToolWindowWarnNotifier(project, "No output path specified. Analysis aborted.");
-		}
+				final File outputPath = new File(compilerOutputPath.getCanonicalPath(), packageName.replace(".", File.separator));
+				if (!outputPath.exists()) {
+					showWarning("Source is not compiled (" + outputPath + ").");
+					return false;
+				}
+				indicator.setText("Collecting files for analysis...");
+				final FindBugsProject findBugsProject = projects.get(module);
+				final int[] count = new int[1];
+				RecurseFileCollector.addFiles(project, indicator, findBugsProject, outputPath, count);
+				return true;
+			}
+		}.start();
 	}
 
 	@Nullable
-	private static VirtualFile getPackagePath(@Nullable final VirtualFile[] selectedSourceFiles, @NotNull final Project project) {
-		VirtualFile packagePath = null;
-		if (selectedSourceFiles != null && selectedSourceFiles.length > 0) {
-			for (final VirtualFile virtualFile : selectedSourceFiles) {
-				final Module moduleOfFile = IdeaUtilImpl.findModuleForFile(virtualFile, project);
-				if (moduleOfFile == null) {
-					return null;
-				}
+	private static VirtualFile getDirectory(
+			@NotNull final AnActionEvent e,
+			@NotNull final Project project
+	) {
 
-				if (virtualFile.isDirectory()) {
-					if (!virtualFile.getPath().endsWith(moduleOfFile.getName())) {
-						packagePath = virtualFile;
-					}
-				} else {
-					final VirtualFile parent = virtualFile.getParent();
-					if (parent != null && !parent.getPath().endsWith(moduleOfFile.getName())) {
-						packagePath = parent;
-					}
-				}
+		final VirtualFile[] selectedFiles = IdeaUtilImpl.getVirtualFiles(e.getDataContext());
+		if (selectedFiles == null || selectedFiles.length != 1) {
+			return null;
+		}
+		VirtualFile directory = selectedFiles[0];
+		if (!directory.isDirectory()) {
+			directory = directory.getParent();
+			if (!directory.isDirectory()) {
+				return null;
 			}
 		}
-		return packagePath;
+		final PsiDirectory psiDirectory = PsiManager.getInstance(project).findDirectory(directory);
+		if (psiDirectory == null) {
+			return null;
+		}
+		if (!PsiDirectoryFactory.getInstance(project).isPackage(psiDirectory)) {
+			return null;
+		}
+		return directory;
 	}
 }

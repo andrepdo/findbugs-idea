@@ -159,14 +159,12 @@ public final class BugsLineMarkerProvider implements LineMarkerProvider {
 			final ToolWindowPanel toolWindowPanel = ToolWindowPanel.getInstance(psiElement.getProject());
 			for (final ExtendedProblemDescriptor descriptor : _descriptors) {
 				if (descriptor.getPsiElement() == psiElement) {
-					toolWindowPanel.getBugTreePanel().getBugTree().gotoNode(descriptor.getBugInstance());
+					toolWindowPanel.getBugTreePanel().getBugTree().gotoNode(descriptor.getBug());
 					break;
 				}
 			}
 			buildPopupMenu().show(new RelativePoint(e));
 		}
-
-
 	}
 
 	private static class TooltipProvider implements Function<PsiElement, String> {
@@ -197,9 +195,9 @@ public final class BugsLineMarkerProvider implements LineMarkerProvider {
 				final ExtendedProblemDescriptor problemDescriptor = problemDescriptors.get(i);
 				buffer.append("");
 				buffer.append("</TITLE></HEAD><BODY><H3>");
-				buffer.append(BugInstanceUtil.getBugPatternShortDescription(problemDescriptor.getBugInstance()));
+				buffer.append(BugInstanceUtil.getBugPatternShortDescription(problemDescriptor.getBug().getInstance()));
 				buffer.append("</H3>");
-				buffer.append(PATTERN.matcher(BugInstanceUtil.getDetailText(problemDescriptor.getBugInstance())).replaceAll(""));
+				buffer.append(PATTERN.matcher(BugInstanceUtil.getDetailText(problemDescriptor.getBug().getInstance())).replaceAll(""));
 				if (i < problemDescriptors.size() - 1) {
 					buffer.append("<HR>");
 				}

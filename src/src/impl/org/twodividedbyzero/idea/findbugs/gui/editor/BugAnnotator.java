@@ -94,7 +94,7 @@ public final class BugAnnotator implements Annotator {
 	}
 
 	private static void addAnnotation(final ExtendedProblemDescriptor problemDescriptor, final List<ExtendedProblemDescriptor> matchingDescriptors, final PsiElement psiElement, @NotNull final AnnotationHolder annotationHolder) {
-		final BugInstance bugInstance = problemDescriptor.getBugInstance();
+		final BugInstance bugInstance = problemDescriptor.getBug().getInstance();
 		final int priority = bugInstance.getPriority();
 		final Annotation annotation;
 		final PsiElement problemElement = problemDescriptor.getPsiElement();
@@ -205,8 +205,8 @@ public final class BugAnnotator implements Annotator {
 		for (//noinspection LocalCanBeFinal
 				int i = 0, problemDescriptorsSize = problemDescriptors.size(); i < problemDescriptorsSize; i++) {
 			final ExtendedProblemDescriptor problemDescriptor = problemDescriptors.get(i);
-			buffer.append(ResourcesLoader.getString("findbugs.name")).append(": ").append(StringUtilFb.html2text(BugInstanceUtil.getBugPatternShortDescription(problemDescriptor.getBugInstance()))).append('\n');
-			buffer.append(StringUtilFb.html2text(BugInstanceUtil.getDetailText(problemDescriptor.getBugInstance())));
+			buffer.append(ResourcesLoader.getString("findbugs.name")).append(": ").append(StringUtilFb.html2text(BugInstanceUtil.getBugPatternShortDescription(problemDescriptor.getBug().getInstance()))).append('\n');
+			buffer.append(StringUtilFb.html2text(BugInstanceUtil.getDetailText(problemDescriptor.getBug().getInstance())));
 			if (i < problemDescriptors.size() - 1) {
 				//noinspection HardcodedLineSeparator
 				buffer.append("\n\n");

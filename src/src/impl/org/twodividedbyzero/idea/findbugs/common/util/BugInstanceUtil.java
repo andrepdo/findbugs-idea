@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -20,7 +20,6 @@ package org.twodividedbyzero.idea.findbugs.common.util;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
@@ -33,6 +32,7 @@ import edu.umd.cs.findbugs.SourceLineAnnotation;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.core.Bug;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 
@@ -40,19 +40,8 @@ import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
- * @since 0.9.84-dev
- */
 @SuppressWarnings({"AnonymousInnerClass"})
 public class BugInstanceUtil {
-
-	private static final Logger LOGGER = Logger.getInstance(BugInstanceUtil.class.getName());
-
 
 	private BugInstanceUtil() {
 		throw new UnsupportedOperationException();
@@ -185,12 +174,11 @@ public class BugInstanceUtil {
 	 * NOTE: use {@link #findPsiElement(com.intellij.openapi.project.Project, org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode)}
 	 * instead of this method. this method is executed through ApplicationManager.getApplication().invokeAndWait so it's very deadlock prone.
 	 *
+	 * @param project ..
+	 * @param node    ..
+	 * @return ..
 	 * @deprecated use {@link #findPsiElement(com.intellij.openapi.project.Project, org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode)}
 	 * instead of this method. this method is executed through ApplicationManager.getApplication().invokeAndWait so it's very deadlock prone.
-	 *
-	 * @param project ..
-	 * @param node ..
-	 * @return ..
 	 */
 	@Deprecated
 	@Nullable
@@ -210,10 +198,10 @@ public class BugInstanceUtil {
 	}
 
 
-	private static List<String> getBugInstanceGroupPath(final BugInstance bugInstance, final GroupBy[] groupBy) {
+	private static List<String> getBugInstanceGroupPath(final Bug bug, final GroupBy[] groupBy) {
 		final List<String> result = new ArrayList<String>();
 		for (final GroupBy group : groupBy) {
-			result.add(GroupBy.getGroupName(group, bugInstance));
+			result.add(GroupBy.getGroupName(group, bug));
 		}
 
 		//Collections.reverse(result);
@@ -221,8 +209,8 @@ public class BugInstanceUtil {
 	}
 
 
-	public static String[] getGroupPath(final BugInstance bugInstance, final int depth, final GroupBy[] groupBy) {
-		final List<String> path = getBugInstanceGroupPath(bugInstance, groupBy);
+	public static String[] getGroupPath(final Bug bug, final int depth, final GroupBy[] groupBy) {
+		final List<String> path = getBugInstanceGroupPath(bug, groupBy);
 		final String[] result = new String[depth];
 
 		for (int i = 0; i < depth; i++) {
@@ -234,8 +222,8 @@ public class BugInstanceUtil {
 	}
 
 
-	public static String[] getFullGroupPath(final BugInstance bugInstance, final GroupBy[] groupBy) {
-		final List<String> path = getBugInstanceGroupPath(bugInstance, groupBy);
-		return getGroupPath(bugInstance, path.size(), groupBy);
+	public static String[] getFullGroupPath(final Bug bug, final GroupBy[] groupBy) {
+		final List<String> path = getBugInstanceGroupPath(bug, groupBy);
+		return getGroupPath(bug, path.size(), groupBy);
 	}
 }

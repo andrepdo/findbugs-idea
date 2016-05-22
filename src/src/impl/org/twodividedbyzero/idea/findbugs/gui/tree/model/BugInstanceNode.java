@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -21,6 +21,7 @@ package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.JBColor;
 import edu.umd.cs.findbugs.BugInstance;
@@ -30,6 +31,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.core.Bug;
 import org.twodividedbyzero.idea.findbugs.gui.tree.NodeVisitor;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.MaskIcon;
 
@@ -40,20 +43,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
- * @since 0.0.1
- */
 public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> implements VisitableTreeNode {
 
 	private PsiFile _file;
 	private ProblemDescriptor _problem;
 	private String _description;
-	private BugInstance _bugInstance;
+
+	@NotNull
+	private final Bug bug;
+
+	@NotNull
+	private final BugInstance _bugInstance;
+
 	private final List<VisitableTreeNode> _childs;
 	private final Project _project;
 
@@ -61,71 +62,18 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	private static final Icon _collapsedIcon = _expandedIcon;
 
 
-	/**
-	 * Construct a node with the given display text.
-	 *
-	 * @param simpleName the text of the node.
-	 * @param parent	 the parent tree node
-	 */
-	public BugInstanceNode(final String simpleName, @Nullable final VisitableTreeNode parent, final Project project) {
-
+	public BugInstanceNode(@NotNull final Bug bug, @Nullable final VisitableTreeNode parent, final Project project) {
+		this.bug = bug;
 		_project = project;
 		//_parent = parent;
 		setParent(parent);
 		_childs = new ArrayList<VisitableTreeNode>();
-		_simpleName = simpleName;
+		_bugInstance = bug.getInstance();
+		_simpleName = _bugInstance.getMessageWithoutPrefix();
 
 		setTooltip(_simpleName);
 		setCollapsedIcon(_collapsedIcon);
 		setExpandedIcon(_expandedIcon);
-	}
-
-
-	public BugInstanceNode(@NotNull final BugInstance bugInstance, @Nullable final VisitableTreeNode parent, final Project project) {
-		this(null, bugInstance, parent, project);
-	}
-
-
-	public BugInstanceNode(@Nullable final String simpleName, @NotNull final BugInstance bugInstance, @Nullable final VisitableTreeNode parent, final Project project) {
-
-		_project = project;
-		//_parent = parent;
-		setParent(parent);
-		_childs = new ArrayList<VisitableTreeNode>();
-		_bugInstance = bugInstance;
-		_simpleName = simpleName == null ? bugInstance.getMessageWithoutPrefix() : simpleName;
-
-		setTooltip(_simpleName);
-		setCollapsedIcon(_collapsedIcon);
-		setExpandedIcon(_expandedIcon);
-	}
-
-
-	public BugInstanceNode(final PsiFile file, final ProblemDescriptor problem, @NotNull final BugInstance bugInstance, @Nullable final VisitableTreeNode parent, final Project project) {
-		if (file == null) {
-			throw new IllegalArgumentException("File may not be null");
-		}
-		if (problem == null) {
-			throw new IllegalArgumentException("Problem may not be null");
-		}
-
-		_project = project;
-		//_parent = parent;
-		setParent(parent);
-		_childs = new ArrayList<VisitableTreeNode>();
-		_file = file;
-		_problem = problem;
-		_bugInstance = bugInstance;
-		_simpleName = bugInstance.getMessageWithoutPrefix();
-
-		setTooltip(_simpleName);
-		setCollapsedIcon(_collapsedIcon);
-		setExpandedIcon(_expandedIcon);
-	}
-
-
-	public static String getJavaClassType(final BugInstance bugInstance) {
-		return "abstract|default";   // FIXME: ... icon
 	}
 
 
@@ -134,46 +82,30 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	}
 
 
-	public void setSimpleName(final String simpleName) {
-		if (simpleName == null || simpleName.trim().isEmpty()) {
-			throw new IllegalArgumentException("simpleName may not be null/empty");
-		}
-		_simpleName = simpleName;
-	}
-
-
 	@Nullable
 	public PsiFile getPsiFile() {
-		if(_file == null) {
-			_file = BugInstanceUtil.getPsiElement(_project, this);
-		}
-		return _file;
-	}
-
-
-	@SuppressWarnings({"AnonymousInnerClass"})
-	@Nullable
-	public PsiFile findAndGetPsiFile() {
 		EventDispatchThreadHelper.checkEDT();
-		if(_file == null) {
-			_file = BugInstanceUtil.findPsiElement(_project, this);
+		if (_file == null) {
+			final PsiClass psiClass = IdeaUtilImpl.findJavaPsiClass(_project, getBug().getModule(), getSourcePath());
+			if (psiClass != null) {
+				_file = psiClass.getContainingFile();
+			}
 		}
 		return _file;
 	}
-
 
 	public void setPsiFile(final PsiFile file) {
-		_file = file;
+		_file = file; // TODO check
 	}
 
+	@NotNull
+	public Bug getBug() {
+		return bug;
+	}
 
+	@NotNull
 	public BugInstance getBugInstance() {
 		return _bugInstance;
-	}
-
-
-	public void setBugInstance(final BugInstance bugInstance) {
-		_bugInstance = bugInstance;
 	}
 
 
@@ -257,7 +189,9 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	}
 
 
-	/** @return start line and end line */
+	/**
+	 * @return start line and end line
+	 */
 	@SuppressWarnings("ConstantConditions")
 	@SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE")
 	public int[] getSourceLines() {

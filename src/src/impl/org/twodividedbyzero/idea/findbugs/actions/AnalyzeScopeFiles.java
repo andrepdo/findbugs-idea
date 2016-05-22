@@ -56,17 +56,14 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.collectors.StatelessClassAdder;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProjects;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 
 import javax.swing.Action;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
@@ -138,10 +135,6 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 			@NotNull final Project project,
 			@NotNull final AnalysisScope scope
 	) {
-
-		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
-		final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(e.getDataContext());
-
 		new FindBugsStarter(project, "Running FindBugs analysis...") {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
@@ -149,11 +142,9 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 			}
 
 			@Override
-			protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
-				findBugsProject.configureAuxClasspathEntries(indicator, files);
-				findBugsProject.configureSourceDirectories(indicator, sourceRoots);
-				indicator.setText("Collecting files for analysis...");
-				addClasses(indicator, project, scope, findBugsProject);
+			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
+				addClasses(indicator, project, scope, projects);
+				return true;
 			}
 		}.start();
 	}
@@ -163,11 +154,9 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 			@NotNull final ProgressIndicator indicator,
 			@NotNull final Project project,
 			@NotNull final AnalysisScope scope,
-			@NotNull final FindBugsProject findBugsProject
+			@NotNull final FindBugsProjects projects
 	) {
 
-		final List<String> outputFiles = new ArrayList<String>();
-		final StatelessClassAdder sca = new StatelessClassAdder(findBugsProject, project);
 		final PsiManager psiManager = PsiManager.getInstance(project);
 		psiManager.startBatchFilesProcessingMode();
 		final int[] count = new int[1];
@@ -180,8 +169,7 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 					}
 					if (IdeaUtilImpl.SUPPORTED_FILE_TYPES.contains(file.getFileType())) {
 						final VirtualFile vf = file.getVirtualFile();
-						outputFiles.add(vf.getPath());
-						sca.addContainingClasses(vf);
+						projects.addFile(vf); // LATER: profile this
 						indicator.setText2("Files collected: " + ++count[0]);
 					}
 				}
@@ -189,7 +177,6 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 		} finally {
 			psiManager.finishBatchFilesProcessingMode();
 		}
-		findBugsProject.setConfiguredOutputFiles(outputFiles);
 	}
 
 	@NonNls

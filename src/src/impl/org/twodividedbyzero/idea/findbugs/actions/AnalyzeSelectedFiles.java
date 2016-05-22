@@ -29,7 +29,7 @@ import com.intellij.util.Consumer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProjects;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
@@ -67,9 +67,8 @@ public final class AnalyzeSelectedFiles extends AbstractAnalyzeAction {
 			@NotNull final FindBugsState state
 	) {
 
-		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
-		final VirtualFile[] selectedSourceFiles = IdeaUtilImpl.getVirtualFiles(e.getDataContext());
-		if (selectedSourceFiles == null) {
+		final VirtualFile[] selectedFiles = IdeaUtilImpl.getVirtualFiles(e.getDataContext());
+		if (selectedFiles == null) {
 			BalloonTipFactory.showToolWindowWarnNotifier(project, "No selected files");
 			return;
 		}
@@ -77,14 +76,13 @@ public final class AnalyzeSelectedFiles extends AbstractAnalyzeAction {
 		new FindBugsStarter(project, "Running FindBugs analysis for selected files...") {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
-				consumer.consume(compilerManager.createFilesCompileScope(selectedSourceFiles));
+				consumer.consume(compilerManager.createFilesCompileScope(selectedFiles));
 			}
 
 			@Override
-			protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
-				findBugsProject.configureAuxClasspathEntries(indicator, files);
-				findBugsProject.configureSourceDirectories(indicator, selectedSourceFiles);
-				findBugsProject.configureOutputFiles(project, selectedSourceFiles);
+			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
+				projects.addFiles(selectedFiles);
+				return true;
 			}
 		}.start();
 	}

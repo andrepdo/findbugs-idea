@@ -88,14 +88,12 @@ public final class GuiUtil {
 		throw new UnsupportedOperationException();
 	}
 
-
 	public static void navigateToElement(final PsiElement psiElement) {
 		final PsiElement navigationElement = psiElement.getNavigationElement();
 		if (navigationElement != null && navigationElement instanceof Navigatable && ((Navigatable) navigationElement).canNavigate()) {
 			((Navigatable) navigationElement).navigate(true);
 		}
 	}
-
 
 	@Nullable
 	public static Component getScrollPane(final Component innerComponent) {
@@ -110,7 +108,6 @@ public final class GuiUtil {
 			return null;
 		}
 	}
-
 
 	@SuppressWarnings({"RawUseOfParameterizedType"})
 	public static void configureGraphics(final Graphics graphics) {
@@ -129,11 +126,10 @@ public final class GuiUtil {
 		}
 	}
 
-
 	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"DB_DUPLICATE_SWITCH_CLAUSES"})
 	@Nullable
 	public static Icon getIcon(final ExtendedProblemDescriptor problemDescriptor) {
-		final BugInstance bugInstance = problemDescriptor.getBugInstance();
+		final BugInstance bugInstance = problemDescriptor.getBug().getInstance();
 		final int priority = bugInstance.getPriority();
 		final Icon icon;
 		switch (priority) {
@@ -158,12 +154,11 @@ public final class GuiUtil {
 		return icon;
 	}
 
-
 	@SuppressWarnings("HardcodedFileSeparator")
 	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"DB_DUPLICATE_SWITCH_CLAUSES"})
 	@Nullable
 	public static Icon getTinyIcon(final ExtendedProblemDescriptor problemDescriptor) {
-		final BugInstance bugInstance = problemDescriptor.getBugInstance();
+		final BugInstance bugInstance = problemDescriptor.getBug().getInstance();
 		final int priority = bugInstance.getPriority();
 		final Icon icon;
 		switch (priority) {
@@ -188,12 +183,11 @@ public final class GuiUtil {
 		return icon;
 	}
 
-
 	@SuppressWarnings("HardcodedFileSeparator")
 	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"DB_DUPLICATE_SWITCH_CLAUSES"})
 	@Nullable
 	public static Icon getCombinedIcon(final ExtendedProblemDescriptor problemDescriptor) {
-		final BugInstance bugInstance = problemDescriptor.getBugInstance();
+		final BugInstance bugInstance = problemDescriptor.getBug().getInstance();
 		final int priority = bugInstance.getPriority();
 		final Icon icon;
 		switch (priority) {
@@ -218,12 +212,10 @@ public final class GuiUtil {
 		return icon;
 	}
 
-
 	@NotNull
 	public static Component createVerticalStrut(final int height) {
 		return new Box.Filler(new Dimension(0, height), new Dimension(0, height), new Dimension(Short.MAX_VALUE, height));
 	}
-
 
 	@NotNull
 	public static JPanel newFlowPane(@NotNull final Component... components) {
@@ -234,7 +226,6 @@ public final class GuiUtil {
 		return ret;
 	}
 
-
 	@NotNull
 	public static IdeaTitledBorder createTitledBorder(@NotNull final String title) {
 		return IdeBorderFactory.createTitledBorder(title, true,
@@ -243,7 +234,6 @@ public final class GuiUtil {
 						IdeBorderFactory.TITLED_BORDER_BOTTOM_INSET,
 						IdeBorderFactory.TITLED_BORDER_RIGHT_INSET));
 	}
-
 
 	@NotNull
 	public static JBTable createCheckboxTable(

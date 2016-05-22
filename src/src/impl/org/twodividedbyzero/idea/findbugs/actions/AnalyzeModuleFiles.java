@@ -31,11 +31,15 @@ import com.intellij.util.Consumer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.collectors.RecurseFileCollector;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProjects;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
+
+import java.io.File;
 
 public final class AnalyzeModuleFiles extends AbstractAnalyzeAction {
 
@@ -71,15 +75,11 @@ public final class AnalyzeModuleFiles extends AbstractAnalyzeAction {
 			BalloonTipFactory.showToolWindowWarnNotifier(project, "No or more than one current module");
 			return;
 		}
-		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
-		final VirtualFile[] sourceRoots = IdeaUtilImpl.getModulesSourceRoots(e.getDataContext());
 		final VirtualFile compilerOutputPath = IdeaUtilImpl.getCompilerOutputPath(module);
 		if (compilerOutputPath == null) {
 			BalloonTipFactory.showToolWindowInfoNotifier(project, "Module not yet compiled");
 			return;
 		}
-		final String outPath = compilerOutputPath.getPresentableUrl();
-
 		new FindBugsStarter(project, "Running FindBugs analysis for module'" + module.getName() + "'...") {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
@@ -87,10 +87,12 @@ public final class AnalyzeModuleFiles extends AbstractAnalyzeAction {
 			}
 
 			@Override
-			protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
-				findBugsProject.configureAuxClasspathEntries(indicator, files);
-				findBugsProject.configureSourceDirectories(indicator, sourceRoots);
-				findBugsProject.configureOutputFiles(project, indicator, outPath);
+			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
+				indicator.setText("Collecting files for analysis...");
+				final FindBugsProject findBugsProject = projects.get(module);
+				final int[] count = new int[1];
+				RecurseFileCollector.addFiles(project, indicator, findBugsProject, new File(compilerOutputPath.getCanonicalPath()), count);
+				return true;
 			}
 		}.start();
 	}

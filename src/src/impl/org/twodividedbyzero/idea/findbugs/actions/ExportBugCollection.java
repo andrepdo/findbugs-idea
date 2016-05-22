@@ -38,6 +38,7 @@ import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.ErrorUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FileUtilFb;
 import org.twodividedbyzero.idea.findbugs.common.util.IoUtil;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsResult;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.export.ExportBugCollectionDialog;
@@ -79,8 +80,8 @@ public final class ExportBugCollection extends AbstractAction {
 
 		boolean enable = false;
 		if (state.isIdle()) {
-			final BugCollection bugCollection = ToolWindowPanel.getInstance(project).getBugCollection();
-			enable = bugCollection != null && bugCollection.iterator().hasNext();
+			final FindBugsResult result = ToolWindowPanel.getInstance(project).getResult();
+			enable = result != null && !result.isBugCollectionEmpty();
 		}
 
 		e.getPresentation().setEnabled(enable);
@@ -121,12 +122,12 @@ public final class ExportBugCollection extends AbstractAction {
 			}
 		}
 
-		final BugCollection bugCollection = ToolWindowPanel.getInstance(project).getBugCollection();
+		final FindBugsResult result = ToolWindowPanel.getInstance(project).getResult();
 
 		new Task.Backgroundable(project, ResourcesLoader.getString("export.progress.title"), false) {
 			@Override
 			public void run(@NotNull final ProgressIndicator indicator) {
-				final boolean withMessages = bugCollection.getWithMessages();
+				/*final boolean withMessages = bugCollection.getWithMessages(); // TODO
 				try {
 
 					FileUtilFb.mkdirs(exportDirPath);
@@ -158,7 +159,7 @@ public final class ExportBugCollection extends AbstractAction {
 					throw ErrorUtil.toUnchecked(e);
 				} finally {
 					bugCollection.setWithMessages(withMessages);
-				}
+				}*/
 			}
 		}.queue();
 	}

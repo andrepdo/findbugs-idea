@@ -232,10 +232,11 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 			}
 
 			@Override
-			protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
-				findBugsProject.configureAuxClasspathEntries(indicator, auxFiles);
-				findBugsProject.configureSourceDirectories(indicator, affectedFiles);
-				findBugsProject.configureOutputFiles(project, affectedFiles);
+			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
+				/*projects.configureAuxClasspathEntries(indicator, auxFiles); TODO
+				projects.configureSourceDirectories(indicator, affectedFiles);
+				projects.configureOutputFiles(project, affectedFiles);*/
+				return true;
 			}
 		}.start();
 	}
@@ -302,10 +303,11 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 					}
 
 					@Override
-					protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
-						findBugsProject.configureAuxClasspathEntries(indicator, classPaths);
-						findBugsProject.configureSourceDirectories(indicator, changed);
-						findBugsProject.configureOutputFiles(project, changed);
+					protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
+						/*projects.configureAuxClasspathEntries(indicator, classPaths); TODO
+						projects.configureSourceDirectories(indicator, changed);
+						projects.configureOutputFiles(project, changed);*/
+						return true;
 					}
 				}.start();
 			}

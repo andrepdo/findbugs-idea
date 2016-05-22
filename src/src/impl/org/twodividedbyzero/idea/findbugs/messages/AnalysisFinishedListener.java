@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -18,24 +18,17 @@
  */
 package org.twodividedbyzero.idea.findbugs.messages;
 
-
 import com.intellij.util.messages.Topic;
-import edu.umd.cs.findbugs.BugCollection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsResult;
 
-
-/**
- * @author Reto Merz<reto.merz@gmail.com>
- * @since 0.9.995
- */
 public interface AnalysisFinishedListener {
 	Topic<AnalysisFinishedListener> TOPIC = Topic.create("FindBugs Analysis Finished", AnalysisFinishedListener.class);
 
 	/**
 	 * Invoked by EDT.
 	 */
-	void analysisFinished(@NotNull final BugCollection bugCollection, @Nullable final FindBugsProject findBugsProject, @Nullable final Throwable error);
+	void analysisFinished(@NotNull final FindBugsResult result, @Nullable final Throwable error);
 
 }

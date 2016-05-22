@@ -26,10 +26,13 @@ import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompileStatusNotification;
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -38,7 +41,6 @@ import com.intellij.util.Consumer;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import edu.umd.cs.findbugs.FindBugs2;
-import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import edu.umd.cs.findbugs.config.UserPreferences;
@@ -48,10 +50,11 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
+import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 import org.twodividedbyzero.idea.findbugs.messages.AnalysisAbortingListener;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
 import org.twodividedbyzero.idea.findbugs.plugins.PluginLoader;
+import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -169,6 +172,55 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 
 	private void asyncStart(@NotNull final ProgressIndicator indicator) {
 
+		final FindBugsProjects projects = new FindBugsProjects(_project);
+
+		boolean canceled = !ApplicationManager.getApplication().runReadAction(new Computable<Boolean>() {
+			@Override
+			public Boolean compute() {
+				return configure(indicator, projects);
+			}
+		});
+
+		final FindBugsResult result = new FindBugsResult();
+		Throwable error = null;
+
+		if (!canceled) {
+			try {
+				int numClassesOffset = 0;
+				for (final Map.Entry<Module, FindBugsProject> entry : projects.getProjects().entrySet()) {
+					final FindBugsProject findBugsProject = entry.getValue();
+					final Module module = entry.getKey();
+					indicator.setText("Start FindBugs analysis of " + findBugsProject.getProjectName());
+					final Pair<SortedBugCollection, Reporter> data = executeImpl(indicator, module, findBugsProject, numClassesOffset);
+					final int numClasses = data.getSecond().getProjectStats().getNumClasses();
+					numClassesOffset += numClasses;
+					result.put(findBugsProject, data.getFirst(), numClasses);
+					if (data.getSecond().isCanceled()) {
+						canceled = true;
+						break;
+					}
+				}
+			} catch (final InterruptedException e) {
+				Thread.currentThread().interrupt();
+			} catch (final Throwable e) {
+				error = e;
+			}
+		}
+
+		if (canceled) {
+			MessageBusManager.publishAnalysisAbortedToEDT(_project);
+		} else {
+			MessageBusManager.publishAnalysisFinishedToEDT(_project, result, error);
+		}
+	}
+
+	private Pair<SortedBugCollection, Reporter> executeImpl(
+			@NotNull final ProgressIndicator indicator,
+			@NotNull final Module module,
+			@NotNull final FindBugsProject findBugsProject,
+			final int numClassesOffset
+	) throws IOException, InterruptedException {
+
 		if (!PluginLoader.load(_project, projectSettings, true)) {
 			throw new ProcessCanceledException();
 		}
@@ -200,41 +252,17 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 			}
 		}
 
-		final FindBugsProject findBugsProject = new FindBugsProject();
-		{
-			findBugsProject.setProjectName(_project.getName());
-			for (final Plugin plugin : Plugin.getAllPlugins()) {
-				if (!plugin.isCorePlugin()) {
-					boolean enabled = false;
-					for (final PluginSettings pluginSettings : projectSettings.plugins) {
-						if (plugin.getPluginId().equals(pluginSettings.id)) {
-							if (pluginSettings.enabled) {
-								enabled = true; // do not break loop here ; maybe there are multiple plugins (with same plugin id) configured and one is enabled
-							}
-						}
-					}
-					findBugsProject.setPluginStatusTrinary(plugin.getPluginId(), enabled);
-				}
-			}
-			findBugsProject.setGuiCallback(new PluginGuiCallback(_project));
-		}
-
 		final SortedBugCollection bugCollection = new SortedBugCollection(findBugsProject);
 		bugCollection.setDoNotUseCloud(true);
 
-		ApplicationManager.getApplication().runReadAction(new Runnable() {
-			@Override
-			public void run() {
-				configure(indicator, findBugsProject);
-			}
-		});
-
 		final Reporter reporter = new Reporter(
 				_project,
+				module,
 				bugCollection,
 				new HashSet<String>(settings.hiddenBugCategory),
 				indicator,
-				_cancellingByUser
+				_cancellingByUser,
+				numClassesOffset
 		);
 
 		reporter.setPriorityThreshold(userPrefs.getUserDetectorThreshold());
@@ -251,27 +279,17 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 			engine.setUserPreferences(userPrefs);
 		}
 
-		indicator.setText("Start FindBugs...");
-		Throwable error = null;
 		try {
 			engine.execute();
-		} catch (final InterruptedException e) {
-			Thread.currentThread().interrupt();
-		} catch (final Throwable e) {
-			error = e;
 		} finally {
 			engine.dispose();
-		}
-
-		if (reporter.isCanceled()) {
-			MessageBusManager.publishAnalysisAbortedToEDT(_project);
-		} else {
-			MessageBusManager.publishAnalysisFinishedToEDT(_project, reporter.getBugCollection(), findBugsProject, error);
 		}
 
 		bugCollection.setDoNotUseCloud(false);
 		bugCollection.setTimestamp(System.currentTimeMillis());
 		bugCollection.reinitializeCloud();
+
+		return Pair.create(bugCollection, reporter);
 	}
 
 	protected abstract void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer);
@@ -287,7 +305,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		return new CompositeScope(scopes);
 	}
 
-	protected abstract void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject);
+	protected abstract boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects);
 
 	@Override
 	public final void analysisAborting() {
@@ -347,5 +365,14 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 				}
 			}
 		}
+	}
+
+	protected void showWarning(@NotNull final String message) {
+		EventDispatchThreadHelper.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				BalloonTipFactory.showToolWindowWarnNotifier(_project, message + " " + ResourcesLoader.getString("analysis.aborted"));
+			}
+		});
 	}
 }

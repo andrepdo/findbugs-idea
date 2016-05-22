@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -18,29 +18,19 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.tree;
 
-import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.BugPattern;
 import edu.umd.cs.findbugs.BugRankCategory;
+import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.core.Bug;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
- * @since 0.0.1
- */
-@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
 public class BugInstanceComparator {
 
 	private BugInstanceComparator() {
 	}
-
 
 	/**
 	 * Compare BugInstance class names.
@@ -48,25 +38,21 @@ public class BugInstanceComparator {
 	 * Note that all instances with the same class name will compare
 	 * as equal.
 	 */
-	public static class BugInstanceClassComparator implements Comparator<BugInstance>, Serializable {
-
-		private static final long serialVersionUID = 0L;
-
-
-		public int compare(final BugInstance lhs, final BugInstance rhs) {
-			return getClassName(lhs).compareTo(getClassName(rhs));
+	static class BugInstanceClassComparator implements Comparator<Bug> {
+		@Override
+		public int compare(@NotNull final Bug o1, @NotNull final Bug o2) {
+			return getClassName(o1).compareTo(getClassName(o2));
 		}
 
-
-		@SuppressWarnings({"MethodMayBeStatic"})
-		public String getClassName(final BugInstance bugInstance) {
-			return bugInstance.getPrimaryClass().getClassName().split("\\$")[0];
+		static String getClassName(@NotNull final Bug bugInstance) {
+			return bugInstance.getInstance().getPrimaryClass().getClassName().split("\\$")[0];
 		}
 	}
 
-	/** The instance of BugInstanceClassComparator. */
-	public static final Comparator<BugInstance> _bugInstanceClassComparator = new BugInstanceClassComparator();
-
+	/**
+	 * The instance of BugInstanceClassComparator.
+	 */
+	private static final Comparator<Bug> _bugInstanceClassComparator = new BugInstanceClassComparator();
 
 	/**
 	 * Compare BugInstance package names.
@@ -74,25 +60,21 @@ public class BugInstanceComparator {
 	 * Note that all instances with the same package name will compare
 	 * as equal.
 	 */
-	public static class BugInstancePackageComparator implements Comparator<BugInstance>, Serializable {
-
-		private static final long serialVersionUID = 0L;
-
-
-		public int compare(final BugInstance lhs, final BugInstance rhs) {
-			return getPackageName(lhs).compareTo(getPackageName(rhs));
+	static class BugInstancePackageComparator implements Comparator<Bug> {
+		@Override
+		public int compare(@NotNull final Bug o1, @NotNull final Bug o2) {
+			return getPackageName(o1).compareTo(getPackageName(o2));
 		}
 
-
-		@SuppressWarnings({"MethodMayBeStatic"})
-		public String getPackageName(final BugInstance bugInstance) {
-			return bugInstance.getPrimaryClass().getPackageName();
+		static String getPackageName(@NotNull final Bug bug) {
+			return bug.getInstance().getPrimaryClass().getPackageName();
 		}
 	}
 
-	/** The instance of BugInstancePackageComparator. */
-	public static final Comparator<BugInstance> _bugInstancePackageComparator = new BugInstancePackageComparator();
-
+	/**
+	 * The instance of BugInstancePackageComparator.
+	 */
+	private static final Comparator<Bug> _bugInstancePackageComparator = new BugInstancePackageComparator();
 
 	/**
 	 * Compare BugInstance bug types.
@@ -100,26 +82,22 @@ public class BugInstanceComparator {
 	 * Note that all instances with the same bug type will compare
 	 * as equal.
 	 */
-	public static class BugInstanceTypeComparator implements Comparator<BugInstance>, Serializable {
-
-		private static final long serialVersionUID = 0L;
-
-
-		public int compare(final BugInstance lhs, final BugInstance rhs) {
-			return getTypeDescription(lhs).compareTo(getTypeDescription(rhs));
+	static class BugInstanceTypeComparator implements Comparator<Bug> {
+		@Override
+		public int compare(@NotNull final Bug o1, @NotNull final Bug o2) {
+			return getTypeDescription(o1).compareTo(getTypeDescription(o2));
 		}
 
-
-		@SuppressWarnings({"MethodMayBeStatic"})
-		public String getTypeDescription(final BugInstance bugInstance) {
-			final BugPattern bugPattern = bugInstance.getBugPattern();
+		static String getTypeDescription(@NotNull final Bug bug) {
+			final BugPattern bugPattern = bug.getInstance().getBugPattern();
 			return bugPattern.getAbbrev();
 		}
 	}
 
-	/** The instance of BugInstanceTypeComparator. */
-	public static final Comparator<BugInstance> _bugInstanceTypeComparator = new BugInstanceTypeComparator();
-
+	/**
+	 * The instance of BugInstanceTypeComparator.
+	 */
+	private static final Comparator<Bug> _bugInstanceTypeComparator = new BugInstanceTypeComparator();
 
 	/**
 	 * Compare BugInstance bug categories.
@@ -127,26 +105,22 @@ public class BugInstanceComparator {
 	 * Note that all instances with the same bug category will compare
 	 * as equal.
 	 */
-	public static class BugInstanceCategoryComparator implements Comparator<BugInstance>, Serializable {
-
-		private static final long serialVersionUID = 0L;
-
-
-		public int compare(final BugInstance lhs, final BugInstance rhs) {
-			return getCategory(lhs).compareTo(getCategory(rhs));
+	static class BugInstanceCategoryComparator implements Comparator<Bug> {
+		@Override
+		public int compare(@NotNull final Bug o1, @NotNull final Bug o2) {
+			return getCategory(o1).compareTo(getCategory(o2));
 		}
 
-
-		@SuppressWarnings({"MethodMayBeStatic"})
-		public String getCategory(final BugInstance bugInstance) {
-			final BugPattern bugPattern = bugInstance.getBugPattern();
+		static String getCategory(@NotNull final Bug bugInstance) {
+			final BugPattern bugPattern = bugInstance.getInstance().getBugPattern();
 			return bugPattern.getCategory();
 		}
 	}
 
-	/** The instance of BugInstanceCategoryComparator. */
-	public static final Comparator<BugInstance> _bugInstanceCategoryComparator = new BugInstanceCategoryComparator();
-
+	/**
+	 * The instance of BugInstanceCategoryComparator.
+	 */
+	private static final Comparator<Bug> _bugInstanceCategoryComparator = new BugInstanceCategoryComparator();
 
 	/**
 	 * Compare BugInstance bug short description.
@@ -154,98 +128,80 @@ public class BugInstanceComparator {
 	 * Note that all instances with the same bug short description will compare
 	 * as equal.
 	 */
-	public static class BugInstanceShortDescrComparator implements Comparator<BugInstance>, Serializable {
-
-		private static final long serialVersionUID = 0L;
-
-
-		public int compare(final BugInstance lhs, final BugInstance rhs) {
-			return getShortDescr(lhs).compareTo(getShortDescr(rhs));
+	static class BugInstanceShortDescrComparator implements Comparator<Bug> {
+		@Override
+		public int compare(@NotNull final Bug o1, @NotNull final Bug o2) {
+			return getShortDescr(o1).compareTo(getShortDescr(o2));
 		}
 
-
-		@SuppressWarnings({"MethodMayBeStatic"})
-		public String getShortDescr(final BugInstance warning) {
-			final BugPattern bugPattern = warning.getBugPattern();
+		static String getShortDescr(@NotNull final Bug bug) {
+			final BugPattern bugPattern = bug.getInstance().getBugPattern();
 			return bugPattern.getShortDescription();
 		}
 	}
 
+	/**
+	 * The instance of BugInstanceCategoryComparator.
+	 */
+	private static final Comparator<Bug> _bugInstanceShortDescrComparator = new BugInstanceShortDescrComparator();
 
-	/** The instance of BugInstanceCategoryComparator. */
-	public static final Comparator<BugInstance> _bugInstanceShortDescrComparator = new BugInstanceShortDescrComparator();
-
-
-	public static class BugInstancePriorityComparator implements Comparator<BugInstance>, Serializable {
-
-		private static final long serialVersionUID = 0L;
-
-
-		public int compare(final BugInstance lhs, final BugInstance rhs) {
-			return getPriorityString(lhs).compareTo(getPriorityString(rhs));
+	static class BugInstancePriorityComparator implements Comparator<Bug> {
+		@Override
+		public int compare(@NotNull final Bug o1, @NotNull final Bug o2) {
+			return getPriorityString(o1).compareTo(getPriorityString(o2));
 		}
 
-
-		@SuppressWarnings({"MethodMayBeStatic"})
-		public String getPriorityString(final BugInstance bugInstance) {
-			return bugInstance.getPriorityString();
+		static String getPriorityString(@NotNull final Bug bug) {
+			return bug.getInstance().getPriorityString();
 		}
 	}
 
+	/**
+	 * The instance of BugInstancePriorityComparator.
+	 */
+	private static final Comparator<Bug> _bugInstancePriorityComparator = new BugInstancePriorityComparator();
 
-	/** The instance of BugInstancePriorityComparator. */
-	public static final Comparator<BugInstance> _bugInstancePriorityComparator = new BugInstancePriorityComparator();
-
-
-	public static class BugInstanceBugRankComparator implements Comparator<BugInstance>, Serializable {
-
-		private static final long serialVersionUID = 0L;
-
-		public int compare(final BugInstance lhs, final BugInstance rhs) {
-			return BugRankCategory.getRank(lhs.getBugRank()).compareTo(BugRankCategory.getRank(rhs.getBugRank()));
+	private static class BugInstanceBugRankComparator implements Comparator<Bug> {
+		@Override
+		public int compare(@NotNull final Bug o1, @NotNull final Bug o2) {
+			return BugRankCategory.getRank(o1.getInstance().getBugRank()).compareTo(BugRankCategory.getRank(o2.getInstance().getBugRank()));
 		}
 	}
 
-	/** The instance of BugInstancePriorityComparator. */
-	public static final Comparator<BugInstance> _bugInstanceBugRankComparator = new BugInstanceBugRankComparator();
+	/**
+	 * The instance of BugInstancePriorityComparator.
+	 */
+	private static final Comparator<Bug> _bugInstanceBugRankComparator = new BugInstanceBugRankComparator();
 
-
-	public static Comparator<BugInstance> getBugInstanceClassComparator() {
+	public static Comparator<Bug> getBugInstanceClassComparator() {
 		return _bugInstanceClassComparator;
 	}
 
-
-	public static Comparator<BugInstance> getBugInstancePackageComparator() {
+	static Comparator<Bug> getBugInstancePackageComparator() {
 		return _bugInstancePackageComparator;
 	}
 
-
-	public static Comparator<BugInstance> getBugInstanceTypeComparator() {
+	static Comparator<Bug> getBugInstanceTypeComparator() {
 		return _bugInstanceTypeComparator;
 	}
 
-
-	public static Comparator<BugInstance> getBugInstanceShortDescrComparator() {
+	static Comparator<Bug> getBugInstanceShortDescrComparator() {
 		return _bugInstanceShortDescrComparator;
 	}
 
-
-	public static Comparator<BugInstance> getBugInstanceCategoryComparator() {
+	static Comparator<Bug> getBugInstanceCategoryComparator() {
 		return _bugInstanceCategoryComparator;
 	}
 
-
-	public static Comparator<BugInstance> getBugInstancePriorityComparator() {
+	static Comparator<Bug> getBugInstancePriorityComparator() {
 		return _bugInstancePriorityComparator;
 	}
 
-
-	public static Comparator<BugInstance> getBugInstanceBugRankComparator() {
+	private static Comparator<Bug> getBugInstanceBugRankComparator() {
 		return _bugInstanceBugRankComparator;
 	}
 
-
-	public static Comparator<BugInstance> getBugInstanceComparator(final GroupBy groupBy) {
+	public static Comparator<Bug> getBugInstanceComparator(@NotNull final GroupBy groupBy) {
 		switch (groupBy) {
 			case Class:
 				return getBugInstanceClassComparator();
@@ -266,14 +222,10 @@ public class BugInstanceComparator {
 		}
 	}
 
-
-	public static List<Comparator<BugInstance>> getGroupComparators(final GroupBy[] orderGroups) {
-		final List<Comparator<BugInstance>> comp = new ArrayList<Comparator<BugInstance>>();
-
+	public static List<Comparator<Bug>> getGroupComparators(@NotNull final GroupBy[] orderGroups) {
+		final List<Comparator<Bug>> comp = new ArrayList<Comparator<Bug>>();
 		for (final GroupBy groupBy : orderGroups) {
-
 			switch (groupBy) {
-
 				case BugCategory:
 					comp.add(getBugInstanceCategoryComparator());
 					break;
@@ -299,18 +251,14 @@ public class BugInstanceComparator {
 					throw new IllegalArgumentException("Bad group order: " + groupBy);
 			}
 		}
-
 		return comp;
 	}
 
+	public static class ComparatorChain implements Comparator<Bug> {
 
-	public static class ComparatorChain implements Comparator<BugInstance>, Serializable {
-
-		private static final long serialVersionUID = 0L;
 		private final int _compareDepth;
 		private final GroupBy[] _groupBy;
-		final transient List<Comparator<BugInstance>> _comparators;
-
+		final transient List<Comparator<Bug>> _comparators;
 
 		public ComparatorChain(final int compareDepth, final GroupBy[] groupBy) {
 			_compareDepth = compareDepth;
@@ -318,26 +266,21 @@ public class BugInstanceComparator {
 			_comparators = getGroupComparators(groupBy);
 		}
 
-
-		public int compare(final BugInstance lhs, final BugInstance rhs) {
-			int retval = -1;
+		@Override
+		public int compare(@NotNull final Bug o1, @NotNull final Bug o2) {
+			int ret = -1;
 			for (int i = 0; i < _comparators.size(); i++) {
-				final Comparator<BugInstance> comp = _comparators.get(i);
-				retval = comp.compare(lhs, rhs);
-
-				if (_compareDepth == i || retval != 0) {
-					return retval;
+				final Comparator<Bug> comp = _comparators.get(i);
+				ret = comp.compare(o1, o2);
+				if (_compareDepth == i || ret != 0) {
+					return ret;
 				}
-
 			}
-
-			return retval;
+			return ret;
 		}
 	}
 
-
-	public static Comparator<BugInstance> getComparatorChain(final int depth, final GroupBy[] groupBy) {
+	public static Comparator<Bug> getComparatorChain(final int depth, final GroupBy[] groupBy) {
 		return new ComparatorChain(depth, groupBy);
 	}
-
 }

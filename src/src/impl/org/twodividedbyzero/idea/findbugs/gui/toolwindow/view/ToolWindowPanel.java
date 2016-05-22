@@ -44,9 +44,6 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.content.Content;
-import edu.umd.cs.findbugs.BugCollection;
-import edu.umd.cs.findbugs.BugInstance;
-import edu.umd.cs.findbugs.ProjectStats;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
@@ -54,7 +51,8 @@ import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.VersionManager;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
+import org.twodividedbyzero.idea.findbugs.core.Bug;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsResult;
 import org.twodividedbyzero.idea.findbugs.gui.common.ActionToolbarContainer;
 import org.twodividedbyzero.idea.findbugs.gui.common.AnalysisRunDetailsDialog;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
@@ -112,7 +110,7 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 	private boolean _isPreviewLayoutEnabled;
 	private transient PreviewPanel _previewPanel;
 	private final transient ToolWindow _parent;
-	private FindBugsProject _bugsProject;
+	private FindBugsResult result;
 
 
 	public ToolWindowPanel(@NotNull final Project project, final ToolWindow parent) {
@@ -130,9 +128,9 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		});
 		MessageBusManager.subscribe(project, this, NewBugInstanceListener.TOPIC, new NewBugInstanceListener() {
 			@Override
-			public void newBugInstance(@NotNull final BugInstance bugInstance, @NotNull final ProjectStats projectStats) {
-				_bugTreePanel.addNode(bugInstance);
-				_bugTreePanel.updateRootNode(projectStats);
+			public void newBug(@NotNull final Bug bug, final int analyzedClassCount) {
+				_bugTreePanel.addNode(bug);
+				_bugTreePanel.updateRootNode(analyzedClassCount);
 			}
 		});
 	}
@@ -257,13 +255,8 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 	}
 
 
-	public BugCollection getBugCollection() {
-		return _bugTreePanel.getBugCollection();
-	}
-
-
-	public FindBugsProject getBugsProject() {
-		return _bugsProject;
+	public FindBugsResult getResult() {
+		return result;
 	}
 
 
@@ -296,18 +289,18 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 
 	@Override
 	public void analysisAborted() {
-		_bugTreePanel.setBugCollection(null);
+		_bugTreePanel.setResult(null);
 		BalloonTipFactory.showToolWindowInfoNotifier(_project, "Analysis aborted");
 	}
 
 
 	@Override
-	public void analysisFinished(@NotNull final BugCollection bugCollection, @Nullable final FindBugsProject findBugsProject, @Nullable final Throwable error) {
-		_bugTreePanel.setBugCollection(bugCollection);
-		final ProjectStats stats = bugCollection.getProjectStats();
-		_bugTreePanel.updateRootNode(stats);
+	public void analysisFinished(@NotNull final FindBugsResult result, @Nullable final Throwable error) {
+		_bugTreePanel.setResult(result);
+		final Integer numClasses = result.getNumClasses();
+		_bugTreePanel.updateRootNode(numClasses);
 		_bugTreePanel.getBugTree().validate();
-		final int numAnalysedClasses = stats != null ? stats.getNumClasses() : 0;
+		final int numAnalysedClasses = numClasses != null ? numClasses : 0;
 
 		final StringBuilder message = new StringBuilder()
 				.append("Found ")
@@ -316,7 +309,7 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 				.append(numAnalysedClasses)
 				.append(numAnalysedClasses > 1 ? " classes" : " class");
 
-		_bugsProject = findBugsProject;
+		this.result = result;
 
 		final NotificationType notificationType;
 		if (numAnalysedClasses == 0) {
@@ -349,14 +342,14 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 			message.append(String.format("%s The results of the analysis might be incomplete.", errorText));
 			LOGGER.error(error);
 			// use balloon because error should never disabled
-			BalloonTipFactory.showToolWindowErrorNotifier(_project, message.toString(), new BalloonErrorListenerImpl(ToolWindowPanel.this, _bugsProject, ideMessagePanel));
+			BalloonTipFactory.showToolWindowErrorNotifier(_project, message.toString(), new BalloonErrorListenerImpl(ToolWindowPanel.this, result, ideMessagePanel));
 		} else {
 			message.append("<a href='").append(A_HREF_DISABLE_ANCHOR).append("'>Disable notification").append("</a>");
 			NOTIFICATION_GROUP_ANALYSIS_FINISHED.createNotification(
 					VersionManager.getName() + ": Analysis Finished",
 					message.toString(),
 					notificationType,
-					new NotificationListenerImpl(ToolWindowPanel.this, _bugsProject)
+					new NotificationListenerImpl(ToolWindowPanel.this, result)
 			).setImportant(false).notify(_project);
 		}
 
@@ -466,19 +459,19 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 
 	private static abstract class AbstractListenerImpl {
 
-		protected final FindBugsProject _bugsProject;
+		protected final FindBugsResult result;
 		protected final ToolWindowPanel _toolWindowPanel;
 
 
-		private AbstractListenerImpl(@NotNull final ToolWindowPanel toolWindowPanel, final FindBugsProject bugsProject) {
-			_bugsProject = bugsProject;
+		private AbstractListenerImpl(@NotNull final ToolWindowPanel toolWindowPanel, final FindBugsResult result) {
+			this.result = result;
 			_toolWindowPanel = toolWindowPanel;
 		}
 
 
 		final void openAnalysisRunDetailsDialog() {
 			final int bugCount = _toolWindowPanel.getBugTreePanel().getGroupModel().getBugCount();
-			final DialogBuilder dialog = AnalysisRunDetailsDialog.create(_toolWindowPanel.getProject(), bugCount, _toolWindowPanel.getBugCollection().getProjectStats(), _bugsProject);
+			final DialogBuilder dialog = AnalysisRunDetailsDialog.create(_toolWindowPanel.getProject(), bugCount, result.getNumClasses(), result);
 			dialog.showModal(false);
 		}
 	}
@@ -487,8 +480,8 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 	private static class NotificationListenerImpl extends AbstractListenerImpl implements NotificationListener {
 
 
-		private NotificationListenerImpl(@NotNull final ToolWindowPanel toolWindowPanel, final FindBugsProject bugsProject) {
-			super(toolWindowPanel, bugsProject);
+		private NotificationListenerImpl(@NotNull final ToolWindowPanel toolWindowPanel, final FindBugsResult result) {
+			super(toolWindowPanel, result);
 		}
 
 
@@ -523,7 +516,7 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		@Override
 		public String toString() {
 			return "NotifierHyperlinkListener" +
-					"{_bugsProject=" + _bugsProject +
+					"{result=" + result +
 					", _toolWindowPanel=" + _toolWindowPanel +
 					'}';
 		}
@@ -535,8 +528,8 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		private final IdeMessagePanel _ideMessagePanel;
 
 
-		private BalloonErrorListenerImpl(@NotNull final ToolWindowPanel toolWindowPanel, final FindBugsProject bugsProject, @Nullable final IdeMessagePanel ideMessagePanel) {
-			super(toolWindowPanel, bugsProject);
+		private BalloonErrorListenerImpl(@NotNull final ToolWindowPanel toolWindowPanel, final FindBugsResult result, @Nullable final IdeMessagePanel ideMessagePanel) {
+			super(toolWindowPanel, result);
 			_ideMessagePanel = ideMessagePanel;
 		}
 

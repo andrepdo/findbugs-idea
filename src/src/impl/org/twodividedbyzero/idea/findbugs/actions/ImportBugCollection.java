@@ -30,7 +30,6 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.util.Processor;
 import com.intellij.util.containers.TransferToEDTQueue;
-import edu.umd.cs.findbugs.BugCollection;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.Plugin;
 import edu.umd.cs.findbugs.ProjectStats;
@@ -41,6 +40,8 @@ import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
+import org.twodividedbyzero.idea.findbugs.core.Bug;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsResult;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
@@ -58,6 +59,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+// TODO test it
 public final class ImportBugCollection extends AbstractAction {
 
 	private static final Logger LOGGER = Logger.getInstance(ImportBugCollection.class);
@@ -103,8 +105,8 @@ public final class ImportBugCollection extends AbstractAction {
 		}
 
 
-		final BugCollection bugCollection = ToolWindowPanel.getInstance(project).getBugCollection();
-		if (bugCollection != null && !bugCollection.getCollection().isEmpty()) {
+		final FindBugsResult findBugsResult = ToolWindowPanel.getInstance(project).getResult();
+		if (findBugsResult != null && !findBugsResult.isBugCollectionEmpty()) {
 			//noinspection DialogTitleCapitalization
 			final int result = Messages.showYesNoDialog(project, "Current result in the 'Found bugs view' will be cleared. Continue ?", "Clear found bugs?", Messages.getQuestionIcon());
 			if (result == 1) {
@@ -176,14 +178,16 @@ public final class ImportBugCollection extends AbstractAction {
 						 * Guarantee thread visibility *one* time.
 						 */
 						final AtomicReference<BugInstance> bugInstanceRef = New.atomicRef(bugInstance);
-						final AtomicReference<ProjectStats> projectStatsRef = New.atomicRef(projectStats);
+						final AtomicReference<SortedBugCollection> importBugCollectionRef = New.atomicRef(importBugCollection);
+						final int analyzedClassCount = projectStats.getNumClasses();
 						transferToEDTQueue.offer(new Runnable() {
 							/**
 							 * Invoked by EDT.
 							 */
 							@Override
 							public void run() {
-								MessageBusManager.publishNewBugInstance(project, bugInstanceRef.get(), projectStatsRef.get());
+								final Bug bug = new Bug(null, importBugCollectionRef.get(), bugInstanceRef.get());
+								MessageBusManager.publishNewBug(project, bug, analyzedClassCount);
 							}
 						});
 					}
@@ -211,7 +215,9 @@ public final class ImportBugCollection extends AbstractAction {
 					LOGGER.error(message, e1);
 
 				} finally {
-					MessageBusManager.publishAnalysisFinishedToEDT(project, importBugCollection, null, null);
+					final FindBugsResult result = new FindBugsResult();
+					result.put(null, importBugCollection, importBugCollection.getProjectStats().getNumClasses());
+					MessageBusManager.publishAnalysisFinishedToEDT(project, result, null);
 					Thread.currentThread().interrupt();
 				}
 			}

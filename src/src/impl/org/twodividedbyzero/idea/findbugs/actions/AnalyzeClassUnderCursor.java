@@ -31,6 +31,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProjects;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 
@@ -79,10 +80,11 @@ public final class AnalyzeClassUnderCursor extends AbstractAnalyzeAction {
 			}
 
 			@Override
-			protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
-				findBugsProject.configureAuxClasspathEntries(indicator, files);
-				findBugsProject.configureSourceDirectories(indicator, selectedSourceFiles);
-				findBugsProject.configureOutputFile(project, psiClass);
+			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
+				/*projects.configureAuxClasspathEntries(indicator, files); TODO
+				projects.configureSourceDirectories(indicator, selectedSourceFiles);
+				projects.configureOutputFile(project, psiClass);*/
+				return true;
 			}
 		}.start();
 	}

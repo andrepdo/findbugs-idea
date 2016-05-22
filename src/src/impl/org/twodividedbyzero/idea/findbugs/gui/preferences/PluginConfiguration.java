@@ -191,7 +191,8 @@ public class PluginConfiguration implements ConfigurationPage {
 
 	@Nullable
 	private Project getCurrentFbProject() {
-		final ToolWindowPanel panel = _parent.getFindBugsPlugin().getToolWindowPanel();
+		throw new RuntimeException("Deprecated");
+		/*final ToolWindowPanel panel = _parent.getFindBugsPlugin().getToolWindowPanel();
 		if (panel == null) {
 			return null;
 		}
@@ -199,7 +200,7 @@ public class PluginConfiguration implements ConfigurationPage {
 		if (bugCollection == null) {
 			return null;
 		}
-		return bugCollection.getProject();
+		return bugCollection.getProject();*/
 	}
 
 

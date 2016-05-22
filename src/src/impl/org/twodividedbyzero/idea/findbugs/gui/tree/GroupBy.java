@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,12 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.gui.tree;
 
-import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.BugRankCategory;
 import edu.umd.cs.findbugs.I18N;
+import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.core.Bug;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstanceCategoryComparator;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstanceClassComparator;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator.BugInstancePackageComparator;
@@ -34,14 +34,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
- * @since 0.0.1
- */
 public enum GroupBy {
 
 	BugShortDescription("by bug short description"),
@@ -52,19 +44,15 @@ public enum GroupBy {
 	Priority("by priority"),
 	BugRank("by bug rank");
 
-
 	private final String _description;
-
 
 	GroupBy(final String description) {
 		_description = description;
 	}
 
-
 	public String getDescription() {
 		return _description;
 	}
-
 
 	public static List<GroupBy> getGroupByList() {
 		final List<GroupBy> list = new ArrayList<GroupBy>();
@@ -73,14 +61,11 @@ public enum GroupBy {
 		return list;
 	}
 
-
-	public static String getBugCategory(final BugInstance bugInstance) {
-		final BugInstanceCategoryComparator categoryComparator = (BugInstanceCategoryComparator) BugInstanceComparator.getBugInstanceCategoryComparator();
-		return categoryComparator.getCategory(bugInstance);
+	public static String getBugCategory(@NotNull final Bug bug) {
+		return BugInstanceCategoryComparator.getCategory(bug);
 	}
 
-
-	public static String getGroupName(final GroupBy groupBy, final BugInstance bugInstance) {
+	public static String getGroupName(final GroupBy groupBy, @NotNull final Bug bug) {
 
 		if (!Locale.ENGLISH.equals(Locale.getDefault())) {
 			Locale.setDefault(Locale.ENGLISH);
@@ -90,40 +75,33 @@ public enum GroupBy {
 		switch (groupBy) {
 
 			case BugCategory:
-				final BugInstanceCategoryComparator categoryComparator = (BugInstanceCategoryComparator) BugInstanceComparator.getBugInstanceCategoryComparator();
-				final String category = categoryComparator.getCategory(bugInstance);
+				final String category = BugInstanceCategoryComparator.getCategory(bug);
 				groupName = I18N.instance().getBugCategoryDescription(category);
 				break;
 			case BugShortDescription:
-				final BugInstanceShortDescrComparator shortDescrComparator = (BugInstanceShortDescrComparator) BugInstanceComparator.getBugInstanceShortDescrComparator();
-				groupName = shortDescrComparator.getShortDescr(bugInstance);
+				groupName = BugInstanceShortDescrComparator.getShortDescr(bug);
 				break;
 			case BugType:
-				final BugInstanceTypeComparator typeComparator = (BugInstanceTypeComparator) BugInstanceComparator.getBugInstanceTypeComparator();
-				final String type = typeComparator.getTypeDescription(bugInstance);
+				final String type = BugInstanceTypeComparator.getTypeDescription(bug);
 				groupName = I18N.instance().getBugTypeDescription(type);
 				break;
 			case Class:
-				final BugInstanceClassComparator classComparator = (BugInstanceClassComparator) BugInstanceComparator.getBugInstanceClassComparator();
-				groupName = classComparator.getClassName(bugInstance);
+				groupName = BugInstanceClassComparator.getClassName(bug);
 				break;
 			case Package:
-				final BugInstancePackageComparator packageComparator = (BugInstancePackageComparator) BugInstanceComparator.getBugInstancePackageComparator();
-				groupName = packageComparator.getPackageName(bugInstance);
+				groupName = BugInstancePackageComparator.getPackageName(bug);
 				break;
 			case Priority:
-				final BugInstancePriorityComparator priorityComparator = (BugInstancePriorityComparator) BugInstanceComparator.getBugInstancePriorityComparator();
-				groupName = priorityComparator.getPriorityString(bugInstance);
+				groupName = BugInstancePriorityComparator.getPriorityString(bug);
 				break;
 			case BugRank:
-				groupName = BugRankCategory.getRank(bugInstance.getBugRank()).toString();
+				groupName = BugRankCategory.getRank(bug.getInstance().getBugRank()).toString();
 				break;
 			default:
 				throw new IllegalStateException("Unknown group order: " + groupBy);
 		}
 		return groupName;
 	}
-
 
 	/**
 	 * @param groupBy the primary group
@@ -138,22 +116,21 @@ public enum GroupBy {
 		switch (groupBy) {
 
 			case BugCategory:
-				return new GroupBy[] {BugCategory, BugType, BugShortDescription}; // FIXME: 2:Package, 3:Class, 4:Priority
+				return new GroupBy[]{BugCategory, BugType, BugShortDescription}; // FIXME: 2:Package, 3:Class, 4:Priority
 			case Class:
-				return new GroupBy[] {Class, BugCategory, BugType, BugShortDescription}; // FIXME: 1:Package, 3:Priority
+				return new GroupBy[]{Class, BugCategory, BugType, BugShortDescription}; // FIXME: 1:Package, 3:Priority
 			case Package:
-				return new GroupBy[] {Package, BugCategory, BugType, BugShortDescription}; // FIXME: 2:Priority, 3:Class
+				return new GroupBy[]{Package, BugCategory, BugType, BugShortDescription}; // FIXME: 2:Priority, 3:Class
 			case Priority:
-				return new GroupBy[] {Priority, BugCategory, BugType, BugShortDescription}; // FIXME: 2:Package, 3:Class
+				return new GroupBy[]{Priority, BugCategory, BugType, BugShortDescription}; // FIXME: 2:Package, 3:Class
 			case BugRank:
-				return new GroupBy[] {BugRank, /*BugCategory,*/ BugType, BugShortDescription};
+				return new GroupBy[]{BugRank, /*BugCategory,*/ BugType, BugShortDescription};
 			default:
 				throw new IllegalStateException("Unknown sort order group: " + groupBy);
 		}
 	}
 
 	// FIXME: getAvailGroupsForPrimaryGroup ??? static !!??
-
 
 	public static GroupBy[] getAvailableGroups(final GroupBy[] currentGroupBy) {
 		final List<GroupBy> result = new ArrayList<GroupBy>();

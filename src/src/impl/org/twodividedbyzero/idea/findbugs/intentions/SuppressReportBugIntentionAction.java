@@ -87,7 +87,7 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 	}
 
 	protected static String getBugId(final ExtendedProblemDescriptor problemDescriptor) {
-		return problemDescriptor.getBugInstance().getBugPattern().getType();
+		return problemDescriptor.getBug().getInstance().getBugPattern().getType();
 	}
 
 	@Override

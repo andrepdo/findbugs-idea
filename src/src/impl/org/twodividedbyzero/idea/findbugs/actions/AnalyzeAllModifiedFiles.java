@@ -29,7 +29,7 @@ import com.intellij.util.Consumer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsProjects;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 
@@ -69,7 +69,6 @@ public final class AnalyzeAllModifiedFiles extends AbstractAnalyzeAction {
 			@NotNull final FindBugsState state
 	) {
 
-		final VirtualFile[] files = IdeaUtilImpl.getProjectClasspath(e.getDataContext());
 		final List<VirtualFile> modifiedFiles = IdeaUtilImpl.getAllModifiedFiles(e.getDataContext());
 
 		new FindBugsStarter(project, "Running FindBugs analysis for modified files...") {
@@ -79,10 +78,9 @@ public final class AnalyzeAllModifiedFiles extends AbstractAnalyzeAction {
 			}
 
 			@Override
-			protected void configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProject findBugsProject) {
-				findBugsProject.configureAuxClasspathEntries(indicator, files);
-				findBugsProject.configureSourceDirectories(indicator, modifiedFiles);
-				findBugsProject.configureOutputFiles(project, modifiedFiles);
+			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects) {
+				projects.addFiles(modifiedFiles);
+				return true;
 			}
 		}.start();
 	}

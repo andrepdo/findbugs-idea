@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.core.Bug;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 
 
@@ -67,8 +68,8 @@ public class ExtendedProblemDescriptor implements ProblemDescriptor, ProblemGrou
 	}
 
 
-	public BugInstance getBugInstance() {
-		return _bugInstanceNode.getBugInstance();
+	public Bug getBug() {
+		return _bugInstanceNode.getBug();
 	}
 
 

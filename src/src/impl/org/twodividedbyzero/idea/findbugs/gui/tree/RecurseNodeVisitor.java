@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -20,28 +20,19 @@ package org.twodividedbyzero.idea.findbugs.gui.tree;
 
 import edu.umd.cs.findbugs.BugInstance;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.core.Bug;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceGroupNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.VisitableTreeNode;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
- * @since 0.9.29-dev
- */
 public class RecurseNodeVisitor<T extends VisitableTreeNode> implements NodeVisitor<BugInstanceGroupNode> { // FIXME: rename recurseGroupVisitor
 
 	private final T _startNode;
 	private BugInstanceGroupNode _resultNode;
 	private RecurseVisitCriteria _recurseVisitCriteria;
 
-
 	public RecurseNodeVisitor(final T startNode) {
 		_startNode = startNode;
 	}
-
 
 	@Nullable
 	public BugInstanceGroupNode findChildNode(final RecurseVisitCriteria recurseVisitCriteria) {
@@ -62,39 +53,39 @@ public class RecurseNodeVisitor<T extends VisitableTreeNode> implements NodeVisi
 		return _resultNode;
 	}
 
-
+	@Override
 	public void visitGroupNode(final BugInstanceGroupNode node) {
+		// TODO check use Bug.equals instead of BugInstance.equals
 		if (_recurseVisitCriteria.getBugInstance().equals(node.getBugInstance()) && _recurseVisitCriteria.getDepth() == node.getDepth() && _recurseVisitCriteria.getGroupName().equals(node.getGroupName())) {
 			_resultNode = node;
 		} else {
-			_resultNode = node.findChildNode(_recurseVisitCriteria.getBugInstance(), _recurseVisitCriteria.getDepth(), _recurseVisitCriteria.getGroupName());
+			_resultNode = node.findChildNode(_recurseVisitCriteria.getBug(), _recurseVisitCriteria.getDepth(), _recurseVisitCriteria.getGroupName());
 		}
 	}
 
-
 	public static class RecurseVisitCriteria {
 
-		private final BugInstance _bugInstance;
+		private final Bug _bug;
 		private final int _depth;
 		private final String _groupName;
 
-
-		public RecurseVisitCriteria(final BugInstance bugInstance, final int depth, final String groupName) {
-			_bugInstance = bugInstance;
+		public RecurseVisitCriteria(final Bug bug, final int depth, final String groupName) {
+			_bug = bug;
 			_depth = depth;
 			_groupName = groupName;
 		}
 
-
-		public BugInstance getBugInstance() {
-			return _bugInstance;
+		public Bug getBug() {
+			return _bug;
 		}
 
+		public BugInstance getBugInstance() {
+			return _bug.getInstance();
+		}
 
 		public int getDepth() {
 			return _depth;
 		}
-
 
 		public String getGroupName() {
 			return _groupName;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -18,27 +18,19 @@
  */
 package org.twodividedbyzero.idea.findbugs.messages;
 
-
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.Topic;
-import edu.umd.cs.findbugs.BugCollection;
-import edu.umd.cs.findbugs.BugInstance;
-import edu.umd.cs.findbugs.ProjectStats;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
+import org.twodividedbyzero.idea.findbugs.core.Bug;
+import org.twodividedbyzero.idea.findbugs.core.FindBugsResult;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-
-/**
- * @author Reto Merz<reto.merz@gmail.com>
- * @since 0.9.995
- */
 public final class MessageBusManager {
 
 
@@ -72,10 +64,10 @@ public final class MessageBusManager {
 	 * Note that you can only subscribe *one* {@code handler} per {@code topic}.
 	 * If {@code subscriber} has subscribed the topic already, nothing is done.
 	 *
-	 * @param project ..
+	 * @param project    ..
 	 * @param subscriber ..
-	 * @param topic ..
-	 * @param handler ..
+	 * @param topic      ..
+	 * @param handler    ..
 	 * @param <L>.
 	 */
 	public static <L> void subscribe(@NotNull final Project project, @NotNull final Object subscriber, @NotNull final Topic<L> topic, @NotNull final L handler) {
@@ -91,9 +83,9 @@ public final class MessageBusManager {
 	}
 
 
-	public static void publishNewBugInstance(@NotNull final Project project, @NotNull final BugInstance bugInstance, @NotNull final ProjectStats projectStats) {
+	public static void publishNewBug(@NotNull final Project project, @NotNull final Bug bug, final int analyzedClassCount) {
 		EventDispatchThreadHelper.checkEDT();
-		publish(project, NewBugInstanceListener.TOPIC).newBugInstance(bugInstance, projectStats);
+		publish(project, NewBugInstanceListener.TOPIC).newBug(bug, analyzedClassCount);
 	}
 
 
@@ -135,19 +127,18 @@ public final class MessageBusManager {
 	}
 
 
-	public static void publishAnalysisFinishedToEDT(@NotNull final Project project, @NotNull final BugCollection bugCollection, @Nullable final FindBugsProject findBugsProject, @Nullable final Throwable error) {
+	public static void publishAnalysisFinishedToEDT(@NotNull final Project project, @NotNull final FindBugsResult result, @Nullable final Throwable error) {
 		EventDispatchThreadHelper.checkNotEDT();
 		/**
 		 * Guarantee thread visibility *one* time.
 		 */
-		final AtomicReference<BugCollection> bugCollectionRef = New.atomicRef(bugCollection);
-		final AtomicReference<FindBugsProject> findBugsProjectRef = New.atomicRef(findBugsProject);
+		final AtomicReference<FindBugsResult> resultRef = New.atomicRef(result);
 		final AtomicReference<Throwable> errorRef = New.atomicRef(error);
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				FindBugsState.set(project, FindBugsState.Finished);
-				publish(project, AnalysisFinishedListener.TOPIC).analysisFinished(bugCollectionRef.get(), findBugsProjectRef.get(), errorRef.get());
+				publish(project, AnalysisFinishedListener.TOPIC).analysisFinished(resultRef.get(), errorRef.get());
 			}
 		});
 	}

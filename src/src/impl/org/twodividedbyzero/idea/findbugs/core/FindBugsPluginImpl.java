@@ -284,7 +284,7 @@ public class FindBugsPluginImpl implements ProjectComponent, FindBugsPlugin, Sea
 
 	@Override
 	public BugCollection getBugCollection() {
-		return getToolWindowPanel().getBugCollection();
+		throw new RuntimeException("Deprecated");
 	}
 
 
