@@ -19,27 +19,30 @@
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
 import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.components.StorageScheme;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleServiceManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
-import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.ModuleSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
 
+/**
+ * Note that the conversion of module settings works but the legacy settings are not removed from the .iml file.
+ * It seems that {@link Storage#deprecated()} does only work with non-module (.iml) settings or with dir-based settings
+ * because in case of the project settings ({@link LegacyProjectSettings}) it works at least when the settings was
+ * stored in a separate dir (leagcy settings was directory based stored).
+ */
 @State(
 		name = FindBugsPluginConstants.PLUGIN_ID,
-		storages = {
-				@Storage(id = "other", file = "$PROJECT_FILE$", deprecated = true),
-				@Storage(id = "dir", file = "$PROJECT_CONFIG_DIR$/findbugs-idea.xml", scheme = StorageScheme.DIRECTORY_BASED, deprecated = true)})
-public final class LegacyProjectSettings implements PersistentStateComponent<PersistencePreferencesBean> {
+		storages = {@Storage(id = "other", file = "$MODULE_FILE$", deprecated = true)})
+public final class LegacyModuleSettings implements PersistentStateComponent<PersistencePreferencesBean> {
 
-	private static final Logger LOGGER = Logger.getInstance(LegacyProjectSettings.class);
+	private static final Logger LOGGER = Logger.getInstance(LegacyModuleSettings.class);
 
 	private PersistencePreferencesBean state;
 
@@ -54,15 +57,15 @@ public final class LegacyProjectSettings implements PersistentStateComponent<Per
 		this.state = state;
 	}
 
-	public static LegacyProjectSettings getInstance(@NotNull final Project project) {
-		return ServiceManager.getService(project, LegacyProjectSettings.class);
+	public static LegacyModuleSettings getInstance(@NotNull final Module module) {
+		return ModuleServiceManager.getService(module, LegacyModuleSettings.class);
 	}
 
-	void applyTo(@NotNull final ProjectSettings settings, @NotNull final WorkspaceSettings workspaceSettings) {
+	void applyTo(@NotNull final ModuleSettings settings, @NotNull final WorkspaceSettings workspaceSettings) {
 		if (state == null) {
 			return;
 		}
-		LOGGER.info("Start convert legacy findbugs-idea project settings");
+		LOGGER.info("Start convert legacy findbugs-idea module settings");
 		LegacyAbstractSettingsConverter.applyTo(state, settings, workspaceSettings, WorkspaceSettings.PROJECT_IMPORT_FILE_PATH_KEY);
 	}
 }

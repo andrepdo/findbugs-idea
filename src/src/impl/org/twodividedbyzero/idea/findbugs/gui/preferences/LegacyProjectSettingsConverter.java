@@ -19,10 +19,16 @@
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
 import com.intellij.openapi.components.AbstractProjectComponent;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.core.ModuleSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
+import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
+
+import java.util.List;
 
 public final class LegacyProjectSettingsConverter extends AbstractProjectComponent {
 	public LegacyProjectSettingsConverter(@NotNull final Project project) {
@@ -31,11 +37,37 @@ public final class LegacyProjectSettingsConverter extends AbstractProjectCompone
 
 	@Override
 	public void projectOpened() {
+
 		final LegacyProjectSettings legacy = LegacyProjectSettings.getInstance(myProject);
-		final ProjectSettings current = ProjectSettings.getInstance(myProject);
-		final WorkspaceSettings currentWorkspace = WorkspaceSettings.getInstance(myProject);
-		if (legacy != null) {
-			legacy.applyTo(current, currentWorkspace);
+		if (legacy == null) {
+			return;
 		}
+		final PersistencePreferencesBean legacyBean = legacy.getState();
+		if (legacyBean == null) {
+			return;
+		}
+
+		final WorkspaceSettings currentWorkspace = WorkspaceSettings.getInstance(myProject);
+
+		final List<String> enabledModuleConfigs = legacyBean.getEnabledModuleConfigs();
+
+		if (enabledModuleConfigs != null && !enabledModuleConfigs.isEmpty()) {
+			// first convert module settings if necessary
+			for (final Module module : ModuleManager.getInstance(myProject).getModules()) {
+				final LegacyModuleSettings legacyModuleSettings = LegacyModuleSettings.getInstance(module);
+				if (legacyModuleSettings != null) {
+					final ModuleSettings currentModule = ModuleSettings.getInstance(module);
+					if (enabledModuleConfigs.contains(module.getName())) {
+						legacyModuleSettings.applyTo(currentModule, currentWorkspace);
+						currentModule.overrideProjectSettings = true;
+					}
+				}
+			}
+		}
+
+		// convert project- after module-settings if necessary
+		final ProjectSettings current = ProjectSettings.getInstance(myProject);
+		legacy.applyTo(current, currentWorkspace);
+
 	}
 }

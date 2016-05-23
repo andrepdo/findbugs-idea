@@ -303,6 +303,7 @@
         <search.optionContributor implementation="org.twodividedbyzero.idea.findbugs.gui.settings.SearchableOptionContributorImpl"/>
 
         <moduleService serviceImplementation="org.twodividedbyzero.idea.findbugs.core.ModuleSettings"/>
+        <moduleService serviceImplementation="org.twodividedbyzero.idea.findbugs.gui.preferences.LegacyModuleSettings"/>
         <moduleConfigurable provider="org.twodividedbyzero.idea.findbugs.core.ModuleConfigurableProvider"
                             displayName="FindBugs-IDEA"/>
     </extensions>
