@@ -46,8 +46,8 @@ import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
-import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.plugins.AbstractPluginLoader;
 import org.twodividedbyzero.idea.findbugs.plugins.PluginInfo;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
@@ -65,7 +65,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSettings> {
+final class PluginTablePane extends JPanel {
 	private static final Logger LOGGER = Logger.getInstance(PluginTablePane.class);
 
 	private JBTable table;
@@ -274,8 +274,7 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 		table.setEnabled(enabled);
 	}
 
-	@Override
-	public boolean isModified(@NotNull final ProjectSettings settings) {
+	boolean isModified(@NotNull final AbstractSettings settings) {
 		final Set<PluginSettings> plugins = New.set();
 		for (final PluginInfo pluginInfo : getModel().rows) {
 			plugins.add(pluginInfo.settings);
@@ -283,8 +282,7 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 		return !settings.plugins.equals(plugins);
 	}
 
-	@Override
-	public void apply(@NotNull final ProjectSettings settings) throws ConfigurationException {
+	void apply(@NotNull final AbstractSettings settings) throws ConfigurationException {
 		if (lastPluginError != null) {
 			throw new ConfigurationException(lastPluginError, ResourcesLoader.getString("plugins.error.title"));
 		}
@@ -294,8 +292,7 @@ final class PluginTablePane extends JPanel implements SettingsOwner<ProjectSetti
 		}
 	}
 
-	@Override
-	public void reset(@NotNull final ProjectSettings settings) {
+	void reset(@NotNull final AbstractSettings settings) {
 		lastPluginError = null;
 		load(settings.plugins);
 	}

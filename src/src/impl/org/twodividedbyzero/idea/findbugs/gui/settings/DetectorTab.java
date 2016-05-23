@@ -26,7 +26,7 @@ import com.intellij.ui.JBSplitter;
 import com.intellij.ui.treeStructure.treetable.TreeTableTree;
 import edu.umd.cs.findbugs.DetectorFactory;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.BorderFactory;
@@ -127,15 +127,15 @@ final class DetectorTab extends JPanel implements Disposable {
 		getDetails().setEnabled(enabled);
 	}
 
-	boolean isModified(@NotNull final ProjectSettings settings) {
+	boolean isModified(@NotNull final AbstractSettings settings) {
 		return getTablePane().isModified(settings);
 	}
 
-	void apply(@NotNull final ProjectSettings settings) throws ConfigurationException {
+	void apply(@NotNull final AbstractSettings settings) throws ConfigurationException {
 		getTablePane().apply(settings);
 	}
 
-	void reset(@NotNull final ProjectSettings settings) {
+	void reset(@NotNull final AbstractSettings settings) {
 		getTablePane().reset(settings);
 	}
 

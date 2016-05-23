@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -26,18 +26,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @version $Revision$
- * @since 0.0.1
- */
+// TODO Test re-group of duplicates from different modules
 @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
 class Grouper<T> {
 
-	public interface GrouperCallback<E> {
+	interface GrouperCallback<E> {
 
 		void startGroup(E firstMember, int depth);
 
@@ -61,7 +54,6 @@ class Grouper<T> {
 
 	private final GrouperCallback<T> _callback;
 
-
 	/**
 	 * Creates a new instance of Grouper.
 	 *
@@ -70,7 +62,6 @@ class Grouper<T> {
 	Grouper(final GrouperCallback<T> callback) {
 		_callback = callback;
 	}
-
 
 	/**
 	 * Group elements of given collection obtained by calling {@link GrouperCallback#availableGroups(int, Object)}
@@ -212,5 +203,4 @@ class Grouper<T> {
 
 
 	}
-
 }

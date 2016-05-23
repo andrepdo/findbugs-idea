@@ -69,13 +69,7 @@ public final class ProjectConfigurableImpl implements SearchableConfigurable, Co
 	@Override
 	public JComponent createComponent() {
 		if (pane == null) {
-			pane = new ProjectSettingsPane() {
-				@NotNull
-				@Override
-				Project getProject() {
-					return project;
-				}
-			};
+			pane = new ProjectSettingsPane(project);
 		}
 		return pane;
 	}

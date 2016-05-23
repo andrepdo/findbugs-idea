@@ -47,6 +47,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.io.File;
 
+// TODO allow per module
 final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>, Disposable {
 	private JLabel description;
 	private HyperlinkLabel link;

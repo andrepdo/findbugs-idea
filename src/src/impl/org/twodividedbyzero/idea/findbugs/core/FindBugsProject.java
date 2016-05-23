@@ -30,7 +30,6 @@ import org.twodividedbyzero.idea.findbugs.gui.PluginGuiCallback;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 public class FindBugsProject extends edu.umd.cs.findbugs.Project {
 
@@ -87,15 +86,24 @@ public class FindBugsProject extends edu.umd.cs.findbugs.Project {
 	static FindBugsProject create(
 			@NotNull final Project project,
 			@NotNull final Module module,
-			@NotNull final String projectName,
-			@NotNull final Set<PluginSettings> plugins
+			@NotNull final String projectName
 	) {
+
+
+		final ModuleSettings moduleSettings = ModuleSettings.getInstance(module);
+		final AbstractSettings settings;
+		if (moduleSettings.overrideProjectSettings) {
+			settings = moduleSettings;
+		} else {
+			settings = ProjectSettings.getInstance(project);
+		}
+
 		final FindBugsProject ret = new FindBugsProject(project, module);
 		ret.setProjectName(projectName);
 		for (final Plugin plugin : Plugin.getAllPlugins()) {
 			if (!plugin.isCorePlugin()) {
 				boolean enabled = false;
-				for (final PluginSettings pluginSettings : plugins) {
+				for (final PluginSettings pluginSettings : settings.plugins) {
 					if (plugin.getPluginId().equals(pluginSettings.id)) {
 						if (pluginSettings.enabled) {
 							enabled = true; // do not break loop here ; maybe there are multiple plugins (with same plugin id) configured and one is enabled

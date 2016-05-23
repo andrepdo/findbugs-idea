@@ -61,7 +61,7 @@ public final class ModuleConfigurableImpl implements Configurable {
 	@Override
 	public JComponent createComponent() {
 		if (pane == null) {
-			pane = new ModuleSettingsPane();
+			pane = new ModuleSettingsPane(module.getProject());
 		}
 		return pane;
 	}

@@ -18,11 +18,14 @@
  */
 package org.twodividedbyzero.idea.findbugs.core;
 
+import com.intellij.util.xmlb.Constants;
 import com.intellij.util.xmlb.annotations.AbstractCollection;
 import com.intellij.util.xmlb.annotations.MapAnnotation;
 import com.intellij.util.xmlb.annotations.Tag;
 import edu.umd.cs.findbugs.BugRanker;
 import edu.umd.cs.findbugs.config.ProjectFilterSettings;
+import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
+import org.twodividedbyzero.idea.findbugs.common.util.FindBugsCustomPluginUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
 
@@ -58,6 +61,18 @@ public abstract class AbstractSettings {
 	@Tag(value = "hiddenBugCategory")
 	@AbstractCollection(surroundWithTag = false, elementTag = "category", elementValueAttribute = "name")
 	public Set<String> hiddenBugCategory = New.asSet("NOISE");
+
+	@Tag
+	public String suppressWarningsClassName = FindBugsPluginConstants.DEFAULT_SUPPRESS_WARNINGS_CLASSNAME;
+
+	/**
+	 * Additional findbugs plugins.
+	 *
+	 * @see FindBugsCustomPluginUtil
+	 */
+	@Tag(value = "plugins")
+	@AbstractCollection(surroundWithTag = false, elementTag = Constants.SET)
+	public Set<PluginSettings> plugins = New.set();
 
 	/**
 	 * @see edu.umd.cs.findbugs.config.UserPreferences#setIncludeFilterFiles(Map)
@@ -100,4 +115,25 @@ public abstract class AbstractSettings {
 			valueAttributeName = "enabled"
 	)
 	public Map<String, Boolean> excludeBugsFiles = New.map();
+
+	/**
+	 * Note that the map only contains detectors from the core plugin and
+	 * only enabled state which are not equal to the default enable state
+	 * {@link edu.umd.cs.findbugs.DetectorFactory#isDefaultEnabled()}.
+	 * <p>
+	 * Key = {@link edu.umd.cs.findbugs.DetectorFactory#getShortName()}
+	 * (like {@link edu.umd.cs.findbugs.config.UserPreferences#detectorEnablementMap})
+	 * <p>
+	 * Value = Enabled state
+	 */
+	@Tag(value = "detectors")
+	@MapAnnotation(
+			surroundWithTag = false,
+			surroundValueWithTag = false,
+			surroundKeyWithTag = false,
+			entryTagName = "detector",
+			keyAttributeName = "name",
+			valueAttributeName = "enabled"
+	)
+	public Map<String, Boolean> detectors = New.map();
 }

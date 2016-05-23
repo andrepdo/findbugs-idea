@@ -125,8 +125,7 @@ public final class FindBugsProjects {
 			ret = FindBugsProject.create(
 					project,
 					module,
-					makeProjectName(module),
-					getPlugins(module)
+					makeProjectName(module)
 			);
 
 			final VirtualFile[] sourceRoots = getSourceRoots(module);
@@ -162,15 +161,10 @@ public final class FindBugsProjects {
 	}
 
 	@NotNull
-	private Set<PluginSettings> getPlugins(@Nullable final Module module) {
-		return ProjectSettings.getInstance(project).plugins; // TODO
-	}
-
-	@NotNull
 	private Collection<VirtualFile> getCompilerOutputPaths(@NotNull final Module module) {
 
 		final Set<Module> modules = New.set();
-		ModuleUtilCore.collectModulesDependsOn(module, modules);
+		ModuleUtilCore.getDependencies(module, modules);
 		modules.add(module);
 
 		final List<VirtualFile> ret = new ArrayList<VirtualFile>(modules.size());

@@ -28,8 +28,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
-import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.ArrayList;
@@ -185,7 +185,7 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 
 	@NotNull
 	static Map<String, Map<String, Boolean>> createEnabledMap(
-			@NotNull final ProjectSettings settings
+			@NotNull final AbstractSettings settings
 	) {
 		final Map<String, Map<String, Boolean>> ret = New.map();
 		if (!settings.detectors.isEmpty()) {
@@ -200,7 +200,7 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 	}
 
 	static void fillSettings(
-			@NotNull final ProjectSettings settings,
+			@NotNull final AbstractSettings settings,
 			@NotNull final Map<String, Map<String, Boolean>> detectors
 	) {
 		apply(detectors.get(FindBugsPluginConstants.FINDBUGS_CORE_PLUGIN_ID), settings.detectors);

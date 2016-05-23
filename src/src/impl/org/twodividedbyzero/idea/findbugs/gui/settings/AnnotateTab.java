@@ -33,7 +33,7 @@ import com.intellij.ui.components.JBCheckBox;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
-import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.HAlignment;
 import org.twodividedbyzero.idea.findbugs.gui.common.VAlignment;
@@ -81,15 +81,11 @@ final class AnnotateTab extends JPanel {
 		add(textRangeMarkupCheckbox);
 	}
 
-	@Override
-	public void setEnabled(final boolean enabled) {
-		super.setEnabled(enabled);
+	void setProjectSettingsEnabled(final boolean enabled) {
 		annotationClassField.setEnabled(enabled);
-		gutterIconCheckbox.setEnabled(enabled);
-		textRangeMarkupCheckbox.setEnabled(enabled);
 	}
 
-	boolean isModifiedProject(@NotNull final ProjectSettings settings) {
+	boolean isModified(@NotNull final AbstractSettings settings) {
 		return !StringUtil.equals(settings.suppressWarningsClassName, annotationClassField.getComponent().getText());
 	}
 
@@ -99,7 +95,7 @@ final class AnnotateTab extends JPanel {
 	}
 
 	@SuppressWarnings("UnnecessaryLocalVariable")
-	void applyProject(@NotNull final ProjectSettings settings) throws ConfigurationException {
+	void apply(@NotNull final AbstractSettings settings) throws ConfigurationException {
 		final String suppressWarningsClassName = annotationClassField.getComponent().getText();
 		settings.suppressWarningsClassName = suppressWarningsClassName;
 		// Do not throw any configuration exception at the moment because it
@@ -114,7 +110,7 @@ final class AnnotateTab extends JPanel {
 		settings.annotationTextRangeMarkup = textRangeMarkupCheckbox.isSelected();
 	}
 
-	void resetProject(@NotNull final ProjectSettings settings) {
+	void reset(@NotNull final AbstractSettings settings) {
 		annotationClassField.getComponent().setText(settings.suppressWarningsClassName);
 	}
 

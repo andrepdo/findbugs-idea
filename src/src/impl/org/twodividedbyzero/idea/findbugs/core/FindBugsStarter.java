@@ -79,9 +79,6 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 	@NotNull
 	private final WorkspaceSettings workspaceSettings;
 
-	@NotNull
-	private final AbstractSettings settings;
-
 	private final boolean _startInBackground;
 	private final AtomicBoolean _cancellingByUser;
 
@@ -103,7 +100,6 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		_title = title;
 		this.projectSettings = ProjectSettings.getInstance(project);
 		this.workspaceSettings = WorkspaceSettings.getInstance(project);
-		this.settings = projectSettings; // TODO
 		_startInBackground = workspaceSettings.runInBackground || forceStartInBackground;
 		_cancellingByUser = new AtomicBoolean();
 		MessageBusManager.subscribe(project, this, AnalysisAbortingListener.TOPIC, this);
@@ -221,7 +217,15 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 			final int numClassesOffset
 	) throws IOException, InterruptedException {
 
-		if (!PluginLoader.load(_project, projectSettings, true)) {
+		final ModuleSettings moduleSettings = ModuleSettings.getInstance(module);
+		final AbstractSettings settings;
+		if (moduleSettings.overrideProjectSettings) {
+			settings = moduleSettings;
+		} else {
+			settings = projectSettings;
+		}
+
+		if (!PluginLoader.load(_project, moduleSettings.overrideProjectSettings ? module : null, settings, true)) {
 			throw new ProcessCanceledException();
 		}
 

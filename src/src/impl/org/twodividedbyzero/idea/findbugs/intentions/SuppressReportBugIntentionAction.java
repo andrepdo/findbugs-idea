@@ -27,10 +27,14 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Iconable;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.ReadonlyStatusHandler;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnonymousClass;
@@ -51,8 +55,10 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
+import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.FileModificationServiceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.core.ModuleSettings;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
@@ -67,17 +73,11 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 
 	private final String _bugPatternId;
 	private String _key;
-	private final String _suppressWarningsClassName;
 	private final ExtendedProblemDescriptor _problemDescriptor;
-
 
 	public SuppressReportBugIntentionAction(final ExtendedProblemDescriptor problemDescriptor) {
 		_problemDescriptor = problemDescriptor;
 		_bugPatternId = getBugId(problemDescriptor);
-
-		final Project project = IdeaUtilImpl.getProject(problemDescriptor.getPsiFile());
-		final ProjectSettings workspaceSettings = ProjectSettings.getInstance(project);
-		_suppressWarningsClassName = workspaceSettings.suppressWarningsClassName;
 	}
 
 	@SuppressWarnings({"override", "HardcodedFileSeparator"}) // idea 8 compatibility
@@ -86,7 +86,7 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 		//return GuiUtil.getIcon(_problemDescriptor);
 	}
 
-	protected static String getBugId(final ExtendedProblemDescriptor problemDescriptor) {
+	private static String getBugId(final ExtendedProblemDescriptor problemDescriptor) {
 		return problemDescriptor.getBug().getInstance().getBugPattern().getType();
 	}
 
@@ -199,8 +199,16 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 
 	@SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
 	@SuppressWarnings("HardcodedLineSeparator")
-	public void addSuppressAnnotation(final Project project, final Editor editor, final PsiElement container, final PsiModifierList modifierList, final String id) throws IncorrectOperationException {
-		PsiAnnotation annotation = modifierList.findAnnotation(_suppressWarningsClassName);
+	private void addSuppressAnnotation(
+			final Project project,
+			final Editor editor,
+			@NotNull final PsiElement container,
+			@NotNull final PsiModifierList modifierList,
+			final String id
+	) throws IncorrectOperationException {
+
+		final String suppressWarningsClassName = getSuppressWarningsClassName(container);
+		PsiAnnotation annotation = modifierList.findAnnotation(suppressWarningsClassName);
 		if (annotation != null) {
 
 			String value = null;
@@ -232,7 +240,7 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 					value = "{\"" + value + "\", \"" + id + "\"}";
 					justification = "";
 				}
-				final String annotationText = '@' + _suppressWarningsClassName + "(" + value + justification + ")\r\n";
+				final String annotationText = '@' + suppressWarningsClassName + "(" + value + justification + ")\r\n";
 				annotation.replace(createAnnotationFromText(project, annotationText, container));
 			} else {
 				if (!ApplicationManager.getApplication().isUnitTestMode() && editor != null) {
@@ -241,10 +249,10 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 			}
 
 		} else {
-			annotation = createAnnotationFromText(project, '@' + _suppressWarningsClassName + "(\"" + id + "\")\r\n", container);
+			annotation = createAnnotationFromText(project, '@' + suppressWarningsClassName + "(\"" + id + "\")\r\n", container);
 			modifierList.addBefore(annotation, modifierList.getFirstChild());
 			JavaCodeStyleManager.getInstance(project).shortenClassReferences(modifierList);
-			if (needsImportStatement()) {
+			if (needsImportStatement(suppressWarningsClassName)) {
 				addImport(project, container);
 			}
 		}
@@ -255,12 +263,12 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 		return JavaPsiFacade.getInstance(project).getElementFactory().createAnnotationFromText(annotationText, context);
 	}
 
-	private boolean needsImportStatement() {
-		final String result = _suppressWarningsClassName.substring(0, _suppressWarningsClassName.lastIndexOf('.'));
+	private boolean needsImportStatement(@NotNull final String suppressWarningsClassName) {
+		final String result = suppressWarningsClassName.substring(0, suppressWarningsClassName.lastIndexOf('.'));
 		return result.indexOf('.') != -1;
 	}
 
-	protected static boolean use15Suppressions(final PsiDocCommentOwner container) {
+	private static boolean use15Suppressions(final PsiDocCommentOwner container) {
 		return SuppressManager.getInstance().canHave15Suppressions(container) && !SuppressManager.getInstance().alreadyHas14Suppressions(container);
 	}
 
@@ -269,7 +277,7 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 		return true;
 	}
 
-	public String getID(final PsiElement place) {
+	private String getID(final PsiElement place) {
 		/*if (myAlternativeID != null) {
 			final Module module = ModuleUtil.findModuleForPsiElement(place);
 			if (module != null) {
@@ -288,6 +296,27 @@ public class SuppressReportBugIntentionAction extends SuppressIntentionAction im
 
 	public String getBugPatternId() {
 		return _bugPatternId;
+	}
+
+	@NotNull
+	private String getSuppressWarningsClassName(@NotNull final PsiElement psiElement) {
+		final VirtualFile file = psiElement.getContainingFile().getVirtualFile();
+		final Module module = ModuleUtilCore.findModuleForFile(file, psiElement.getProject());
+		if (module == null) {
+			throw new IllegalStateException("No module found for " + file);
+		}
+		String ret = null;
+		final ModuleSettings moduleSettings = ModuleSettings.getInstance(module);
+		if (moduleSettings.overrideProjectSettings) {
+			ret = moduleSettings.suppressWarningsClassName;
+		}
+		if (StringUtil.isEmptyOrSpaces(ret)) {
+			ret = ProjectSettings.getInstance(psiElement.getProject()).suppressWarningsClassName;
+		}
+		if (StringUtil.isEmptyOrSpaces(ret)) {
+			ret = FindBugsPluginConstants.DEFAULT_SUPPRESS_WARNINGS_CLASSNAME;
+		}
+		return ret;
 	}
 
 	@Override

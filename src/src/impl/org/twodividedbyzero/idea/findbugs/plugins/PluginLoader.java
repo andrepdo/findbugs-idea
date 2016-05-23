@@ -18,34 +18,44 @@
  */
 package org.twodividedbyzero.idea.findbugs.plugins;
 
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
-import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 
 import java.lang.ref.WeakReference;
 
 public final class PluginLoader {
 	private static WeakReference<Project> projectRef; // @GuardedBy PluginLoader.class
+	private static WeakReference<Module> moduleRef; // @GuardedBy PluginLoader.class
 
 	private PluginLoader() {
 	}
 
-	public synchronized static void invalidate() {
+	synchronized static void invalidate() {
 		projectRef = null;
+		moduleRef = null;
 	}
 
 	public synchronized static boolean load(
 			@NotNull final Project project,
-			@NotNull final ProjectSettings settings,
+			@Nullable final Module module,
+			@NotNull final AbstractSettings settings,
 			final boolean addEditSettingsLinkToErrorMessage
 	) {
 
 		Project latestProject = projectRef == null ? null : projectRef.get();
-		if (latestProject != project) {
+		Module latestModule = moduleRef == null ? null : moduleRef.get();
+		if (latestProject != project || latestModule != module) {
 			final PluginLoaderImpl pluginLoader = new PluginLoaderImpl(addEditSettingsLinkToErrorMessage);
 			pluginLoader.load(settings.plugins);
 			projectRef = New.weakRef(project);
+			moduleRef = null;
+			if (module != null) {
+				moduleRef = New.weakRef(module);
+			}
 			return pluginLoader.showErrorNotificationIfNecessary(project);
 		}
 		return true;

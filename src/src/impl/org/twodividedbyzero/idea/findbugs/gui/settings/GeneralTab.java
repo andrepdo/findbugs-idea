@@ -22,7 +22,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.HAlignment;
 import org.twodividedbyzero.idea.findbugs.gui.common.VAlignment;
@@ -61,18 +61,11 @@ final class GeneralTab extends JPanel {
 		add(plugin);
 	}
 
-	@Override
-	public void setEnabled(final boolean enabled) {
-		super.setEnabled(enabled);
-		compileBeforeAnalyze.setEnabled(enabled);
-		analyzeAfterCompile.setEnabled(enabled);
-		analyzeAfterAutoMake.setEnabled(enabled);
-		runInBackground.setEnabled(enabled);
-		toolWindowToFront.setEnabled(enabled);
+	void setProjectSettingsEnabled(final boolean enabled) {
 		plugin.setEnabled(enabled);
 	}
 
-	boolean isModifiedProject(@NotNull final ProjectSettings settings) {
+	boolean isModified(@NotNull final AbstractSettings settings) {
 		return plugin.isModified(settings);
 	}
 
@@ -84,7 +77,7 @@ final class GeneralTab extends JPanel {
 				toolWindowToFront.isSelected() != settings.toolWindowToFront;
 	}
 
-	void applyProject(@NotNull final ProjectSettings settings) throws ConfigurationException {
+	void apply(@NotNull final AbstractSettings settings) throws ConfigurationException {
 		plugin.apply(settings);
 	}
 
@@ -96,7 +89,7 @@ final class GeneralTab extends JPanel {
 		settings.toolWindowToFront = toolWindowToFront.isSelected();
 	}
 
-	void resetProject(@NotNull final ProjectSettings settings) {
+	void reset(@NotNull final AbstractSettings settings) {
 		plugin.reset(settings);
 	}
 

@@ -30,17 +30,15 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import java.awt.FlowLayout;
 
-abstract class ProjectSettingsPane extends SettingsPane {
+final class ProjectSettingsPane extends SettingsPane {
 
-	ProjectSettingsPane() {
+	ProjectSettingsPane(@NotNull final Project project) {
+		super(project);
 	}
 
 	@NotNull
-	abstract Project getProject();
-
-	@NotNull
 	@Override
-	JComponent createHeaderPane() {
+	JComponent createHeaderPane() { // TODO move to base
 		final JPanel topPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		topPane.add(createToolbar().getComponent());
 		topPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
@@ -53,24 +51,6 @@ abstract class ProjectSettingsPane extends SettingsPane {
 		final ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, actions, true);
 		actionToolbar.setTargetComponent(this);
 		return actionToolbar;
-	}
-
-	@NotNull
-	@Override
-	GeneralTab createGeneralTab() {
-		return new GeneralTab();
-	}
-
-	@Nullable
-	@Override
-	DetectorTab createDetectorTab() {
-		return new DetectorTab();
-	}
-
-	@Nullable
-	@Override
-	AnnotateTab createAnnotateTab() {
-		return new AnnotateTab(getProject());
 	}
 
 	@Nullable

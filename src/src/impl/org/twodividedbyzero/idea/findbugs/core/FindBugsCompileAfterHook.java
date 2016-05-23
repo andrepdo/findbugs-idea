@@ -194,16 +194,6 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		final CompileScope compileScope = compileContext.getCompileScope();
 		final VirtualFile[] affectedFiles = getAffectedFiles(compileScope);
 
-		// TODO
-		/*final ProjectSettings projectSettings = ProjectSettings.getInstance(project);
-		AbstractSettings settings = projectSettings;
-		if (modules.size() == 1) {
-			final ModuleSettings moduleSettings = ModuleSettings.getInstance(modules.iterator().next());
-			if (moduleSettings.overrideProjectSettings) {
-				settings = moduleSettings;
-			}
-		}*/
-
 		new FindBugsStarter(
 				project,
 				"Running FindBugs analysis for affected files...",

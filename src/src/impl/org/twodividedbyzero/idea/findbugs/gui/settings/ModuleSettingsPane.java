@@ -18,6 +18,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBCheckBox;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,6 +35,10 @@ import java.awt.event.ActionListener;
 final class ModuleSettingsPane extends SettingsPane {
 
 	private JBCheckBox overrideProjectSettingsCheckbox;
+
+	ModuleSettingsPane(@NotNull Project project) {
+		super(project);
+	}
 
 	@NotNull
 	@Override
@@ -53,7 +58,7 @@ final class ModuleSettingsPane extends SettingsPane {
 	}
 
 	private void updateControls() {
-		super.setEnabled(overrideProjectSettingsCheckbox.isSelected());
+		setProjectSettingsEnabled(overrideProjectSettingsCheckbox.isSelected());
 	}
 
 	@Override
@@ -71,24 +76,6 @@ final class ModuleSettingsPane extends SettingsPane {
 	void resetModule(@NotNull final ModuleSettings settings) {
 		overrideProjectSettingsCheckbox.setSelected(settings.overrideProjectSettings);
 		updateControls();
-	}
-
-	@Nullable
-	@Override
-	GeneralTab createGeneralTab() {
-		return null;
-	}
-
-	@Nullable
-	@Override
-	DetectorTab createDetectorTab() {
-		return null;
-	}
-
-	@Nullable
-	@Override
-	AnnotateTab createAnnotateTab() {
-		return null;
 	}
 
 	@Nullable

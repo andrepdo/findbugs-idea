@@ -23,7 +23,7 @@ import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.tree.TreeUtil;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.TreeState;
 
 import javax.swing.JPanel;
@@ -77,18 +77,18 @@ final class DetectorTablePane extends JPanel {
 		scrollPane.setEnabled(enabled);
 	}
 
-	boolean isModified(@NotNull final ProjectSettings settings) {
+	boolean isModified(@NotNull final AbstractSettings settings) {
 		final Map<String, Map<String, Boolean>> currentDetectors = getRootNode().getEnabledMap();
 		final Map<String, Map<String, Boolean>> settingsDetectors = AbstractDetectorNode.createEnabledMap(settings);
 		return !settingsDetectors.equals(currentDetectors);
 	}
 
-	void apply(@NotNull final ProjectSettings settings) throws ConfigurationException {
+	void apply(@NotNull final AbstractSettings settings) throws ConfigurationException {
 		final Map<String, Map<String, Boolean>> detectors = getRootNode().getEnabledMap();
 		AbstractDetectorNode.fillSettings(settings, detectors);
 	}
 
-	void reset(@NotNull final ProjectSettings settings) {
+	void reset(@NotNull final AbstractSettings settings) {
 		final Map<String, Map<String, Boolean>> detectors = AbstractDetectorNode.createEnabledMap(settings);
 		final TreeState treeState = TreeState.create(table.getTree());
 		model.setRoot(DetectorNode.buildRoot(headerPane.getGroupBy(), headerPane.createAcceptor(), detectors));

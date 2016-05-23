@@ -20,6 +20,7 @@ package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.components.JBTabbedPane;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +40,7 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	@NotNull
 	private JBTabbedPane tabs;
 
-	@Nullable
+	@NotNull
 	private GeneralTab generalTab;
 
 	@NotNull
@@ -48,23 +49,23 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	@NotNull
 	private FilterTab filterTab;
 
-	@Nullable
+	@NotNull
 	private DetectorTab detectorTab;
 
-	@Nullable
+	@NotNull
 	private AnnotateTab annotateTab;
 
 	@Nullable
 	private ShareTab shareTab;
 
-	SettingsPane() {
+	SettingsPane(@NotNull final Project project) {
 		super(new BorderLayout());
 
-		generalTab = createGeneralTab();
+		generalTab = new GeneralTab();
 		reportTab = new ReportTab();
 		filterTab = new FilterTab();
-		detectorTab = createDetectorTab();
-		annotateTab = createAnnotateTab();
+		detectorTab = new DetectorTab();
+		annotateTab = new AnnotateTab(project);
 		shareTab = createShareTab();
 
 		add(createHeaderPane(), BorderLayout.NORTH);
@@ -75,55 +76,37 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		 */
 		//final TabbedPaneWrapper tabs = new TabbedPaneWrapper(this);
 		tabs = new JBTabbedPane();
-		if (generalTab != null) {
-			tabs.addTab(ResourcesLoader.getString("settings.general"), generalTab);
-		}
+		tabs.addTab(ResourcesLoader.getString("settings.general"), generalTab);
 		tabs.addTab(ResourcesLoader.getString("settings.report"), reportTab);
 		tabs.addTab(ResourcesLoader.getString("settings.filter"), filterTab);
-		if (detectorTab != null) {
-			tabs.addTab(ResourcesLoader.getString("settings.detector"), detectorTab);
-		}
-		if (annotateTab != null) {
-			tabs.addTab(ResourcesLoader.getString("settings.annotate"), annotateTab);
-		}
+		tabs.addTab(ResourcesLoader.getString("settings.detector"), detectorTab);
+		tabs.addTab(ResourcesLoader.getString("settings.annotate"), annotateTab);
 		if (shareTab != null) {
 			tabs.addTab(ResourcesLoader.getString("settings.share"), shareTab);
 		}
 		//add(tabs.getComponent()); // see comment above
 		add(tabs);
 
-		if (detectorTab != null) {
-			detectorTab.getTablePane().getTable().setBugCategory(reportTab.getBugCategory());
-		}
-		if (generalTab != null) {
-			generalTab.getPluginTablePane().setDetectorTablePane(detectorTab.getTablePane());
-		}
+		detectorTab.getTablePane().getTable().setBugCategory(reportTab.getBugCategory());
+		generalTab.getPluginTablePane().setDetectorTablePane(detectorTab.getTablePane());
 	}
 
 	@NotNull
 	abstract JComponent createHeaderPane();
 
 	@Nullable
-	abstract GeneralTab createGeneralTab();
-
-	@Nullable
-	abstract DetectorTab createDetectorTab();
-
-	@Nullable
-	abstract AnnotateTab createAnnotateTab();
-
-	@Nullable
 	abstract ShareTab createShareTab();
 
 	final boolean isModified(@NotNull final AbstractSettings settings) {
-		return reportTab.isModified(settings) ||
-				filterTab.isModified(settings);
+		return generalTab.isModified(settings) ||
+				reportTab.isModified(settings) ||
+				filterTab.isModified(settings) ||
+				detectorTab.isModified(settings) ||
+				annotateTab.isModified(settings);
 	}
 
 	final boolean isModifiedProject(@NotNull final ProjectSettings settings) {
-		return generalTab.isModifiedProject(settings) ||
-				detectorTab.isModified(settings) ||
-				annotateTab.isModifiedProject(settings);
+		return false;
 	}
 
 	boolean isModifiedModule(@NotNull final ModuleSettings settings) {
@@ -137,14 +120,14 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	}
 
 	final void apply(@NotNull final AbstractSettings settings) throws ConfigurationException {
+		generalTab.apply(settings);
 		reportTab.apply(settings);
 		filterTab.apply(settings);
+		detectorTab.apply(settings);
+		annotateTab.apply(settings);
 	}
 
 	final void applyProject(@NotNull final ProjectSettings settings) throws ConfigurationException {
-		generalTab.applyProject(settings);
-		detectorTab.apply(settings);
-		annotateTab.applyProject(settings);
 	}
 
 	void applyModule(@NotNull final ModuleSettings settings) {
@@ -157,14 +140,14 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	}
 
 	final void reset(@NotNull final AbstractSettings settings) {
+		generalTab.reset(settings);
 		reportTab.reset(settings);
 		filterTab.reset(settings);
+		detectorTab.reset(settings);
+		annotateTab.reset(settings);
 	}
 
 	final void resetProject(@NotNull final ProjectSettings settings) {
-		generalTab.resetProject(settings);
-		detectorTab.reset(settings);
-		annotateTab.resetProject(settings);
 	}
 
 	void resetModule(@NotNull final ModuleSettings settings) {
@@ -177,9 +160,7 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	}
 
 	final void setFilter(String filter) {
-		if (detectorTab != null) {
-			detectorTab.setFilter(filter);
-		}
+		detectorTab.setFilter(filter);
 	}
 
 	void requestFocusOnShareImportFile() {
@@ -187,20 +168,12 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		shareTab.requestFocusOnImportFile();
 	}
 
-	@Override
-	public void setEnabled(final boolean enabled) {
-		super.setEnabled(enabled);
-		if (generalTab != null) {
-			generalTab.setEnabled(enabled);
-		}
+	void setProjectSettingsEnabled(final boolean enabled) {
+		generalTab.setProjectSettingsEnabled(enabled);
 		reportTab.setEnabled(enabled);
 		filterTab.setEnabled(enabled);
-		if (detectorTab != null) {
-			detectorTab.setEnabled(enabled);
-		}
-		if (annotateTab != null) {
-			annotateTab.setEnabled(enabled);
-		}
+		detectorTab.setEnabled(enabled);
+		annotateTab.setProjectSettingsEnabled(enabled);
 		if (shareTab != null) {
 			shareTab.setEnabled(enabled);
 		}

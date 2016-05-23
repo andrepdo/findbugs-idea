@@ -28,6 +28,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+// TODO support legacy importer like LegacyProjectSettingsConverter
 @State(
 		name = "FindBugs-IDEA",
 		storages = @Storage(file = StoragePathMacros.MODULE_FILE)
