@@ -32,10 +32,8 @@ import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
 
 /**
- * Note that the conversion of module settings works but the legacy settings are not removed from the .iml file.
- * It seems that {@link Storage#deprecated()} does only work with non-module (.iml) settings or with dir-based settings
- * because in case of the project settings ({@link LegacyProjectSettings}) it works at least when the settings was
- * stored in a separate dir (leagcy settings was directory based stored).
+ * Legacy settings are converted (by {@link LegacyProjectSettingsConverter}) to {@link ModuleSettings}.
+ * The settings are removed when the .iml is stored next time.
  */
 @State(
 		name = FindBugsPluginConstants.PLUGIN_ID,

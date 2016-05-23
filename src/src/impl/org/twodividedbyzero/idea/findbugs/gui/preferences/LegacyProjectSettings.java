@@ -32,6 +32,10 @@ import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
 
+/**
+ * Legacy settings are converted (by {@link LegacyProjectSettingsConverter}) to {@link ProjectSettings}.
+ * The settings are removed when the .ipr or config xml is stored next time.
+ */
 @State(
 		name = FindBugsPluginConstants.PLUGIN_ID,
 		storages = {
