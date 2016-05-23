@@ -23,19 +23,20 @@ import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vcs.VcsDataKeys;
+import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ChangeList;
-import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.util.Consumer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProjects;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 
-import java.util.Collection;
 import java.util.List;
 
 public final class AnalyzeChangelistFiles extends AbstractAnalyzeAction {
@@ -51,10 +52,21 @@ public final class AnalyzeChangelistFiles extends AbstractAnalyzeAction {
 		boolean enable = false;
 		final List<VirtualFile> modifiedFiles = IdeaUtilImpl.getAllModifiedFiles(e.getDataContext());
 		if (state.isIdle() && !modifiedFiles.isEmpty()) {
-			for (final VirtualFile virtualFile : modifiedFiles) {
-				if (IdeaUtilImpl.isValidFileType(virtualFile.getFileType())) {
-					enable = true;
-					break;
+			final ChangeList[] changeLists = e.getData(VcsDataKeys.CHANGE_LISTS);
+			if (changeLists != null) {
+				for (final ChangeList changeList : changeLists) {
+					for (final Change change : changeList.getChanges()) {
+						final VirtualFile file = change.getVirtualFile();
+						if (file != null) {
+							if (IdeaUtilImpl.isValidFileType(file.getFileType())) {
+								enable = true;
+								break;
+							}
+						}
+					}
+					if (enable) {
+						break;
+					}
 				}
 			}
 		}
@@ -72,18 +84,31 @@ public final class AnalyzeChangelistFiles extends AbstractAnalyzeAction {
 			@NotNull final FindBugsState state
 	) {
 
-		final ChangeList changeList = ChangeListManager.getInstance(project).getDefaultChangeList();
-		final Collection<VirtualFile> modifiedFiles = IdeaUtilImpl.getModifiedFilesByList(changeList, e.getDataContext());
+		final List<VirtualFile> files = New.arrayList();
+		final ChangeList[] changeLists = e.getData(VcsDataKeys.CHANGE_LISTS);
+		final StringBuilder sb = new StringBuilder();
+		for (final ChangeList changeList : changeLists) {
+			if (sb.length() > 0) {
+				sb.append(", ");
+			}
+			sb.append(changeList.getName());
+			for (final Change change : changeList.getChanges()) {
+				final VirtualFile file = change.getVirtualFile();
+				if (file != null) {
+					files.add(file);
+				}
+			}
+		}
 
-		new FindBugsStarter(project, "Running FindBugs analysis for changelist '" + changeList.getName() + "'...") {
+		new FindBugsStarter(project, "Running FindBugs analysis for changelist(s) '" + sb.toString() + "'...") {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
-				consumer.consume(createFilesCompileScope(modifiedFiles));
+				consumer.consume(createFilesCompileScope(files));
 			}
 
 			@Override
 			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
-				return projects.addFiles(modifiedFiles, !justCompiled);
+				return projects.addFiles(files, !justCompiled);
 			}
 		}.start();
 	}

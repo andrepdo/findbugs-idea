@@ -452,8 +452,8 @@
 
             <action id="FindBugs.ActiveChangeListAction"
                     class="org.twodividedbyzero.idea.findbugs.actions.AnalyzeChangelistFiles"
-                    text="Analyze active changelist Files"
-                    description="Run FindBugs analysis on all modified files of the active changelist."
+                    text="Analyze changelist files"
+                    description="Run FindBugs analysis on selected changelist(s)."
                     icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/analyzeActiveChangelist.png">
 
                 <!--<add-to-group group-id="EditorPopupMenu" anchor="last"/>-->
@@ -490,8 +490,8 @@
 
         <action id="FindBugs.ChangesViewToolbar.ActiveChangeListAction"
                 class="org.twodividedbyzero.idea.findbugs.actions.AnalyzeChangelistFiles"
-                text="FindBugs - Analyze active changelist Files"
-                description="Run FindBugs analysis on all modified files of the active changelist."
+                text="FindBugs - Analyze changelist files"
+                description="Run FindBugs analysis on selected changelist(s)."
                 icon="/org/twodividedbyzero/idea/findbugs/resources/icons/actions/fbAnalyzeActiveChangelist.png">
 
             <add-to-group group-id="ChangesViewToolbar" anchor="last"/>
