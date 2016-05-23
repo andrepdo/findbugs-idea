@@ -43,7 +43,6 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.util.List;
 
-// FIXME: check darcula and scaling
 @SuppressWarnings({"HardcodedFileSeparator"})
 public class AnalysisRunDetailsDialog {
 
@@ -133,8 +132,7 @@ public class AnalysisRunDetailsDialog {
 		final JComponent panel = new JPanel(new BorderLayout());
 		panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-		final HTMLEditorKit htmlEditorKit = new HTMLEditorKit();
-		htmlEditorKit.setStyleSheet(GuiResources.EDITORPANE_STYLESHEET);
+		final HTMLEditorKit htmlEditorKit = GuiResources.createHtmlEditorKit();
 		final JEditorPane jEditorPane = new JEditorPane() {
 
 			@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -23,6 +23,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBTabbedPane;
+import com.intellij.util.ui.UIUtil;
 import edu.umd.cs.findbugs.BugAnnotation;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.DetectorFactory;
@@ -70,17 +71,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @since 0.0.1
- */
 @SuppressWarnings("MagicNumber")
-public class BugDetailsComponents {
+public final class BugDetailsComponents {
 
-	private static final Logger LOGGER = Logger.getInstance(BugDetailsComponents.class.getName());
+	private static final Logger LOGGER = Logger.getInstance(BugDetailsComponents.class);
 	private static final String EDU_UMD_CS_FINDBUGS_PLUGINS_WEB_CLOUD = "edu.umd.cs.findbugs.plugins.webCloud";
 
 	private HTMLEditorKit _htmlEditorKit;
@@ -98,17 +92,10 @@ public class BugDetailsComponents {
 	private MultiSplitPane _bugDetailsSplitPane;
 
 
-	public BugDetailsComponents(final ToolWindowPanel toolWindowPanel) {
+	BugDetailsComponents(final ToolWindowPanel toolWindowPanel) {
 		_parent = toolWindowPanel;
-		init();
+		_htmlEditorKit = GuiResources.createHtmlEditorKit();
 	}
-
-
-	public final void init() {
-		_htmlEditorKit = new HTMLEditorKit();
-		_htmlEditorKit.setStyleSheet(GuiResources.EDITORPANE_STYLESHEET);
-	}
-
 
 	JTabbedPane getTabbedPane() {
 		if (_jTabbedPane == null) {
@@ -148,7 +135,6 @@ public class BugDetailsComponents {
 		return _jTabbedPane;
 	}
 
-
 	private Component getBugDetailsSplitPane() {
 		if (_bugDetailsSplitPane == null) {
 			_bugDetailsSplitPane = new MultiSplitPane();
@@ -167,9 +153,8 @@ public class BugDetailsComponents {
 		return _bugDetailsSplitPane;
 	}
 
-
 	@SuppressWarnings("MagicNumber")
-	JPanel getBugDetailsPanel() {
+	private JPanel getBugDetailsPanel() {
 		if (_bugDetailsPanel == null) {
 			final JScrollPane scrollPane = ScrollPaneFacade.createScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			scrollPane.setViewportView(getBugDetailsPane());
@@ -186,13 +171,12 @@ public class BugDetailsComponents {
 		return _bugDetailsPanel;
 	}
 
-
 	private JEditorPane getBugDetailsPane() {
 		if (_bugDetailsPane == null) {
 			_bugDetailsPane = new BugDetailsEditorPane();
 			_bugDetailsPane.setBorder(new EmptyBorder(10, 10, 10, 10));
 			_bugDetailsPane.setEditable(false);
-			_bugDetailsPane.setContentType("text/html");
+			_bugDetailsPane.setContentType(UIUtil.HTML_MIME);
 			_bugDetailsPane.setEditorKit(_htmlEditorKit);
 			_bugDetailsPane.addHyperlinkListener(new HyperlinkListener() {
 				@Override
@@ -207,8 +191,7 @@ public class BugDetailsComponents {
 		return _bugDetailsPane;
 	}
 
-
-	JPanel getBugExplanationPanel() {
+	private JPanel getBugExplanationPanel() {
 		if (_explanationPanel == null) {
 			final JScrollPane scrollPane = ScrollPaneFacade.createScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			scrollPane.setViewportView(getExplanationPane());
@@ -222,7 +205,6 @@ public class BugDetailsComponents {
 
 		return _explanationPanel;
 	}
-
 
 	@SuppressWarnings({"AnonymousInnerClass"})
 	private JEditorPane getExplanationPane() {
@@ -243,8 +225,7 @@ public class BugDetailsComponents {
 		return _explanationPane;
 	}
 
-
-	JPanel getCloudCommentsPanel() {
+	private JPanel getCloudCommentsPanel() {
 		if (_cloudCommentsPanel == null) {
 			final JScrollPane scrollPane = ScrollPaneFacade.createScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			scrollPane.setBorder(null);
@@ -257,7 +238,6 @@ public class BugDetailsComponents {
 		return _cloudCommentsPanel;
 	}
 
-
 	private CloudCommentsPaneIntellij getCloudCommentsPane() {
 		if (_cloudCommentsPane == null) {
 			_cloudCommentsPane = new CloudCommentsPaneIntellij(_parent);
@@ -266,7 +246,6 @@ public class BugDetailsComponents {
 
 		return _cloudCommentsPane;
 	}
-
 
 	private void handleDetailsClick(final HyperlinkEvent evt) {
 		if (evt.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
@@ -289,7 +268,6 @@ public class BugDetailsComponents {
 		}
 	}
 
-
 	private void editorPaneHyperlinkUpdate(final HyperlinkEvent evt) {
 		try {
 			if (evt.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
@@ -302,10 +280,9 @@ public class BugDetailsComponents {
 		}
 	}
 
-
 	@SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
 	@SuppressWarnings({"HardCodedStringLiteral"})
-	public void setBugsDetails(@NotNull final BugInstance bugInstance) {
+	void setBugsDetails(@NotNull final BugInstance bugInstance) {
 		final int[] lines = BugInstanceUtil.getSourceLines(bugInstance);
 		final MethodAnnotation methodAnnotation = BugInstanceUtil.getPrimaryMethod(bugInstance);
 		final FieldAnnotation fieldAnnotation = BugInstanceUtil.getPrimaryField(bugInstance);
@@ -449,13 +426,11 @@ public class BugDetailsComponents {
 
 	}
 
-
-	public void setBugExplanation(final SortedBugCollection bugCollection, final BugInstance bugInstance) {
+	void setBugExplanation(final SortedBugCollection bugCollection, final BugInstance bugInstance) {
 		_lastBugCollection = bugCollection;
 		_lastBugInstance = bugInstance;
 		refreshDetailsShown();
 	}
-
 
 	private void refreshDetailsShown() {
 		final String html = BugInstanceUtil.getDetailHtml(_lastBugInstance);
@@ -473,7 +448,6 @@ public class BugDetailsComponents {
 		scrollRectToVisible(_bugDetailsPane);
 	}
 
-
 	@SuppressWarnings({"AnonymousInnerClass"})
 	private static void scrollRectToVisible(final JEditorPane pane) {
 		SwingUtilities.invokeLater(new Runnable() {
@@ -484,8 +458,7 @@ public class BugDetailsComponents {
 		});
 	}
 
-
-	public void adaptSize(final int width, final int height) {
+	void adaptSize(final int width, final int height) {
 		//final int newWidth = (int) (width * _splitPaneHorizontalWeight);
 		final int expHeight = (int) (height * 0.4);
 		final int detailsHeight = (int) (height * 0.6);
@@ -508,7 +481,6 @@ public class BugDetailsComponents {
 		//}
 	}
 
-
 	public void issueUpdated(final BugInstance bug) {
 		//noinspection ObjectEquality
 		if (bug == _lastBugInstance) {
@@ -516,16 +488,13 @@ public class BugDetailsComponents {
 		}
 	}
 
-
 	public double getSplitPaneHorizontalWeight() {
 		return _splitPaneHorizontalWeight;
 	}
 
-
 	public void setSplitPaneHorizontalWeight(final double splitPaneHorizontalWeight) {
 		_splitPaneHorizontalWeight = splitPaneHorizontalWeight;
 	}
-
 
 	public void clear() {
 		if (_bugDetailsPane != null) {
@@ -536,9 +505,7 @@ public class BugDetailsComponents {
 		}
 	}
 
-
 	private static class BugDetailsEditorPane extends JEditorPane {
-
 		@Override
 		protected void paintComponent(final Graphics g) {
 			super.paintComponent(g);
@@ -549,7 +516,6 @@ public class BugDetailsComponents {
 	}
 
 	private static class ExplanationEditorPane extends JEditorPane {
-
 		@Override
 		protected void paintComponent(final Graphics g) {
 			super.paintComponent(g);
@@ -558,5 +524,4 @@ public class BugDetailsComponents {
 			g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		}
 	}
-
 }
