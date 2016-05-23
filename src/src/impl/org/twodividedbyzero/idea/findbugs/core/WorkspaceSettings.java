@@ -82,9 +82,11 @@ public final class WorkspaceSettings implements PersistentStateComponent<Workspa
 	@Tag
 	public boolean openExportedHtmlBugCollectionInBrowser = true;
 
+	public static final String PROJECT_IMPORT_FILE_PATH_KEY = "";
+
 	/**
 	 * This settings file will be used for analysis.
-	 * Key is the module name, null is for project scope.
+	 * Key is the module name, {@code PROJECT_IMPORT_FILE_PATH_KEY} is for project scope.
 	 */
 	@Tag(value = "importFilePaths")
 	@MapAnnotation(

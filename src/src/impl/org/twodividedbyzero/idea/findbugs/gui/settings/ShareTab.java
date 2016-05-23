@@ -20,6 +20,7 @@ package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
@@ -37,6 +38,7 @@ import com.intellij.ui.HyperlinkLabel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.FileUtilFb;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.common.HAlignment;
 import org.twodividedbyzero.idea.findbugs.gui.common.VAlignment;
@@ -49,14 +51,19 @@ import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.io.File;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>, Disposable {
+
+	private static final Logger LOGGER = Logger.getInstance(ShareTab.class);
 
 	@NotNull
 	private final Project project;
 
 	@Nullable
-	private final String moduleName;
+	private final String importFilePathKey;
 
 	private JLabel description;
 	private HyperlinkLabel link;
@@ -65,7 +72,7 @@ final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>,
 	ShareTab(@NotNull final Project project, @Nullable final Module module) {
 		super(new VerticalFlowLayout(HAlignment.Left, VAlignment.Top, 0, 0, true, false));
 		this.project = project;
-		moduleName = module != null ? module.getName() : null;
+		importFilePathKey = module != null ? module.getName() : WorkspaceSettings.PROJECT_IMPORT_FILE_PATH_KEY;
 
 		description = new JLabel("<html>" + ResourcesLoader.getString("share.description"));
 		description.setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 5));
@@ -119,7 +126,7 @@ final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>,
 
 	@Override
 	public boolean isModified(@NotNull final WorkspaceSettings settings) {
-		return !StringUtil.equals(settings.importFilePath.get(moduleName), getImportFilePath());
+		return !StringUtil.equals(settings.importFilePath.get(importFilePathKey), getImportFilePath());
 	}
 
 	@Override
@@ -138,18 +145,31 @@ final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>,
 			}
 		}
 		if (StringUtil.isEmptyOrSpaces(filePath)) {
-			settings.importFilePath.remove(moduleName);
+			settings.importFilePath.remove(importFilePathKey);
 		} else {
-			settings.importFilePath.put(moduleName, filePath);
+			settings.importFilePath.put(importFilePathKey, filePath);
 		}
-		for (final Module module : ModuleManager.getInstance(project).getModules()) {
-			// TODO remove orphan entry (also on reset)
-		}
+		removeOrphanEntries(settings.importFilePath);
 	}
 
 	@Override
 	public void reset(@NotNull final WorkspaceSettings settings) {
-		importPathLabel.getComponent().setText(FileUtilFb.toSystemDependentName(settings.importFilePath.get(moduleName)));
+		importPathLabel.getComponent().setText(FileUtilFb.toSystemDependentName(settings.importFilePath.get(importFilePathKey)));
+	}
+
+	private void removeOrphanEntries(@NotNull final Map<String, String> importFilePath) {
+		final Set<String> moduleNames = New.set();
+		for (final Module module : ModuleManager.getInstance(project).getModules()) {
+			moduleNames.add(module.getName());
+		}
+		for (final String moduleName : new HashSet<String>(importFilePath.keySet())) {
+			if (!StringUtil.equals(WorkspaceSettings.PROJECT_IMPORT_FILE_PATH_KEY, moduleName)) {
+				if (!moduleNames.contains(moduleName)) {
+					LOGGER.warn(String.format("Remove importFilePath (%s) from settings because module with name '%s' does not exist", importFilePath.get(moduleName), moduleName));
+					importFilePath.remove(moduleName);
+				}
+			}
+		}
 	}
 
 	@Override

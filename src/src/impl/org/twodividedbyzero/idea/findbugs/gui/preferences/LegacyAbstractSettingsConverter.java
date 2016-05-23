@@ -47,9 +47,9 @@ public final class LegacyAbstractSettingsConverter {
 			@NotNull final PersistencePreferencesBean from,
 			@NotNull final AbstractSettings to,
 			@NotNull final WorkspaceSettings toWorkspace,
-			@Nullable final String moduleNameForImportFilePath
+			@NotNull final String importFilePathKey
 	) {
-		applyBasePreferencesTo(from, to, toWorkspace, moduleNameForImportFilePath);
+		applyBasePreferencesTo(from, to, toWorkspace, importFilePathKey);
 		applyBugCategoriesTo(from, to);
 		applyFileFiltersTo(from, to);
 		applyDetectorsAndPluginsTo(from, to);
@@ -59,7 +59,7 @@ public final class LegacyAbstractSettingsConverter {
 			@NotNull final PersistencePreferencesBean from,
 			@NotNull final AbstractSettings to,
 			@NotNull final WorkspaceSettings toWorkspace,
-			@Nullable final String moduleNameForImportFilePath
+			@NotNull final String importFilePathKey
 	) {
 
 		final Map<String, String> p = from.getBasePreferences();
@@ -76,7 +76,7 @@ public final class LegacyAbstractSettingsConverter {
 
 		final String importFilePath = FileUtilFb.toSystemIndependentName(asString(p.get(FindBugsPreferences.IMPORT_FILE_PATH), null));
 		if (!StringUtil.isEmptyOrSpaces(importFilePath)) {
-			toWorkspace.importFilePath.put(moduleNameForImportFilePath, importFilePath);
+			toWorkspace.importFilePath.put(importFilePathKey, importFilePath);
 		}
 		toWorkspace.exportBugCollectionDirectory = asString(p.get(FindBugsPreferences.EXPORT_BASE_DIR), toWorkspace.exportBugCollectionDirectory);
 		toWorkspace.exportBugCollectionAsHtml = asBoolean(p.get(FindBugsPreferences.EXPORT_AS_HTML), toWorkspace.exportBugCollectionAsHtml);

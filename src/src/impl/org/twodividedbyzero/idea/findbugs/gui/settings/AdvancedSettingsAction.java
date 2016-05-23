@@ -67,7 +67,7 @@ final class AdvancedSettingsAction extends DefaultActionGroup {
 		this.enabled = true;
 		getTemplatePresentation().setIcon(AllIcons.General.GearPlain);
 		add(new ResetToDefault());
-		add(new ImportSettings(module != null ? module.getName() : null));
+		add(new ImportSettings(module != null ? module.getName() : WorkspaceSettings.PROJECT_IMPORT_FILE_PATH_KEY));
 		add(new ExportSettings());
 	}
 
@@ -94,16 +94,16 @@ final class AdvancedSettingsAction extends DefaultActionGroup {
 	}
 
 	private class ImportSettings extends AbstractAction {
-		@Nullable
-		private final String moduleNameForImportFilePath;
+		@NotNull
+		private final String importFilePathKey;
 
-		ImportSettings(@Nullable final String moduleNameForImportFilePath) {
+		ImportSettings(@NotNull final String importFilePathKey) {
 			super(
 					StringUtil.capitalizeWords(ResourcesLoader.getString("settings.action.import.title"), true),
 					ResourcesLoader.getString("settings.action.import.description"),
 					AllIcons.ToolbarDecorator.Import
 			);
-			this.moduleNameForImportFilePath = moduleNameForImportFilePath;
+			this.importFilePathKey = importFilePathKey;
 		}
 
 		@Override
@@ -134,7 +134,7 @@ final class AdvancedSettingsAction extends DefaultActionGroup {
 							protected void handleError(@NotNull final String title, @NotNull final String message) {
 								Messages.showErrorDialog(message, title);
 							}
-						}.doImport(in, settings, moduleNameForImportFilePath);
+						}.doImport(in, settings, importFilePathKey);
 
 						if (success) {
 							settingsPane.reset(settings);

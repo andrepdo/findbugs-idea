@@ -63,6 +63,6 @@ public final class LegacyProjectSettings implements PersistentStateComponent<Per
 			return;
 		}
 		LOGGER.info("Start convert legacy findbugs-idea settings");
-		LegacyAbstractSettingsConverter.applyTo(state, settings, workspaceSettings, null);
+		LegacyAbstractSettingsConverter.applyTo(state, settings, workspaceSettings, WorkspaceSettings.PROJECT_IMPORT_FILE_PATH_KEY);
 	}
 }

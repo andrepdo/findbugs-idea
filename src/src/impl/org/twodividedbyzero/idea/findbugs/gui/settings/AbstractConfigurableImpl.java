@@ -20,6 +20,7 @@ package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.Nls;
@@ -99,5 +100,23 @@ abstract class AbstractConfigurableImpl<V extends AbstractSettings> implements C
 			Disposer.dispose(pane);
 			pane = null;
 		}
+	}
+
+	private void requestFocusOnShareImportFile() {
+		createComponent();
+		pane.requestFocusOnShareImportFile();
+	}
+
+	static void showShareImpl(@NotNull final Project project, @NotNull final AbstractConfigurableImpl configurable) {
+		/**
+		 * It is correct to create a configurable instance,
+		 * see java doc of ShowSettingsUtil#findProjectConfigurable (deprecated).
+		 */
+		ShowSettingsUtil.getInstance().editConfigurable(project, configurable, new Runnable() {
+			@Override
+			public void run() {
+				configurable.requestFocusOnShareImportFile();
+			}
+		});
 	}
 }

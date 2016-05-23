@@ -220,15 +220,15 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 
 		final ModuleSettings moduleSettings = ModuleSettings.getInstance(module);
 		AbstractSettings settings = projectSettings;
-		String moduleNameForImportFilePath = null;
+		String importFilePathKey = WorkspaceSettings.PROJECT_IMPORT_FILE_PATH_KEY;
 		if (moduleSettings.overrideProjectSettings) {
 			settings = moduleSettings;
-			moduleNameForImportFilePath = module.getName();
+			importFilePathKey = module.getName();
 		}
 
-		final String importFilePath = WorkspaceSettings.getInstance(project).importFilePath.get(moduleNameForImportFilePath);
+		final String importFilePath = WorkspaceSettings.getInstance(project).importFilePath.get(importFilePathKey);
 		if (!StringUtil.isEmptyOrSpaces(importFilePath)) {
-			final boolean success = RuntimeSettingsImporter.importSettings(project, settings, importFilePath, moduleNameForImportFilePath);
+			final boolean success = RuntimeSettingsImporter.importSettings(project, module, settings, importFilePath, importFilePathKey);
 			/**
 			 * Do continue analysis on import settings failure, but invalidate plugin state
 			 * on success because the plugins settings can change anytime.

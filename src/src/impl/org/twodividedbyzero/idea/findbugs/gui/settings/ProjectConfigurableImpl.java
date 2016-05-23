@@ -76,11 +76,6 @@ public final class ProjectConfigurableImpl extends AbstractConfigurableImpl<Proj
 		};
 	}
 
-	private void requestFocusOnShareImportFile() {
-		createComponent();
-		pane.requestFocusOnShareImportFile();
-	}
-
 	public static void show(@NotNull final Project project) {
 		ShowSettingsUtil.getInstance().showSettingsDialog(project, ProjectConfigurableImpl.DISPLAY_NAME);
 	}
@@ -90,12 +85,6 @@ public final class ProjectConfigurableImpl extends AbstractConfigurableImpl<Proj
 		 * It is correct to create a configurable instance,
 		 * see java doc of ShowSettingsUtil#findProjectConfigurable (deprecated).
 		 */
-		final ProjectConfigurableImpl configurable = new ProjectConfigurableImpl(project);
-		ShowSettingsUtil.getInstance().editConfigurable(project, configurable, new Runnable() {
-			@Override
-			public void run() {
-				configurable.requestFocusOnShareImportFile();
-			}
-		});
+		showShareImpl(project, new ProjectConfigurableImpl(project));
 	}
 }

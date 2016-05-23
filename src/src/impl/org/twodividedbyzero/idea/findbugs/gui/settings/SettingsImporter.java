@@ -48,7 +48,7 @@ public abstract class SettingsImporter {
 	public final boolean doImport(
 			@NotNull final InputStream input,
 			@NotNull final AbstractSettings settings,
-			@Nullable final String moduleNameForImportFilePath
+			@NotNull final String importFilePathKey
 	) throws JDOMException, IOException {
 
 		final Element root = JDOMUtil.load(input);
@@ -77,7 +77,7 @@ public abstract class SettingsImporter {
 							legacyPrefs,
 							settings,
 							WorkspaceSettings.getInstance(project),
-							moduleNameForImportFilePath
+							importFilePathKey
 					);
 					success = true;
 				} else {

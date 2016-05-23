@@ -19,11 +19,12 @@
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.core.ModuleSettings;
 
-public final class ModuleConfigurableImpl extends AbstractConfigurableImpl<ModuleSettings> {
+public final class ModuleConfigurableImpl extends AbstractConfigurableImpl<ModuleSettings> implements Configurable.NoScroll {
 
 	@NotNull
 	private final Module module;
@@ -54,5 +55,13 @@ public final class ModuleConfigurableImpl extends AbstractConfigurableImpl<Modul
 	public void reset() {
 		super.reset();
 		pane.resetModule(settings);
+	}
+
+	public static void showShare(@NotNull final Module module) {
+		/**
+		 * It is correct to create a configurable instance,
+		 * see java doc of ShowSettingsUtil#findProjectConfigurable (deprecated).
+		 */
+		showShareImpl(module.getProject(), new ModuleConfigurableImpl(module));
 	}
 }
