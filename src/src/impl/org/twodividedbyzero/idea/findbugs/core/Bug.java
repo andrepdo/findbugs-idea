@@ -19,6 +19,7 @@
 package org.twodividedbyzero.idea.findbugs.core;
 
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.util.text.StringUtil;
 import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import org.jetbrains.annotations.NotNull;
@@ -76,5 +77,15 @@ public final class Bug {
 		result = 31 * result + bugCollection.hashCode();
 		result = 31 * result + instance.hashCode();
 		return result;
+	}
+
+	@SuppressWarnings("RedundantIfStatement")
+	public static boolean equalsBugType(@NotNull final Bug bugA, @NotNull final Bug bugB) {
+		final BugInstance a = bugA.getInstance();
+		final BugInstance b = bugB.getInstance();
+		if (!StringUtil.equals(a.getType(), b.getType())) {
+			return false;
+		}
+		return true;
 	}
 }

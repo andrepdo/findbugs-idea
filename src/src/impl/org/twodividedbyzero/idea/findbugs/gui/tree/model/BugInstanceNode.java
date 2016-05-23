@@ -94,10 +94,6 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 		return _file;
 	}
 
-	public void setPsiFile(final PsiFile file) {
-		_file = file; // TODO check
-	}
-
 	@NotNull
 	public Bug getBug() {
 		return bug;

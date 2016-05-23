@@ -300,6 +300,7 @@ public class BugTreePanel extends JPanel {
 	private void regroupTree() {
 		EventDispatchThreadHelper.checkEDT();
 		if (result != null) {
+			boolean cleared = false;
 			for (final Map.Entry<edu.umd.cs.findbugs.Project, SortedBugCollection> entry : result.getResults().entrySet()) {
 				Module module = null;
 				if (entry.getKey() instanceof FindBugsProject) {
@@ -307,7 +308,10 @@ public class BugTreePanel extends JPanel {
 				}
 				final Collection<BugInstance> instanceCollection = entry.getValue().getCollection();
 				if (instanceCollection != null && !instanceCollection.isEmpty()) {
-					_treeModel.clear();
+					if (!cleared) {
+						cleared = true;
+						_treeModel.clear();
+					}
 					for (final BugInstance bugInstance : instanceCollection) {
 						if (bugInstance != null) {
 							addNode(new Bug(

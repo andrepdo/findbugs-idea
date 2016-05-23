@@ -22,7 +22,6 @@ import com.intellij.ide.OccurenceNavigator;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.DataProvider;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogBuilder;
@@ -48,7 +47,6 @@ import org.twodividedbyzero.idea.findbugs.gui.tree.BugTreeHelper;
 import org.twodividedbyzero.idea.findbugs.gui.tree.ScrollToSourceHandler;
 import org.twodividedbyzero.idea.findbugs.gui.tree.TreeOccurenceNavigator;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.AbstractNodeDescriptor;
-import org.twodividedbyzero.idea.findbugs.gui.tree.model.AbstractTreeNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.VisitableTreeNode;
 
@@ -69,8 +67,6 @@ import java.awt.event.MouseMotionAdapter;
 @SuppressFBWarnings("SE_BAD_FIELD")
 public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 
-	private static final Logger LOGGER = Logger.getInstance(BugTree.class);
-
 	private final BugTreePanel _bugTreePanel;
 	private final Project _project;
 	private BugTreeHelper _treeHelper;
@@ -86,7 +82,7 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 	}
 
 	public final void init() {
-		_treeHelper = BugTreeHelper.create(this, _project);
+		_treeHelper = new BugTreeHelper(this);
 
 		addTreeSelectionListener(new SelectionListenerImpl());
 		addMouseMotionListener(new MouseMotionListenerImpl());
@@ -149,34 +145,29 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 		if (treepath == null) {
 			return null;
 		}
-
-		@SuppressWarnings({"unchecked"})
-		final AbstractTreeNode<VisitableTreeNode> treeNode = (AbstractTreeNode<VisitableTreeNode>) treepath.getLastPathComponent();
+		final Object treeNode = treepath.getLastPathComponent();
 		if (!(treeNode instanceof BugInstanceNode)) {
 			return null;
 		}
 		final BugInstanceNode node = (BugInstanceNode) treeNode;
+		final PsiFile psiFile = _treeHelper.getSelectedPsiFile();
 
 		if ("virtualFile".equals(s)) {
-			final PsiFile psiFile = _treeHelper.getSelectedFile();
 			return psiFile == null ? null : psiFile.getVirtualFile();
 		}
 		if ("Navigatable".equals(s)) {
-			final PsiFile psiFile = _treeHelper.getSelectedFile();
-			if (psiFile != null) {
-				final VirtualFile virtualFile = psiFile.getVirtualFile();
-				//LOGGER.debug("PsiFile: " + psiFile + " VirtualFile: " + virtualFile.getName() + " - Line: " + node.getSourceLines()[0]);
-				final int[] lines = node.getSourceLines();
-				if (lines[0] == -1 && lines[1] == -1) {  // find anonymous classes
-					final PsiElement psiElement = IdeaUtilImpl.findAnonymousClassPsiElement(psiFile, node, _project);
-					if (psiElement != null) {
-						return psiElement;
-					}
-				} else if (virtualFile != null) {
-					return new OpenFileDescriptor(_project, virtualFile, node.getSourceLines()[0] - 1, 0);
-				} else {
-					return null;
+			if (psiFile == null) {
+				return null;
+			}
+			final VirtualFile virtualFile = psiFile.getVirtualFile();
+			final int[] lines = node.getSourceLines();
+			if (lines[0] == -1 && lines[1] == -1) {  // find anonymous classes
+				final PsiElement psiElement = IdeaUtilImpl.findAnonymousClassPsiElement(psiFile, node, _project);
+				if (psiElement != null) {
+					return psiElement;
 				}
+			} else if (virtualFile != null) {
+				return new OpenFileDescriptor(_project, virtualFile, node.getSourceLines()[0] - 1, 0);
 			} else {
 				return null;
 			}
@@ -184,28 +175,19 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 		if ("psi.Element".equals(s)) {
 			final int[] lines = node.getSourceLines();
 			if (lines[0] == -1 && lines[1] == -1) {  // find anonymous classes
-				final PsiFile psiFile = _treeHelper.getSelectedFile();
 				final PsiElement psiElement = IdeaUtilImpl.findAnonymousClassPsiElement(psiFile, node, _project);
 				if (psiElement != null) {
 					return psiElement;
 				}
 			}
-			return _treeHelper.getSelectedElement();
+			return psiFile;
 		}
 		if ("virtualFileArray".equals(s)) {
-			final PsiFile psiFile = _treeHelper.getSelectedFile();
-			if (psiFile != null) {
-				LOGGER.debug("PsiFile: " + psiFile);
-				return new VirtualFile[]{psiFile.getVirtualFile()};
-			} else {
+			if (psiFile == null) {
 				return VirtualFile.EMPTY_ARRAY;
 			}
+			return new VirtualFile[]{psiFile.getVirtualFile()};
 		}
-		/*if ("helpId".equals(s)) {
-			return "find.todoList";
-		} else {
-			return null;
-		}*/
 		return null;
 	}
 

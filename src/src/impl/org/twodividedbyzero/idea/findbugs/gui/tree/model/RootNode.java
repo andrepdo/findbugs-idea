@@ -87,7 +87,6 @@ public class RootNode extends AbstractTreeNode<VisitableTreeNode> implements Vis
 		for (final TreeNode child : _childs) {
 			if (child instanceof BugInstanceGroupNode) {
 				final BugInstanceGroupNode node = (BugInstanceGroupNode) child;
-				ret.add(node.getBug());
 				final List<Bug> bugs = node.getAllChildBugs();
 				ret.addAll(ret.size(), bugs);
 			}

@@ -26,9 +26,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-// TODO Test re-group of duplicates from different modules
 @SuppressWarnings({"UseOfSystemOutOrSystemErr"})
-class Grouper<T> {
+final class Grouper<T> {
 
 	interface GrouperCallback<E> {
 

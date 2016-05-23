@@ -20,7 +20,6 @@ package org.twodividedbyzero.idea.findbugs.gui.tree.model;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
-import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.BugRankCategory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
@@ -44,10 +43,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> implements VisitableTreeNode {
+public final class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> implements VisitableTreeNode {
 
 	private final List<VisitableTreeNode> _childs;
-	private final Bug _bug;
+	private final Bug bug;
 	private final RecurseNodeVisitor<BugInstanceGroupNode> _recurseNodeVisitor = new RecurseNodeVisitor<BugInstanceGroupNode>(this);
 	private final Project _project;
 
@@ -65,7 +64,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 	BugInstanceGroupNode(final GroupBy groupBy, final String groupName, final VisitableTreeNode parent, final Bug bug, final int depth, final Project project) {
 		setParent(parent);
 		_project = project;
-		_bug = bug;
+		this.bug = bug;
 		_childs = new ArrayList<VisitableTreeNode>();
 		_groupBy = groupBy;
 		_groupName = groupName;
@@ -98,7 +97,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 
 	@Nullable
 	public BugInstanceGroupNode findChildNode(final Bug bug, final int depth, final String groupName) {
-		if (bug.equals(_bug) && depth == _depthFromRoot && groupName.equals(_groupName)) {
+		if (Bug.equalsBugType(this.bug, bug) && depth == _depthFromRoot && groupName.equals(_groupName)) {
 			return this;
 		}
 		final RecurseVisitCriteria criteria = new RecurseVisitCriteria(bug, depth, groupName);
@@ -116,8 +115,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 		for (final TreeNode child : _childs) {
 			if (child instanceof BugInstanceGroupNode) {
 				final BugInstanceGroupNode node = (BugInstanceGroupNode) child;
-				ret.add(node.getBug());
-				final List<Bug> bugs = ((BugInstanceGroupNode) child).getAllChildBugs();
+				final List<Bug> bugs = node.getAllChildBugs();
 				ret.addAll(ret.size(), bugs);
 			}
 		}
@@ -186,12 +184,8 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 		++_memberCount;
 	}
 
-	public BugInstance getBugInstance() {
-		return _bug.getInstance();
-	}
-
 	public Bug getBug() {
-		return _bug;
+		return bug;
 	}
 
 	private Icon getGroupByCollapsedIcon(final GroupBy groupBy) {
@@ -206,14 +200,14 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 			case Package:
 				return GuiResources.GROUP_BY_PACKAGE_ICON;
 			case Priority:
-				final String priorityString = getBugInstance().getPriorityString();
+				final String priorityString = bug.getInstance().getPriorityString();
 				if (GuiResources.GROUP_BY_PRIORITY_ICONS.containsKey(priorityString)) {
 					return GuiResources.GROUP_BY_PRIORITY_ICONS.get(priorityString);
 				} else {
 					return GuiResources.GROUP_BY_PRIORITY_EXP_ICON;
 				}
 			case BugRank:
-				final String rankString = BugRankCategory.getRank(getBugInstance().getBugRank()).toString().toUpperCase(Locale.ENGLISH);
+				final String rankString = BugRankCategory.getRank(bug.getInstance().getBugRank()).toString().toUpperCase(Locale.ENGLISH);
 				if (GuiResources.GROUP_BY_RANK_ICONS.containsKey(rankString)) {
 					return GuiResources.GROUP_BY_RANK_ICONS.get(rankString);
 				} else {
@@ -236,14 +230,14 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 			case Package:
 				return GuiResources.GROUP_BY_PACKAGE_ICON;
 			case Priority:
-				final String priorityString = getBugInstance().getPriorityString();
+				final String priorityString = bug.getInstance().getPriorityString();
 				if (GuiResources.GROUP_BY_PRIORITY_ICONS.containsKey(priorityString)) {
 					return GuiResources.GROUP_BY_PRIORITY_ICONS.get(priorityString);
 				} else {
 					return GuiResources.GROUP_BY_PRIORITY_EXP_ICON;
 				}
 			case BugRank:
-				final String rankString = BugRankCategory.getRank(getBugInstance().getBugRank()).name();
+				final String rankString = BugRankCategory.getRank(bug.getInstance().getBugRank()).name();
 				if (GuiResources.GROUP_BY_RANK_ICONS.containsKey(rankString)) {
 					return GuiResources.GROUP_BY_RANK_ICONS.get(rankString);
 				} else {
@@ -258,7 +252,7 @@ public class BugInstanceGroupNode extends AbstractTreeNode<VisitableTreeNode> im
 	public String toString() {
 		return "BugInstanceGroupNode" +
 				"{_childs=" + _childs +
-				", _bug=" + _bug +
+				", bug=" + bug +
 				", _recurseNodeVisitor=" + _recurseNodeVisitor +
 				'}';
 	}
