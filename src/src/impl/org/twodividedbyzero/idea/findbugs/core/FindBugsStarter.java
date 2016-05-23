@@ -33,6 +33,7 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -68,7 +69,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 	private static final Logger LOGGER = Logger.getInstance(FindBugsStarter.class);
 
 	@NotNull
-	private final Project _project;
+	private final Project project;
 
 	@NotNull
 	private final String _title;
@@ -80,6 +81,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 	private final WorkspaceSettings workspaceSettings;
 
 	private final boolean _startInBackground;
+
 	private final AtomicBoolean _cancellingByUser;
 
 
@@ -96,7 +98,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 			@NotNull final String title,
 			final boolean forceStartInBackground
 	) {
-		_project = project;
+		this.project = project;
 		_title = title;
 		this.projectSettings = ProjectSettings.getInstance(project);
 		this.workspaceSettings = WorkspaceSettings.getInstance(project);
@@ -113,7 +115,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		EventDispatchThreadHelper.checkEDT();
 		if (isCompileBeforeAnalyze()) {
 			final boolean isAnalyzeAfterCompile = workspaceSettings.analyzeAfterCompile;
-			final CompilerManager compilerManager = CompilerManager.getInstance(_project);
+			final CompilerManager compilerManager = CompilerManager.getInstance(project);
 			createCompileScope(compilerManager, new Consumer<CompileScope>() {
 				@Override
 				public void consume(@Nullable final CompileScope compileScope) {
@@ -136,9 +138,9 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 	}
 
 	private void startImpl(final boolean justCompiled) {
-		MessageBusManager.publishAnalysisStarted(_project);
+		MessageBusManager.publishAnalysisStarted(project);
 
-		final ToolWindow toolWindow = ToolWindowManager.getInstance(_project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
+		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
 		if (workspaceSettings.toolWindowToFront) {
 			IdeaUtilImpl.activateToolWindow(toolWindow);
 		} else {
@@ -146,7 +148,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 			((ToolWindowImpl) toolWindow).ensureContentInitialized();
 		}
 
-		new Task.Backgroundable(_project, _title, true) {
+		new Task.Backgroundable(project, _title, true) {
 			@Override
 			public void run(@NotNull final ProgressIndicator indicator) {
 				indicator.setIndeterminate(true);
@@ -154,7 +156,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 				try {
 					asyncStart(indicator, justCompiled);
 				} catch (final ProcessCanceledException ignore) {
-					MessageBusManager.publishAnalysisAbortedToEDT(_project);
+					MessageBusManager.publishAnalysisAbortedToEDT(project);
 				}
 			}
 
@@ -165,10 +167,9 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		}.queue();
 	}
 
-
 	private void asyncStart(@NotNull final ProgressIndicator indicator, final boolean justCompiled) {
 
-		final FindBugsProjects projects = new FindBugsProjects(_project);
+		final FindBugsProjects projects = new FindBugsProjects(project);
 
 		boolean canceled = !ApplicationManager.getApplication().runReadAction(new Computable<Boolean>() {
 			@Override
@@ -204,9 +205,9 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		}
 
 		if (canceled) {
-			MessageBusManager.publishAnalysisAbortedToEDT(_project);
+			MessageBusManager.publishAnalysisAbortedToEDT(project);
 		} else {
-			MessageBusManager.publishAnalysisFinishedToEDT(_project, result, error);
+			MessageBusManager.publishAnalysisFinishedToEDT(project, result, error);
 		}
 	}
 
@@ -214,18 +215,30 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 			@NotNull final ProgressIndicator indicator,
 			@NotNull final Module module,
 			@NotNull final FindBugsProject findBugsProject,
-			final int numClassesOffset
+			final int analyzedClassCountOffset
 	) throws IOException, InterruptedException {
 
 		final ModuleSettings moduleSettings = ModuleSettings.getInstance(module);
-		final AbstractSettings settings;
+		AbstractSettings settings = projectSettings;
+		String moduleNameForImportFilePath = null;
 		if (moduleSettings.overrideProjectSettings) {
 			settings = moduleSettings;
-		} else {
-			settings = projectSettings;
+			moduleNameForImportFilePath = module.getName();
 		}
 
-		if (!PluginLoader.load(_project, moduleSettings.overrideProjectSettings ? module : null, settings, true)) {
+		final String importFilePath = WorkspaceSettings.getInstance(project).importFilePath.get(moduleNameForImportFilePath);
+		if (!StringUtil.isEmptyOrSpaces(importFilePath)) {
+			final boolean success = RuntimeSettingsImporter.importSettings(project, settings, importFilePath, moduleNameForImportFilePath);
+			/**
+			 * Do continue analysis on import settings failure, but invalidate plugin state
+			 * on success because the plugins settings can change anytime.
+			 */
+			if (success) {
+				PluginLoader.invalidate();
+			}
+		}
+
+		if (!PluginLoader.load(project, moduleSettings.overrideProjectSettings ? module : null, settings, true)) {
 			throw new ProcessCanceledException();
 		}
 
@@ -250,8 +263,8 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 			userPrefs.setExcludeBugsFiles(new HashMap<String, Boolean>(settings.excludeBugsFiles));
 			userPrefs.setExcludeFilterFiles(new HashMap<String, Boolean>(settings.excludeFilterFiles));
 
-			configureDetectors(projectSettings.detectors, detectorFactoryCollection, userPrefs);
-			for (final PluginSettings pluginSettings : projectSettings.plugins) {
+			configureDetectors(settings.detectors, detectorFactoryCollection, userPrefs);
+			for (final PluginSettings pluginSettings : settings.plugins) {
 				configureDetectors(pluginSettings.detectors, detectorFactoryCollection, userPrefs);
 			}
 		}
@@ -260,13 +273,13 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		bugCollection.setDoNotUseCloud(true);
 
 		final Reporter reporter = new Reporter(
-				_project,
+				project,
 				module,
 				bugCollection,
 				new HashSet<String>(settings.hiddenBugCategory),
 				indicator,
 				_cancellingByUser,
-				numClassesOffset
+				analyzedClassCountOffset
 		);
 
 		reporter.setPriorityThreshold(userPrefs.getUserDetectorThreshold());
@@ -304,7 +317,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		final CompileScope[] scopes = new CompileScope[files.size()];
 		int i = 0;
 		for (final VirtualFile file : files) {
-			scopes[i++] = new OneProjectItemCompileScope(_project, file);
+			scopes[i++] = new OneProjectItemCompileScope(project, file);
 		}
 		return new CompositeScope(scopes);
 	}
@@ -379,7 +392,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				BalloonTipFactory.showToolWindowWarnNotifier(_project, message + " " + ResourcesLoader.getString("analysis.aborted"));
+				BalloonTipFactory.showToolWindowWarnNotifier(project, message + " " + ResourcesLoader.getString("analysis.aborted"));
 			}
 		});
 	}

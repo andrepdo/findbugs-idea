@@ -34,7 +34,7 @@ public final class PluginLoader {
 	private PluginLoader() {
 	}
 
-	synchronized static void invalidate() {
+	public synchronized static void invalidate() {
 		projectRef = null;
 		moduleRef = null;
 	}

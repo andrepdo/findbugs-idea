@@ -19,6 +19,10 @@
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
@@ -31,11 +35,16 @@ import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 
 abstract class SettingsPane extends JPanel implements Disposable {
+
+	@NotNull
+	private AdvancedSettingsAction advancedSettingsAction;
 
 	@NotNull
 	private JBTabbedPane tabs;
@@ -55,10 +64,10 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	@NotNull
 	private AnnotateTab annotateTab;
 
-	@Nullable
+	@NotNull
 	private ShareTab shareTab;
 
-	SettingsPane(@NotNull final Project project) {
+	SettingsPane(@NotNull final Project project, @Nullable final Module module) {
 		super(new BorderLayout());
 
 		generalTab = new GeneralTab();
@@ -66,9 +75,9 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		filterTab = new FilterTab();
 		detectorTab = new DetectorTab();
 		annotateTab = new AnnotateTab(project);
-		shareTab = createShareTab();
+		shareTab = new ShareTab(project, module);
 
-		add(createHeaderPane(), BorderLayout.NORTH);
+		add(createHeaderPane(module), BorderLayout.NORTH);
 
 		/**
 		 * LATER: Switch to TabbedPaneWrapper after
@@ -81,9 +90,7 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		tabs.addTab(ResourcesLoader.getString("settings.filter"), filterTab);
 		tabs.addTab(ResourcesLoader.getString("settings.detector"), detectorTab);
 		tabs.addTab(ResourcesLoader.getString("settings.annotate"), annotateTab);
-		if (shareTab != null) {
-			tabs.addTab(ResourcesLoader.getString("settings.share"), shareTab);
-		}
+		tabs.addTab(ResourcesLoader.getString("settings.share"), shareTab);
 		//add(tabs.getComponent()); // see comment above
 		add(tabs);
 
@@ -92,10 +99,24 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	}
 
 	@NotNull
-	abstract JComponent createHeaderPane();
+	private JComponent createHeaderPane(@Nullable final Module module) {
+		final JPanel topPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		initHeaderPane(topPane);
+		topPane.add(createToolbar(module).getComponent());
+		topPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+		return topPane;
+	}
 
-	@Nullable
-	abstract ShareTab createShareTab();
+	void initHeaderPane(@NotNull final JPanel topPanel) {
+	}
+
+	@NotNull
+	private ActionToolbar createToolbar(@Nullable final Module module) {
+		advancedSettingsAction = new AdvancedSettingsAction(this, module);
+		final ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, advancedSettingsAction, true);
+		actionToolbar.setTargetComponent(this);
+		return actionToolbar;
+	}
 
 	final boolean isModified(@NotNull final AbstractSettings settings) {
 		return generalTab.isModified(settings) ||
@@ -169,16 +190,16 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	}
 
 	void setProjectSettingsEnabled(final boolean enabled) {
+		advancedSettingsAction.setEnabled(enabled);
 		generalTab.setProjectSettingsEnabled(enabled);
 		reportTab.setEnabled(enabled);
 		filterTab.setEnabled(enabled);
 		detectorTab.setEnabled(enabled);
 		annotateTab.setProjectSettingsEnabled(enabled);
-		if (shareTab != null) {
-			shareTab.setEnabled(enabled);
-		}
+		shareTab.setEnabled(enabled);
 	}
 
+	@SuppressWarnings("ConstantConditions")
 	@Override
 	public void dispose() {
 		if (detectorTab != null) {

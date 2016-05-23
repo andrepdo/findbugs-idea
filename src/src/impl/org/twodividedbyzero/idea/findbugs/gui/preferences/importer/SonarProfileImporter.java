@@ -29,9 +29,9 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
-import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
@@ -55,7 +55,7 @@ public abstract class SonarProfileImporter {
 		return isValid(document.getRootElement());
 	}
 
-	public boolean doImport(@NotNull final Element profile, @NotNull final ProjectSettings settings) {
+	public boolean doImport(@NotNull final Element profile, @NotNull final AbstractSettings settings) {
 		final Element rules = profile.getChild("rules");
 		if (rules == null) {
 			handleError(ResourcesLoader.getString("sonar.import.error.noRules"));

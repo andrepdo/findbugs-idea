@@ -19,75 +19,40 @@
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.util.Disposer;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.ModuleSettings;
-import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
-import javax.swing.JComponent;
-
-public final class ModuleConfigurableImpl implements Configurable {
+public final class ModuleConfigurableImpl extends AbstractConfigurableImpl<ModuleSettings> {
 
 	@NotNull
 	private final Module module;
 
-	@NotNull
-	private final ModuleSettings settings;
-
-	private SettingsPane pane;
-
 	public ModuleConfigurableImpl(@NotNull final Module module) {
+		super(module.getProject(), ModuleSettings.getInstance(module));
 		this.module = module;
-		settings = ModuleSettings.getInstance(module);
 	}
 
-	@Nls
+	@NotNull
 	@Override
-	public String getDisplayName() {
-		return ResourcesLoader.getString("findbugs.plugin.configuration.name");
-	}
-
-	@Nullable
-	@Override
-	public String getHelpTopic() {
-		return null;
-	}
-
-	@Nullable
-	@Override
-	public JComponent createComponent() {
-		if (pane == null) {
-			pane = new ModuleSettingsPane(module.getProject());
-		}
-		return pane;
+	SettingsPane createSettingsPane() {
+		return new ModuleSettingsPane(module.getProject(), module);
 	}
 
 	@Override
 	public boolean isModified() {
-		return pane.isModified(settings) || pane.isModifiedModule(settings);
+		return super.isModified() || pane.isModifiedModule(settings);
 	}
 
 	@Override
 	public void apply() throws ConfigurationException {
-		pane.apply(settings);
+		super.apply();
 		pane.applyModule(settings);
 	}
 
 	@Override
 	public void reset() {
-		pane.reset(settings);
+		super.reset();
 		pane.resetModule(settings);
-	}
-
-	@Override
-	public void disposeUIResources() {
-		if (pane != null) {
-			Disposer.dispose(pane);
-			pane = null;
-		}
 	}
 }

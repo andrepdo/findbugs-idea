@@ -76,6 +76,7 @@ final class DetectorTab extends JPanel implements Disposable {
 			hintLabel = new JLabel("<html>" + ResourcesLoader.getString("detector.description.line1") + "<br>"
 					+ ResourcesLoader.getString("detector.description.line2") + "</html>");
 			hintLabel.setIcon(MessageType.INFO.getDefaultIcon());
+			hintLabel.setDisabledIcon(MessageType.INFO.getDefaultIcon());
 		}
 		return hintLabel;
 	}

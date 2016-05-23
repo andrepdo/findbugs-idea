@@ -25,10 +25,14 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.components.StoragePathMacros;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import com.intellij.util.xmlb.annotations.MapAnnotation;
 import com.intellij.util.xmlb.annotations.Tag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
+
+import java.util.Map;
 
 @State(
 		name = "FindBugs-IDEA-Workspace",
@@ -78,8 +82,20 @@ public final class WorkspaceSettings implements PersistentStateComponent<Workspa
 	@Tag
 	public boolean openExportedHtmlBugCollectionInBrowser = true;
 
-	@Tag
-	public String importFilePath;
+	/**
+	 * This settings file will be used for analysis.
+	 * Key is the module name, null is for project scope.
+	 */
+	@Tag(value = "importFilePaths")
+	@MapAnnotation(
+			surroundWithTag = false,
+			surroundValueWithTag = false,
+			surroundKeyWithTag = false,
+			entryTagName = "importFilePath",
+			keyAttributeName = "module",
+			valueAttributeName = "path"
+	)
+	public Map<String, String> importFilePath = New.map();
 
 	@Tag
 	public boolean annotationTextRangeMarkup = true;

@@ -24,7 +24,10 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
 import com.intellij.openapi.fileChooser.FileTextField;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -47,18 +50,27 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.io.File;
 
-// TODO allow per module
 final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>, Disposable {
+
+	@NotNull
+	private final Project project;
+
+	@Nullable
+	private final String moduleName;
+
 	private JLabel description;
 	private HyperlinkLabel link;
 	private LabeledComponent<TextFieldWithBrowseButton> importPathLabel;
 
-	ShareTab() {
+	ShareTab(@NotNull final Project project, @Nullable final Module module) {
 		super(new VerticalFlowLayout(HAlignment.Left, VAlignment.Top, 0, 0, true, false));
+		this.project = project;
+		moduleName = module != null ? module.getName() : null;
 
 		description = new JLabel("<html>" + ResourcesLoader.getString("share.description"));
 		description.setBorder(BorderFactory.createEmptyBorder(5, 5, 0, 5));
 		description.setIcon(MessageType.INFO.getDefaultIcon());
+		description.setDisabledIcon(MessageType.INFO.getDefaultIcon());
 
 		final String url = ResourcesLoader.getString("share.url");
 		link = new HyperlinkLabel(); // LATER: HotspotPainter (Search) does not work with HyperlinkLabel
@@ -107,7 +119,7 @@ final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>,
 
 	@Override
 	public boolean isModified(@NotNull final WorkspaceSettings settings) {
-		return !StringUtil.equals(settings.importFilePath, getImportFilePath());
+		return !StringUtil.equals(settings.importFilePath.get(moduleName), getImportFilePath());
 	}
 
 	@Override
@@ -125,12 +137,19 @@ final class ShareTab extends JPanel implements SettingsOwner<WorkspaceSettings>,
 				throw new ConfigurationException(ResourcesLoader.getString("error.file.readable", filePath));
 			}
 		}
-		settings.importFilePath = filePath;
+		if (StringUtil.isEmptyOrSpaces(filePath)) {
+			settings.importFilePath.remove(moduleName);
+		} else {
+			settings.importFilePath.put(moduleName, filePath);
+		}
+		for (final Module module : ModuleManager.getInstance(project).getModules()) {
+			// TODO remove orphan entry (also on reset)
+		}
 	}
 
 	@Override
 	public void reset(@NotNull final WorkspaceSettings settings) {
-		importPathLabel.getComponent().setText(FileUtilFb.toSystemDependentName(settings.importFilePath));
+		importPathLabel.getComponent().setText(FileUtilFb.toSystemDependentName(settings.importFilePath.get(moduleName)));
 	}
 
 	@Override

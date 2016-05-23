@@ -54,18 +54,6 @@ abstract class AbstractAnalyzeAction extends AbstractAction {
 		EventDispatchThreadHelper.checkEDT();
 
 // TODO
-//		final String importFilePath = WorkspaceSettings.getInstance(project).importFilePath;
-//		if (!StringUtil.isEmptyOrSpaces(importFilePath)) {
-//			final boolean success = AnalyzeUtil.importSettings(project, projectSettings, importFilePath);
-//			/**
-//			 * Do continue analysis on import settings failure, but invalidate plugin state
-//			 * on success because the plugins settings can change anytime.
-//			 */
-//			if (success) {
-//				PluginLoader.invalidate();
-//			}
-//		}
-//
 //		if (areAllBugCategoriesDisabled(settings)) {
 //			showSettingsWarning(project, "analysis.allBugCategoriesDisabled");
 //			return;

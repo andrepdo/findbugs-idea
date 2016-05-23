@@ -77,7 +77,7 @@ public final class SearchableOptionContributorImpl extends SearchableOptionContr
 						path,
 						text,
 						ProjectConfigurableImpl.ID,
-						ProjectConfigurableImpl.DISPLAY_NAME,
+						AbstractConfigurableImpl.DISPLAY_NAME,
 						false
 				);
 			}

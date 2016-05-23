@@ -28,6 +28,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
 import com.intellij.openapi.fileChooser.FileSaverDescriptor;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
@@ -58,13 +59,20 @@ final class AdvancedSettingsAction extends DefaultActionGroup {
 	@NotNull
 	private final SettingsPane settingsPane;
 
-	AdvancedSettingsAction(@NotNull final SettingsPane settingsPane) {
+	private boolean enabled;
+
+	AdvancedSettingsAction(@NotNull final SettingsPane settingsPane, @Nullable final Module module) {
 		super("Advanced Settings", true);
 		this.settingsPane = settingsPane;
+		this.enabled = true;
 		getTemplatePresentation().setIcon(AllIcons.General.GearPlain);
 		add(new ResetToDefault());
-		add(new ImportSettings());
+		add(new ImportSettings(module != null ? module.getName() : null));
 		add(new ExportSettings());
+	}
+
+	void setEnabled(final boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	private class ResetToDefault extends AbstractAction {
@@ -86,12 +94,16 @@ final class AdvancedSettingsAction extends DefaultActionGroup {
 	}
 
 	private class ImportSettings extends AbstractAction {
-		ImportSettings() {
+		@Nullable
+		private final String moduleNameForImportFilePath;
+
+		ImportSettings(@Nullable final String moduleNameForImportFilePath) {
 			super(
 					StringUtil.capitalizeWords(ResourcesLoader.getString("settings.action.import.title"), true),
 					ResourcesLoader.getString("settings.action.import.description"),
 					AllIcons.ToolbarDecorator.Import
 			);
+			this.moduleNameForImportFilePath = moduleNameForImportFilePath;
 		}
 
 		@Override
@@ -122,7 +134,7 @@ final class AdvancedSettingsAction extends DefaultActionGroup {
 							protected void handleError(@NotNull final String title, @NotNull final String message) {
 								Messages.showErrorDialog(message, title);
 							}
-						}.doImport(in, settings);
+						}.doImport(in, settings, moduleNameForImportFilePath);
 
 						if (success) {
 							settingsPane.reset(settings);
@@ -183,6 +195,11 @@ final class AdvancedSettingsAction extends DefaultActionGroup {
 	private abstract class AbstractAction extends AnAction implements DumbAware {
 		AbstractAction(@Nullable final String text, @Nullable final String description, @Nullable final Icon icon) {
 			super(text, description, icon);
+		}
+
+		@Override
+		public void update(@NotNull final AnActionEvent e) {
+			e.getPresentation().setEnabled(enabled);
 		}
 
 		@Override

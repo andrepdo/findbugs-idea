@@ -18,17 +18,14 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBCheckBox;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.ModuleSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -36,13 +33,12 @@ final class ModuleSettingsPane extends SettingsPane {
 
 	private JBCheckBox overrideProjectSettingsCheckbox;
 
-	ModuleSettingsPane(@NotNull Project project) {
-		super(project);
+	ModuleSettingsPane(@NotNull final Project project, @NotNull final Module module) {
+		super(project, module);
 	}
 
-	@NotNull
 	@Override
-	JComponent createHeaderPane() {
+	void initHeaderPane(@NotNull final JPanel topPanel) {
 		overrideProjectSettingsCheckbox = new JBCheckBox(ResourcesLoader.getString("settings.module.overrideProjectSettings"));
 		overrideProjectSettingsCheckbox.addActionListener(new ActionListener() {
 			@Override
@@ -50,11 +46,7 @@ final class ModuleSettingsPane extends SettingsPane {
 				updateControls();
 			}
 		});
-
-		final JPanel topPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		topPane.add(overrideProjectSettingsCheckbox);
-		topPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-		return topPane;
+		topPanel.add(overrideProjectSettingsCheckbox);
 	}
 
 	private void updateControls() {
@@ -76,11 +68,5 @@ final class ModuleSettingsPane extends SettingsPane {
 	void resetModule(@NotNull final ModuleSettings settings) {
 		overrideProjectSettingsCheckbox.setSelected(settings.overrideProjectSettings);
 		updateControls();
-	}
-
-	@Nullable
-	@Override
-	ShareTab createShareTab() {
-		return null;
 	}
 }

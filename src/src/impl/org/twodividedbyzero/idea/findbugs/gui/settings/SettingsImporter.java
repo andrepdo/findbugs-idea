@@ -26,9 +26,9 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
+import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
-import org.twodividedbyzero.idea.findbugs.gui.preferences.LegacyProjectSettings;
+import org.twodividedbyzero.idea.findbugs.gui.preferences.LegacyAbstractSettingsConverter;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.importer.SonarProfileImporter;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
@@ -45,7 +45,12 @@ public abstract class SettingsImporter {
 		this.project = project;
 	}
 
-	public final boolean doImport(@NotNull final InputStream input, @NotNull final ProjectSettings settings) throws JDOMException, IOException {
+	public final boolean doImport(
+			@NotNull final InputStream input,
+			@NotNull final AbstractSettings settings,
+			@Nullable final String moduleNameForImportFilePath
+	) throws JDOMException, IOException {
+
 		final Element root = JDOMUtil.load(input);
 		boolean success = false;
 		if (SonarProfileImporter.isValid(root)) {
@@ -68,7 +73,12 @@ public abstract class SettingsImporter {
 			}
 			if (legacy) {
 				if (legacyPrefs != null) {
-					LegacyProjectSettings.applyToImpl(legacyPrefs, settings, WorkspaceSettings.getInstance(project));
+					LegacyAbstractSettingsConverter.applyTo(
+							legacyPrefs,
+							settings,
+							WorkspaceSettings.getInstance(project),
+							moduleNameForImportFilePath
+					);
 					success = true;
 				} else {
 					handleError(ResourcesLoader.getString("sonar.import.error.legacyInvalid.title"), ResourcesLoader.getString("sonar.import.error.legacyInvalid.text"));

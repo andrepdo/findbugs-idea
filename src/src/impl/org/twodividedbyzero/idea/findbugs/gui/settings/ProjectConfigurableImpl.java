@@ -23,84 +23,38 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Disposer;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
-import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 
-import javax.swing.JComponent;
-
-public final class ProjectConfigurableImpl implements SearchableConfigurable, Configurable.NoScroll {
-	public static final String ID = "settings.findbugs.project";
-	static final String DISPLAY_NAME = "FindBugs-IDEA";
-
-	@NotNull
-	private final Project project;
-
-	@NotNull
-	private final ProjectSettings settings;
-
-	@NotNull
-	private final WorkspaceSettings workspaceSettings;
-
-	private SettingsPane pane;
+public final class ProjectConfigurableImpl extends AbstractConfigurableImpl<ProjectSettings> implements SearchableConfigurable, Configurable.NoScroll {
+	static final String ID = "settings.findbugs.project";
 
 	public ProjectConfigurableImpl(@NotNull final Project project) {
-		this.project = project;
-		settings = ProjectSettings.getInstance(project);
-		workspaceSettings = WorkspaceSettings.getInstance(project);
+		super(project, ProjectSettings.getInstance(project));
 	}
 
-	@Nls
+	@NotNull
 	@Override
-	public String getDisplayName() {
-		return DISPLAY_NAME;
-	}
-
-	@Nullable
-	@Override
-	public String getHelpTopic() {
-		return null;
-	}
-
-	@Nullable
-	@Override
-	public JComponent createComponent() {
-		if (pane == null) {
-			pane = new ProjectSettingsPane(project);
-		}
-		return pane;
+	SettingsPane createSettingsPane() {
+		return new ProjectSettingsPane(project);
 	}
 
 	@Override
 	public boolean isModified() {
-		return pane.isModified(settings) ||
-				pane.isModifiedProject(settings) ||
-				pane.isModifiedWorkspace(workspaceSettings);
+		return super.isModified() || pane.isModifiedProject(settings);
 	}
 
 	@Override
 	public void apply() throws ConfigurationException {
-		pane.apply(settings);
+		super.apply();
 		pane.applyProject(settings);
-		pane.applyWorkspace(workspaceSettings);
 	}
 
 	@Override
 	public void reset() {
-		pane.reset(settings);
+		super.reset();
 		pane.resetProject(settings);
-		pane.resetWorkspace(workspaceSettings);
-	}
-
-	@Override
-	public void disposeUIResources() {
-		if (pane != null) {
-			Disposer.dispose(pane);
-			pane = null;
-		}
 	}
 
 	@NotNull
