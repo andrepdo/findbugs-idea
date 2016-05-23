@@ -32,17 +32,14 @@ public final class FindBugsResult {
 	@NotNull
 	private Map<Project, SortedBugCollection> results;
 
-	private int numClasses; // TODO kick this
-
 	public FindBugsResult() {
 		this.results = New.map();
 	}
 
-	public void put(@NotNull final Project project, @Nullable final SortedBugCollection bugCollection, int numClasses) {
+	public void put(@NotNull final Project project, @Nullable final SortedBugCollection bugCollection) {
 		if (results.put(project, bugCollection) != null) {
 			throw new IllegalStateException("Duplicate project " + project);
 		}
-		this.numClasses += numClasses;
 	}
 
 	public boolean isBugCollectionEmpty() {
@@ -54,8 +51,8 @@ public final class FindBugsResult {
 		return true;
 	}
 
-	public int getNumClassesSafe() {
-		final Integer ret = getNumClasses();
+	public int getAnalyzedClassCountSafe() {
+		final Integer ret = getAnalyzedClassCount();
 		if (ret != null) {
 			return ret;
 		}
@@ -63,7 +60,7 @@ public final class FindBugsResult {
 	}
 
 	@Nullable
-	public Integer getNumClasses() {
+	public Integer getAnalyzedClassCount() {
 		int ret = -1;
 		for (final SortedBugCollection bugCollection : results.values()) {
 			final ProjectStats stats = bugCollection.getProjectStats();

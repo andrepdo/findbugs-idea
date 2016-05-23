@@ -275,7 +275,7 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 							final DialogBuilder dialog = AnalysisRunDetailsDialog.create(
 									panel.getProject(),
 									panel.getBugTreePanel().getGroupModel().getBugCount(),
-									panel.getResult().getNumClassesSafe(),
+									panel.getResult().getAnalyzedClassCountSafe(),
 									panel.getResult()
 							);
 							dialog.showModal(false);

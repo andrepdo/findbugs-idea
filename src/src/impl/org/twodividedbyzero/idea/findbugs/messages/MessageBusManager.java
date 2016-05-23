@@ -33,13 +33,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public final class MessageBusManager {
 
-
 	private static final Map<Project, MessageBus> _busByProject = New.map();
-
 
 	private MessageBusManager() {
 	}
-
 
 	@NotNull
 	private static MessageBus of(@NotNull final Project project) {
@@ -51,14 +48,12 @@ public final class MessageBusManager {
 		return ret;
 	}
 
-
 	public static <L extends AnalysisStateListener> void subscribeAnalysisState(@NotNull final Project project, @NotNull final Object subscriber, @NotNull final L handler) {
 		subscribe(project, subscriber, AnalysisStartedListener.TOPIC, handler);
 		subscribe(project, subscriber, AnalysisAbortingListener.TOPIC, handler);
 		subscribe(project, subscriber, AnalysisAbortedListener.TOPIC, handler);
 		subscribe(project, subscriber, AnalysisFinishedListener.TOPIC, handler);
 	}
-
 
 	/**
 	 * Note that you can only subscribe *one* {@code handler} per {@code topic}.
@@ -75,26 +70,22 @@ public final class MessageBusManager {
 		of(project).subscribe(subscriber, topic, handler);
 	}
 
-
 	public static void publishClear(@NotNull final Project project) {
 		EventDispatchThreadHelper.checkEDT();
 		FindBugsState.set(project, FindBugsState.Cleared);
 		publish(project, ClearListener.TOPIC).clear();
 	}
 
-
 	public static void publishNewBug(@NotNull final Project project, @NotNull final Bug bug, final int analyzedClassCount) {
 		EventDispatchThreadHelper.checkEDT();
-		publish(project, NewBugInstanceListener.TOPIC).newBug(bug, analyzedClassCount);
+		publish(project, NewBugListener.TOPIC).newBug(bug, analyzedClassCount);
 	}
-
 
 	public static void publishAnalysisStarted(@NotNull final Project project) {
 		EventDispatchThreadHelper.checkEDT();
 		FindBugsState.set(project, FindBugsState.Started);
 		publish(project, AnalysisStartedListener.TOPIC).analysisStarted();
 	}
-
 
 	public static void publishAnalysisStartedToEDT(@NotNull final Project project) {
 		EventDispatchThreadHelper.checkNotEDT();
@@ -107,13 +98,11 @@ public final class MessageBusManager {
 		});
 	}
 
-
 	public static void publishAnalysisAborting(@NotNull final Project project) {
 		EventDispatchThreadHelper.checkEDT();
 		FindBugsState.set(project, FindBugsState.Aborting);
 		publish(project, AnalysisAbortingListener.TOPIC).analysisAborting();
 	}
-
 
 	public static void publishAnalysisAbortedToEDT(@NotNull final Project project) {
 		EventDispatchThreadHelper.checkNotEDT();
@@ -125,7 +114,6 @@ public final class MessageBusManager {
 			}
 		});
 	}
-
 
 	public static void publishAnalysisFinishedToEDT(@NotNull final Project project, @NotNull final FindBugsResult result, @Nullable final Throwable error) {
 		EventDispatchThreadHelper.checkNotEDT();
@@ -143,13 +131,11 @@ public final class MessageBusManager {
 		});
 	}
 
-
 	@NotNull
 	private static <L> L publish(@NotNull final Project project, @NotNull final Topic<L> topic) {
 		EventDispatchThreadHelper.checkEDT();
 		return of(project).publisher(topic);
 	}
-
 
 	public static void dispose(@NotNull final Project project) {
 		EventDispatchThreadHelper.checkEDT();

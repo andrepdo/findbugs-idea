@@ -215,7 +215,7 @@ public final class ImportBugCollection extends AbstractAction {
 				} finally {
 					if (success) {
 						final FindBugsResult result = new FindBugsResult();
-						result.put(importProject, importBugCollection, importBugCollection.getProjectStats().getNumClasses());
+						result.put(importProject, importBugCollection);
 						MessageBusManager.publishAnalysisFinishedToEDT(project, result, null);
 						Thread.currentThread().interrupt();
 					} else {

@@ -22,8 +22,8 @@ import com.intellij.util.messages.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.core.Bug;
 
-public interface NewBugInstanceListener {
-	Topic<NewBugInstanceListener> TOPIC = Topic.create("FindBugs New Bug", NewBugInstanceListener.class);
+public interface NewBugListener {
+	Topic<NewBugListener> TOPIC = Topic.create("FindBugs New Bug", NewBugListener.class);
 
 	/**
 	 * Invoked by EDT.

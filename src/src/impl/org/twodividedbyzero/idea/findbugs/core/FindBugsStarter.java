@@ -190,7 +190,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 					final Pair<SortedBugCollection, Reporter> data = executeImpl(indicator, module, findBugsProject, numClassesOffset);
 					final int numClasses = data.getSecond().getProjectStats().getNumClasses();
 					numClassesOffset += numClasses;
-					result.put(findBugsProject, data.getFirst(), numClasses);
+					result.put(findBugsProject, data.getFirst());
 					if (data.getSecond().isCanceled()) {
 						canceled = true;
 						break;

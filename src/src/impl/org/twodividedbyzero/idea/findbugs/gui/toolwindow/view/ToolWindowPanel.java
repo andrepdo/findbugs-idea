@@ -63,7 +63,7 @@ import org.twodividedbyzero.idea.findbugs.gui.common.NotificationUtil;
 import org.twodividedbyzero.idea.findbugs.messages.AnalysisStateListener;
 import org.twodividedbyzero.idea.findbugs.messages.ClearListener;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
-import org.twodividedbyzero.idea.findbugs.messages.NewBugInstanceListener;
+import org.twodividedbyzero.idea.findbugs.messages.NewBugListener;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -125,7 +125,7 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 				DaemonCodeAnalyzer.getInstance(_project).restart();
 			}
 		});
-		MessageBusManager.subscribe(project, this, NewBugInstanceListener.TOPIC, new NewBugInstanceListener() {
+		MessageBusManager.subscribe(project, this, NewBugListener.TOPIC, new NewBugListener() {
 			@Override
 			public void newBug(@NotNull final Bug bug, final int analyzedClassCount) {
 				_bugTreePanel.addNode(bug);
@@ -279,10 +279,10 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 	@Override
 	public void analysisFinished(@NotNull final FindBugsResult result, @Nullable final Throwable error) {
 		_bugTreePanel.setResult(result);
-		final Integer numClasses = result.getNumClasses();
-		_bugTreePanel.updateRootNode(numClasses);
+		final Integer analyzedClassCount = result.getAnalyzedClassCount();
+		_bugTreePanel.updateRootNode(analyzedClassCount);
 		_bugTreePanel.getBugTree().validate();
-		final int numAnalysedClasses = numClasses != null ? numClasses : 0;
+		final int numAnalysedClasses = analyzedClassCount != null ? analyzedClassCount : 0;
 
 		final StringBuilder message = new StringBuilder()
 				.append("Found ")
@@ -442,7 +442,7 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 
 		final void openAnalysisRunDetailsDialog() {
 			final int bugCount = _toolWindowPanel.getBugTreePanel().getGroupModel().getBugCount();
-			final DialogBuilder dialog = AnalysisRunDetailsDialog.create(_toolWindowPanel.getProject(), bugCount, result.getNumClasses(), result);
+			final DialogBuilder dialog = AnalysisRunDetailsDialog.create(_toolWindowPanel.getProject(), bugCount, result.getAnalyzedClassCountSafe(), result);
 			dialog.showModal(false);
 		}
 	}
