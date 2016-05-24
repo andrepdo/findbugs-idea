@@ -57,6 +57,14 @@ public final class ModuleConfigurableImpl extends AbstractConfigurableImpl<Modul
 		pane.resetModule(settings);
 	}
 
+	public static void show(@NotNull final Module module) {
+		/**
+		 * It is correct to create a configurable instance,
+		 * see java doc of ShowSettingsUtil#findProjectConfigurable (deprecated).
+		 */
+		showImpl(module.getProject(), new ModuleConfigurableImpl(module), null);
+	}
+
 	public static void showShare(@NotNull final Module module) {
 		/**
 		 * It is correct to create a configurable instance,

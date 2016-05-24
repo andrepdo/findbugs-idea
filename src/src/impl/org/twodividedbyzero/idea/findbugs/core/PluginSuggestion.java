@@ -24,94 +24,96 @@ import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetTypeId;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
+import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.gui.common.NotificationUtil;
-import org.twodividedbyzero.idea.findbugs.gui.preferences.ConfigurationPanel;
+import org.twodividedbyzero.idea.findbugs.gui.settings.ModuleConfigurableImpl;
+import org.twodividedbyzero.idea.findbugs.gui.settings.ProjectConfigurableImpl;
 import org.twodividedbyzero.idea.findbugs.plugins.Plugins;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 
 import javax.swing.event.HyperlinkEvent;
 import java.util.Set;
 
-final class PluginSuggestion {
+public final class PluginSuggestion extends AbstractProjectComponent {
+
+	private static final String NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION = "FindBugs: Plugin Suggestion";
+	private static final NotificationGroup NOTIFICATION_GROUP_PLUGIN_SUGGESTION = new NotificationGroup(NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION, NotificationDisplayType.STICKY_BALLOON, false);
 
 	private static final String A_HREF_DISABLE_ANCHOR = "#disable";
 
-
-	private PluginSuggestion() {
+	public PluginSuggestion(@NotNull final Project project) {
+		super(project);
 	}
 
-
-	static void suggest(
-			@NotNull final Project project,
-			@NotNull final FindBugsPlugin findBugsPlugin,
-			@Nullable final FindBugsPreferences preferences
-	) {
-
-		if (preferences == null) {
+	@Override
+	public void projectOpened() {
+		final ProjectSettings settings = ProjectSettings.getInstance(myProject);
+		if (!NotificationUtil.isGroupEnabled(NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION)) {
 			return;
 		}
-		if (!NotificationUtil.isGroupEnabled(FindBugsPluginImpl.NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION)) {
+		if (isAndroidFindbugsPluginEnabled(settings)) {
 			return;
 		}
-		if (isPluginEnabled(Plugins.AndroidFindbugs.id, preferences)) {
-			return;
-		}
-		final Set<Suggestion> suggestions = collectSuggestions(project, preferences);
+		final Set<Suggestion> suggestions = collectSuggestions(myProject, settings);
 		if (!suggestions.isEmpty()) {
-			showSuggestions(project, findBugsPlugin, preferences, suggestions);
+			showSuggestions(myProject, suggestions);
 		}
 	}
 
-
-	private static boolean isPluginEnabled(@NotNull final String pluginId, @NotNull final FindBugsPreferences preferences) {
-		return preferences.isPluginEnabled(pluginId, true) ||
-				preferences.isPluginEnabled(pluginId, false);
+	private static boolean isAndroidFindbugsPluginEnabled(@NotNull final AbstractSettings settings) {
+		return isPluginEnabled(Plugins.AndroidFindbugs.id, settings);
 	}
 
+	private static boolean isPluginEnabled(@NotNull final String pluginId, @NotNull final AbstractSettings settings) {
+		for (final PluginSettings pluginSettings : settings.plugins) {
+			if (pluginId.equals(pluginSettings.id)) {
+				if (pluginSettings.enabled) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	@SuppressWarnings("UnusedParameters") // LATER: enabled plugin - think of bundled and user plugins
 	private static void enablePlugin(
 			@NotNull final Project project,
-			@NotNull final FindBugsPlugin findBugsPlugin,
-			@NotNull final String pluginId,
-			@NotNull final FindBugsPreferences preferences
+			@NotNull final Module module,
+			final boolean moduleSettingsOverrideProjectSettings
 	) {
 
-		ShowSettingsUtil.getInstance().editConfigurable(project, findBugsPlugin, new Runnable() {
-			@SuppressWarnings("ConstantConditions")
-			@Override
-			public void run() {
-				final ConfigurationPanel panel = ((ConfigurationPanel) findBugsPlugin.createComponent());
-				panel.showConfigPage(panel.getPluginConfig());
-			}
-		});
+		if (moduleSettingsOverrideProjectSettings) {
+			ModuleConfigurableImpl.show(module);
+		} else {
+			ProjectConfigurableImpl.show(project);
+		}
 	}
-
 
 	private static void showSuggestions(
 			@NotNull final Project project,
-			@NotNull final FindBugsPlugin findBugsPlugin,
-			@NotNull final FindBugsPreferences preferences,
 			@NotNull final Set<Suggestion> suggestions
 	) {
 
 		final StringBuilder sb = new StringBuilder();
 		for (final Suggestion suggestion : suggestions) {
-			sb.append("&nbsp;&nbsp;- <a href='").append(suggestion._pluginId).append("'>").append("Enable '").append(suggestion._name).append("'</a><br>");
+			sb.append("&nbsp;&nbsp;- <a href='").append(suggestion.pluginId).append("'>").append("Enable '").append(suggestion.name).append("'</a>");
+			if (suggestion.moduleSettingsOverrideProjectSettings) {
+				sb.append(" for module '").append(suggestion.module.getName()).append("'");
+			}
+			sb.append("<br>");
 		}
 		sb.append("<br><a href='").append(A_HREF_DISABLE_ANCHOR).append("'>Disable Suggestion</a>");
 
-		FindBugsPluginImpl.NOTIFICATION_GROUP_PLUGIN_SUGGESTION.createNotification(
+		NOTIFICATION_GROUP_PLUGIN_SUGGESTION.createNotification(
 				"FindBugs Plugin Suggestion",
 				sb.toString(),
 				NotificationType.INFORMATION,
@@ -125,21 +127,30 @@ final class PluginSuggestion {
 										project,
 										"Notification will be disabled for all projects.\n\n" +
 												"Settings | Appearance & Behavior | Notifications | " +
-												FindBugsPluginImpl.NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION +
+												NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION +
 												"\ncan be used to configure the notification.",
 										"FindBugs Plugin Suggestion Notification",
 										"Disable Notification", CommonBundle.getCancelButtonText(), Messages.getWarningIcon());
 								if (result == Messages.YES) {
 									NotificationUtil.getNotificationsConfigurationImpl().changeSettings(
-											FindBugsPluginImpl.NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION,
+											NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION,
 											NotificationDisplayType.NONE, false, false);
 									notification.expire();
 								} else {
 									notification.hideBalloon();
 								}
 							} else {
-								enablePlugin(project, findBugsPlugin, desc, preferences);
-								notification.hideBalloon();
+								Suggestion suggestion = suggestions.iterator().next();
+								for (final Suggestion s : suggestions) {
+									if (suggestion.pluginId.equals(desc)) {
+										suggestion = s;
+										break;
+									}
+								}
+								enablePlugin(project, suggestion.module, suggestion.moduleSettingsOverrideProjectSettings);
+								if (suggestions.size() == 1) {
+									notification.hideBalloon();
+								}
 							}
 						}
 					}
@@ -147,18 +158,16 @@ final class PluginSuggestion {
 		).setImportant(false).notify(project);
 	}
 
-
 	@NotNull
-	private static Set<Suggestion> collectSuggestions(@NotNull final Project project, @NotNull final FindBugsPreferences preferences) {
+	private static Set<Suggestion> collectSuggestions(@NotNull final Project project, @NotNull final ProjectSettings settings) {
 		final Set<Suggestion> ret = New.set();
-		collectSuggestionsByModules(project, preferences, ret);
+		collectSuggestionsByModules(project, settings, ret);
 		return ret;
 	}
 
-
 	private static void collectSuggestionsByModules(
 			@NotNull final Project project,
-			@NotNull final FindBugsPreferences preferences,
+			@NotNull final ProjectSettings settings,
 			@NotNull final Set<Suggestion> suggestions
 	) {
 
@@ -168,13 +177,12 @@ final class PluginSuggestion {
 		}
 		final Module[] modules = moduleManager.getModules();
 		for (final Module module : modules) {
-			collectSuggestionsByFacets(preferences, module, suggestions);
+			collectSuggestionsByFacets(settings, module, suggestions);
 		}
 	}
 
-
 	private static void collectSuggestionsByFacets(
-			@NotNull final FindBugsPreferences preferences,
+			@NotNull final ProjectSettings projectSettings,
 			@NotNull final Module module,
 			@NotNull final Set<Suggestion> suggestions
 	) {
@@ -188,38 +196,49 @@ final class PluginSuggestion {
 		for (final Facet facet : facets) {
 			facetTypeId = facet.getTypeId();
 			if (facetTypeId != null) {
-				if (!isPluginEnabled(Plugins.AndroidFindbugs.id, preferences)) {
-					if ("AndroidFacetType".equals(facetTypeId.getClass().getSimpleName()) ||
-							"android".equalsIgnoreCase(facetTypeId.toString())) {
-						suggestions.add(new Suggestion(Plugins.AndroidFindbugs.id, "Android FindBugs"));
+
+				if (!isAndroidFindbugsPluginEnabled(projectSettings)) {
+					final ModuleSettings moduleSettings = ModuleSettings.getInstance(module);
+					if (!moduleSettings.overrideProjectSettings || !isAndroidFindbugsPluginEnabled(moduleSettings)) {
+						if ("AndroidFacetType".equals(facetTypeId.getClass().getSimpleName()) ||
+								"android".equalsIgnoreCase(facetTypeId.toString())) {
+							suggestions.add(new Suggestion(Plugins.AndroidFindbugs.id, "Android FindBugs", module, moduleSettings.overrideProjectSettings));
+						}
 					}
 				}
+
 			}
 		}
 	}
 
-
 	private static class Suggestion {
 
-		private final String _pluginId;
-		private final String _name;
+		@NotNull
+		private final String pluginId;
 
+		@NotNull
+		private final String name;
 
-		Suggestion(@NotNull final String pluginId, @NotNull final String name) {
-			_pluginId = pluginId;
-			_name = name;
+		@NotNull
+		private final Module module;
+
+		private boolean moduleSettingsOverrideProjectSettings;
+
+		Suggestion(@NotNull final String pluginId, @NotNull final String name, @NotNull final Module module, final boolean moduleSettingsOverrideProjectSettings) {
+			this.pluginId = pluginId;
+			this.name = name;
+			this.module = module;
+			this.moduleSettingsOverrideProjectSettings = moduleSettingsOverrideProjectSettings;
 		}
-
 
 		@Override
 		public boolean equals(@Nullable final Object o) {
-			return this == o || !(o == null || getClass() != o.getClass()) && _pluginId.equals(((Suggestion) o)._pluginId);
+			return this == o || !(o == null || getClass() != o.getClass()) && pluginId.equals(((Suggestion) o).pluginId);
 		}
-
 
 		@Override
 		public int hashCode() {
-			return _pluginId.hashCode();
+			return pluginId.hashCode();
 		}
 	}
 }

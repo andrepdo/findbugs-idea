@@ -107,12 +107,12 @@ abstract class AbstractConfigurableImpl<V extends AbstractSettings> implements C
 		pane.requestFocusOnShareImportFile();
 	}
 
+	static void showImpl(@NotNull final Project project, @NotNull final AbstractConfigurableImpl configurable, @Nullable final Runnable advancedInitialization) {
+		ShowSettingsUtil.getInstance().editConfigurable(project, configurable, advancedInitialization);
+	}
+
 	static void showShareImpl(@NotNull final Project project, @NotNull final AbstractConfigurableImpl configurable) {
-		/**
-		 * It is correct to create a configurable instance,
-		 * see java doc of ShowSettingsUtil#findProjectConfigurable (deprecated).
-		 */
-		ShowSettingsUtil.getInstance().editConfigurable(project, configurable, new Runnable() {
+		showImpl(project, configurable, new Runnable() {
 			@Override
 			public void run() {
 				configurable.requestFocusOnShareImportFile();

@@ -334,6 +334,11 @@
     </project-components>
     <project-components>
         <component>
+            <implementation-class>org.twodividedbyzero.idea.findbugs.core.PluginSuggestion</implementation-class>
+        </component>
+    </project-components>
+    <project-components>
+        <component>
             <implementation-class>org.twodividedbyzero.idea.findbugs.gui.preferences.LegacyProjectSettingsConverter</implementation-class>
         </component>
     </project-components>
