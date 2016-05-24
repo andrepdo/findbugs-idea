@@ -20,11 +20,14 @@ package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.profile.codeInspection.ui.inspectionsTree.InspectionsConfigTreeTable;
 import com.intellij.profile.codeInspection.ui.table.ThreeStateCheckBoxRenderer;
+import com.intellij.psi.codeStyle.NameUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleColoredComponent;
 import com.intellij.ui.SimpleTextAttributes;
+import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.ui.treeStructure.treetable.TreeTable;
 import com.intellij.ui.treeStructure.treetable.TreeTableTree;
+import com.intellij.util.text.Matcher;
 import com.intellij.util.ui.UIUtil;
 import edu.umd.cs.findbugs.BugPattern;
 import org.jetbrains.annotations.NotNull;
@@ -38,11 +41,13 @@ import java.awt.Color;
 import java.awt.Component;
 
 /**
- * Based on inspection code ({@link com.intellij.profile.codeInspection.ui.SingleInspectionProfilePanel}).
+ * Based on inspection code ({@link com.intellij.profile.codeInspection.ui.SingleInspectionProfilePanel}) and
+ * plugin table ({@link com.intellij.ide.plugins.PluginsTableRenderer}).
  */
 final class DetectorTable extends TreeTable {
 
 	private BugCategoryPane bugCategory;
+	private DetectorTableHeaderPane headerPane;
 
 	DetectorTable(@NotNull final DetectorModel model) {
 		super(model);
@@ -83,8 +88,11 @@ final class DetectorTable extends TreeTable {
 						}
 					}
 				}
-				label.append(node.toString(), gray ? SimpleTextAttributes.GRAYED_ATTRIBUTES : SimpleTextAttributes.REGULAR_ATTRIBUTES);
-
+				final String text = node.toString();
+				final String filter = headerPane.getFilter();
+				final SimpleTextAttributes attributes = gray ? SimpleTextAttributes.GRAYED_ATTRIBUTES : SimpleTextAttributes.REGULAR_ATTRIBUTES;
+				final Matcher matcher = NameUtil.buildMatcher("*" + filter, NameUtil.MatchingCaseSensitivity.NONE);
+				SpeedSearchUtil.appendColoredFragmentForMatcher(text, label, attributes, matcher, UIUtil.getTableBackground(selected), true);
 				return label;
 			}
 		});
@@ -93,6 +101,10 @@ final class DetectorTable extends TreeTable {
 		isEnabledColumn.setMaxWidth(20 + InspectionsConfigTreeTable.getAdditionalPadding());
 		isEnabledColumn.setCellRenderer(new ThreeStateCheckBoxRenderer());
 		isEnabledColumn.setCellEditor(new ThreeStateCheckBoxRenderer());
+	}
+
+	void setHeaderPane(@NotNull final DetectorTableHeaderPane headerPane) {
+		this.headerPane = headerPane;
 	}
 
 	void setBugCategory(@Nullable final BugCategoryPane bugCategory) {

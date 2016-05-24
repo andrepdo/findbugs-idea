@@ -51,13 +51,17 @@ final class DetectorTableHeaderPane extends JPanel implements Disposable {
 	@NotNull
 	private final DetectorTablePane tablePane;
 
+	@NotNull
+	private final DetectorDetailsPane detailsPane;
+
 	private FilterComponentImpl filterComponent;
 	private FilterHidden filterHidden;
 	private DetectorGroupBy groupBy = DetectorGroupBy.Provider;
 
-	DetectorTableHeaderPane(@NotNull final DetectorTablePane tablePane) {
+	DetectorTableHeaderPane(@NotNull final DetectorTablePane tablePane, @NotNull final DetectorDetailsPane detailsPane) {
 		super(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		this.tablePane = tablePane;
+		this.detailsPane = detailsPane;
 
 		filterComponent = new FilterComponentImpl();
 		final ActionToolbar actionToolbar = createActionToolbar();
@@ -116,6 +120,10 @@ final class DetectorTableHeaderPane extends JPanel implements Disposable {
 			filterComponent.setFilter(filter);
 			filterComponent.filter();
 		}
+	}
+
+	String getFilter() {
+		return filterComponent.getFilter();
 	}
 
 	@Override
@@ -185,6 +193,7 @@ final class DetectorTableHeaderPane extends JPanel implements Disposable {
 		@Override
 		public void filter() {
 			tablePane.reload(true);
+			detailsPane.reload();
 		}
 	}
 
@@ -219,8 +228,17 @@ final class DetectorTableHeaderPane extends JPanel implements Disposable {
 				if (isAccepted(search, filter, detector.getFullName())) {
 					return true;
 				}
+				if (isAccepted(search, filter, detector.getPlugin().getShortDescription())) {
+					return true;
+				}
+				if (isAccepted(search, filter, StringUtil.removeHtmlTags(detector.getDetailHTML()))) {
+					return true;
+				}
 				final Set<BugPattern> patterns = detector.getReportedBugPatterns();
 				for (final BugPattern pattern : patterns) {
+					if (isAccepted(search, filter, pattern.getCategory())) {
+						return true;
+					}
 					if (isAccepted(search, filter, pattern.getType())) {
 						return true;
 					}

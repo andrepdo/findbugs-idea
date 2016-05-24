@@ -104,17 +104,17 @@ final class DetectorTab extends JPanel implements Disposable {
 					getDetails().load(detector);
 				}
 			});
-			tableHeaderPane = new DetectorTableHeaderPane(tablePane);
+			details = new DetectorDetailsPane();
+			tableHeaderPane = new DetectorTableHeaderPane(tablePane, details);
 			tablePane.setHeaderPane(tableHeaderPane);
+			details.setHeaderPane(tableHeaderPane);
 		}
 		return tablePane;
 	}
 
 	@NotNull
 	private DetectorDetailsPane getDetails() {
-		if (details == null) {
-			details = new DetectorDetailsPane();
-		}
+		getTablePane();
 		return details;
 	}
 

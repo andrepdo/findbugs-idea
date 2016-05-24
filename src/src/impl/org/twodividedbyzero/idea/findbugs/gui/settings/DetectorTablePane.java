@@ -29,6 +29,7 @@ import org.twodividedbyzero.idea.findbugs.gui.common.TreeState;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.tree.TreePath;
 import java.awt.BorderLayout;
 import java.util.Map;
 
@@ -58,6 +59,7 @@ final class DetectorTablePane extends JPanel {
 
 	void setHeaderPane(@NotNull final DetectorTableHeaderPane headerPane) {
 		this.headerPane = headerPane;
+		table.setHeaderPane(headerPane);
 	}
 
 	@NotNull
@@ -102,8 +104,10 @@ final class DetectorTablePane extends JPanel {
 		treeState.restore();
 		if (expandAll) {
 			TreeUtil.expandAll(table.getTree());
-			if (table.getTree().getSelectionPath() == null) {
-				TreeUtil.selectFirstNode(table.getTree());
+			final TreePath lastSelected = table.getTree().getSelectionPath();
+			if (lastSelected == null || !(lastSelected.getLastPathComponent() instanceof DetectorNode)) {
+				final TreePath path = TreeUtil.getFirstLeafNodePath(table.getTree());
+				TreeUtil.selectPath(table.getTree(), path);
 			}
 		}
 	}
