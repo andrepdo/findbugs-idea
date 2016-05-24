@@ -307,7 +307,7 @@ final class PluginTablePane extends JPanel {
 		getModel().rows.addAll(pluginLoader.configured);
 		getModel().fireTableDataChanged();
 		if (detectorTablePane != null) {
-			detectorTablePane.reload();
+			detectorTablePane.reload(false);
 		}
 	}
 

@@ -95,10 +95,16 @@ final class DetectorTablePane extends JPanel {
 		treeState.restore();
 	}
 
-	void reload() {
+	void reload(final boolean expandAll) {
 		final Map<String, Map<String, Boolean>> detectors = getRootNode().getEnabledMap();
 		final TreeState treeState = TreeState.create(table.getTree());
 		model.setRoot(DetectorNode.buildRoot(headerPane.getGroupBy(), headerPane.createAcceptor(), detectors));
 		treeState.restore();
+		if (expandAll) {
+			TreeUtil.expandAll(table.getTree());
+			if (table.getTree().getSelectionPath() == null) {
+				TreeUtil.selectFirstNode(table.getTree());
+			}
+		}
 	}
 }

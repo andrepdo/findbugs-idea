@@ -146,7 +146,7 @@ final class DetectorTableHeaderPane extends JPanel implements Disposable {
 		@Override
 		public void setSelected(final AnActionEvent e, final boolean state) {
 			selected = state;
-			tablePane.reload();
+			tablePane.reload(false);
 		}
 	}
 
@@ -163,7 +163,7 @@ final class DetectorTableHeaderPane extends JPanel implements Disposable {
 					@Override
 					public void actionPerformed(final AnActionEvent e) {
 						DetectorTableHeaderPane.this.groupBy = groupBy;
-						tablePane.reload();
+						tablePane.reload(false);
 					}
 				});
 			}
@@ -184,7 +184,7 @@ final class DetectorTableHeaderPane extends JPanel implements Disposable {
 
 		@Override
 		public void filter() {
-			tablePane.reload();
+			tablePane.reload(true);
 		}
 	}
 
