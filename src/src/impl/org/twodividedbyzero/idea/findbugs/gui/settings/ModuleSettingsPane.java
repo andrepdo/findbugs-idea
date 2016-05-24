@@ -20,9 +20,12 @@ package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.components.JBCheckBox;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.core.ModuleSettings;
+import org.twodividedbyzero.idea.findbugs.core.ProjectSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JPanel;
@@ -43,6 +46,27 @@ final class ModuleSettingsPane extends SettingsPane {
 		overrideProjectSettingsCheckbox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
+				if (overrideProjectSettingsCheckbox.isSelected()) {
+					if (Messages.YES == Messages.showYesNoDialog(
+							overrideProjectSettingsCheckbox,
+							ResourcesLoader.getString("settings.module.loadProject.text"),
+							StringUtil.capitalizeWords(ResourcesLoader.getString("settings.module.loadProject.title"), true),
+							Messages.getQuestionIcon()
+					)) {
+						reset(ProjectSettings.getInstance(project));
+					}
+				} else {
+					if (Messages.YES == Messages.showYesNoDialog(
+							overrideProjectSettingsCheckbox,
+							ResourcesLoader.getString("settings.module.reset.text"),
+							StringUtil.capitalizeWords(ResourcesLoader.getString("settings.action.reset.title"), true),
+							Messages.getQuestionIcon()
+					)) {
+						final ModuleSettings settings = new ModuleSettings();
+						reset(settings);
+						resetModule(settings);
+					}
+				}
 				updateControls();
 			}
 		});
@@ -66,7 +90,7 @@ final class ModuleSettingsPane extends SettingsPane {
 
 	@Override
 	void resetModule(@NotNull final ModuleSettings settings) {
-		overrideProjectSettingsCheckbox.setSelected(settings.overrideProjectSettings);
+		overrideProjectSettingsCheckbox.setSelected(settings.overrideProjectSettings); // does not fire action listener
 		updateControls();
 	}
 }

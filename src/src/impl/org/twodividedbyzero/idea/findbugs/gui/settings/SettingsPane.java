@@ -44,6 +44,9 @@ import java.awt.FlowLayout;
 abstract class SettingsPane extends JPanel implements Disposable {
 
 	@NotNull
+	final Project project;
+
+	@NotNull
 	private AdvancedSettingsAction advancedSettingsAction;
 
 	@NotNull
@@ -69,6 +72,7 @@ abstract class SettingsPane extends JPanel implements Disposable {
 
 	SettingsPane(@NotNull final Project project, @Nullable final Module module) {
 		super(new BorderLayout());
+		this.project = project;
 
 		generalTab = new GeneralTab();
 		reportTab = new ReportTab();
@@ -77,7 +81,7 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		annotateTab = new AnnotateTab(project);
 		shareTab = new ShareTab(project, module);
 
-		add(createHeaderPane(project, module), BorderLayout.NORTH);
+		add(createHeaderPane(module), BorderLayout.NORTH);
 
 		/**
 		 * LATER: Switch to TabbedPaneWrapper after
@@ -99,7 +103,7 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	}
 
 	@NotNull
-	private JComponent createHeaderPane(@NotNull final Project project, @Nullable final Module module) {
+	private JComponent createHeaderPane(@Nullable final Module module) {
 		final JPanel topPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		initHeaderPane(topPane);
 		topPane.add(createToolbar(project, module).getComponent());
