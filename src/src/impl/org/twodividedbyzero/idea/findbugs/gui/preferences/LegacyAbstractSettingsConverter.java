@@ -46,7 +46,7 @@ public final class LegacyAbstractSettingsConverter {
 	public static void applyTo(
 			@NotNull final PersistencePreferencesBean from,
 			@NotNull final AbstractSettings to,
-			@NotNull final WorkspaceSettings toWorkspace,
+			@Nullable final WorkspaceSettings toWorkspace,
 			@NotNull final String importFilePathKey
 	) {
 		applyBasePreferencesTo(from, to, toWorkspace, importFilePathKey);
@@ -58,7 +58,7 @@ public final class LegacyAbstractSettingsConverter {
 	private static void applyBasePreferencesTo(
 			@NotNull final PersistencePreferencesBean from,
 			@NotNull final AbstractSettings to,
-			@NotNull final WorkspaceSettings toWorkspace,
+			@Nullable final WorkspaceSettings toWorkspace,
 			@NotNull final String importFilePathKey
 	) {
 
@@ -66,32 +66,35 @@ public final class LegacyAbstractSettingsConverter {
 		if (p == null || p.isEmpty()) {
 			return;
 		}
-		toWorkspace.compileBeforeAnalyze = asBoolean(p.get(FindBugsPreferences.COMPILE_BEFORE_ANALYZE), toWorkspace.compileBeforeAnalyze);
-		toWorkspace.analyzeAfterCompile = asBoolean(p.get(FindBugsPreferences.ANALYZE_AFTER_COMPILE), toWorkspace.analyzeAfterCompile);
-		toWorkspace.analyzeAfterAutoMake = asBoolean(p.get(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE), toWorkspace.analyzeAfterAutoMake);
-		toWorkspace.runInBackground = asBoolean(p.get(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND), toWorkspace.runInBackground);
 
 		to.analysisEffort = asString(p.get(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL), to.analysisEffort);
 		to.minPriority = asString(p.get(FindBugsPreferences.MIN_PRIORITY_TO_REPORT), to.minPriority);
-
-		final String importFilePath = FileUtilFb.toSystemIndependentName(asString(p.get(FindBugsPreferences.IMPORT_FILE_PATH), null));
-		if (!StringUtil.isEmptyOrSpaces(importFilePath)) {
-			toWorkspace.importFilePath.put(importFilePathKey, importFilePath);
-		}
-		toWorkspace.exportBugCollectionDirectory = asString(p.get(FindBugsPreferences.EXPORT_BASE_DIR), toWorkspace.exportBugCollectionDirectory);
-		toWorkspace.exportBugCollectionAsHtml = asBoolean(p.get(FindBugsPreferences.EXPORT_AS_HTML), toWorkspace.exportBugCollectionAsHtml);
-		toWorkspace.exportBugCollectionAsXml = asBoolean(p.get(FindBugsPreferences.EXPORT_AS_XML), toWorkspace.exportBugCollectionAsXml);
-		toWorkspace.exportBugCollectionCreateSubDirectory = asBoolean(p.get(FindBugsPreferences.EXPORT_CREATE_ARCHIVE_DIR), toWorkspace.exportBugCollectionCreateSubDirectory);
-		toWorkspace.openExportedHtmlBugCollectionInBrowser = asBoolean(p.get(FindBugsPreferences.EXPORT_OPEN_BROWSER), toWorkspace.openExportedHtmlBugCollectionInBrowser);
-
-		toWorkspace.toolWindowToFront = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_TO_FRONT), toWorkspace.toolWindowToFront);
-		toWorkspace.toolWindowScrollToSource = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_SCROLL_TO_SOURCE), toWorkspace.toolWindowScrollToSource);
-		toWorkspace.toolWindowEditorPreview = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_EDITOR_PREVIEW), toWorkspace.toolWindowEditorPreview);
-		toWorkspace.toolWindowGroupBy = asString(p.get(FindBugsPreferences.TOOLWINDOW_GROUP_BY), toWorkspace.toolWindowGroupBy);
-
 		to.suppressWarningsClassName = asString(p.get(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS), to.suppressWarningsClassName);
-		toWorkspace.annotationGutterIcon = asBoolean(p.get(FindBugsPreferences.ANNOTATION_GUTTER_ICON_ENABLED), toWorkspace.annotationGutterIcon);
-		toWorkspace.annotationTextRangeMarkup = asBoolean(p.get(FindBugsPreferences.ANNOTATION_TEXT_RAGE_MARKUP_ENABLED), toWorkspace.annotationTextRangeMarkup);
+
+		if (toWorkspace != null) {
+			toWorkspace.compileBeforeAnalyze = asBoolean(p.get(FindBugsPreferences.COMPILE_BEFORE_ANALYZE), toWorkspace.compileBeforeAnalyze);
+			toWorkspace.analyzeAfterCompile = asBoolean(p.get(FindBugsPreferences.ANALYZE_AFTER_COMPILE), toWorkspace.analyzeAfterCompile);
+			toWorkspace.analyzeAfterAutoMake = asBoolean(p.get(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE), toWorkspace.analyzeAfterAutoMake);
+			toWorkspace.runInBackground = asBoolean(p.get(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND), toWorkspace.runInBackground);
+
+			final String importFilePath = FileUtilFb.toSystemIndependentName(asString(p.get(FindBugsPreferences.IMPORT_FILE_PATH), null));
+			if (!StringUtil.isEmptyOrSpaces(importFilePath)) {
+				toWorkspace.importFilePath.put(importFilePathKey, importFilePath);
+			}
+			toWorkspace.exportBugCollectionDirectory = asString(p.get(FindBugsPreferences.EXPORT_BASE_DIR), toWorkspace.exportBugCollectionDirectory);
+			toWorkspace.exportBugCollectionAsHtml = asBoolean(p.get(FindBugsPreferences.EXPORT_AS_HTML), toWorkspace.exportBugCollectionAsHtml);
+			toWorkspace.exportBugCollectionAsXml = asBoolean(p.get(FindBugsPreferences.EXPORT_AS_XML), toWorkspace.exportBugCollectionAsXml);
+			toWorkspace.exportBugCollectionCreateSubDirectory = asBoolean(p.get(FindBugsPreferences.EXPORT_CREATE_ARCHIVE_DIR), toWorkspace.exportBugCollectionCreateSubDirectory);
+			toWorkspace.openExportedHtmlBugCollectionInBrowser = asBoolean(p.get(FindBugsPreferences.EXPORT_OPEN_BROWSER), toWorkspace.openExportedHtmlBugCollectionInBrowser);
+
+			toWorkspace.toolWindowToFront = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_TO_FRONT), toWorkspace.toolWindowToFront);
+			toWorkspace.toolWindowScrollToSource = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_SCROLL_TO_SOURCE), toWorkspace.toolWindowScrollToSource);
+			toWorkspace.toolWindowEditorPreview = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_EDITOR_PREVIEW), toWorkspace.toolWindowEditorPreview);
+			toWorkspace.toolWindowGroupBy = asString(p.get(FindBugsPreferences.TOOLWINDOW_GROUP_BY), toWorkspace.toolWindowGroupBy);
+
+			toWorkspace.annotationGutterIcon = asBoolean(p.get(FindBugsPreferences.ANNOTATION_GUTTER_ICON_ENABLED), toWorkspace.annotationGutterIcon);
+			toWorkspace.annotationTextRangeMarkup = asBoolean(p.get(FindBugsPreferences.ANNOTATION_TEXT_RAGE_MARKUP_ENABLED), toWorkspace.annotationTextRangeMarkup);
+		}
 	}
 
 	private static void applyBugCategoriesTo(@NotNull final PersistencePreferencesBean from, @NotNull final AbstractSettings to) {

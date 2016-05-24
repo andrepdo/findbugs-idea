@@ -59,7 +59,7 @@ public final class LegacyModuleSettings implements PersistentStateComponent<Pers
 		return ModuleServiceManager.getService(module, LegacyModuleSettings.class);
 	}
 
-	void applyTo(@NotNull final ModuleSettings settings, @NotNull final WorkspaceSettings workspaceSettings) {
+	void applyTo(@NotNull final ModuleSettings settings, @Nullable final WorkspaceSettings workspaceSettings) {
 		if (state == null) {
 			return;
 		}

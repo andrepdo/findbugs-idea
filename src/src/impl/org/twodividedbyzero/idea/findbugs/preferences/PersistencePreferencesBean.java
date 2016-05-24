@@ -27,13 +27,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
- * @since 0.9.90-dev
+ * Legacy. Do not use this anymore. This will be converted by {@link org.twodividedbyzero.idea.findbugs.gui.preferences.LegacyProjectSettingsConverter}.
  */
-@Deprecated
 public class PersistencePreferencesBean {
 	public static final String PERSISTENCE_ROOT_NAME = "findbugs";
 

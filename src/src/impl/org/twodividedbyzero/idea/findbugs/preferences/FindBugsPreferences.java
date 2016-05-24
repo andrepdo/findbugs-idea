@@ -49,16 +49,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-
 /**
- * $Date$
- *
- * @author Andre Pfeiler<andrepdo@dev.java.net>
- * @since 0.9.9
+ * Legacy. Do not use this anymore. This will be converted by {@link org.twodividedbyzero.idea.findbugs.gui.preferences.LegacyProjectSettingsConverter}.
  */
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"SE_TRANSIENT_FIELD_NOT_RESTORED"})
 @SuppressWarnings({"HardCodedStringLiteral", "AssignmentToCollectionOrArrayFieldFromParameter"})
-@Deprecated
 public class FindBugsPreferences extends Properties {
 
 	private static final long serialVersionUID = 3L;

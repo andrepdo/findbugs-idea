@@ -18,6 +18,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -58,7 +59,7 @@ public final class LegacyProjectSettingsConverter extends AbstractProjectCompone
 				if (legacyModuleSettings != null) {
 					final ModuleSettings currentModule = ModuleSettings.getInstance(module);
 					if (enabledModuleConfigs.contains(module.getName())) {
-						legacyModuleSettings.applyTo(currentModule, currentWorkspace);
+						legacyModuleSettings.applyTo(currentModule, null);
 						currentModule.overrideProjectSettings = true;
 					}
 				}
@@ -69,5 +70,7 @@ public final class LegacyProjectSettingsConverter extends AbstractProjectCompone
 		final ProjectSettings current = ProjectSettings.getInstance(myProject);
 		legacy.applyTo(current, currentWorkspace);
 
+		// persist changes immediately
+		ApplicationManager.getApplication().saveAll();
 	}
 }
