@@ -122,8 +122,12 @@ final class DetectorTableHeaderPane extends JPanel implements Disposable {
 		}
 	}
 
+	@Nullable
 	String getFilter() {
-		return filterComponent.getFilter();
+		if (filterComponent != null) {
+			return filterComponent.getFilter();
+		}
+		return null;
 	}
 
 	@Override
