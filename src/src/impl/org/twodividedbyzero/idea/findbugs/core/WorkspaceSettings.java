@@ -36,7 +36,7 @@ import java.util.Map;
 
 @State(
 		name = "FindBugs-IDEA-Workspace",
-		storages = {@Storage(StoragePathMacros.WORKSPACE_FILE)}
+		storages = {@Storage(file /*IDEA 2016: switch to value()*/ = StoragePathMacros.WORKSPACE_FILE)}
 )
 public final class WorkspaceSettings implements PersistentStateComponent<WorkspaceSettings> {
 

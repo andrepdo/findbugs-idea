@@ -94,7 +94,8 @@
             <li>Issue 115: Analyze per module</li>
             <li>Issue 116: Compile before run analyze (enabled by default)</li>
             <li>Issue 10, 111, 117: Minor fixes, cleanups and improvements</li>
-            <li>Plugin compatibility: IDEA 2016.1.2 (145.971)</li>
+            <li>Plugin compatibility: IDEA 15, IDEA 2016</li>
+            <li>Note that IDEA 13 and 14 is no longer supported</li>
         </ul>
         <h3>0.9.997</h3>
         <ul>
@@ -286,7 +287,7 @@
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html
          -->
-    <idea-version since-build="133.193"/>
+    <idea-version since-build="143"/>
 
     <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
