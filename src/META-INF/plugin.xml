@@ -89,11 +89,14 @@
         <h3>0.9.998</h3>
         <ul>
             <li>Issue 48, 108, 114, 118: UI settings rewrite</li>
+            <li>Note that the settings format was changed. The old format is still supported.</li>
             <li>Issue 68: Introduce custom error report submitter</li>
             <li>Issue 106: Improved error handling/feedback</li>
             <li>Issue 115: Analyze per module</li>
             <li>Issue 116: Compile before run analyze (enabled by default)</li>
             <li>Issue 10, 111, 117: Minor fixes, cleanups and improvements</li>
+            <li>Update bundled custom plugins: fb-contrib 6.6.1 and find-sec-bugs 1.4.4</li>
+            <li>Note that IDEA must run with >= JRE 1.7 to use fb-contrib 6.6.1</li>
             <li>Plugin compatibility: IDEA 15, IDEA 2016</li>
             <li>Note that IDEA 13 and 14 is no longer supported</li>
         </ul>

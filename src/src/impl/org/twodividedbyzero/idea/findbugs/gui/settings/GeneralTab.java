@@ -129,17 +129,17 @@ final class GeneralTab extends JPanel {
 	static String[] getSearchTexts() {
 		return new String[]{
 
-				Plugins.fb_contrib_6_2_1.id,
+				Plugins.fb_contrib.id,
 				"fb-contrib plugin",
 				"This plugin contains FindBugs detectors from the fb-contrib project",
 				"http://fb-contrib.sourceforge.net",
 
-				Plugins.findsecbugs_plugin_1_4_1.id,
+				Plugins.findsecbugs_plugin.id,
 				"Find Security Bugs",
 				"Find Security Bugs is a plugin that aims to help security audit.",
 				"https://github.com/h3xstream/find-sec-bugs",
 
-				Plugins.AndroidFindbugs_0_5.id,
+				Plugins.AndroidFindbugs.id,
 				"Findbugs plugin for Android",
 				"This plugin consist of FindBugs detectors for Android coding"
 		};

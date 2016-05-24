@@ -164,9 +164,9 @@ public final class LegacyAbstractSettingsConverter {
 
 		// bundled plugins and detectors
 		for (final String bundledPluginId : new String[]{
-				Plugins.AndroidFindbugs_0_5.id,
-				Plugins.fb_contrib_6_2_1.id,
-				Plugins.findsecbugs_plugin_1_4_1.id
+				Plugins.AndroidFindbugs.id,
+				Plugins.fb_contrib.id,
+				Plugins.findsecbugs_plugin.id
 		}) {
 			final boolean enabled = from.getEnabledBundledPluginIds() != null && from.getEnabledBundledPluginIds().contains(bundledPluginId);
 			final PluginSettings pluginSettings = new PluginSettings();

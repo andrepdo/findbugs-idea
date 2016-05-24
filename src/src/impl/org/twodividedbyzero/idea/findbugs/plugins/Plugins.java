@@ -33,13 +33,14 @@ import java.math.BigDecimal;
 public enum Plugins {
 
 	// https://code.google.com/p/findbugs-for-android/
-	AndroidFindbugs_0_5("AndroidFindbugs_0.5.jar", "jp.f.dev.findbugs.detect.android", true),
+	AndroidFindbugs("AndroidFindbugs_0.5.jar", "jp.f.dev.findbugs.detect.android", true),
 
 	// http://fb-contrib.sourceforge.net/
-	fb_contrib_6_2_1("fb-contrib-6.2.1.jar", "com.mebigfatguy.fbcontrib", false, "fb-contrib-6.0.0.jar", "fb-contrib-5.2.1.jar"),
+	fb_contrib("fb-contrib-6.6.1.jar", "com.mebigfatguy.fbcontrib", true, "fb-contrib-6.2.1.jar", "fb-contrib-6.0.0.jar", "fb-contrib-5.2.1.jar"),
+	fb_contrib_java6("fb-contrib-6.2.1.jar", "com.mebigfatguy.fbcontrib", false, "fb-contrib-6.0.0.jar", "fb-contrib-5.2.1.jar"),
 
 	// http://h3xstream.github.io/find-sec-bugs/
-	findsecbugs_plugin_1_4_1("findsecbugs-plugin-1.4.1.jar", "com.h3xstream.findsecbugs", false, "findsecbugs-plugin-1.4.0.jar", "findsecbugs-plugin-1.3.0.jar", "findsecbugs-plugin-1.2.1.jar", "findsecbugs-plugin-1.2.0.jar");
+	findsecbugs_plugin("findsecbugs-plugin-1.4.4.jar", "com.h3xstream.findsecbugs", false, "findsecbugs-plugin-1.4.1.jar", "findsecbugs-plugin-1.4.0.jar", "findsecbugs-plugin-1.3.0.jar", "findsecbugs-plugin-1.2.1.jar", "findsecbugs-plugin-1.2.0.jar");
 
 	private static final Logger LOGGER = Logger.getInstance(Plugins.class.getName());
 
@@ -66,7 +67,6 @@ public enum Plugins {
 		_legacyJarNames = legacyJarNames;
 	}
 
-
 	@NotNull
 	private static File findAccessibleFindBugsIdeaPluginPath(@NotNull final IdeaPluginDescriptor pluginDescriptor) {
 		File ret = pluginDescriptor.getPath();
@@ -88,7 +88,6 @@ public enum Plugins {
 		return ret;
 	}
 
-
 	@NotNull
 	public static File getDirectory(@NotNull final IdeaPluginDescriptor pluginDescriptor) {
 		final File homeDir = findAccessibleFindBugsIdeaPluginPath(pluginDescriptor);
@@ -101,10 +100,11 @@ public enum Plugins {
 		return dir;
 	}
 
-
 	public static void deploy(@NotNull final IdeaPluginDescriptor plugin) {
-		final boolean isJava7OrLater = isJava7OrLater();
+
 		final File dir = getDirectory(plugin);
+
+		// first delete all legacy
 		for (final Plugins customPlugin : values()) {
 			for (final String legacyJarName : customPlugin._legacyJarNames) {
 				final File legacyJar = new File(dir, legacyJarName);
@@ -114,6 +114,18 @@ public enum Plugins {
 					}
 				}
 			}
+		}
+
+		// deploy new
+		final boolean isJava7OrLater = isJava7OrLater();
+		for (final Plugins customPlugin : values()) {
+
+			if (Plugins.fb_contrib_java6.equals(customPlugin)) {
+				if (isJava7OrLater()) {
+					continue; // use new fb-contrib version
+				}
+			}
+
 			final File jar = new File(dir, customPlugin._jarName);
 			if (customPlugin._needsJava7OrLater && !isJava7OrLater) {
 				if (jar.exists()) {
@@ -128,7 +140,6 @@ public enum Plugins {
 			}
 		}
 	}
-
 
 	private static void deployImpl(@NotNull final File file, @NotNull final Plugins plugin) {
 		final InputStream in = Plugins.class.getResourceAsStream(plugin._jarName);
@@ -149,7 +160,7 @@ public enum Plugins {
 		}
 	}
 
-
+	// IDEA 2016 needs at least JRE 1.8 or higher, so we can kick this if IDEA 15 support is gone.
 	private static boolean isJava7OrLater() {
 		final BigDecimal current = new BigDecimal(System.getProperty("java.specification.version"));
 		return current.compareTo(new BigDecimal("1.7")) >= 0;

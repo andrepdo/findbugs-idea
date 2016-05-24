@@ -63,7 +63,7 @@ final class PluginSuggestion {
 		if (!NotificationUtil.isGroupEnabled(FindBugsPluginImpl.NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION)) {
 			return;
 		}
-		if (isPluginEnabled(Plugins.AndroidFindbugs_0_5.id, preferences)) {
+		if (isPluginEnabled(Plugins.AndroidFindbugs.id, preferences)) {
 			return;
 		}
 		final Set<Suggestion> suggestions = collectSuggestions(project, preferences);
@@ -188,10 +188,10 @@ final class PluginSuggestion {
 		for (final Facet facet : facets) {
 			facetTypeId = facet.getTypeId();
 			if (facetTypeId != null) {
-				if (!isPluginEnabled(Plugins.AndroidFindbugs_0_5.id, preferences)) {
+				if (!isPluginEnabled(Plugins.AndroidFindbugs.id, preferences)) {
 					if ("AndroidFacetType".equals(facetTypeId.getClass().getSimpleName()) ||
 							"android".equalsIgnoreCase(facetTypeId.toString())) {
-						suggestions.add(new Suggestion(Plugins.AndroidFindbugs_0_5.id, "Android FindBugs"));
+						suggestions.add(new Suggestion(Plugins.AndroidFindbugs.id, "Android FindBugs"));
 					}
 				}
 			}
