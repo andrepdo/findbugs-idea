@@ -77,7 +77,7 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		annotateTab = new AnnotateTab(project);
 		shareTab = new ShareTab(project, module);
 
-		add(createHeaderPane(module), BorderLayout.NORTH);
+		add(createHeaderPane(project, module), BorderLayout.NORTH);
 
 		/**
 		 * LATER: Switch to TabbedPaneWrapper after
@@ -99,10 +99,10 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	}
 
 	@NotNull
-	private JComponent createHeaderPane(@Nullable final Module module) {
+	private JComponent createHeaderPane(@NotNull final Project project, @Nullable final Module module) {
 		final JPanel topPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		initHeaderPane(topPane);
-		topPane.add(createToolbar(module).getComponent());
+		topPane.add(createToolbar(project, module).getComponent());
 		topPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
 		return topPane;
 	}
@@ -111,8 +111,8 @@ abstract class SettingsPane extends JPanel implements Disposable {
 	}
 
 	@NotNull
-	private ActionToolbar createToolbar(@Nullable final Module module) {
-		advancedSettingsAction = new AdvancedSettingsAction(this, module);
+	private ActionToolbar createToolbar(@NotNull final Project project, @Nullable final Module module) {
+		advancedSettingsAction = new AdvancedSettingsAction(this, project, module);
 		final ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, advancedSettingsAction, true);
 		actionToolbar.setTargetComponent(this);
 		return actionToolbar;

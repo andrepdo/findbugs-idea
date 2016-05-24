@@ -19,6 +19,7 @@
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.actions.ShowFilePathAction;
 import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -51,6 +52,7 @@ import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.Icon;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -59,11 +61,19 @@ final class AdvancedSettingsAction extends DefaultActionGroup {
 	@NotNull
 	private final SettingsPane settingsPane;
 
+	@NotNull
+	private final Project project;
+
 	private boolean enabled;
 
-	AdvancedSettingsAction(@NotNull final SettingsPane settingsPane, @Nullable final Module module) {
+	AdvancedSettingsAction(
+			@NotNull final SettingsPane settingsPane,
+			@NotNull final Project project,
+			@Nullable final Module module
+	) {
 		super("Advanced Settings", true);
 		this.settingsPane = settingsPane;
+		this.project = project;
 		this.enabled = true;
 		getTemplatePresentation().setIcon(AllIcons.General.GearPlain);
 		add(new ResetToDefault());
@@ -185,7 +195,15 @@ final class AdvancedSettingsAction extends DefaultActionGroup {
 			Element root = new Element("findbugs");
 			new SmartSerializer().writeExternal(settings, root, false);
 			try {
-				JDOMUtil.writeDocument(new Document(root), wrapper.getFile(), "\n");
+				final File file = wrapper.getFile();
+				JDOMUtil.writeDocument(new Document(root), file, "\n");
+				ShowFilePathAction.showDialog(
+						project,
+						ResourcesLoader.getString("settings.export.success.text"),
+						StringUtil.capitalizeWords(ResourcesLoader.getString("settings.export.success.title"), true),
+						file,
+						null
+				);
 			} catch (final IOException ex) {
 				throw ErrorUtil.toUnchecked(ex);
 			}
