@@ -97,7 +97,7 @@
             <li>Issue 10, 111, 117: Minor fixes, cleanups and improvements</li>
             <li>Update bundled custom plugins: fb-contrib 6.6.1 and find-sec-bugs 1.4.4</li>
             <li>Note that IDEA must run with >= JRE 1.7 to use fb-contrib 6.6.1</li>
-            <li>Plugin compatibility: IDEA 15, IDEA 2016</li>
+            <li>Plugin compatibility: IDEA 15, IDEA 2016, Android Studio 2.1</li>
             <li>Note that IDEA 13 and 14 is no longer supported</li>
         </ul>
         <h3>0.9.997</h3>
