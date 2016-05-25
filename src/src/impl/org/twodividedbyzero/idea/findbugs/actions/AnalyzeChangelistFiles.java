@@ -103,7 +103,7 @@ public final class AnalyzeChangelistFiles extends AbstractAnalyzeAction {
 		new FindBugsStarter(project, "Running FindBugs analysis for changelist(s) '" + sb.toString() + "'...") {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
-				consumer.consume(createFilesCompileScope(files));
+				consumer.consume(createFilesCompileScope(compilerManager, files));
 			}
 
 			@Override

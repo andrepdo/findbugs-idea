@@ -18,8 +18,11 @@
  */
 package org.twodividedbyzero.idea.findbugs.core;
 
-import com.intellij.compiler.impl.CompositeScope;
-import com.intellij.compiler.impl.OneProjectItemCompileScope;
+import com.intellij.compiler.options.CompileStepBeforeRun;
+import com.intellij.execution.RunManager;
+import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.execution.configurations.RunConfiguration;
+import com.intellij.facet.FacetManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.compiler.CompileContext;
 import com.intellij.openapi.compiler.CompileScope;
@@ -27,9 +30,11 @@ import com.intellij.openapi.compiler.CompileStatusNotification;
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Pair;
@@ -51,6 +56,7 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 import org.twodividedbyzero.idea.findbugs.messages.AnalysisAbortingListener;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
@@ -62,6 +68,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class FindBugsStarter implements AnalysisAbortingListener {
@@ -120,12 +127,21 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 				@Override
 				public void consume(@Nullable final CompileScope compileScope) {
 					if (compileScope != null) {
+						finalizeCompileScope(compileScope);
 						compilerManager.make(compileScope, new CompileStatusNotification() {
 							@Override
 							public void finished(final boolean aborted, final int errors, final int warnings, final CompileContext compileContext) {
 								if (!aborted && errors == 0 && !isAnalyzeAfterCompile) {
 									EventDispatchThreadHelper.checkEDT(); // see javadoc of CompileStatusNotification
-									startImpl(true);
+									// Compiler can cause dumb mode, and finished() is invoked inside.
+									// We need to continue outside dumb mode to make activateToolWindow work f. e.
+									DumbService.getInstance(project).runWhenSmart(new Runnable() {
+										@Override
+										public void run() {
+											EventDispatchThreadHelper.checkEDT();
+											startImpl(true);
+										}
+									});
 								}
 							}
 						});
@@ -141,11 +157,14 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		MessageBusManager.publishAnalysisStarted(project);
 
 		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
+		/**
+		 * Important: Make sure the tool window is initialized.
+		 * This call is to important to make it just in case of false = toolWindowToFront
+		 * because we have no guarantee that activateToolWindow works.
+		 */
+		((ToolWindowImpl) toolWindow).ensureContentInitialized();
 		if (workspaceSettings.toolWindowToFront) {
 			IdeaUtilImpl.activateToolWindow(toolWindow);
-		} else {
-			// Important: Make sure the tool window is initialized.
-			((ToolWindowImpl) toolWindow).ensureContentInitialized();
 		}
 
 		new Task.Backgroundable(project, _title, true) {
@@ -311,15 +330,64 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 
 	protected abstract void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer);
 
-	// like CompilerManagerImpl#createFilesCompileScope but Collection based
 	@NotNull
-	protected final CompileScope createFilesCompileScope(@NotNull final Collection<VirtualFile> files) {
-		final CompileScope[] scopes = new CompileScope[files.size()];
-		int i = 0;
-		for (final VirtualFile file : files) {
-			scopes[i++] = new OneProjectItemCompileScope(project, file);
+	protected final CompileScope createFilesCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Collection<VirtualFile> files) {
+		return createFilesCompileScope(compilerManager, files.toArray(VirtualFile.EMPTY_ARRAY));
+	}
+
+	@NotNull
+	protected final CompileScope createFilesCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final VirtualFile[] files) {
+		final CompileScope facetsCompileScope = createFacetsCompileScope(compilerManager, files);
+		if (facetsCompileScope != null) {
+			return facetsCompileScope;
 		}
-		return new CompositeScope(scopes);
+		return compilerManager.createFilesCompileScope(files);
+	}
+
+	/**
+	 * It seems that createFilesCompileScope does not work in all environments, at least with Android, see
+	 * https://intellij-support.jetbrains.com/hc/en-us/community/posts/207521525-CompilerManager-make-does-not-all-tasks-in-case-of-a-Android-module-project
+	 * <p>
+	 * We choose a very defensive solution and use createModulesCompileScope when we detect a facet.
+	 */
+	@Nullable
+	private CompileScope createFacetsCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final VirtualFile[] files) {
+		final Set<Module> modules = New.set();
+		boolean facetsFound = false;
+		for (final VirtualFile file : files) {
+			final Module module = ModuleUtilCore.findModuleForFile(file, project);
+			if (module != null) {
+				modules.add(module);
+				if (!facetsFound) {
+					facetsFound = hasFacets(module);
+				}
+			}
+		}
+		if (facetsFound) {
+			return compilerManager.createModulesCompileScope(modules.toArray(Module.EMPTY_ARRAY), true, true);
+		}
+		return null;
+	}
+
+	/**
+	 * Depend on selected configuration is creepy but no other way to make it work with Android, see
+	 * https://intellij-support.jetbrains.com/hc/en-us/community/posts/207521525-CompilerManager-make-does-not-all-tasks-in-case-of-a-Android-module-project
+	 * <p>
+	 * Maybe, sometime, we should make this more clever and search for the best configuration instead of just use the selected.
+	 */
+	private void finalizeCompileScope(@NotNull final CompileScope compileScope) {
+		final RunnerAndConfigurationSettings runnerAndConfigurationSettings = RunManager.getInstance(project).getSelectedConfiguration();
+		if (runnerAndConfigurationSettings != null) {
+			final RunConfiguration runConfiguration = runnerAndConfigurationSettings.getConfiguration();
+			if (runConfiguration != null) {
+				compileScope.putUserData(CompileStepBeforeRun.RUN_CONFIGURATION, runConfiguration);
+				compileScope.putUserData(CompileStepBeforeRun.RUN_CONFIGURATION_TYPE_ID, runConfiguration.getType().getId());
+			}
+		}
+	}
+
+	protected final boolean hasFacets(@NotNull final Module module) {
+		return FacetManager.getInstance(module).getAllFacets().length > 0;
 	}
 
 	protected abstract boolean configure(

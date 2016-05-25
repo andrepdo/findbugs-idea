@@ -74,7 +74,7 @@ public final class AnalyzeAllModifiedFiles extends AbstractAnalyzeAction {
 		new FindBugsStarter(project, "Running FindBugs analysis for modified files...") {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
-				consumer.consume(createFilesCompileScope(modifiedFiles));
+				consumer.consume(createFilesCompileScope(compilerManager, modifiedFiles));
 			}
 
 			@Override

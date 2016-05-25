@@ -74,7 +74,7 @@ public final class AnalyzeClassUnderCursor extends AbstractAnalyzeAction {
 		new FindBugsStarter(project, "Running FindBugs analysis for current class...") {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
-				consumer.consume(compilerManager.createFilesCompileScope(new VirtualFile[]{selectedFile}));
+				consumer.consume(createFilesCompileScope(compilerManager, new VirtualFile[]{selectedFile}));
 			}
 
 			@Override

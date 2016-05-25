@@ -84,10 +84,18 @@ public final class AnalyzeProjectFiles extends AbstractAnalyzeAction {
 					}
 					final VirtualFile compilerOutputPath = extension.getCompilerOutputPath();
 					if (compilerOutputPath == null) {
-						showWarning(ResourcesLoader.getString("analysis.moduleNotCompiled", module.getName()));
-						return false;
+						if (!hasFacets(module)) {
+							showWarning(ResourcesLoader.getString("analysis.moduleNotCompiled", module.getName()));
+							return false;
+						} // maybe this is module is used only to specify a facet
+					} else {
+						compilerOutputPaths.put(module, compilerOutputPath);
 					}
-					compilerOutputPaths.put(module, compilerOutputPath);
+				}
+
+				if (compilerOutputPaths.isEmpty()) {
+					showWarning(ResourcesLoader.getString("analysis.noOutputPaths"));
+					return false;
 				}
 
 				indicator.setText("Collecting files for analysis...");
