@@ -72,4 +72,8 @@ public final class ModuleConfigurableImpl extends AbstractConfigurableImpl<Modul
 		 */
 		showShareImpl(module.getProject(), new ModuleConfigurableImpl(module));
 	}
+
+	public static void showFileFilterAndAddRFilerFilter(@NotNull final Module module) {
+		showFileFilterAndAddRFilerFilterImpl(module.getProject(), new ModuleConfigurableImpl(module));
+	}
 }

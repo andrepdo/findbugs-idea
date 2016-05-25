@@ -193,6 +193,11 @@ abstract class SettingsPane extends JPanel implements Disposable {
 		shareTab.requestFocusOnImportFile();
 	}
 
+	void showFileFilterAndAddRFilerFilter() {
+		tabs.setSelectedComponent(filterTab);
+		filterTab.addRFilerFilter();
+	}
+
 	void setProjectSettingsEnabled(final boolean enabled) {
 		advancedSettingsAction.setEnabled(enabled);
 		generalTab.setProjectSettingsEnabled(enabled);

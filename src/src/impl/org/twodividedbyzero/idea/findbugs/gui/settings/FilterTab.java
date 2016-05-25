@@ -18,8 +18,15 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
+import com.intellij.ide.highlighter.XmlFileType;
+import com.intellij.openapi.fileChooser.FileChooserFactory;
+import com.intellij.openapi.fileChooser.FileSaverDescriptor;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.VirtualFileWrapper;
+import com.yourkit.util.FileUtil;
 import org.jetbrains.annotations.NotNull;
+import org.twodividedbyzero.idea.findbugs.common.util.ErrorUtil;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
@@ -27,6 +34,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
+import java.io.File;
 
 final class FilterTab extends JPanel implements SettingsOwner<AbstractSettings> {
 	private FilterPane include;
@@ -77,6 +85,36 @@ final class FilterTab extends JPanel implements SettingsOwner<AbstractSettings> 
 		include.reset(settings.includeFilterFiles);
 		exclude.reset(settings.excludeFilterFiles);
 		bugs.reset(settings.excludeBugsFiles);
+	}
+
+	void addRFilerFilter() {
+		final VirtualFileWrapper wrapper = FileChooserFactory.getInstance().createSaveFileDialog(
+				new FileSaverDescriptor(
+						StringUtil.capitalizeWords(ResourcesLoader.getString("filter.rFile.save.title"), true),
+						ResourcesLoader.getString("filter.rFile.save.text"),
+						XmlFileType.DEFAULT_EXTENSION
+				), this).save(null, "findbugs-android-exclude");
+		if (wrapper == null) {
+			return;
+		}
+
+		final File file = wrapper.getFile();
+		try {
+			FileUtil.writeFileContentAsUtf8(file, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+					"<FindBugsFilter>\n" +
+					"    <!-- http://stackoverflow.com/questions/7568579/eclipsefindbugs-exclude-filter-files-doesnt-work -->\n" +
+					"    <Match>\n" +
+					"        <Class name=\"~.*\\.R\\$.*\"/>\n" +
+					"    </Match>\n" +
+					"    <Match>\n" +
+					"    <Class name=\"~.*\\.Manifest\\$.*\"/>\n" +
+					"    </Match>\n" +
+					"</FindBugsFilter>");
+
+			exclude.addFile(file);
+		} catch (final Exception e) {
+			throw ErrorUtil.toUnchecked(e);
+		}
 	}
 
 	@NotNull

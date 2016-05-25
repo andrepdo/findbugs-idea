@@ -18,29 +18,27 @@
  */
 package org.twodividedbyzero.idea.findbugs.core;
 
-import com.intellij.CommonBundle;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetTypeId;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
-import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.android.AndroidUtil;
+import org.twodividedbyzero.idea.findbugs.android.RFilerFilterSuggestion;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.gui.common.NotificationUtil;
 import org.twodividedbyzero.idea.findbugs.gui.settings.ModuleConfigurableImpl;
 import org.twodividedbyzero.idea.findbugs.gui.settings.ProjectConfigurableImpl;
 import org.twodividedbyzero.idea.findbugs.plugins.Plugins;
 
-import javax.swing.event.HyperlinkEvent;
 import java.util.Set;
 
 public final class PluginSuggestion extends AbstractProjectComponent {
@@ -48,14 +46,17 @@ public final class PluginSuggestion extends AbstractProjectComponent {
 	private static final String NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION = "FindBugs: Plugin Suggestion";
 	private static final NotificationGroup NOTIFICATION_GROUP_PLUGIN_SUGGESTION = new NotificationGroup(NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION, NotificationDisplayType.STICKY_BALLOON, false);
 
-	private static final String A_HREF_DISABLE_ANCHOR = "#disable";
-
 	public PluginSuggestion(@NotNull final Project project) {
 		super(project);
 	}
 
 	@Override
 	public void projectOpened() {
+		suggestPlugins();
+		new RFilerFilterSuggestion(myProject).suggest();
+	}
+
+	private void suggestPlugins() {
 		final ProjectSettings settings = ProjectSettings.getInstance(myProject);
 		if (!NotificationUtil.isGroupEnabled(NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION)) {
 			return;
@@ -111,47 +112,25 @@ public final class PluginSuggestion extends AbstractProjectComponent {
 			}
 			sb.append("<br>");
 		}
-		sb.append("<br><a href='").append(A_HREF_DISABLE_ANCHOR).append("'>Disable Suggestion</a>");
+		sb.append("<br><a href='").append(AbstractSuggestionNotificationListener.A_HREF_DISABLE_ANCHOR).append("'>Disable Suggestion</a>");
 
 		NOTIFICATION_GROUP_PLUGIN_SUGGESTION.createNotification(
 				"FindBugs Plugin Suggestion",
 				sb.toString(),
 				NotificationType.INFORMATION,
-				new NotificationListener() {
+				new AbstractSuggestionNotificationListener(project, NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION) {
 					@Override
-					public void hyperlinkUpdate(@NotNull final Notification notification, @NotNull final HyperlinkEvent event) {
-						if (event.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
-							final String desc = event.getDescription();
-							if (desc.equals(A_HREF_DISABLE_ANCHOR)) {
-								final int result = Messages.showYesNoDialog(
-										project,
-										"Notification will be disabled for all projects.\n\n" +
-												"Settings | Appearance & Behavior | Notifications | " +
-												NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION +
-												"\ncan be used to configure the notification.",
-										"FindBugs Plugin Suggestion Notification",
-										"Disable Notification", CommonBundle.getCancelButtonText(), Messages.getWarningIcon());
-								if (result == Messages.YES) {
-									NotificationUtil.getNotificationsConfigurationImpl().changeSettings(
-											NOTIFICATION_GROUP_ID_PLUGIN_SUGGESTION,
-											NotificationDisplayType.NONE, false, false);
-									notification.expire();
-								} else {
-									notification.hideBalloon();
-								}
-							} else {
-								Suggestion suggestion = suggestions.iterator().next();
-								for (final Suggestion s : suggestions) {
-									if (suggestion.pluginId.equals(desc)) {
-										suggestion = s;
-										break;
-									}
-								}
-								enablePlugin(project, suggestion.module, suggestion.moduleSettingsOverrideProjectSettings);
-								if (suggestions.size() == 1) {
-									notification.hideBalloon();
-								}
+					protected void linkClicked(@NotNull final Notification notification, String description) {
+						Suggestion suggestion = suggestions.iterator().next();
+						for (final Suggestion s : suggestions) {
+							if (suggestion.pluginId.equals(description)) {
+								suggestion = s;
+								break;
 							}
+						}
+						enablePlugin(project, suggestion.module, suggestion.moduleSettingsOverrideProjectSettings);
+						if (suggestions.size() == 1) {
+							notification.hideBalloon();
 						}
 					}
 				}
@@ -200,8 +179,7 @@ public final class PluginSuggestion extends AbstractProjectComponent {
 				if (!isAndroidFindbugsPluginEnabled(projectSettings)) {
 					final ModuleSettings moduleSettings = ModuleSettings.getInstance(module);
 					if (!moduleSettings.overrideProjectSettings || !isAndroidFindbugsPluginEnabled(moduleSettings)) {
-						if ("AndroidFacetType".equals(facetTypeId.getClass().getSimpleName()) ||
-								"android".equalsIgnoreCase(facetTypeId.toString())) {
+						if (AndroidUtil.isAndroidFacetType(facetTypeId)) {
 							suggestions.add(new Suggestion(Plugins.AndroidFindbugs.id, "Android FindBugs", module, moduleSettings.overrideProjectSettings));
 						}
 					}

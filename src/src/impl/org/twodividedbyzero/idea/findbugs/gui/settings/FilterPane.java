@@ -133,7 +133,7 @@ final class FilterPane extends JPanel {
 		if (files.length > 0) {
 			for (final VirtualFile virtualFile : files) {
 				final File file = VfsUtilCore.virtualToIoFile(virtualFile);
-				getModel().rows.add(new Item(FileUtil.toSystemIndependentName(file.getAbsolutePath()), true));
+				addFileImpl(file);
 			}
 			getModel().fireTableDataChanged();
 		}
@@ -155,6 +155,15 @@ final class FilterPane extends JPanel {
 	public void setEnabled(final boolean enabled) {
 		super.setEnabled(enabled);
 		table.setEnabled(enabled);
+	}
+
+	private void addFileImpl(@NotNull final File file) {
+		getModel().rows.add(new Item(FileUtil.toSystemIndependentName(file.getAbsolutePath()), true));
+	}
+
+	void addFile(@NotNull final File file) {
+		addFileImpl(file);
+		getModel().fireTableDataChanged();
 	}
 
 	boolean isModified(@NotNull final Map<String, Boolean> map) {

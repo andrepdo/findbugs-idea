@@ -107,6 +107,11 @@ abstract class AbstractConfigurableImpl<V extends AbstractSettings> implements C
 		pane.requestFocusOnShareImportFile();
 	}
 
+	private void showFileFilterAndAddRFilerFilter() {
+		createComponent();
+		pane.showFileFilterAndAddRFilerFilter();
+	}
+
 	static void showImpl(@NotNull final Project project, @NotNull final AbstractConfigurableImpl configurable, @Nullable final Runnable advancedInitialization) {
 		ShowSettingsUtil.getInstance().editConfigurable(project, configurable, advancedInitialization);
 	}
@@ -116,6 +121,15 @@ abstract class AbstractConfigurableImpl<V extends AbstractSettings> implements C
 			@Override
 			public void run() {
 				configurable.requestFocusOnShareImportFile();
+			}
+		});
+	}
+
+	static void showFileFilterAndAddRFilerFilterImpl(@NotNull final Project project, @NotNull final AbstractConfigurableImpl configurable) {
+		showImpl(project, configurable, new Runnable() {
+			@Override
+			public void run() {
+				configurable.showFileFilterAndAddRFilerFilter();
 			}
 		});
 	}

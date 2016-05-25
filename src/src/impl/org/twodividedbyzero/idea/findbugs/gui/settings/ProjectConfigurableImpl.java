@@ -87,4 +87,8 @@ public final class ProjectConfigurableImpl extends AbstractConfigurableImpl<Proj
 		 */
 		showShareImpl(project, new ProjectConfigurableImpl(project));
 	}
+
+	public static void showFileFilterAndAddRFilerFilter(@NotNull final Project project) {
+		showFileFilterAndAddRFilerFilterImpl(project, new ProjectConfigurableImpl(project));
+	}
 }
