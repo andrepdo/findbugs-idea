@@ -83,12 +83,11 @@ public final class AnalyzeProjectFiles extends AbstractAnalyzeAction {
 						throw new IllegalStateException("No compiler extension for module " + module.getName());
 					}
 					final VirtualFile compilerOutputPath = extension.getCompilerOutputPath();
-					if (compilerOutputPath == null) {
-						if (!hasFacets(module)) {
-							showWarning(ResourcesLoader.getString("analysis.moduleNotCompiled", module.getName()));
-							return false;
-						} // maybe this is module is used only to specify a facet
-					} else {
+					if (compilerOutputPath != null) {
+						/**
+						 * Otherwise ignore it. Maybe this module is only used to contains fact (think of Android)
+						 * or to aggregate modules (think of maven).
+						 */
 						compilerOutputPaths.put(module, compilerOutputPath);
 					}
 				}

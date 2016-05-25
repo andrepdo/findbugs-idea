@@ -37,7 +37,7 @@ import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProjects;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
+import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import java.io.File;
 
@@ -71,15 +71,7 @@ public final class AnalyzeModuleFiles extends AbstractAnalyzeAction {
 	) {
 
 		final Module module = getModule(e);
-		if (module == null) {
-			BalloonTipFactory.showToolWindowWarnNotifier(project, "No or more than one current module");
-			return;
-		}
-		final VirtualFile compilerOutputPath = IdeaUtilImpl.getCompilerOutputPath(module);
-		if (compilerOutputPath == null) {
-			BalloonTipFactory.showToolWindowInfoNotifier(project, "Module not yet compiled");
-			return;
-		}
+
 		new FindBugsStarter(project, "Running FindBugs analysis for module'" + module.getName() + "'...") {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
@@ -88,6 +80,12 @@ public final class AnalyzeModuleFiles extends AbstractAnalyzeAction {
 
 			@Override
 			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
+				final VirtualFile compilerOutputPath = IdeaUtilImpl.getCompilerOutputPath(module);
+				if (compilerOutputPath == null) {
+					showWarning(ResourcesLoader.getString("analysis.moduleNotCompiled", module.getName()));
+					return false;
+				}
+
 				indicator.setText("Collecting files for analysis...");
 				final FindBugsProject findBugsProject = projects.get(module);
 				final int[] count = new int[1];

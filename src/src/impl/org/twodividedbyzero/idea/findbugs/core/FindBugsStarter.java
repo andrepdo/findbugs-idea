@@ -386,7 +386,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		}
 	}
 
-	protected final boolean hasFacets(@NotNull final Module module) {
+	private boolean hasFacets(@NotNull final Module module) {
 		return FacetManager.getInstance(module).getAllFacets().length > 0;
 	}
 
