@@ -22,9 +22,9 @@ import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
 import com.intellij.openapi.fileChooser.FileSaverDescriptor;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
-import com.yourkit.util.FileUtil;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.util.ErrorUtil;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
@@ -100,7 +100,7 @@ final class FilterTab extends JPanel implements SettingsOwner<AbstractSettings> 
 
 		final File file = wrapper.getFile();
 		try {
-			FileUtil.writeFileContentAsUtf8(file, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+			FileUtil.writeToFile(file, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 					"<FindBugsFilter>\n" +
 					"    <!-- http://stackoverflow.com/questions/7568579/eclipsefindbugs-exclude-filter-files-doesnt-work -->\n" +
 					"    <Match>\n" +
