@@ -43,12 +43,6 @@ abstract class AbstractAction extends AnAction {
 			e.getPresentation().setVisible(false);
 			return;
 		}
-		final ToolWindowPanel panel = ToolWindowPanel.getInstance(toolWindow);
-		if (panel == null) {
-			e.getPresentation().setEnabled(false);
-			e.getPresentation().setVisible(false);
-			return;
-		}
 		updateImpl(
 				e,
 				project,
@@ -74,12 +68,6 @@ abstract class AbstractAction extends AnAction {
 		}
 		final ToolWindow toolWindow = ToolWindowPanel.getWindow(project);
 		if (toolWindow == null || !toolWindow.isAvailable()) {
-			e.getPresentation().setEnabled(false);
-			e.getPresentation().setVisible(false);
-			return;
-		}
-		final ToolWindowPanel panel = ToolWindowPanel.getInstance(toolWindow);
-		if (panel == null) {
 			e.getPresentation().setEnabled(false);
 			e.getPresentation().setVisible(false);
 			return;
