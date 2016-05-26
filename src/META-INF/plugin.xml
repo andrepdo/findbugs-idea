@@ -86,6 +86,10 @@
     </description>
     <change-notes>
         <![CDATA[<html>
+        <h3>0.9.999</h3>
+        <ul>
+            <li>Issue 116: Support run analyze before commit</li>
+        </ul>
         <h3>0.9.998</h3>
         <ul>
             <li>Issue 48, 108, 114, 118: UI settings rewrite</li>
@@ -313,6 +317,7 @@
         <moduleService serviceImplementation="org.twodividedbyzero.idea.findbugs.gui.preferences.LegacyModuleSettings"/>
         <moduleConfigurable provider="org.twodividedbyzero.idea.findbugs.core.ModuleConfigurableProvider"
                             displayName="FindBugs-IDEA"/>
+        <checkinHandlerFactory implementation="org.twodividedbyzero.idea.findbugs.core.CheckinHandlerFactoryImpl"/>
     </extensions>
     <extensions defaultExtensionNs="com.intellij">
         <errorHandler implementation="org.twodividedbyzero.idea.findbugs.core.ErrorReportSubmitterImpl"/>

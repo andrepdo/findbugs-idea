@@ -87,7 +87,9 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 	@NotNull
 	private final WorkspaceSettings workspaceSettings;
 
-	private final boolean _startInBackground;
+	private final boolean startProgressInBackground;
+
+	private final boolean startProgressModal;
 
 	private final AtomicBoolean _cancellingByUser;
 
@@ -96,20 +98,35 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 			@NotNull final Project project,
 			@NotNull final String title
 	) {
-		this(project, title, false);
+		this(project, title, ProgressStartType.RunInBackgroundFromSettings);
 	}
 
 
 	public FindBugsStarter(
 			@NotNull final Project project,
 			@NotNull final String title,
-			final boolean forceStartInBackground
+			@NotNull final ProgressStartType progressStartType
 	) {
 		this.project = project;
 		_title = title;
 		this.projectSettings = ProjectSettings.getInstance(project);
 		this.workspaceSettings = WorkspaceSettings.getInstance(project);
-		_startInBackground = workspaceSettings.runInBackground || forceStartInBackground;
+		switch (progressStartType) {
+			case RunInBackgroundFromSettings:
+				startProgressInBackground = workspaceSettings.runInBackground;
+				startProgressModal = false;
+				break;
+			case RunInBackground:
+				startProgressInBackground = true;
+				startProgressModal = false;
+				break;
+			case Modal:
+				startProgressInBackground = false;
+				startProgressModal = true;
+				break;
+			default:
+				throw new UnsupportedOperationException("Unsupported " + progressStartType);
+		}
 		_cancellingByUser = new AtomicBoolean();
 		MessageBusManager.subscribe(project, this, AnalysisAbortingListener.TOPIC, this);
 	}
@@ -167,26 +184,41 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 			IdeaUtilImpl.activateToolWindow(toolWindow);
 		}
 
-		new Task.Backgroundable(project, _title, true) {
-			@Override
-			public void run(@NotNull final ProgressIndicator indicator) {
-				indicator.setIndeterminate(true);
-				indicator.setText("Configure FindBugs...");
-				try {
+		final Task task;
+		if (startProgressModal) {
+			task = new Task.Modal(project, _title, true) {
+				@Override
+				public void run(@NotNull final ProgressIndicator indicator) {
 					asyncStart(indicator, justCompiled);
-				} catch (final ProcessCanceledException ignore) {
-					MessageBusManager.publishAnalysisAbortedToEDT(project);
 				}
-			}
+			};
+		} else {
+			task = new Task.Backgroundable(project, _title, true) {
+				@Override
+				public void run(@NotNull final ProgressIndicator indicator) {
+					asyncStart(indicator, justCompiled);
+				}
 
-			@Override
-			public boolean shouldStartInBackground() {
-				return _startInBackground;
-			}
-		}.queue();
+				@Override
+				public boolean shouldStartInBackground() {
+					return startProgressInBackground;
+				}
+			};
+		}
+		task.queue();
 	}
 
 	private void asyncStart(@NotNull final ProgressIndicator indicator, final boolean justCompiled) {
+		indicator.setIndeterminate(true);
+		indicator.setText("Configure FindBugs...");
+		try {
+			asyncStartImpl(indicator, justCompiled);
+		} catch (final ProcessCanceledException ignore) {
+			MessageBusManager.publishAnalysisAbortedToEDT(project);
+		}
+	}
+
+	private void asyncStartImpl(@NotNull final ProgressIndicator indicator, final boolean justCompiled) {
 
 		final FindBugsProjects projects = new FindBugsProjects(project);
 

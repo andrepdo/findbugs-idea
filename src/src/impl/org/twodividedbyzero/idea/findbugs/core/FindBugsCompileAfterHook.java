@@ -197,7 +197,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		new FindBugsStarter(
 				project,
 				"Running FindBugs analysis for affected files...",
-				true
+				ProgressStartType.RunInBackground
 		) {
 			@Override
 			protected boolean isCompileBeforeAnalyze() {
@@ -259,7 +259,11 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		EventDispatchThreadHelper.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				new FindBugsStarter(project, "Running FindBugs analysis for affected files...", true) {
+				new FindBugsStarter(
+						project,
+						"Running FindBugs analysis for affected files...",
+						ProgressStartType.RunInBackground
+				) {
 					@Override
 					protected boolean isCompileBeforeAnalyze() {
 						return false;

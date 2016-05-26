@@ -386,10 +386,24 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 	}
 
 	@Nullable
+	private static ToolWindow getWindow(@NotNull final Project project) {
+		return ToolWindowManager.getInstance(project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
+	}
+
+	public static void showWindow(@NotNull final Project project) {
+		final ToolWindow toolWindow = getWindow(project);
+		if (toolWindow == null) {
+			throw new IllegalStateException("No FindBugs ToolWindow");
+		}
+		if (!toolWindow.isActive() && toolWindow.isAvailable()) {
+			toolWindow.show(null);
+		}
+	}
+
+	@Nullable
 	public static ToolWindowPanel getInstance(@NotNull final Project project) {
-		final String id = "FindBugs-IDEA"; // see plugin.xml
-		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(id);
-		final Content content = toolWindow.getContentManager().getContent(0);
+		final ToolWindow toolWindow = getWindow(project);
+		final Content content = toolWindow.getContentManager().getContent(0); // TODO: fix possible NPE here ; see issue #120
 		if (content == null) {
 			return null;
 		}

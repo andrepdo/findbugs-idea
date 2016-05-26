@@ -117,6 +117,9 @@ public final class WorkspaceSettings implements PersistentStateComponent<Workspa
 	@Tag
 	public String toolWindowGroupBy = GroupBy.BugCategory.name();
 
+	@Tag
+	public boolean analyzeBeforeCheckIn = false;
+
 	@Nullable
 	@Override
 	public WorkspaceSettings getState() {
