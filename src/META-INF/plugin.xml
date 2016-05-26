@@ -89,6 +89,8 @@
         <h3>0.9.999</h3>
         <ul>
             <li>Issue 116: Support run analyze before commit</li>
+            <li>Issue 120: Fix possible NPE</li>
+            <li>Fix possible ClassCastException caused by Abstract*Action</li>
         </ul>
         <h3>0.9.998</h3>
         <ul>

@@ -44,6 +44,7 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.content.Content;
+import com.intellij.ui.content.ContentManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
@@ -386,7 +387,7 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 	}
 
 	@Nullable
-	private static ToolWindow getWindow(@NotNull final Project project) {
+	public static ToolWindow getWindow(@NotNull final Project project) {
 		return ToolWindowManager.getInstance(project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
 	}
 
@@ -395,6 +396,10 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		if (toolWindow == null) {
 			throw new IllegalStateException("No FindBugs ToolWindow");
 		}
+		showWindow(toolWindow);
+	}
+
+	public static void showWindow(@NotNull final ToolWindow toolWindow) {
 		if (!toolWindow.isActive() && toolWindow.isAvailable()) {
 			toolWindow.show(null);
 		}
@@ -402,13 +407,24 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 
 	@Nullable
 	public static ToolWindowPanel getInstance(@NotNull final Project project) {
-		final ToolWindow toolWindow = getWindow(project);
-		final Content content = toolWindow.getContentManager().getContent(0); // TODO: fix possible NPE here ; see issue #120
-		if (content == null) {
+		return getInstance(getWindow(project));
+	}
+
+	@Nullable
+	public static ToolWindowPanel getInstance(@Nullable final ToolWindow toolWindow) {
+		if (toolWindow == null) {
 			return null;
 		}
-		final JComponent component = content.getComponent();
-		if (component instanceof ToolWindowPanel) {
+		final ContentManager contentManager = toolWindow.getContentManager();
+		if (contentManager == null) {
+			return null;
+		}
+		final Content[] contents = contentManager.getContents();
+		if (contents.length == 0) {
+			return null;
+		}
+		final JComponent component = contents[0].getComponent();
+		if (component instanceof ToolWindowPanel) { // could be a JLabel
 			return (ToolWindowPanel) component;
 		}
 		return null;

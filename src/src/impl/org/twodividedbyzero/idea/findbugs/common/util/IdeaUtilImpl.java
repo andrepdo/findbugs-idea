@@ -50,8 +50,6 @@ import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vcs.changes.ContentRevision;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnonymousClass;
 import com.intellij.psi.PsiClass;
@@ -684,19 +682,6 @@ public final class IdeaUtilImpl {
 	public static FileType getFileTypeByName(@NotNull final String filename) {
 		return FileTypeManager.getInstance().getFileTypeByFileName(filename);
 	}
-
-
-	public static ToolWindow getToolWindowById(final String uniqueIdentifier, @NotNull final Project project) {
-		return ToolWindowManager.getInstance(project).getToolWindow(uniqueIdentifier);
-	}
-
-
-	public static void activateToolWindow(@NotNull final ToolWindow toolWindow) {
-		if (!toolWindow.isActive() && toolWindow.isAvailable()) {
-			toolWindow.show(null);
-		}
-	}
-
 
 	@Nullable
 	private static PsiFile getPsiFile(@NotNull final Project project, @NotNull final ExtendedProblemDescriptor problem) {

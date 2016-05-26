@@ -41,7 +41,6 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.impl.ToolWindowImpl;
 import com.intellij.util.Consumer;
 import edu.umd.cs.findbugs.DetectorFactory;
@@ -54,10 +53,9 @@ import org.dom4j.DocumentException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
-import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
-import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
+import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.messages.AnalysisAbortingListener;
 import org.twodividedbyzero.idea.findbugs.messages.MessageBusManager;
 import org.twodividedbyzero.idea.findbugs.plugins.PluginLoader;
@@ -173,7 +171,10 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 	private void startImpl(final boolean justCompiled) {
 		MessageBusManager.publishAnalysisStarted(project);
 
-		final ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
+		final ToolWindow toolWindow = ToolWindowPanel.getWindow(project);
+		if (toolWindow == null) {
+			throw new IllegalStateException("No FindBugs ToolWindow");
+		}
 		/**
 		 * Important: Make sure the tool window is initialized.
 		 * This call is to important to make it just in case of false = toolWindowToFront
@@ -181,7 +182,7 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 		 */
 		((ToolWindowImpl) toolWindow).ensureContentInitialized();
 		if (workspaceSettings.toolWindowToFront) {
-			IdeaUtilImpl.activateToolWindow(toolWindow);
+			ToolWindowPanel.showWindow(toolWindow);
 		}
 
 		final Task task;

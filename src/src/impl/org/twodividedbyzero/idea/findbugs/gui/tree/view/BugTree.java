@@ -26,18 +26,14 @@ import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.PopupHandler;
-import com.intellij.ui.content.Content;
 import com.intellij.util.EditSourceOnDoubleClickHandler;
 import com.intellij.util.OpenSourceUtil;
 import com.intellij.util.ui.UIUtil;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NonNls;
-import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.Bug;
 import org.twodividedbyzero.idea.findbugs.gui.common.AnalysisRunDetailsDialog;
@@ -268,10 +264,8 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 					final int width = rendererComponent.getPreferredSize().width;
 					final int mouseX = e.getX();
 					if (mouseX <= width + 10 && mouseX >= width - 40) {
-						final ToolWindow toolWindow = ToolWindowManager.getInstance(_project).getToolWindow(FindBugsPluginConstants.TOOL_WINDOW_ID);
-						final Content content = toolWindow.getContentManager().getContent(0);
-						if (content != null) {
-							final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
+						final ToolWindowPanel panel = ToolWindowPanel.getInstance(_project);
+						if (panel != null) {
 							final DialogBuilder dialog = AnalysisRunDetailsDialog.create(
 									panel.getProject(),
 									panel.getBugTreePanel().getGroupModel().getBugCount(),
