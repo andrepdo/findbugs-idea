@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2015 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -16,9 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.twodividedbyzero.idea.findbugs.core;
-
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter;
@@ -30,34 +28,28 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.twodividedbyzero.idea.findbugs.actions.HelpAction;
 import org.twodividedbyzero.idea.findbugs.common.util.ErrorUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
+import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import java.awt.Component;
 import java.awt.datatransfer.StringSelection;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-
-/**
- * @author Reto Merz<reto.merz@gmail.com>
- * @since 0.9.998
- */
 public final class ErrorReportSubmitterImpl extends ErrorReportSubmitter {
-
 
 	@Override
 	public String getReportActionText() {
-		return "Copy error to clipboard and open page";
+		return StringUtil.capitalizeWords(ResourcesLoader.getString("error.submitReport.title"), true);
 	}
-
 
 	@SuppressWarnings("deprecation") // maximize compatibility
 	@Override
 	public SubmittedReportInfo submit(IdeaLoggingEvent[] events, Component parentComponent) {
 		return submitImpl(events, null, parentComponent);
 	}
-
 
 	@SuppressWarnings("deprecation") // maximize compatibility
 	@Override
@@ -66,7 +58,6 @@ public final class ErrorReportSubmitterImpl extends ErrorReportSubmitter {
 		return true;
 	}
 
-
 	@NotNull
 	private SubmittedReportInfo submitImpl(
 			@NotNull final IdeaLoggingEvent[] events,
@@ -74,8 +65,9 @@ public final class ErrorReportSubmitterImpl extends ErrorReportSubmitter {
 			@NotNull final Component parentComponent
 	) {
 
-		final StringBuilder body = new StringBuilder();
+		final StringBuilder body = HelpAction.createProductInfo();
 		if (!StringUtil.isEmptyOrSpaces(additionalInfo)) {
+			body.append("\n\nAdditional Infos\n");
 			body.append(additionalInfo);
 		}
 
@@ -90,9 +82,7 @@ public final class ErrorReportSubmitterImpl extends ErrorReportSubmitter {
 				title = message;
 			}
 			if (hasMessage || hasStack) {
-				if (body.length() > 0) {
-					body.append("\n\n");
-				}
+				body.append("\n\n");
 				if (hasMessage) {
 					body.append(message);
 					if (hasStack) {
@@ -106,7 +96,7 @@ public final class ErrorReportSubmitterImpl extends ErrorReportSubmitter {
 			if (!hasStack) {
 				isFindBugsError = false;
 			} else if (!FindBugsUtil.isFindBugsError(event.getThrowable())) {
-				isFindBugsError= false;
+				isFindBugsError = false;
 			}
 		}
 		if (title == null) {
@@ -120,7 +110,6 @@ public final class ErrorReportSubmitterImpl extends ErrorReportSubmitter {
 				parentComponent
 		);
 	}
-
 
 	@NotNull
 	private SubmittedReportInfo openBrowser(
@@ -152,7 +141,6 @@ public final class ErrorReportSubmitterImpl extends ErrorReportSubmitter {
 		BrowserUtil.browse(newIssueUrl);
 		return new SubmittedReportInfo(baseUrl, "issue", SubmittedReportInfo.SubmissionStatus.NEW_ISSUE);
 	}
-
 
 	@NotNull
 	private static String encode(@NotNull final String value) {
