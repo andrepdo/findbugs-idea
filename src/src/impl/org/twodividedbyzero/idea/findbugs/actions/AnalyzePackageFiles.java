@@ -127,6 +127,9 @@ public final class AnalyzePackageFiles extends AbstractAnalyzeAction {
 		VirtualFile directory = selectedFiles[0];
 		if (!directory.isDirectory()) {
 			directory = directory.getParent();
+			if (directory == null) {
+				return null;
+			}
 			if (!directory.isDirectory()) {
 				return null;
 			}
