@@ -18,7 +18,6 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.preferences;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -36,41 +35,45 @@ public final class LegacyProjectSettingsConverter extends AbstractProjectCompone
 		super(project);
 	}
 
+	/**
+	 * We can not persist changes immediately in some cases (see issue #121).
+	 * So it is necessary to read both (project- and all module-settings) all the time
+	 * because it could be possible that IDEA only persist the converted project settings
+	 * but not the module settings (f. e. user open only project settings. But, in general,
+	 * it is up to IDEA when the settings are stored).
+	 */
 	@Override
 	public void projectOpened() {
 
 		final LegacyProjectSettings legacy = LegacyProjectSettings.getInstance(myProject);
-		if (legacy == null) {
-			return;
-		}
-		final PersistencePreferencesBean legacyBean = legacy.getState();
-		if (legacyBean == null) {
-			return;
+		PersistencePreferencesBean legacyBean = null;
+		List<String> enabledModuleConfigs = null;
+
+		if (legacy != null) {
+			legacyBean = legacy.getState();
+			if (legacyBean != null) {
+				enabledModuleConfigs = legacyBean.getEnabledModuleConfigs();
+			}
 		}
 
 		final WorkspaceSettings currentWorkspace = WorkspaceSettings.getInstance(myProject);
 
-		final List<String> enabledModuleConfigs = legacyBean.getEnabledModuleConfigs();
-
-		if (enabledModuleConfigs != null && !enabledModuleConfigs.isEmpty()) {
-			// first convert module settings if necessary
-			for (final Module module : ModuleManager.getInstance(myProject).getModules()) {
-				final LegacyModuleSettings legacyModuleSettings = LegacyModuleSettings.getInstance(module);
-				if (legacyModuleSettings != null) {
-					final ModuleSettings currentModule = ModuleSettings.getInstance(module);
-					if (enabledModuleConfigs.contains(module.getName())) {
-						legacyModuleSettings.applyTo(currentModule, null);
-						currentModule.overrideProjectSettings = true;
-					}
-				}
+		// first convert module settings if necessary
+		for (final Module module : ModuleManager.getInstance(myProject).getModules()) {
+			final LegacyModuleSettings legacyModuleSettings = LegacyModuleSettings.getInstance(module);
+			if (legacyModuleSettings != null && legacyModuleSettings.getState() != null) {
+				final ModuleSettings currentModule = ModuleSettings.getInstance(module);
+				legacyModuleSettings.applyTo(currentModule, null);
+				currentModule.overrideProjectSettings = enabledModuleConfigs != null && enabledModuleConfigs.contains(module.getName());
 			}
 		}
 
 		// convert project- after module-settings if necessary
-		final ProjectSettings current = ProjectSettings.getInstance(myProject);
-		legacy.applyTo(current, currentWorkspace);
+		if (legacyBean != null) {
+			final ProjectSettings current = ProjectSettings.getInstance(myProject);
+			legacy.applyTo(current, currentWorkspace);
+		}
 
-		// persist changes immediately
-		ApplicationManager.getApplication().saveAll();
+		//ApplicationManager.getApplication().saveAll(); can not persist changes immediately - see javadoc above
 	}
 }
