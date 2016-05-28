@@ -88,6 +88,7 @@
         <![CDATA[<html>
         <h3>0.9.999</h3>
         <ul>
+            <li>Issue 112: Support test sources</li>
             <li>Issue 116: Support run analyze before commit</li>
             <li>Issue 120, 122: Fix possible NPE</li>
             <li>Issue 121: Fix bug in legacy settings converter</li>

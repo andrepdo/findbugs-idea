@@ -108,7 +108,7 @@ public final class AnalyzeChangelistFiles extends AbstractAnalyzeAction {
 
 			@Override
 			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
-				return projects.addFiles(files, !justCompiled);
+				return projects.addFiles(files, !justCompiled, hasTests(files));
 			}
 		}.start();
 	}

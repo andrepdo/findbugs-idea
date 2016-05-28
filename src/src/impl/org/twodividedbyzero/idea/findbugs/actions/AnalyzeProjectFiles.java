@@ -26,6 +26,8 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.CompilerModuleExtension;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.util.Consumer;
@@ -40,7 +42,7 @@ import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import java.io.File;
-import java.util.Map;
+import java.util.List;
 
 public final class AnalyzeProjectFiles extends AbstractAnalyzeAction {
 
@@ -67,6 +69,12 @@ public final class AnalyzeProjectFiles extends AbstractAnalyzeAction {
 			@NotNull final FindBugsState state
 	) {
 
+		final int answer = askIncludeTest(project);
+		if (answer == Messages.CANCEL) {
+			return;
+		}
+		final boolean includeTests = Messages.YES == answer;
+
 		new FindBugsStarter(project, "Running FindBugs analysis for project '" + project.getName() + "'...") {
 			@Override
 			protected void createCompileScope(@NotNull final CompilerManager compilerManager, @NotNull final Consumer<CompileScope> consumer) {
@@ -76,7 +84,7 @@ public final class AnalyzeProjectFiles extends AbstractAnalyzeAction {
 			@Override
 			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
 				final Module[] modules = ModuleManager.getInstance(project).getModules();
-				final Map<Module, VirtualFile> compilerOutputPaths = New.map();
+				final List<Pair.NonNull<Module, VirtualFile>> compilerOutputPaths = New.arrayList();
 				for (final Module module : modules) {
 					final CompilerModuleExtension extension = CompilerModuleExtension.getInstance(module);
 					if (extension == null) {
@@ -88,7 +96,13 @@ public final class AnalyzeProjectFiles extends AbstractAnalyzeAction {
 						 * Otherwise ignore it. Maybe this module is only used to contains fact (think of Android)
 						 * or to aggregate modules (think of maven).
 						 */
-						compilerOutputPaths.put(module, compilerOutputPath);
+						compilerOutputPaths.add(Pair.createNonNull(module, compilerOutputPath));
+					}
+					if (includeTests) {
+						final VirtualFile compilerOutputPathForTests = extension.getCompilerOutputPathForTests();
+						if (compilerOutputPathForTests != null) {
+							compilerOutputPaths.add(Pair.createNonNull(module, compilerOutputPathForTests));
+						}
 					}
 				}
 
@@ -99,9 +113,9 @@ public final class AnalyzeProjectFiles extends AbstractAnalyzeAction {
 
 				indicator.setText("Collecting files for analysis...");
 				final int[] count = new int[1];
-				for (final Map.Entry<Module, VirtualFile> compilerOutputPath : compilerOutputPaths.entrySet()) {
-					final FindBugsProject findBugsProject = projects.get(compilerOutputPath.getKey());
-					RecurseFileCollector.addFiles(project, indicator, findBugsProject, new File(compilerOutputPath.getValue().getCanonicalPath()), count);
+				for (final Pair.NonNull<Module, VirtualFile> compilerOutputPath : compilerOutputPaths) {
+					final FindBugsProject findBugsProject = projects.get(compilerOutputPath.getFirst(), includeTests);
+					RecurseFileCollector.addFiles(project, indicator, findBugsProject, new File(compilerOutputPath.getSecond().getCanonicalPath()), count);
 				}
 				return true;
 			}

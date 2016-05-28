@@ -59,7 +59,8 @@ public final class AnalyzePackageFiles extends AbstractAnalyzeAction {
 
 		boolean enable = false;
 		if (state.isIdle()) {
-			enable = getDirectory(e, project) != null;
+			final VirtualFile directory = getDirectory(e, project);
+			enable = directory != null && ModuleUtilCore.findModuleForFile(directory, project) != null;
 		}
 
 		e.getPresentation().setEnabled(enable);
@@ -82,6 +83,7 @@ public final class AnalyzePackageFiles extends AbstractAnalyzeAction {
 		}
 		final ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
 		final String packageName = fileIndex.getPackageNameByDirectory(directory);
+		final boolean isTest = fileIndex.isInTestSourceContent(directory);
 
 		new FindBugsStarter(project, "Running FindBugs analysis for package '" + packageName + "'...") {
 			@Override
@@ -95,7 +97,7 @@ public final class AnalyzePackageFiles extends AbstractAnalyzeAction {
 				if (extension == null) {
 					throw new IllegalStateException("No compiler extension for module " + module.getName());
 				}
-				final VirtualFile compilerOutputPath = extension.getCompilerOutputPath();
+				final VirtualFile compilerOutputPath = isTest ? extension.getCompilerOutputPathForTests() : extension.getCompilerOutputPath();
 				if (compilerOutputPath == null) {
 					showWarning("Source is not compiled.");
 					return false;
@@ -106,7 +108,7 @@ public final class AnalyzePackageFiles extends AbstractAnalyzeAction {
 					return false;
 				}
 				indicator.setText("Collecting files for analysis...");
-				final FindBugsProject findBugsProject = projects.get(module);
+				final FindBugsProject findBugsProject = projects.get(module, isTest);
 				final int[] count = new int[1];
 				RecurseFileCollector.addFiles(project, indicator, findBugsProject, outputPath, count);
 				return true;

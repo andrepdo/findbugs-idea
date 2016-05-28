@@ -24,7 +24,6 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.components.ComponentManager;
 import com.intellij.openapi.components.PathMacroManager;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -36,18 +35,8 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.CompilerModuleExtension;
-import com.intellij.openapi.roots.CompilerProjectExtension;
-import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.OrderEntry;
-import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.roots.impl.DirectoryIndex;
-import com.intellij.openapi.vcs.FilePath;
-import com.intellij.openapi.vcs.changes.Change;
-import com.intellij.openapi.vcs.changes.ChangeList;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
-import com.intellij.openapi.vcs.changes.ContentRevision;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
@@ -70,17 +59,11 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.collectors.AbstractClassAdder;
 import org.twodividedbyzero.idea.findbugs.collectors.ClassCollector;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
-import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
-import org.twodividedbyzero.idea.findbugs.common.exception.FindBugsPluginException;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -88,8 +71,6 @@ import java.util.Set;
 
 @SuppressWarnings({"HardcodedFileSeparator"})
 public final class IdeaUtilImpl {
-
-	private static final Logger LOGGER = Logger.getInstance(IdeaUtilImpl.class.getName());
 
 	@NotNull
 	private static final VirtualFile[] EMPTY_VIRTUAL_FILE = new VirtualFile[0];
@@ -236,23 +217,6 @@ public final class IdeaUtilImpl {
 		return changeListManager.getAffectedFiles();
 	}
 
-
-	@NotNull
-	public static Collection<VirtualFile> getModifiedFilesByList(@NotNull final ChangeList list, final DataContext dataContext) {
-		final Collection<VirtualFile> result = new ArrayList<VirtualFile>();
-		final Collection<Change> changeCollection = list.getChanges();
-		// (Change[]) DataProvider.getData(DataConstants.CHANGES)
-		for (final Change change : changeCollection) {
-			final ContentRevision contentRevision = change.getAfterRevision();
-			if (contentRevision != null) {
-				final FilePath path = contentRevision.getFile();
-				result.add(path.getVirtualFile());
-			}
-		}
-		return result;
-	}
-
-
 	@Nullable
 	public static VirtualFile[] getVirtualFiles(@NotNull final DataContext dataContext) {
 		return DataKeys.VIRTUAL_FILE_ARRAY.getData(dataContext);
@@ -264,99 +228,6 @@ public final class IdeaUtilImpl {
 		return DataKeys.VIRTUAL_FILE.getData(dataContext);
 	}
 
-
-	@SuppressWarnings({"TypeMayBeWeakened"})
-	@Nullable
-	public static VirtualFile getVirtualFile(@NotNull final PsiClass psiClass) {
-		final PsiFile containingFile = psiClass.getContainingFile();
-		if (containingFile != null) {
-			return containingFile.getVirtualFile();
-		}
-		return null;
-	}
-
-
-	@NotNull
-	public static String[] getCompilerOutputUrls(final Project project) {
-		final VirtualFile[] vFiles = getCompilerOutputPaths(project);
-		final int length = vFiles.length;
-		final String[] files = new String[length];
-
-		for (int i = 0; i < length; i++) {
-			final VirtualFile file = vFiles[i];
-			if (file != null) {
-				files[i] = file.getPresentableUrl();
-			} else {
-				files[i] = ""; // FIXME: remove -> crude, getProjectOutputPath(final Module module) returns always null
-			}
-		}
-
-		return files;
-	}
-
-
-	@NotNull
-	private static VirtualFile[] getCompilerOutputPaths(final Project project) {
-		final Module[] modules = getModules(project);
-		final int length = modules.length;
-		final VirtualFile[] vFiles = new VirtualFile[length];
-
-		for (int i = 0; i < length; i++) {
-			final Module module = modules[i];
-			final CompilerModuleExtension extension = CompilerModuleExtension.getInstance(module);
-			VirtualFile path = null;
-			if (extension != null) {
-				path = extension.getCompilerOutputPath();
-			}
-			if (path == null) {
-				//throw new FindBugsPluginException("Make sure your module compiler output path configuration points to a existing directory in module (" + module.getName() + ")");
-				path = getProjectOutputPath(module);
-			}
-			vFiles[i] = path;
-			// FIXME: facade
-			//ModuleRootManager.getInstance(module).getCompilerOutputPath();
-		}
-
-		return vFiles;
-	}
-
-
-	@Nullable
-	public static VirtualFile getCompilerOutputPath(final Module module) {
-		final CompilerModuleExtension compilerModuleExtension = CompilerModuleExtension.getInstance(module);
-		if (compilerModuleExtension != null) {
-			return compilerModuleExtension.getCompilerOutputPath();
-		}
-		return null;
-	}
-
-
-	@Nullable
-	public static VirtualFile getCompilerOutputPath(@NotNull final VirtualFile virtualFile, @NotNull final Project project) {
-		final Module module = findModuleForFile(virtualFile, project);
-		if (module == null) {
-			return null;
-		}
-		final CompilerModuleExtension compilerModuleExtension = CompilerModuleExtension.getInstance(module);
-		if (compilerModuleExtension != null) {
-			return compilerModuleExtension.getCompilerOutputPath();
-		}
-		return null;
-		//return ModuleRootManager.getInstance(module).getCompilerOutputPath();
-	}
-
-
-	@Nullable
-	private static VirtualFile getProjectOutputPath(@NotNull final Module module) {
-		final Project project = module.getProject();
-		final CompilerProjectExtension compilerProjectExtension = CompilerProjectExtension.getInstance(project);
-		if (compilerProjectExtension != null) {
-			return compilerProjectExtension.getCompilerOutput();
-		}
-		return null;
-	}
-
-
 	@NotNull
 	public static String getPackage(@NotNull final PsiElement psiElement) {
 		return ((PsiClassOwner) psiElement.getContainingFile()).getPackageName();
@@ -367,97 +238,6 @@ public final class IdeaUtilImpl {
 	public static String getPackageUrl(@NotNull final PsiElement psiElement) {
 		return getPackage(psiElement).replace('.', '/');
 	}
-
-
-	public static String getPackageAsPath(@NotNull final com.intellij.openapi.project.Project project, final VirtualFile packagePath) {
-		final StringBuilder result = new StringBuilder(30);
-		final List<String> list = getPackagePathAsList(project, packagePath);
-		for (final String dir : list) {
-			result.append(dir);
-		}
-
-		return result.toString();
-	}
-
-
-	@NotNull
-	private static List<String> getPackagePathAsList(@NotNull final com.intellij.openapi.project.Project project, @NotNull final VirtualFile packagePath) {
-		final List<String> parentPath = new ArrayList<String>();
-		final String packageName = DirectoryIndex.getInstance(project).getPackageName(packagePath);
-		if (packageName != null && !packageName.isEmpty()) {
-			final String[] path = packageName.split("\\.");
-			for (final String p : path) {
-				parentPath.add(FindBugsPluginConstants.FILE_SEPARATOR + p);
-			}
-		}
-		return parentPath;
-	}
-
-
-	@NotNull
-	public static VirtualFile[] getModulesSourceRoots(@NotNull final DataContext dataContext) {
-		final Project project = getProject(dataContext);
-		//noinspection ConstantConditions
-		return getModulesSourceRoots(project);
-	}
-
-
-	@NotNull
-	public static VirtualFile[] getModulesSourceRoots(@NotNull final Project project) {
-		final ProjectRootManager projectRootManager = ProjectRootManager.getInstance(project);
-		return projectRootManager.getContentSourceRoots();
-	}
-
-
-	@NotNull
-	public static VirtualFile[] getProjectClasspath(@NotNull final DataContext dataContext) {
-		final Module module = getModule(dataContext);
-		return getProjectClasspath(module);
-	}
-
-
-	@NotNull
-	public static VirtualFile[] getProjectClasspath(@Nullable final Module module) {
-		if (module == null) {
-			return EMPTY_VIRTUAL_FILE;
-		}
-		final List<VirtualFile> found = new LinkedList<VirtualFile>();
-		addProjectClasspath(module, found);
-		return found.toArray(new VirtualFile[found.size()]);
-	}
-
-
-	public static void addProjectClasspath(@Nullable final Module module, @NotNull List<VirtualFile> classpath) {
-		try {
-			@SuppressWarnings("ConstantConditions")
-			final ModuleRootManager mrm = ModuleRootManager.getInstance(module);
-			final OrderEntry[] orderEntries = mrm.getOrderEntries();
-			for (final OrderEntry entry : orderEntries) {
-				Collections.addAll(classpath, entry.getFiles(OrderRootType.CLASSES));
-			}
-		} catch (final Exception e) {
-			throw new FindBugsPluginException("ModuleRootManager must not be null. may be the current class is not a project/module class. check your project/module outpath configuration.", e);
-		}
-	}
-
-
-	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"})
-	@Nullable
-	public static Module findModuleForFile(@NotNull final VirtualFile virtualFile, @NotNull final Project project) {
-		//noinspection ConstantConditions
-		if (virtualFile == null || project == null) {
-			LOGGER.debug("Expected not null arguments. virtualFile=" + virtualFile + " project=" + project);
-			return null;
-		}
-		return ModuleUtilCore.findModuleForFile(virtualFile, project);
-	}
-
-
-	@Nullable
-	public static Module getModule(@NotNull final DataContext dataContext) {
-		return getModule(dataContext, getProject(dataContext));
-	}
-
 
 	@Nullable
 	public static Module getModule(@NotNull final DataContext dataContext, @NotNull final Project project) {
@@ -555,7 +335,6 @@ public final class IdeaUtilImpl {
 		return psiClass;
 	}
 
-
 	/**
 	 * Finds the PsiMethod for a specific PsiElement.
 	 *
@@ -572,21 +351,11 @@ public final class IdeaUtilImpl {
 		return method;
 	}
 
-
 	@SuppressWarnings("UnusedDeclaration")
 	@Nullable
 	public static VirtualFile findFileByIoFile(final File file) {
 		return LocalFileSystem.getInstance().findFileByIoFile(file);
 	}
-
-
-	@SuppressWarnings("StaticMethodOnlyUsedInOneClass")
-	@Nullable
-	public static VirtualFile findFileByPath(@NotNull final String path) {
-		return LocalFileSystem.getInstance().findFileByPath(path.replace(File.separatorChar, '/'));
-		//return LocalFileSystem.getInstance().findFileByPath(path);
-	}
-
 
 	/**
 	 * Find a PsiClass using {@link GlobalSearchScope#allScope(com.intellij.openapi.project.Project)} }

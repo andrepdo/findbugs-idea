@@ -30,6 +30,7 @@ import com.intellij.openapi.vcs.changes.CommitExecutor;
 import com.intellij.openapi.vcs.checkin.CheckinHandler;
 import com.intellij.openapi.vcs.checkin.CheckinHandlerFactory;
 import com.intellij.openapi.vcs.ui.RefreshableOnComponent;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.Consumer;
 import com.intellij.util.PairConsumer;
 import com.intellij.util.ui.JBUI;
@@ -41,6 +42,7 @@ import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import java.util.Collection;
 
 public final class CheckinHandlerFactoryImpl extends CheckinHandlerFactory {
 	@NotNull
@@ -90,7 +92,8 @@ public final class CheckinHandlerFactoryImpl extends CheckinHandlerFactory {
 
 					@Override
 					protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
-						projects.addFiles(panel.getVirtualFiles(), false);
+						final Collection<VirtualFile> virtualFiles = panel.getVirtualFiles();
+						projects.addFiles(virtualFiles, false, hasTests(virtualFiles));
 						return true;
 					}
 				}.start();

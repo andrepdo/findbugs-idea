@@ -25,6 +25,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiClass;
@@ -83,7 +84,8 @@ public final class AnalyzeClassUnderCursor extends AbstractAnalyzeAction {
 				if (module == null) {
 					throw new IllegalStateException("No module found for " + selectedFile);
 				}
-				final FindBugsProject findBugsProject = projects.get(module);
+				final boolean isTest = ProjectRootManager.getInstance(project).getFileIndex().isInTestSourceContent(selectedFile);
+				final FindBugsProject findBugsProject = projects.get(module, isTest);
 				findBugsProject.addOutputFile(selectedFile, psiClass);
 				return true;
 			}

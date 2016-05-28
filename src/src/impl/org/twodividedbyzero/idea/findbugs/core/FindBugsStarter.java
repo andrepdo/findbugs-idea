@@ -36,6 +36,8 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.text.StringUtil;
@@ -496,5 +498,25 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 				BalloonTipFactory.showToolWindowWarnNotifier(project, message + " " + ResourcesLoader.getString("analysis.aborted"));
 			}
 		});
+	}
+
+	protected final boolean hasTests(@NotNull final Iterable<VirtualFile> virtualFiles) {
+		final ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
+		for (final VirtualFile file : virtualFiles) {
+			if (fileIndex.isInTestSourceContent(file)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected final boolean hasTests(@NotNull final VirtualFile[] virtualFiles) {
+		final ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
+		for (final VirtualFile file : virtualFiles) {
+			if (fileIndex.isInTestSourceContent(file)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

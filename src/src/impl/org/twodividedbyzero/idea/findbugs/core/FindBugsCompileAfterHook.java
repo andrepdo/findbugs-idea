@@ -211,7 +211,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 
 			@Override
 			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
-				projects.addFiles(affectedFiles, false);
+				projects.addFiles(affectedFiles, false, hasTests(affectedFiles));
 				return true;
 			}
 		}.start();
@@ -276,7 +276,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 
 					@Override
 					protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
-						projects.addFiles(changed, false);
+						projects.addFiles(changed, false, hasTests(changed));
 						return true;
 					}
 				}.start();

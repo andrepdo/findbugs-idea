@@ -20,7 +20,10 @@ package org.twodividedbyzero.idea.findbugs.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.util.ui.UIUtil;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
 import org.jetbrains.annotations.NotNull;
@@ -138,5 +141,14 @@ abstract class AbstractAnalyzeAction extends AbstractAction {
 						}
 					}
 				});
+	}
+
+	static int askIncludeTest(@NotNull final Project project) {
+		return Messages.showYesNoCancelDialog(
+				project,
+				ResourcesLoader.getString("analysis.includeTests.text"),
+				StringUtil.capitalizeWords(ResourcesLoader.getString("analysis.includeTests.title"), true),
+				UIUtil.getQuestionIcon()
+		);
 	}
 }

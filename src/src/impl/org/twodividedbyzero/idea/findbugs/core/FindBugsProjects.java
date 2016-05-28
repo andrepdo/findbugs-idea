@@ -59,25 +59,25 @@ public final class FindBugsProjects {
 		projects = New.map();
 	}
 
-	public boolean addFiles(@NotNull final Iterable<VirtualFile> files, final boolean checkCompiled) {
+	public boolean addFiles(@NotNull final Iterable<VirtualFile> files, final boolean checkCompiled, final boolean includeTests) {
 		for (final VirtualFile file : files) {
-			if (!addFile(file, checkCompiled) && checkCompiled) {
+			if (!addFile(file, checkCompiled, includeTests) && checkCompiled) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	public boolean addFiles(@NotNull final VirtualFile[] files, final boolean checkCompiled) {
+	public boolean addFiles(@NotNull final VirtualFile[] files, final boolean checkCompiled, final boolean includeTests) {
 		for (final VirtualFile file : files) {
-			if (!addFile(file, checkCompiled) && checkCompiled) {
+			if (!addFile(file, checkCompiled, includeTests) && checkCompiled) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	public boolean addFile(@NotNull final VirtualFile file, final boolean checkCompiled) {
+	public boolean addFile(@NotNull final VirtualFile file, final boolean checkCompiled, final boolean includeTests) {
 		if (!IdeaUtilImpl.isValidFileType(file.getFileType())) {
 			return true;
 		}
@@ -112,13 +112,13 @@ public final class FindBugsProjects {
 			}
 		}
 
-		final FindBugsProject findBugsProject = get(module);
+		final FindBugsProject findBugsProject = get(module, includeTests);
 		findBugsProject.addOutputFile(file);
 		return true;
 	}
 
 	@NotNull
-	public FindBugsProject get(@NotNull final Module module) {
+	public FindBugsProject get(@NotNull final Module module, final boolean includeTests) {
 		FindBugsProject ret = projects.get(module);
 		if (ret == null) {
 
@@ -128,14 +128,14 @@ public final class FindBugsProjects {
 					makeProjectName(module)
 			);
 
-			final VirtualFile[] sourceRoots = getSourceRoots(module);
+			final VirtualFile[] sourceRoots = getSourceRoots(module, includeTests);
 			for (final VirtualFile sourceRoot : sourceRoots) {
 				if (!ret.addSourceDir(sourceRoot.getCanonicalPath())) {
 					LOGGER.debug(String.format("Source directory '%s' of module '%s' already added", sourceRoot, module.getName()));
 				}
 			}
 
-			final Collection<VirtualFile> compilerOutputPaths = getCompilerOutputPaths(module);
+			final Collection<VirtualFile> compilerOutputPaths = getCompilerOutputPaths(module, includeTests);
 			for (final VirtualFile compilerOutputPath : compilerOutputPaths) {
 				if (!ret.addAuxClasspathEntry(compilerOutputPath.getCanonicalPath())) {
 					LOGGER.debug(String.format("Aux classpath '%s' of module '%s' already added", compilerOutputPath, module.getName()));
@@ -161,7 +161,7 @@ public final class FindBugsProjects {
 	}
 
 	@NotNull
-	private Collection<VirtualFile> getCompilerOutputPaths(@NotNull final Module module) {
+	private Collection<VirtualFile> getCompilerOutputPaths(@NotNull final Module module, final boolean includeTests) {
 
 		final Set<Module> modules = New.set();
 		ModuleUtilCore.getDependencies(module, modules);
@@ -174,10 +174,17 @@ public final class FindBugsProjects {
 			boolean added = false;
 			final CompilerModuleExtension extension = CompilerModuleExtension.getInstance(m);
 			if (extension != null) {
-				final VirtualFile path = extension.getCompilerOutputPath(); // FIXME: think of getCompilerOutputPathForTests()
+				VirtualFile path = extension.getCompilerOutputPath();
 				if (path != null) {
 					ret.add(path);
 					added = true;
+				}
+				if (includeTests) {
+					path = extension.getCompilerOutputPathForTests();
+					if (path != null) {
+						ret.add(path);
+						added = true;
+					}
 				}
 			}
 			if (!added) {
@@ -197,8 +204,8 @@ public final class FindBugsProjects {
 	}
 
 	@NotNull
-	private VirtualFile[] getSourceRoots(@NotNull final Module module) {
-		return ModuleRootManager.getInstance(module).getSourceRoots();
+	private VirtualFile[] getSourceRoots(@NotNull final Module module, final boolean includeTests) {
+		return ModuleRootManager.getInstance(module).getSourceRoots(includeTests);
 	}
 
 	private void showWarning(@NotNull final String message) {

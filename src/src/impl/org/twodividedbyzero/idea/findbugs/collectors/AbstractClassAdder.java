@@ -19,7 +19,12 @@
 package org.twodividedbyzero.idea.findbugs.collectors;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.CompilerModuleExtension;
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassOwner;
@@ -41,9 +46,13 @@ public abstract class AbstractClassAdder {
 	private final Project _project;
 	private final PsiManager _psiManager;
 
+	@NotNull
+	private final ProjectFileIndex fileIndex;
+
 	AbstractClassAdder(@NotNull final Project project) {
 		_project = project;
 		_psiManager = PsiManager.getInstance(_project);
+		fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
 	}
 
 	abstract void put(@NotNull final String fqp, @NotNull final PsiElement element);
@@ -57,7 +66,7 @@ public abstract class AbstractClassAdder {
 			final PsiClass[] psiClasses = psiClassOwner.getClasses();
 
 			for (final PsiClass psiClass : psiClasses) {
-				final VirtualFile compilerOutputPath = IdeaUtilImpl.getCompilerOutputPath(virtualFile, _project);
+				final VirtualFile compilerOutputPath = getCompilerOutputPath(virtualFile);
 				if (compilerOutputPath == null) {
 					continue;
 				}
@@ -82,7 +91,7 @@ public abstract class AbstractClassAdder {
 				final String s = selectedPsiClass.getName();
 				final String s1 = psiClass.getName();
 
-				final VirtualFile compilerOutputPath = IdeaUtilImpl.getCompilerOutputPath(virtualFile, _project);
+				final VirtualFile compilerOutputPath = getCompilerOutputPath(virtualFile);
 				if (compilerOutputPath == null) {
 					LOGGER.warn("No output path specified for " + virtualFile + " in " + _project);
 					return; // f. e. project/module compiled and then compiler output path removed (empty text field)
@@ -203,6 +212,23 @@ public abstract class AbstractClassAdder {
 		//fqn.append(getParentClassNotation(psiClass));
 		fqn.append(psiClass.getName());
 		return fqn.toString();
+	}
+
+	@Nullable
+	private VirtualFile getCompilerOutputPath(@NotNull final VirtualFile virtualFile) {
+		final Module module = ModuleUtilCore.findModuleForFile(virtualFile, _project);
+		if (module == null) {
+			return null;
+		}
+		final CompilerModuleExtension compilerModuleExtension = CompilerModuleExtension.getInstance(module);
+		if (compilerModuleExtension != null) {
+			if (fileIndex.isInTestSourceContent(virtualFile)) {
+				return compilerModuleExtension.getCompilerOutputPathForTests();
+			} else {
+				return compilerModuleExtension.getCompilerOutputPath();
+			}
+		}
+		return null;
 	}
 
 	/*public static String getParentClassNotation(final PsiClass psiClass) {

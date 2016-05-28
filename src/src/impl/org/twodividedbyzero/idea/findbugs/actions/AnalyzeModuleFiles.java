@@ -25,6 +25,8 @@ import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.CompilerModuleExtension;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.util.Consumer;
@@ -32,7 +34,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.collectors.RecurseFileCollector;
-import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProject;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsProjects;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsStarter;
@@ -70,6 +71,12 @@ public final class AnalyzeModuleFiles extends AbstractAnalyzeAction {
 			@NotNull final FindBugsState state
 	) {
 
+		final int answer = askIncludeTest(project);
+		if (answer == Messages.CANCEL) {
+			return;
+		}
+		final boolean includeTests = Messages.YES == answer;
+
 		final Module module = getModule(e);
 
 		new FindBugsStarter(project, "Running FindBugs analysis for module'" + module.getName() + "'...") {
@@ -80,16 +87,29 @@ public final class AnalyzeModuleFiles extends AbstractAnalyzeAction {
 
 			@Override
 			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
-				final VirtualFile compilerOutputPath = IdeaUtilImpl.getCompilerOutputPath(module);
+				final CompilerModuleExtension extension = CompilerModuleExtension.getInstance(module);
+				if (extension == null) {
+					throw new IllegalStateException("No compiler extension for module " + module.getName());
+				}
+
+				final VirtualFile compilerOutputPath = extension.getCompilerOutputPath();
 				if (compilerOutputPath == null) {
 					showWarning(ResourcesLoader.getString("analysis.moduleNotCompiled", module.getName()));
 					return false;
 				}
+				VirtualFile compilerOutputPathForTests = null;
+				if (includeTests) {
+					compilerOutputPathForTests = extension.getCompilerOutputPathForTests();
+				}
 
 				indicator.setText("Collecting files for analysis...");
-				final FindBugsProject findBugsProject = projects.get(module);
+				final FindBugsProject findBugsProject = projects.get(module, includeTests && compilerOutputPathForTests != null);
 				final int[] count = new int[1];
 				RecurseFileCollector.addFiles(project, indicator, findBugsProject, new File(compilerOutputPath.getCanonicalPath()), count);
+
+				if (compilerOutputPathForTests != null) {
+					RecurseFileCollector.addFiles(project, indicator, findBugsProject, new File(compilerOutputPathForTests.getCanonicalPath()), count);
+				}
 				return true;
 			}
 		}.start();

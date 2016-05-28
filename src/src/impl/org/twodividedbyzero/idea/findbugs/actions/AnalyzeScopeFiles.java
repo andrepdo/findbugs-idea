@@ -126,14 +126,15 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 		uiOptions.ANALYZE_TEST_SOURCES = dlg.isInspectTestSources();
 		FileDocumentManager.getInstance().saveAllDocuments();
 
-		analyzeImpl(e, project, scope);
+		analyzeImpl(e, project, scope, dlg.isInspectTestSources());
 	}
 
 
 	private void analyzeImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
-			@NotNull final AnalysisScope scope
+			@NotNull final AnalysisScope scope,
+			final boolean includeTests
 	) {
 		new FindBugsStarter(project, "Running FindBugs analysis...") {
 			@Override
@@ -143,7 +144,7 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 
 			@Override
 			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
-				addClasses(indicator, project, scope, projects);
+				addClasses(indicator, project, scope, projects, includeTests);
 				return true;
 			}
 		}.start();
@@ -154,7 +155,8 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 			@NotNull final ProgressIndicator indicator,
 			@NotNull final Project project,
 			@NotNull final AnalysisScope scope,
-			@NotNull final FindBugsProjects projects
+			@NotNull final FindBugsProjects projects,
+			final boolean includeTests
 	) {
 
 		final PsiManager psiManager = PsiManager.getInstance(project);
@@ -169,7 +171,7 @@ public final class AnalyzeScopeFiles extends AbstractAnalyzeAction {
 					}
 					if (IdeaUtilImpl.SUPPORTED_FILE_TYPES.contains(file.getFileType())) {
 						final VirtualFile vf = file.getVirtualFile();
-						projects.addFile(vf, false); // LATER: profile this
+						projects.addFile(vf, false, includeTests); // LATER: profile this
 						indicator.setText2("Files collected: " + ++count[0]);
 					}
 				}
