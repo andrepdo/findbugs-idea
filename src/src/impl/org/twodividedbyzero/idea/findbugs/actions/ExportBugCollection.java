@@ -83,8 +83,11 @@ public final class ExportBugCollection extends AbstractAction {
 
 		boolean enable = false;
 		if (state.isIdle()) {
-			final FindBugsResult result = ToolWindowPanel.getInstance(project).getResult();
-			enable = result != null && !result.isBugCollectionEmpty();
+			final ToolWindowPanel panel = ToolWindowPanel.getInstance(toolWindow);
+			if (panel != null) {
+				final FindBugsResult result = panel.getResult();
+				enable = result != null && !result.isBugCollectionEmpty();
+			}
 		}
 
 		e.getPresentation().setEnabled(enable);
@@ -98,6 +101,11 @@ public final class ExportBugCollection extends AbstractAction {
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state
 	) {
+
+		final ToolWindowPanel panel = ToolWindowPanel.getInstance(toolWindow);
+		if (panel == null) {
+			return;
+		}
 
 		final ExportBugCollectionDialog dialog = new ExportBugCollectionDialog(project);
 		dialog.reset();
@@ -125,7 +133,7 @@ public final class ExportBugCollection extends AbstractAction {
 			}
 		}
 
-		final FindBugsResult result = ToolWindowPanel.getInstance(project).getResult();
+		final FindBugsResult result = panel.getResult();
 
 		new Task.Backgroundable(project, ResourcesLoader.getString("export.progress.title"), false) {
 			@Override

@@ -90,7 +90,7 @@
         <ul>
             <li>Issue 112: Support test sources</li>
             <li>Issue 116: Support run analyze before commit</li>
-            <li>Issue 120, 122: Fix possible NPE</li>
+            <li>Issue 120, 122, 126: Fix possible NPE</li>
             <li>Issue 121: Fix bug in legacy settings converter</li>
             <li>Issue 124: Fix possible ClassCastException caused by ShowQuickSearch</li>
             <li>Issue 128: Fix possible ClassCastException caused by Abstract*Action</li>
