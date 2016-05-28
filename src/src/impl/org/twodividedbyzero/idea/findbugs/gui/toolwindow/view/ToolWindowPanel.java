@@ -358,6 +358,7 @@ public final class ToolWindowPanel extends JPanel implements AnalysisStateListen
 		_multiSplitPane.validate();
 	}
 
+	@NotNull
 	public BugTreePanel getBugTreePanel() {
 		if (_bugTreePanel == null) {
 			_bugTreePanel = new BugTreePanel(this, _project);

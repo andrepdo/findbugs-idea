@@ -74,6 +74,8 @@ public class BugTreePanel extends JPanel {
 	private final Project _project;
 
 	private boolean _scrollToSource;
+
+	@NotNull
 	private final BugTree _bugTree;
 
 	private final RootNode _visibleRootNode;
@@ -348,6 +350,7 @@ public class BugTreePanel extends JPanel {
 		_splitPaneVerticalWeight = splitPaneVerticalWeight;
 	}
 
+	@NotNull
 	public BugTree getBugTree() {
 		return _bugTree;
 	}

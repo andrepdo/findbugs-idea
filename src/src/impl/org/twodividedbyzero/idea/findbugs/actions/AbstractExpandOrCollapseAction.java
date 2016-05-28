@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2016 Andre Pfeiler
+ * Copyright 2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -23,25 +23,37 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
+import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.BugTreePanel;
 import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
-import org.twodividedbyzero.idea.findbugs.gui.tree.view.BugTree;
 
-public final class ShowQuickSearch extends AbstractAction {
+import javax.swing.JTree;
+
+abstract class AbstractExpandOrCollapseAction extends AbstractAction {
 
 	@Override
-	void updateImpl(
+	final void updateImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@NotNull final ToolWindow toolWindow,
 			@NotNull final FindBugsState state
 	) {
 
-		e.getPresentation().setEnabled(state.isIdle());
+		final ToolWindowPanel panel = ToolWindowPanel.getInstance(toolWindow);
+		if (panel == null) {
+			e.getPresentation().setEnabled(false);
+			e.getPresentation().setVisible(false);
+			return;
+		}
+		final JTree tree = panel.getBugTreePanel().getBugTree();
+		final boolean enabled = isExpandedOrCollapsed(tree) && tree.getRowCount() > 1;
+		e.getPresentation().setEnabled(enabled);
 		e.getPresentation().setVisible(true);
 	}
 
+	abstract boolean isExpandedOrCollapsed(@NotNull final JTree bugTree);
+
 	@Override
-	void actionPerformedImpl(
+	final void actionPerformedImpl(
 			@NotNull final AnActionEvent e,
 			@NotNull final Project project,
 			@NotNull final ToolWindow toolWindow,
@@ -50,10 +62,9 @@ public final class ShowQuickSearch extends AbstractAction {
 
 		final ToolWindowPanel panel = ToolWindowPanel.getInstance(toolWindow);
 		if (panel != null) {
-			final BugTree tree = panel.getBugTreePanel().getBugTree();
-			tree.setSelectionRow(0);
-			tree.requestFocusInWindow();
-			tree.showQuickSearchPopup("");
+			expandOrCollapse(panel.getBugTreePanel());
 		}
 	}
+
+	abstract void expandOrCollapse(@NotNull final BugTreePanel bugTreePanel);
 }

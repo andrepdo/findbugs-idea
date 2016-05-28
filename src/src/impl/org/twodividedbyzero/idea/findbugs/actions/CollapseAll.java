@@ -18,51 +18,20 @@
  */
 package org.twodividedbyzero.idea.findbugs.actions;
 
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.ui.content.Content;
 import org.jetbrains.annotations.NotNull;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
-import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
+import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.BugTreePanel;
 
 import javax.swing.JTree;
 
-public final class CollapseAll extends AbstractAction {
+public final class CollapseAll extends AbstractExpandOrCollapseAction {
 
 	@Override
-	void updateImpl(
-			@NotNull final AnActionEvent e,
-			@NotNull final Project project,
-			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state
-	) {
-
-		final Content content = toolWindow.getContentManager().getContent(0);
-		if (content == null) {
-			e.getPresentation().setEnabled(false);
-			e.getPresentation().setVisible(false);
-			return;
-		}
-		final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
-		final JTree tree = panel.getBugTreePanel().getBugTree();
-		final boolean enabled = tree.isExpanded(1) && tree.getRowCount() > 1;
-		e.getPresentation().setEnabled(enabled);
-		e.getPresentation().setVisible(true);
+	boolean isExpandedOrCollapsed(@NotNull final JTree bugTree) {
+		return bugTree.isExpanded(1);
 	}
 
 	@Override
-	void actionPerformedImpl(
-			@NotNull final AnActionEvent e,
-			@NotNull final Project project,
-			@NotNull final ToolWindow toolWindow,
-			@NotNull final FindBugsState state
-	) {
-
-		final Content content = toolWindow.getContentManager().getContent(0);
-		if (content != null) {
-			final ToolWindowPanel panel = (ToolWindowPanel) content.getComponent();
-			panel.getBugTreePanel().collapseTree();
-		}
+	void expandOrCollapse(@NotNull final BugTreePanel bugTreePanel) {
+		bugTreePanel.collapseTree();
 	}
 }
