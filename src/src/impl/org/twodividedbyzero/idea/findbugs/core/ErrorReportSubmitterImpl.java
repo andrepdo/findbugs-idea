@@ -31,13 +31,21 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.actions.HelpAction;
 import org.twodividedbyzero.idea.findbugs.common.util.ErrorUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
+import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
 import java.awt.Component;
 import java.awt.datatransfer.StringSelection;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
+/**
+ * LATER: check is plugin up-to-date? query latest release -> https://api.github.com/repos/andrepdo/findbugs-idea/releases/latest
+ */
 public final class ErrorReportSubmitterImpl extends ErrorReportSubmitter {
 
 	@Override
@@ -71,37 +79,28 @@ public final class ErrorReportSubmitterImpl extends ErrorReportSubmitter {
 			body.append(additionalInfo);
 		}
 
-		boolean isFindBugsError = true;
-		String title = null;
+		boolean isFindBugsError = false;
+		final Set<Error> errors = New.set();
 		for (final IdeaLoggingEvent event : events) {
-			final String message = event.getMessage();
-			final boolean hasMessage = !StringUtil.isEmptyOrSpaces(message);
-			final String stack = event.getThrowableText();
-			final boolean hasStack = !StringUtil.isEmptyOrSpaces(stack);
-			if (title == null && hasMessage) {
-				title = message;
-			}
-			if (hasMessage || hasStack) {
-				body.append("\n\n");
-				if (hasMessage) {
-					body.append(message);
-					if (hasStack) {
-						body.append("\n");
-					}
-				}
-				if (hasStack) {
-					body.append(stack);
+			final Error error = createError(event);
+			if (error != null) {
+				errors.add(error);
+				if (!isFindBugsError && error.throwable != null) {
+					isFindBugsError = FindBugsUtil.isFindBugsError(error.throwable);
 				}
 			}
-			if (!hasStack) {
-				isFindBugsError = false;
-			} else if (!FindBugsUtil.isFindBugsError(event.getThrowable())) {
-				isFindBugsError = false;
-			}
 		}
-		if (title == null) {
-			title = "Analysis Error";
+		if (errors.isEmpty()) {
+			throw new IllegalStateException("No error to report");
 		}
+		final List<Error> sorted = new ArrayList<Error>(errors);
+		Collections.sort(sorted);
+
+		for (final Error error : sorted) {
+			body.append("\n\n").append(error.fullError);
+		}
+
+		final String title = makeTitle(sorted.get(0));
 
 		return openBrowser(
 				isFindBugsError,
@@ -148,6 +147,92 @@ public final class ErrorReportSubmitterImpl extends ErrorReportSubmitter {
 			return URLEncoder.encode(value, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			throw ErrorUtil.toUnchecked(e); // all system support UTF-8
+		}
+	}
+
+	@NotNull
+	private static String makeTitle(@NotNull final Error error) {
+		String ret = error.message;
+		if (ret == null && error.throwable != null) {
+			@SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+			final Throwable cause = ErrorUtil.getCause(error.throwable);
+			ret = cause.toString();
+			if ("java.lang.IllegalStateException".equals(ret)) {
+				ret = "ISE";
+			} else if ("java.lang.NullPointerException".equals(ret)) {
+				ret = "NPE";
+			}
+			final StackTraceElement[] stack = cause.getStackTrace();
+			if (stack.length > 0) {
+				String location = stack[0].toString();
+				if (location.startsWith("org.twodividedbyzero.idea.findbugs.")) {
+					location = location.substring("org.twodividedbyzero.idea.findbugs.".length());
+				}
+				ret += " at " + location;
+			}
+		}
+		if (StringUtil.isEmptyOrSpaces(ret)) {
+			ret = "Analysis Error";
+		}
+		return ret;
+	}
+
+	@Nullable
+	private static Error createError(@NotNull final IdeaLoggingEvent event) {
+		String message = event.getMessage();
+		if (StringUtil.isEmptyOrSpaces(message) || "null".equals(message)) {
+			message = null;
+		}
+		final Throwable throwable = event.getThrowable();
+		if (message == null && throwable == null) {
+			return null;
+		}
+		final String fullError;
+		if (!StringUtil.equals(message, throwable.getMessage())) {
+			fullError = message + "\n" + StringUtil.getThrowableText(throwable);
+		} else {
+			fullError = StringUtil.getThrowableText(throwable);
+		}
+		return new Error(message, throwable, fullError);
+	}
+
+	private static class Error implements Comparable<Error> {
+		@Nullable
+		private final String message;
+
+		@Nullable
+		private final Throwable throwable;
+
+		@NotNull
+		private final String fullError;
+
+		public Error(
+				@Nullable final String message,
+				@Nullable final Throwable throwable,
+				@NotNull final String fullError
+		) {
+			this.message = message;
+			this.throwable = throwable;
+			this.fullError = fullError;
+		}
+
+		@Override
+		public int compareTo(@NotNull final Error o) {
+			return fullError.compareTo(o.fullError);
+		}
+
+		@Override
+		public boolean equals(@Nullable final Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			Error error = (Error) o;
+			return fullError.equals(error.fullError);
+
+		}
+
+		@Override
+		public int hashCode() {
+			return fullError.hashCode();
 		}
 	}
 }

@@ -86,6 +86,10 @@
     </description>
     <change-notes>
         <![CDATA[<html>
+        <h3>1.0.0</h3>
+        <ul>
+            <li>Improved error submitter</li>
+        </ul>
         <h3>0.9.999</h3>
         <ul>
             <li>Issue 112: Support test sources</li>
