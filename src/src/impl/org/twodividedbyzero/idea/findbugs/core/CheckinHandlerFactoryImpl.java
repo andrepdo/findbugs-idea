@@ -75,6 +75,10 @@ public final class CheckinHandlerFactoryImpl extends CheckinHandlerFactory {
 
 			@Override
 			public ReturnResult beforeCheckin(@Nullable final CommitExecutor executor, final PairConsumer<Object, Object> additionalDataConsumer) {
+				if (!WorkspaceSettings.getInstance(panel.getProject()).analyzeBeforeCheckIn) {
+					return super.beforeCheckin(executor, additionalDataConsumer);
+				}
+
 				new FindBugsStarter(
 						panel.getProject(),
 						"Running FindBugs analysis for affected files...",
@@ -120,7 +124,7 @@ public final class CheckinHandlerFactoryImpl extends CheckinHandlerFactory {
 						}
 					}
 				}
-				return ReturnResult.COMMIT;
+				return super.beforeCheckin(executor, additionalDataConsumer);
 			}
 		};
 	}
