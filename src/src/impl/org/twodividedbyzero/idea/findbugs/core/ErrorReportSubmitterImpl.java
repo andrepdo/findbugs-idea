@@ -21,14 +21,19 @@ package org.twodividedbyzero.idea.findbugs.core;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter;
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.diagnostic.SubmittedReportInfo;
 import com.intellij.openapi.ide.CopyPasteManager;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.actions.HelpAction;
+import org.twodividedbyzero.idea.findbugs.common.VersionManager;
 import org.twodividedbyzero.idea.findbugs.common.util.ErrorUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.FindBugsUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
@@ -42,27 +47,52 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * LATER: check is plugin up-to-date? query latest release -> https://api.github.com/repos/andrepdo/findbugs-idea/releases/latest
- */
 public final class ErrorReportSubmitterImpl extends ErrorReportSubmitter {
+
+	private static final Logger LOGGER = Logger.getInstance(ErrorReportSubmitterImpl.class);
 
 	@Override
 	public String getReportActionText() {
 		return StringUtil.capitalizeWords(ResourcesLoader.getString("error.submitReport.title"), true);
 	}
 
-	@SuppressWarnings("deprecation") // maximize compatibility
 	@Override
-	public SubmittedReportInfo submit(IdeaLoggingEvent[] events, Component parentComponent) {
-		return submitImpl(events, null, parentComponent);
-	}
+	public boolean submit(@NotNull IdeaLoggingEvent[] events, @Nullable String additionalInfo, @NotNull Component parentComponent, @NotNull Consumer<SubmittedReportInfo> consumer) {
 
-	@SuppressWarnings("deprecation") // maximize compatibility
-	@Override
-	public boolean trySubmitAsync(IdeaLoggingEvent[] events, String additionalInfo, Component parentComponent, Consumer<SubmittedReportInfo> consumer) {
-		consumer.consume(submitImpl(events, additionalInfo, parentComponent));
+		final AtomicReference<String> latestVersionRef = New.atomicRef(null);
+		new Task.Modal(null, ResourcesLoader.getString("error.submitReport.checkVersion"), false) {
+			@Override
+			public void run(@NotNull final ProgressIndicator indicator) {
+				try {
+					latestVersionRef.set(PluginVersionChecker.getLatestVersion(indicator));
+				} catch (final Exception e) {
+					LOGGER.warn(e);
+				}
+			}
+		}.queue();
+
+		String latestVersion = latestVersionRef.get();
+		if (!StringUtil.isEmptyOrSpaces(latestVersion)) {
+			if (latestVersion.startsWith("v")) {
+				latestVersion = latestVersion.substring(1);
+				final String current = VersionManager.getVersion();
+				if (!latestVersion.equals(current)) {
+					final int answer = Messages.showYesNoDialog(
+							ResourcesLoader.getString("error.submitReport.old.text", current, latestVersion),
+							StringUtil.capitalizeWords(ResourcesLoader.getString("error.submitReport.old.title"), true),
+							Messages.getQuestionIcon()
+					);
+					if (answer == Messages.NO) {
+						return false;
+					}
+				}
+			}
+		}
+
+		final SubmittedReportInfo reportInfo = submitImpl(events, additionalInfo, parentComponent);
+		consumer.consume(reportInfo);
 		return true;
 	}
 
