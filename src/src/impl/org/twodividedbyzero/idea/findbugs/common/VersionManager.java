@@ -39,9 +39,9 @@ import java.nio.charset.Charset;
 @SuppressWarnings({"HardCodedStringLiteral", "UseOfSystemOutOrSystemErr", "StringConcatenation", "CallToPrintStackTrace", "CallToPrintStackTrace"})
 public class VersionManager {
 
-	private static final long _major = 0;
-	private static final long _minor = 9;
-	private static final long _build = 999;
+	private static final long _major = 1;
+	private static final long _minor = 0;
+	private static final long _build = 0;
 
 	private static final String _branch = "trunk";
 
@@ -80,7 +80,7 @@ public class VersionManager {
 
 	/** e.g. "0.9.21".
 	 * @return*/
-	private static String getVersion() {
+	public static String getVersion() {
 		return MAJOR_MINOR_BUILD;
 	}
 
