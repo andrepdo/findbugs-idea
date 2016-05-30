@@ -19,10 +19,10 @@
 package org.twodividedbyzero.idea.findbugs.core;
 
 import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.RoamingType;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.components.StorageScheme;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +30,11 @@ import org.jetbrains.annotations.Nullable;
 
 @State(
 		name = "FindBugs-IDEA",
-		storages = @Storage(file /*IDEA 2016: switch to value()*/ = "findbugs-idea.xml", roamingType = RoamingType.DEFAULT)
+		storages = {
+				// Remove both @Storage entry below and use only this if IDEA 15 support is gone: @Storage("findbugs-idea.xml")
+				@Storage(file = "$PROJECT_FILE$"),
+				@Storage(file = "$PROJECT_CONFIG_DIR$/findbugs-idea.xml", scheme = StorageScheme.DIRECTORY_BASED)
+		}
 )
 public final class ProjectSettings extends AbstractSettings implements PersistentStateComponent<ProjectSettings> {
 
