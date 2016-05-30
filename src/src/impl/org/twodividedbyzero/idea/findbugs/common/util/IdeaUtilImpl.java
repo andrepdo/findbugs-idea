@@ -52,6 +52,7 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import edu.umd.cs.findbugs.BugInstance;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
@@ -60,7 +61,6 @@ import org.twodividedbyzero.idea.findbugs.collectors.AbstractClassAdder;
 import org.twodividedbyzero.idea.findbugs.collectors.ClassCollector;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
-import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 
 import java.io.File;
 import java.util.Arrays;
@@ -466,18 +466,10 @@ public final class IdeaUtilImpl {
 		return psiFile == null ? null : PsiDocumentManager.getInstance(project).getDocument(psiFile);
 	}
 
-
 	@Nullable
-	public static PsiElement findAnonymousClassPsiElement(@NotNull final BugInstanceNode bugInstanceNode, @NotNull final Project project) {
-		final PsiFile psiFile = bugInstanceNode.getPsiFile();
-		return findAnonymousClassPsiElement(psiFile, bugInstanceNode, project);
-	}
-
-
-	@Nullable
-	public static PsiElement findAnonymousClassPsiElement(@Nullable final PsiFileSystemItem psiFile, @NotNull final BugInstanceNode bugInstanceNode, @NotNull final Project project) {
+	public static PsiElement findAnonymousClassPsiElement(@Nullable final PsiFileSystemItem psiFile, @NotNull final BugInstance bugInstance, @NotNull final Project project) {
 		if (psiFile != null) {
-			final String classNameToFind = BugInstanceUtil.getSimpleClassName(bugInstanceNode.getBugInstance());
+			final String classNameToFind = BugInstanceUtil.getSimpleClassName(bugInstance);
 			final ClassCollector cc = new ClassCollector(project);
 			cc.addContainingClasses(psiFile.getVirtualFile());
 			final Map<String, PsiElement> classes = cc.getClasses();

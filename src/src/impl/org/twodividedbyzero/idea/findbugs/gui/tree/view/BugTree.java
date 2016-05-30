@@ -158,7 +158,7 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 			final VirtualFile virtualFile = psiFile.getVirtualFile();
 			final int[] lines = node.getSourceLines();
 			if (lines[0] == -1 && lines[1] == -1) {  // find anonymous classes
-				final PsiElement psiElement = IdeaUtilImpl.findAnonymousClassPsiElement(psiFile, node, _project);
+				final PsiElement psiElement = IdeaUtilImpl.findAnonymousClassPsiElement(psiFile, node.getBugInstance(), _project);
 				if (psiElement != null) {
 					return psiElement;
 				}
@@ -171,7 +171,7 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 		if ("psi.Element".equals(s)) {
 			final int[] lines = node.getSourceLines();
 			if (lines[0] == -1 && lines[1] == -1) {  // find anonymous classes
-				final PsiElement psiElement = IdeaUtilImpl.findAnonymousClassPsiElement(psiFile, node, _project);
+				final PsiElement psiElement = IdeaUtilImpl.findAnonymousClassPsiElement(psiFile, node.getBugInstance(), _project);
 				if (psiElement != null) {
 					return psiElement;
 				}

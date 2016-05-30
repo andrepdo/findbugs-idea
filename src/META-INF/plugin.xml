@@ -88,6 +88,7 @@
         <![CDATA[<html>
         <h3>1.0.0</h3>
         <ul>
+            <li>Issue 129: Fix possible ISE caused by LineMarker</li>
             <li>Improved error submitter</li>
         </ul>
         <h3>0.9.999</h3>

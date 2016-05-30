@@ -200,7 +200,7 @@ public class BugTreePanel extends JPanel {
 		PsiElement element = null;
 
 		if (lineStart < 0 && lineEnd < 0) {   // find anonymous classes
-			final PsiElement psiElement = IdeaUtilImpl.findAnonymousClassPsiElement(bugInstanceNode, _project);
+			final PsiElement psiElement = IdeaUtilImpl.findAnonymousClassPsiElement(bugInstanceNode.getPsiFile(), bugInstanceNode.getBugInstance(), _project);
 			if (psiElement != null) {
 				element = psiElement;
 			}

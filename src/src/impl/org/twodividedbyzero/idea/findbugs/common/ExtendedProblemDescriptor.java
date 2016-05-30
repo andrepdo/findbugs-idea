@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Andre Pfeiler
+ * Copyright 2008-2016 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -26,177 +26,124 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import edu.umd.cs.findbugs.BugInstance;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.Bug;
-import org.twodividedbyzero.idea.findbugs.gui.tree.model.BugInstanceNode;
 
-
-/**
- * $Date$
- *
- * @author Andre Pfeiler<andrep@twodividedbyzero.org>
- * @version $Revision$
- * @since 0.0.1
- */
 public class ExtendedProblemDescriptor implements ProblemDescriptor, ProblemGroup {
 
+	@NotNull
+	private final PsiFile psiFile;
 
-	private final PsiFile _psiFile;
-	private PsiElement _psiElement;
-	private int _lineStart;
-	private int _lineEnd;
-	private int _hash;
+	private PsiElement psiElement;
 
-	private final BugInstanceNode _bugInstanceNode;
+	/**
+	 * This is the line as reported by FindBugs, rather than that computed by IDEA.
+	 */
+	private final int lineStart;
+
+	@NotNull
+	private final Bug bug;
 
 
-	public ExtendedProblemDescriptor(final PsiFile psiFile, final BugInstanceNode bugInstanceNode) {
-		_psiFile = psiFile;
-		_bugInstanceNode = bugInstanceNode;
-		final int[] lines = BugInstanceUtil.getSourceLines(_bugInstanceNode);
-		_lineStart = lines[0] - 1;
-		_lineEnd = lines[1] - 1;
+	public ExtendedProblemDescriptor(@NotNull final PsiFile psiFile, @NotNull final Bug bug) {
+		this.psiFile = psiFile;
+		this.bug = bug;
+		final int[] lines = BugInstanceUtil.getSourceLines(this.bug.getInstance());
+		lineStart = lines[0] - 1;
+		//_lineEnd = lines[1] - 1;
 	}
 
-
+	@Override
 	public boolean showTooltip() {
 		return true;
 	}
 
-
+	@NotNull
 	public Bug getBug() {
-		return _bugInstanceNode.getBug();
+		return bug;
 	}
 
-
-	/**
-	 * Get the column position of this error.
-	 *
-	 * @return the column position.
-	 */
-	public int getColumn() {
-		return 0;
-	}
-
-
-	/**
-	 * Get the line position of this error.
-	 * <p/>
-	 * This is the line as reported by FindBugs, rather than that computed
-	 * by IDEA.
-	 *
-	 * @return the line position.
-	 */
-	public int getLine() {
-		return _lineStart;
-	}
-
-
+	@Override
 	public void setTextAttributes(final TextAttributesKey key) {
 	}
 
-
 	@Nullable
+	@Override
 	public ProblemGroup getProblemGroup() {
 		return this;
 	}
 
-
+	@Override
 	public void setProblemGroup(@Nullable final ProblemGroup problemgroup) {
 	}
 
-
+	@Override
 	public String getProblemName() {
 		return "FindBugs-IDEA";
 	}
 
-
+	@Override
 	public PsiElement getEndElement() {
 		return getPsiElement();
 	}
 
-
+	@NotNull
+	@Override
 	public ProblemHighlightType getHighlightType() {
 		return ProblemHighlightType.GENERIC_ERROR_OR_WARNING;
 	}
 
-
+	@Override
 	public int getLineNumber() {
-		return getLine();
+		return lineStart;
 	}
 
-
+	@Override
 	public PsiElement getPsiElement() {
-		if (_psiElement != null) {
-			return _psiElement;
+		if (psiElement != null) {
+			return psiElement;
 		}
-		if(_lineStart < 0) {
-			_psiElement =  IdeaUtilImpl.findAnonymousClassPsiElement(_bugInstanceNode, _psiFile.getProject());
+		if (lineStart < 0) {
+			psiElement = IdeaUtilImpl.findAnonymousClassPsiElement(psiFile, bug.getInstance(), psiFile.getProject());
 		} else {
-			_psiElement = IdeaUtilImpl.getElementAtLine(_psiFile, _lineStart);
+			psiElement = IdeaUtilImpl.getElementAtLine(psiFile, lineStart);
 		}
-		return _psiElement;
+		return psiElement;
 	}
 
-
+	@Override
 	public PsiElement getStartElement() {
 		return getPsiElement();
 	}
 
-
+	@Override
 	public boolean isAfterEndOfLine() {
 		return false;
 	}
 
-
 	@NotNull
+	@Override
 	public String getDescriptionTemplate() {
 		return "<description template>";
 	}
 
-
 	@edu.umd.cs.findbugs.annotations.SuppressFBWarnings({"PZLA_PREFER_ZERO_LENGTH_ARRAYS"})
 	@Nullable
+	@Override
 	public QuickFix<?>[] getFixes() {
 		return null;
 	}
 
-
+	@Override
 	public TextRange getTextRangeInElement() {
 		return null;
 	}
 
-
-	public void setLineStart(final int lineStart) {
-		_lineStart = lineStart;
-	}
-
-
-	public void setLineEnd(final int lineEnd) {
-		_lineEnd = lineEnd;
-	}
-
-
+	@NotNull
 	public PsiFile getPsiFile() {
-		return _psiFile;
-	}
-
-
-	public int getLineStart() {
-		return _lineStart;
-	}
-
-
-	public int getLineEnd() {
-		return _lineEnd;
-	}
-
-
-	public int getHash() {
-		return _hash;
+		return psiFile;
 	}
 }

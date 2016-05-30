@@ -109,7 +109,7 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode, RootNod
 
 	private void _addProblem(@Nullable final PsiFile value, final BugInstanceNode leaf) {
 		if (value != null) {
-			final ExtendedProblemDescriptor element = new ExtendedProblemDescriptor(value, leaf);
+			final ExtendedProblemDescriptor element = new ExtendedProblemDescriptor(value, leaf.getBug());
 			if (_problems.containsKey(value)) {
 				_problems.get(value).add(element);
 			} else {

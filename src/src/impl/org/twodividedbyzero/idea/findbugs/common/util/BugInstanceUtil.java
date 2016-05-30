@@ -133,13 +133,6 @@ public class BugInstanceUtil {
 		return bugInstance.getBugPattern().getDetailText();
 	}
 
-
-	public static int[] getSourceLines(final BugInstanceNode bugInstanceNode) {
-		final BugInstance bugInstance = bugInstanceNode.getBugInstance();
-		return getSourceLines(bugInstance);
-	}
-
-
 	@SuppressWarnings("ConstantConditions")
 	@SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE")
 	public static int[] getSourceLines(@NotNull final BugInstance bugInstance) {

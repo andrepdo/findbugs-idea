@@ -57,6 +57,9 @@ public final class BugsLineMarkerProvider implements LineMarkerProvider {
 	public BugsLineMarkerProvider() {
 	}
 
+	/**
+	 * TODO: Note that this method could be invoked outside EDT!
+	 */
 	@Override
 	@Nullable
 	public LineMarkerInfo<?> getLineMarkerInfo(@NotNull final PsiElement psiElement) {
@@ -70,7 +73,7 @@ public final class BugsLineMarkerProvider implements LineMarkerProvider {
 		}
 
 		final PsiFile psiFile = IdeaUtilImpl.getPsiFile(psiElement);
-		final ToolWindowPanel toolWindow = ToolWindowPanel.getInstance(project);
+		final ToolWindowPanel toolWindow = ToolWindowPanel.getInstance(project); // TODO fix possible EDT visibility issue
 		if (toolWindow == null) {
 			return null;
 		}
