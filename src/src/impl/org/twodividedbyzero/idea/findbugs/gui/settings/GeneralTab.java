@@ -136,7 +136,7 @@ final class GeneralTab extends JPanel {
 
 				Plugins.findsecbugs_plugin.id,
 				"Find Security Bugs",
-				"Find Security Bugs is a plugin that aims to help security audit.",
+				"The FindBugs plugin for security audits of Java web applications.",
 				"https://github.com/h3xstream/find-sec-bugs",
 
 				Plugins.AndroidFindbugs.id,
