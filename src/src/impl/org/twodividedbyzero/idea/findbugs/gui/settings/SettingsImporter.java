@@ -29,7 +29,6 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.preferences.LegacyAbstractSettingsConverter;
-import org.twodividedbyzero.idea.findbugs.gui.preferences.importer.SonarProfileImporter;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 

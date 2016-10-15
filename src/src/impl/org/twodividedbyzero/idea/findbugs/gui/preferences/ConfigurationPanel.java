@@ -45,7 +45,7 @@ import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.gui.common.AaComboBox;
 import org.twodividedbyzero.idea.findbugs.gui.common.AaSlider;
 import org.twodividedbyzero.idea.findbugs.gui.common.VerticalFlowLayout;
-import org.twodividedbyzero.idea.findbugs.gui.preferences.importer.SonarProfileImporter;
+import org.twodividedbyzero.idea.findbugs.gui.settings.SonarProfileImporter;
 import org.twodividedbyzero.idea.findbugs.preferences.AnalysisEffort;
 import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;

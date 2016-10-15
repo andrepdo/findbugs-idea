@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with FindBugs-IDEA.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.twodividedbyzero.idea.findbugs.gui.preferences.importer;
+package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
