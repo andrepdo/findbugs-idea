@@ -32,13 +32,33 @@ import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.plugins.AbstractPluginLoaderLegacy;
 import org.twodividedbyzero.idea.findbugs.plugins.Plugins;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
 import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
 
 import java.util.List;
 import java.util.Map;
 
 public final class LegacyAbstractSettingsConverter {
+
+	private static final String PROPERTIES_PREFIX = "property.";
+	private static final String RUN_ANALYSIS_IN_BACKGROUND = PROPERTIES_PREFIX + "runAnalysisInBackground";
+	private static final String ANALYSIS_EFFORT_LEVEL = PROPERTIES_PREFIX + "analysisEffortLevel";
+	private static final String MIN_PRIORITY_TO_REPORT = PROPERTIES_PREFIX + "minPriorityToReport";
+	private static final String TOOLWINDOW_TO_FRONT = PROPERTIES_PREFIX + "toolWindowToFront";
+	private static final String COMPILE_BEFORE_ANALYZE = PROPERTIES_PREFIX + "compileBeforeAnalyse";
+	private static final String ANALYZE_AFTER_COMPILE = PROPERTIES_PREFIX + "analyzeAfterCompile";
+	private static final String ANALYZE_AFTER_AUTOMAKE = PROPERTIES_PREFIX + "analyzeAfterAutoMake";
+	private static final String IMPORT_FILE_PATH = PROPERTIES_PREFIX + "importedFilePath";
+	private static final String EXPORT_BASE_DIR = PROPERTIES_PREFIX + "exportBaseDir";
+	private static final String EXPORT_CREATE_ARCHIVE_DIR = PROPERTIES_PREFIX + "exportCreateArchiveDir";
+	private static final String EXPORT_AS_HTML = PROPERTIES_PREFIX + "exportAsHtml";
+	private static final String EXPORT_AS_XML = PROPERTIES_PREFIX + "exportAsXml";
+	private static final String EXPORT_OPEN_BROWSER = PROPERTIES_PREFIX + "exportOpenBrowser";
+	private static final String TOOLWINDOW_SCROLL_TO_SOURCE = PROPERTIES_PREFIX + "toolWindowScrollToSource";
+	private static final String TOOLWINDOW_EDITOR_PREVIEW = PROPERTIES_PREFIX + "toolWindowEditorPreview";
+	private static final String TOOLWINDOW_GROUP_BY = PROPERTIES_PREFIX + "toolWindowGroupBy";
+	private static final String ANNOTATION_SUPPRESS_WARNING_CLASS = PROPERTIES_PREFIX + "annotationSuppressWarningsClass";
+	private static final String ANNOTATION_GUTTER_ICON_ENABLED = PROPERTIES_PREFIX + "annotationGutterIconEnabled";
+	private static final String ANNOTATION_TEXT_RAGE_MARKUP_ENABLED = PROPERTIES_PREFIX + "annotationTextRangeMarkupEnabled";
 
 	private LegacyAbstractSettingsConverter() {
 	}
@@ -67,33 +87,33 @@ public final class LegacyAbstractSettingsConverter {
 			return;
 		}
 
-		to.analysisEffort = asString(p.get(FindBugsPreferences.ANALYSIS_EFFORT_LEVEL), to.analysisEffort);
-		to.minPriority = asString(p.get(FindBugsPreferences.MIN_PRIORITY_TO_REPORT), to.minPriority);
-		to.suppressWarningsClassName = asString(p.get(FindBugsPreferences.ANNOTATION_SUPPRESS_WARNING_CLASS), to.suppressWarningsClassName);
+		to.analysisEffort = asString(p.get(ANALYSIS_EFFORT_LEVEL), to.analysisEffort);
+		to.minPriority = asString(p.get(MIN_PRIORITY_TO_REPORT), to.minPriority);
+		to.suppressWarningsClassName = asString(p.get(ANNOTATION_SUPPRESS_WARNING_CLASS), to.suppressWarningsClassName);
 
 		if (toWorkspace != null) {
-			toWorkspace.compileBeforeAnalyze = asBoolean(p.get(FindBugsPreferences.COMPILE_BEFORE_ANALYZE), toWorkspace.compileBeforeAnalyze);
-			toWorkspace.analyzeAfterCompile = asBoolean(p.get(FindBugsPreferences.ANALYZE_AFTER_COMPILE), toWorkspace.analyzeAfterCompile);
-			toWorkspace.analyzeAfterAutoMake = asBoolean(p.get(FindBugsPreferences.ANALYZE_AFTER_AUTOMAKE), toWorkspace.analyzeAfterAutoMake);
-			toWorkspace.runInBackground = asBoolean(p.get(FindBugsPreferences.RUN_ANALYSIS_IN_BACKGROUND), toWorkspace.runInBackground);
+			toWorkspace.compileBeforeAnalyze = asBoolean(p.get(COMPILE_BEFORE_ANALYZE), toWorkspace.compileBeforeAnalyze);
+			toWorkspace.analyzeAfterCompile = asBoolean(p.get(ANALYZE_AFTER_COMPILE), toWorkspace.analyzeAfterCompile);
+			toWorkspace.analyzeAfterAutoMake = asBoolean(p.get(ANALYZE_AFTER_AUTOMAKE), toWorkspace.analyzeAfterAutoMake);
+			toWorkspace.runInBackground = asBoolean(p.get(RUN_ANALYSIS_IN_BACKGROUND), toWorkspace.runInBackground);
 
-			final String importFilePath = FileUtilFb.toSystemIndependentName(asString(p.get(FindBugsPreferences.IMPORT_FILE_PATH), null));
+			final String importFilePath = FileUtilFb.toSystemIndependentName(asString(p.get(IMPORT_FILE_PATH), null));
 			if (!StringUtil.isEmptyOrSpaces(importFilePath)) {
 				toWorkspace.importFilePath.put(importFilePathKey, importFilePath);
 			}
-			toWorkspace.exportBugCollectionDirectory = asString(p.get(FindBugsPreferences.EXPORT_BASE_DIR), toWorkspace.exportBugCollectionDirectory);
-			toWorkspace.exportBugCollectionAsHtml = asBoolean(p.get(FindBugsPreferences.EXPORT_AS_HTML), toWorkspace.exportBugCollectionAsHtml);
-			toWorkspace.exportBugCollectionAsXml = asBoolean(p.get(FindBugsPreferences.EXPORT_AS_XML), toWorkspace.exportBugCollectionAsXml);
-			toWorkspace.exportBugCollectionCreateSubDirectory = asBoolean(p.get(FindBugsPreferences.EXPORT_CREATE_ARCHIVE_DIR), toWorkspace.exportBugCollectionCreateSubDirectory);
-			toWorkspace.openExportedHtmlBugCollectionInBrowser = asBoolean(p.get(FindBugsPreferences.EXPORT_OPEN_BROWSER), toWorkspace.openExportedHtmlBugCollectionInBrowser);
+			toWorkspace.exportBugCollectionDirectory = asString(p.get(EXPORT_BASE_DIR), toWorkspace.exportBugCollectionDirectory);
+			toWorkspace.exportBugCollectionAsHtml = asBoolean(p.get(EXPORT_AS_HTML), toWorkspace.exportBugCollectionAsHtml);
+			toWorkspace.exportBugCollectionAsXml = asBoolean(p.get(EXPORT_AS_XML), toWorkspace.exportBugCollectionAsXml);
+			toWorkspace.exportBugCollectionCreateSubDirectory = asBoolean(p.get(EXPORT_CREATE_ARCHIVE_DIR), toWorkspace.exportBugCollectionCreateSubDirectory);
+			toWorkspace.openExportedHtmlBugCollectionInBrowser = asBoolean(p.get(EXPORT_OPEN_BROWSER), toWorkspace.openExportedHtmlBugCollectionInBrowser);
 
-			toWorkspace.toolWindowToFront = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_TO_FRONT), toWorkspace.toolWindowToFront);
-			toWorkspace.toolWindowScrollToSource = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_SCROLL_TO_SOURCE), toWorkspace.toolWindowScrollToSource);
-			toWorkspace.toolWindowEditorPreview = asBoolean(p.get(FindBugsPreferences.TOOLWINDOW_EDITOR_PREVIEW), toWorkspace.toolWindowEditorPreview);
-			toWorkspace.toolWindowGroupBy = asString(p.get(FindBugsPreferences.TOOLWINDOW_GROUP_BY), toWorkspace.toolWindowGroupBy);
+			toWorkspace.toolWindowToFront = asBoolean(p.get(TOOLWINDOW_TO_FRONT), toWorkspace.toolWindowToFront);
+			toWorkspace.toolWindowScrollToSource = asBoolean(p.get(TOOLWINDOW_SCROLL_TO_SOURCE), toWorkspace.toolWindowScrollToSource);
+			toWorkspace.toolWindowEditorPreview = asBoolean(p.get(TOOLWINDOW_EDITOR_PREVIEW), toWorkspace.toolWindowEditorPreview);
+			toWorkspace.toolWindowGroupBy = asString(p.get(TOOLWINDOW_GROUP_BY), toWorkspace.toolWindowGroupBy);
 
-			toWorkspace.annotationGutterIcon = asBoolean(p.get(FindBugsPreferences.ANNOTATION_GUTTER_ICON_ENABLED), toWorkspace.annotationGutterIcon);
-			toWorkspace.annotationTextRangeMarkup = asBoolean(p.get(FindBugsPreferences.ANNOTATION_TEXT_RAGE_MARKUP_ENABLED), toWorkspace.annotationTextRangeMarkup);
+			toWorkspace.annotationGutterIcon = asBoolean(p.get(ANNOTATION_GUTTER_ICON_ENABLED), toWorkspace.annotationGutterIcon);
+			toWorkspace.annotationTextRangeMarkup = asBoolean(p.get(ANNOTATION_TEXT_RAGE_MARKUP_ENABLED), toWorkspace.annotationTextRangeMarkup);
 		}
 	}
 

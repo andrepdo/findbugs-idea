@@ -60,7 +60,6 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.collectors.AbstractClassAdder;
 import org.twodividedbyzero.idea.findbugs.collectors.ClassCollector;
 import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPlugin;
 
 import java.io.File;
 import java.util.Arrays;
@@ -124,18 +123,6 @@ public final class IdeaUtilImpl {
 	}
 
 	private IdeaUtilImpl() {
-	}
-
-
-	@Deprecated
-	public static FindBugsPlugin getPluginComponent(@NotNull final Project project) {
-		return project.getComponent(FindBugsPlugin.class);
-	}
-
-
-	@Deprecated
-	public static FindBugsPlugin getModuleComponent(@NotNull final Module module) {
-		return module.getComponent(FindBugsPlugin.class);
 	}
 
 

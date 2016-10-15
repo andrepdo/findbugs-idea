@@ -19,43 +19,31 @@
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.MessageType;
 import edu.umd.cs.findbugs.BugPattern;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.DetectorFactoryCollection;
-import org.jdom.Document;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
-import org.twodividedbyzero.idea.findbugs.core.FindBugsPluginImpl;
 import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
-import org.twodividedbyzero.idea.findbugs.preferences.FindBugsPreferences;
-import org.twodividedbyzero.idea.findbugs.preferences.PersistencePreferencesBean;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class SonarProfileImporter {
+abstract class SonarProfileImporter {
 
 	private static final Logger LOGGER = Logger.getInstance(SonarProfileImporter.class.getName());
 	private static final String ROOT_NAME = "profile";
 
-	public static boolean isValid(@NotNull final Element root) {
+	static boolean isValid(@NotNull final Element root) {
 		return ROOT_NAME.equals(root.getName());
 	}
 
-	public static boolean isValid(@NotNull final Document document) {
-		return isValid(document.getRootElement());
-	}
-
-	public boolean doImport(@NotNull final Element profile, @NotNull final AbstractSettings settings) {
+	boolean doImport(@NotNull final Element profile, @NotNull final AbstractSettings settings) {
 		final Element rules = profile.getChild("rules");
 		if (rules == null) {
 			handleError(ResourcesLoader.getString("sonar.import.error.noRules"));
@@ -111,7 +99,7 @@ public abstract class SonarProfileImporter {
 
 	}
 
-	protected abstract void handleError(@NotNull final String message);
+	abstract void handleError(@NotNull final String message);
 
 	@NotNull
 	private static Map<String, String> createIndexDetectorsPluginIdByShortName() {
@@ -126,64 +114,6 @@ public abstract class SonarProfileImporter {
 	private static Map<String, Set<String>> createIndexShortNameByBugPatternType() {
 		final Map<String, Set<String>> ret = New.map();
 		for (final DetectorFactory detector : DetectorFactoryCollection.instance().getFactories()) {
-			for (final BugPattern bugPattern : detector.getReportedBugPatterns()) {
-				Set<String> detectorsShortName = ret.get(bugPattern.getType());
-				if (detectorsShortName == null) {
-					detectorsShortName = new HashSet<String>();
-					ret.put(bugPattern.getType(), detectorsShortName);
-				}
-				detectorsShortName.add(detector.getShortName());
-			}
-		}
-		return ret;
-	}
-
-
-	@Nullable
-	public static PersistencePreferencesBean doImportLegacy(Project project, final Document document) {
-		final Element profile = document.getRootElement();
-		final Element rules = profile.getChild("rules");
-		if (rules == null) {
-			FindBugsPluginImpl.showToolWindowNotifier(project, "The file format is invalid. No rules element found.",
-					MessageType.ERROR);
-			return null;
-		}
-
-		final Map<String, Set<String>> detectorsShortNameByBugPatternType = createIndexDetectorsShortNameByBugPatternTypeLegacy();
-
-		final PersistencePreferencesBean ret = new PersistencePreferencesBean();
-		for (final Set<String> detectorsShortName : detectorsShortNameByBugPatternType.values()) {
-			for (final String detectorShortName : detectorsShortName) {
-				ret.getDetectors().put(detectorShortName, "false");
-			}
-		}
-
-		final List ruleList = rules.getChildren("rule");
-		for (final Object child : ruleList) {
-			if (child instanceof Element) {
-				final Element rule = (Element) child;
-				final Element repositoryKey = rule.getChild("repositoryKey");
-				final Element key = rule.getChild("key");
-				if (repositoryKey != null && "findbugs".equals(repositoryKey.getValue()) && key != null) {
-					final String bugPatternType = key.getValue();
-					final Set<String> detectorsShortName = detectorsShortNameByBugPatternType.get(bugPatternType);
-					if (detectorsShortName != null) {
-						for (final String detectorShortName : detectorsShortName) {
-							ret.getDetectors().put(detectorShortName, "true");
-						}
-					} else {
-						LOGGER.warn("Unknown bug pattern type: " + bugPatternType);
-					}
-				}
-			}
-		}
-		return ret;
-	}
-
-
-	private static Map<String, Set<String>> createIndexDetectorsShortNameByBugPatternTypeLegacy() {
-		final Map<String, Set<String>> ret = new HashMap<String, Set<String>>();
-		for (final DetectorFactory detector : FindBugsPreferences.getDetectorFactorCollection().getFactories()) {
 			for (final BugPattern bugPattern : detector.getReportedBugPatterns()) {
 				Set<String> detectorsShortName = ret.get(bugPattern.getType());
 				if (detectorsShortName == null) {

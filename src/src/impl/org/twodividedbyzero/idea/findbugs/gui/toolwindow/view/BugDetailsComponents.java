@@ -26,6 +26,7 @@ import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.util.ui.UIUtil;
 import edu.umd.cs.findbugs.BugAnnotation;
 import edu.umd.cs.findbugs.BugInstance;
+import edu.umd.cs.findbugs.BugPattern;
 import edu.umd.cs.findbugs.DetectorFactory;
 import edu.umd.cs.findbugs.FieldAnnotation;
 import edu.umd.cs.findbugs.I18N;
@@ -42,7 +43,6 @@ import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitLayout;
 import org.twodividedbyzero.idea.findbugs.gui.common.MultiSplitPane;
 import org.twodividedbyzero.idea.findbugs.gui.common.ScrollPaneFacade;
 import org.twodividedbyzero.idea.findbugs.gui.common.VerticalTextIcon;
-import org.twodividedbyzero.idea.findbugs.gui.preferences.DetectorConfiguration;
 import org.twodividedbyzero.idea.findbugs.gui.tree.view.BugTree;
 import org.twodividedbyzero.idea.findbugs.resources.GuiResources;
 
@@ -70,6 +70,10 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 
 @SuppressWarnings("MagicNumber")
 public final class BugDetailsComponents {
@@ -411,7 +415,7 @@ public final class BugDetailsComponents {
 			html.append("<li>");
 			html.append(detectorFactory.getShortName());
 			html.append(" <font color='gray'>(");
-			html.append(DetectorConfiguration.createBugsAbbreviation(detectorFactory));
+			html.append(createBugsAbbreviation(detectorFactory));
 			html.append(")</font>");
 			html.append("</li>");
 		}
@@ -503,6 +507,25 @@ public final class BugDetailsComponents {
 		if (_explanationPane != null) {
 			_explanationPane.setText(null);
 		}
+	}
+
+	public static String createBugsAbbreviation(final DetectorFactory factory) {
+		final StringBuilder sb = new StringBuilder();
+		final Collection<BugPattern> patterns = factory.getReportedBugPatterns();
+		final HashSet<String> abbrs = new LinkedHashSet<String>();
+		for (final BugPattern pattern : patterns) {
+			final String abbr = pattern.getAbbrev();
+			abbrs.add(abbr);
+		}
+		//noinspection ForLoopWithMissingComponent
+		for (final Iterator<String> iter = abbrs.iterator(); iter.hasNext(); ) {
+			final String element = iter.next();
+			sb.append(element);
+			if (iter.hasNext()) {
+				sb.append('|');
+			}
+		}
+		return sb.toString();
 	}
 
 	private static class BugDetailsEditorPane extends JEditorPane {

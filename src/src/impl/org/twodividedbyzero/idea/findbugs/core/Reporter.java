@@ -184,7 +184,7 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 				map.put(error.getMessage(), error.getCause());
 			}
 
-			FindBugsPluginImpl.processError(status);
+			//FindBugsPluginImpl.processError(status); TODO
 		}
 
 		final Set<String> missingClasses = getMissingClasses();
@@ -198,7 +198,7 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 				map.put(missingClass, null);
 				LOGGER.info(missingClass);
 			}
-			FindBugsPluginImpl.processError(status);
+			//FindBugsPluginImpl.processError(status); TODO
 		}
 	}
 

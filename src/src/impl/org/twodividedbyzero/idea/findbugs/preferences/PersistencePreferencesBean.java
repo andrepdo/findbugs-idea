@@ -18,6 +18,8 @@
  */
 package org.twodividedbyzero.idea.findbugs.preferences;
 
+import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,8 +32,6 @@ import java.util.Set;
  * Legacy. Do not use this anymore. This will be converted by {@link org.twodividedbyzero.idea.findbugs.gui.preferences.LegacyProjectSettingsConverter}.
  */
 public class PersistencePreferencesBean {
-	public static final String PERSISTENCE_ROOT_NAME = "findbugs";
-
 	// do not make fields final or private - initialized per reflection from intellij persistence framework
 	public Map<String, String> _basePreferences;
 
@@ -77,7 +77,7 @@ public class PersistencePreferencesBean {
 		_enabledModuleConfigs = new ArrayList<String>();
 
 		_annotationGutterIconEnabled = true;
-		_annotationSuppressWarningsClass = FindBugsPreferences.DEFAULT_ANNOTATION_CLASS_NAME;
+		_annotationSuppressWarningsClass = FindBugsPluginConstants.DEFAULT_SUPPRESS_WARNINGS_CLASSNAME;
 		_annotationTextRangeMarkupEnabled = true;
 		_annotationTypeSettings = new HashMap<String, String>();
 	}
@@ -125,11 +125,6 @@ public class PersistencePreferencesBean {
 	}
 
 
-	public Collection<String> getEnabledUserPluginIds() {
-		return _enabledUserPluginIds;
-	}
-
-
 	public Collection<String> getDisabledUserPluginIds() {
 		return _disabledUserPluginIds;
 	}
@@ -154,12 +149,6 @@ public class PersistencePreferencesBean {
 	public boolean isEmpty() {
 		return _basePreferences.isEmpty() && _detectors.isEmpty();
 	}
-
-
-	/*public static void clearAndSet(final Collection<?> collection) {
-		collection.clear();
-		collection.addAll(collection);
-	}*/
 
 
 	public boolean isAnnotationTextRangeMarkupEnabled() {
