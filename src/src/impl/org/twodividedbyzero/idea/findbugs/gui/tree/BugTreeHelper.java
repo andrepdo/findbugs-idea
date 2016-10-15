@@ -46,17 +46,22 @@ public final class BugTreeHelper {
 	}
 
 	@Nullable
-	public PsiFile getSelectedPsiFile() {
+	public BugInstanceNode getSelectedBugInstanceNode() {
 		final TreePath treepath = tree.getSelectionPath();
 		if (treepath == null) {
 			return null;
 		}
 		final Object treeNode = treepath.getLastPathComponent();
 		if (treeNode instanceof BugInstanceNode) {
-			final BugInstanceNode node = (BugInstanceNode) treeNode;
-			return node.getPsiFile();
+			return (BugInstanceNode) treeNode;
 		}
 		return null;
+	}
+
+	@Nullable
+	public PsiFile getSelectedPsiFile() {
+		final BugInstanceNode node = getSelectedBugInstanceNode();
+		return node != null ? node.getPsiFile() : null;
 	}
 
 	@Nullable

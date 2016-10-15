@@ -20,6 +20,7 @@ package org.twodividedbyzero.idea.findbugs.gui.tree.view;
 
 import com.intellij.ide.OccurenceNavigator;
 import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataProvider;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
@@ -34,6 +35,7 @@ import com.intellij.util.OpenSourceUtil;
 import com.intellij.util.ui.UIUtil;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.Bug;
 import org.twodividedbyzero.idea.findbugs.gui.common.AnalysisRunDetailsDialog;
@@ -136,41 +138,24 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 	}
 
 	@Override
-	public Object getData(@NonNls final String s) {
-		final TreePath treepath = getSelectionPath();
-		if (treepath == null) {
-			return null;
+	public Object getData(@NonNls final String dataId) {
+		if (CommonDataKeys.VIRTUAL_FILE.is(dataId)) {
+			return getSelectedVirtualFile();
 		}
-		final Object treeNode = treepath.getLastPathComponent();
-		if (!(treeNode instanceof BugInstanceNode)) {
-			return null;
+		if (CommonDataKeys.NAVIGATABLE.is(dataId)) {
+			return getNavigatableData();
 		}
-		final BugInstanceNode node = (BugInstanceNode) treeNode;
-		final PsiFile psiFile = _treeHelper.getSelectedPsiFile();
-
-		if ("virtualFile".equals(s)) {
-			return psiFile == null ? null : psiFile.getVirtualFile();
+		if (CommonDataKeys.VIRTUAL_FILE_ARRAY.is(dataId)) {
+			final VirtualFile virtualFile = getSelectedVirtualFile();
+			return virtualFile != null ? new VirtualFile[]{virtualFile} : VirtualFile.EMPTY_ARRAY;
 		}
-		if ("Navigatable".equals(s)) {
-			if (psiFile == null) {
+		if (CommonDataKeys.PSI_ELEMENT.is(dataId)) {
+			final BugInstanceNode node = _treeHelper.getSelectedBugInstanceNode();
+			if (node == null) {
 				return null;
 			}
-			final VirtualFile virtualFile = psiFile.getVirtualFile();
-			final int[] lines = node.getSourceLines();
-			if (lines[0] == -1 && lines[1] == -1) {  // find anonymous classes
-				final PsiElement psiElement = IdeaUtilImpl.findAnonymousClassPsiElement(psiFile, node.getBugInstance(), _project);
-				if (psiElement != null) {
-					return psiElement;
-				}
-			} else if (virtualFile != null) {
-				return new OpenFileDescriptor(_project, virtualFile, node.getSourceLines()[0] - 1, 0);
-			} else {
-				return null;
-			}
-		}
-		if ("psi.Element".equals(s)) {
-			final int[] lines = node.getSourceLines();
-			if (lines[0] == -1 && lines[1] == -1) {  // find anonymous classes
+			final PsiFile psiFile = node.getPsiFile();
+			if (node.isAnonymousClass()) {
 				final PsiElement psiElement = IdeaUtilImpl.findAnonymousClassPsiElement(psiFile, node.getBugInstance(), _project);
 				if (psiElement != null) {
 					return psiElement;
@@ -178,13 +163,39 @@ public class BugTree extends Tree implements DataProvider, OccurenceNavigator {
 			}
 			return psiFile;
 		}
-		if ("virtualFileArray".equals(s)) {
-			if (psiFile == null) {
-				return VirtualFile.EMPTY_ARRAY;
-			}
-			return new VirtualFile[]{psiFile.getVirtualFile()};
-		}
 		return null;
+	}
+
+	@Nullable
+	private PsiFile getSelectedPsiFile() {
+		return _treeHelper.getSelectedPsiFile();
+	}
+
+	@Nullable
+	private VirtualFile getSelectedVirtualFile() {
+		final PsiFile psiFile = getSelectedPsiFile();
+		return psiFile != null ? psiFile.getVirtualFile() : null;
+	}
+
+	@Nullable
+	private Object getNavigatableData() {
+		final BugInstanceNode node = _treeHelper.getSelectedBugInstanceNode();
+		if (node == null) {
+			return null;
+		}
+		final int[] lines = node.getSourceLines();
+		if (BugInstanceNode.isAnonymousClass(lines)) {
+			return IdeaUtilImpl.findAnonymousClassPsiElement(node.getPsiFile(), node.getBugInstance(), _project);
+		}
+		final PsiFile psiFile = node.getPsiFile();
+		if (psiFile == null) {
+			return null;
+		}
+		final VirtualFile virtualFile = psiFile.getVirtualFile();
+		if (virtualFile == null) {
+			return null;
+		}
+		return new OpenFileDescriptor(_project, virtualFile, lines[0] - 1, 0);
 	}
 
 	public ScrollToSourceHandler getScrollToSourceHandler() {

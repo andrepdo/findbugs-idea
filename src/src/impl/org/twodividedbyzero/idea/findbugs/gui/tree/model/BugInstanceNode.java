@@ -29,8 +29,6 @@ import edu.umd.cs.findbugs.SourceLineAnnotation;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
-import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.Bug;
 import org.twodividedbyzero.idea.findbugs.gui.tree.NodeVisitor;
@@ -81,10 +79,14 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 		return _problem;
 	}
 
-
+	/**
+	 * Note that this method could be invoked outside EDT.
+	 * So in worst case the {@code _file} reference is resolved multiple times
+	 * (because of thread visibility, _file is not volatile)
+	 * but this is legal since other used references (f. e. {@code _project}) are final.
+	 */
 	@Nullable
 	public PsiFile getPsiFile() {
-		EventDispatchThreadHelper.checkEDT();
 		if (_file == null) {
 			final PsiClass psiClass = IdeaUtilImpl.findJavaPsiClass(_project, getBug().getModule(), getSourcePath());
 			if (psiClass != null) {
@@ -190,6 +192,7 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 	 */
 	@SuppressWarnings("ConstantConditions")
 	@SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE")
+	@NotNull
 	public int[] getSourceLines() {
 		final int[] lines = new int[2];
 		final SourceLineAnnotation annotation = _bugInstance.getPrimarySourceLineAnnotation();
@@ -205,6 +208,13 @@ public class BugInstanceNode extends AbstractTreeNode<VisitableTreeNode> impleme
 		return lines;
 	}
 
+	public static boolean isAnonymousClass(@NotNull final int lines[]) {
+		return lines[0] == -1 && lines[1] == -1;
+	}
+
+	public boolean isAnonymousClass() {
+		return isAnonymousClass(getSourceLines());
+	}
 
 	@Override
 	public String toString() {
