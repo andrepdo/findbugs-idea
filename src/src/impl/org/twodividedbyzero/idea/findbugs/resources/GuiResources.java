@@ -133,8 +133,10 @@ public class GuiResources {
 
 		EDITORPANE_STYLESHEET = new StyleSheet();
 		EDITORPANE_STYLESHEET.addRule("body {font-size: " + fontSize + "pt; color: " + fontColor + "}");
-		EDITORPANE_STYLESHEET.addRule("code {font-family: courier; font-size: " + fontSize + "pt}");
-		EDITORPANE_STYLESHEET.addRule("pre {color: " + gray + "; font-family: courier; font-size: " + fontSize + "pt}");
+		EDITORPANE_STYLESHEET.addRule("p {margin-top:4px;margin-bottom:8px;}");
+		EDITORPANE_STYLESHEET.addRule("code {font-family: courier; font-size: " + fontSize + "pt; background-color:#f5f5f5;padding:4px;}");
+		EDITORPANE_STYLESHEET.addRule("pre {color: " + gray + "; font-family: courier; font-size: " + fontSize + "pt; padding:9px; background-color:#f5f5f5; border:1px solid #cccccc;color:#333333;}");
+		EDITORPANE_STYLESHEET.addRule("blockquote {padding: 10px 20px; margin: 0 0 20px; border-left: 5px solid #bbbbbb;");
 		EDITORPANE_STYLESHEET.addRule("a {color: " + blue + "; font-decoration: underline}");
 		EDITORPANE_STYLESHEET.addRule("li {margin-left: 10px; list-style-type: none}");
 		EDITORPANE_STYLESHEET.addRule("#Low {background-color: " + green + "; width: 15px; height: 15px;}");
