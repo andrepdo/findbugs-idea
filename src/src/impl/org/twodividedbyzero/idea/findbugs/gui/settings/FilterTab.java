@@ -104,10 +104,10 @@ final class FilterTab extends JPanel implements SettingsOwner<AbstractSettings> 
 					"<FindBugsFilter>\n" +
 					"    <!-- http://stackoverflow.com/questions/7568579/eclipsefindbugs-exclude-filter-files-doesnt-work -->\n" +
 					"    <Match>\n" +
-					"        <Class name=\"~.*\\.R\\$.*\"/>\n" +
-					"    </Match>\n" +
-					"    <Match>\n" +
-					"    <Class name=\"~.*\\.Manifest\\$.*\"/>\n" +
+					"        <Or>\n" +
+					"            <Class name=\"~.*\\.R\\$.*\"/>\n" +
+					"            <Class name=\"~.*\\.Manifest\\$.*\"/>\n" +
+					"        </Or>\n" +
 					"    </Match>\n" +
 					"</FindBugsFilter>");
 
