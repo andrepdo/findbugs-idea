@@ -37,8 +37,8 @@ import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.StringUtilFb;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
+import org.twodividedbyzero.idea.findbugs.core.ProblemCache;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
-import org.twodividedbyzero.idea.findbugs.gui.toolwindow.view.ToolWindowPanel;
 import org.twodividedbyzero.idea.findbugs.intentions.ClearAndSuppressBugIntentionAction;
 import org.twodividedbyzero.idea.findbugs.intentions.ClearBugIntentionAction;
 import org.twodividedbyzero.idea.findbugs.intentions.SuppressReportBugForClassIntentionAction;
@@ -65,11 +65,11 @@ public final class BugAnnotator implements Annotator {
 		if (!FindBugsState.get(project).isIdle()) {
 			return;
 		}
-		final ToolWindowPanel toolWindow = ToolWindowPanel.getInstance(project);
-		if (toolWindow == null) {
+		final ProblemCache cache = psiElement.getProject().getComponent(ProblemCache.class);
+		if (cache == null) {
 			return;
 		}
-		final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = toolWindow.getProblems();
+		final Map<PsiFile, List<ExtendedProblemDescriptor>> problems = cache.getProblems();
 
 		final PsiFile psiFile = psiElement.getContainingFile();
 		if (problems.containsKey(psiFile)) {

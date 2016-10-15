@@ -71,6 +71,7 @@ import java.util.Map;
 @SuppressWarnings({"AnonymousInnerClass"})
 public class BugTreePanel extends JPanel {
 
+	@NotNull
 	private final Project _project;
 
 	private boolean _scrollToSource;

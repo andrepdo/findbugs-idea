@@ -27,6 +27,7 @@ import org.twodividedbyzero.idea.findbugs.common.ExtendedProblemDescriptor;
 import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 import org.twodividedbyzero.idea.findbugs.core.Bug;
+import org.twodividedbyzero.idea.findbugs.core.ProblemCache;
 import org.twodividedbyzero.idea.findbugs.gui.tree.BugInstanceComparator;
 import org.twodividedbyzero.idea.findbugs.gui.tree.GroupBy;
 import org.twodividedbyzero.idea.findbugs.gui.tree.model.Grouper.GrouperCallback;
@@ -40,8 +41,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode, RootNode> implements GrouperCallback<Bug> {
 
@@ -51,16 +50,18 @@ public class GroupTreeModel extends AbstractTreeModel<VisitableTreeNode, RootNod
 	private final transient Map<String, Map<Integer, List<BugInstanceGroupNode>>> _groups;
 	private transient Grouper<Bug> _grouper;
 	private int _bugCount;
-	private final transient ConcurrentMap<PsiFile, List<ExtendedProblemDescriptor>> _problems;
+	private final transient Map<PsiFile, List<ExtendedProblemDescriptor>> _problems;
+
+	@NotNull
 	private final transient Project _project;
 
 
-	public GroupTreeModel(@NotNull final RootNode root, final GroupBy[] groupBy, final Project project) {
+	public GroupTreeModel(@NotNull final RootNode root, final GroupBy[] groupBy, @NotNull final Project project) {
 		_root = root;
 		_project = project;
 		_groupBy = groupBy.clone();
 		_groups = new HashMap<String, Map<Integer, List<BugInstanceGroupNode>>>();
-		_problems = new ConcurrentHashMap<PsiFile, List<ExtendedProblemDescriptor>>();
+		_problems = project.getComponent(ProblemCache.class).getProblems();
 	}
 
 	Project getProject() {

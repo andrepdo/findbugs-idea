@@ -86,6 +86,10 @@
     </description>
     <change-notes>
         <![CDATA[<html>
+        <h3>1.0.1</h3>
+        <ul>
+            <li>Issue 176: Fix illegal toolwindow access outside EDT</li>
+        </ul>
         <h3>1.0.0</h3>
         <ul>
             <li>Issue 129: Fix possible ISE caused by LineMarker</li>
@@ -357,6 +361,11 @@
     <project-components>
         <component>
             <implementation-class>org.twodividedbyzero.idea.findbugs.gui.preferences.LegacyProjectSettingsConverter</implementation-class>
+        </component>
+    </project-components>
+    <project-components>
+        <component>
+            <implementation-class>org.twodividedbyzero.idea.findbugs.core.ProblemCache</implementation-class>
         </component>
     </project-components>
 

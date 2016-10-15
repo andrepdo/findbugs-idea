@@ -36,6 +36,7 @@ import org.twodividedbyzero.idea.findbugs.common.util.BugInstanceUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.GuiUtil;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.core.FindBugsState;
+import org.twodividedbyzero.idea.findbugs.core.ProblemCache;
 import org.twodividedbyzero.idea.findbugs.core.WorkspaceSettings;
 import org.twodividedbyzero.idea.findbugs.gui.intentions.GroupBugIntentionListPopupStep;
 import org.twodividedbyzero.idea.findbugs.gui.intentions.RootGroupBugIntentionListPopupStep;
@@ -71,13 +72,12 @@ public final class BugsLineMarkerProvider implements LineMarkerProvider {
 		if (!FindBugsState.get(project).isIdle()) {
 			return null;
 		}
-
-		final PsiFile psiFile = IdeaUtilImpl.getPsiFile(psiElement);
-		final ToolWindowPanel toolWindow = ToolWindowPanel.getInstance(project); // TODO fix possible EDT visibility issue
-		if (toolWindow == null) {
+		final ProblemCache cache = psiElement.getProject().getComponent(ProblemCache.class);
+		if (cache == null) {
 			return null;
 		}
-		final Map<PsiFile, List<ExtendedProblemDescriptor>> problemCache = toolWindow.getProblems();
+		final PsiFile psiFile = IdeaUtilImpl.getPsiFile(psiElement);
+		final Map<PsiFile, List<ExtendedProblemDescriptor>> problemCache = cache.getProblems();
 
 		if (problemCache.containsKey(psiFile)) {
 			final List<ExtendedProblemDescriptor> matchingDescriptors = new ArrayList<ExtendedProblemDescriptor>();
