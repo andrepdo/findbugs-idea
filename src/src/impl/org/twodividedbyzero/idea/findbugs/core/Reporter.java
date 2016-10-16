@@ -125,9 +125,7 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 	@Override
 	protected void doReportBug(@NotNull final BugInstance bug) {
 		if (!projectFilterSettings.displayWarning(bug)) {
-			if (!projectFilterSettings.displayWarning(bug)) {
-				return;
-			}
+			return;
 		}
 		_bugCollection.add(bug);
 		bugCount++;
