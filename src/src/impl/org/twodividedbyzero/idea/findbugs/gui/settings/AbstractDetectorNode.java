@@ -18,6 +18,7 @@
  */
 package org.twodividedbyzero.idea.findbugs.gui.settings;
 
+import com.intellij.openapi.util.NotNullComputable;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.Processor;
 import edu.umd.cs.findbugs.BugPattern;
@@ -28,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
+import org.twodividedbyzero.idea.findbugs.common.util.WithPluginClassloader;
 import org.twodividedbyzero.idea.findbugs.core.AbstractSettings;
 import org.twodividedbyzero.idea.findbugs.core.PluginSettings;
 
@@ -82,7 +84,13 @@ abstract class AbstractDetectorNode extends DefaultMutableTreeNode {
 	) {
 
 		final Map<String, List<DetectorNode>> byGroup = New.map();
-		final Iterator<DetectorFactory> detectorFactoryIterator = DetectorFactoryCollection.instance().factoryIterator();
+		final Iterator<DetectorFactory> detectorFactoryIterator = WithPluginClassloader.notNull(new NotNullComputable<Iterator<DetectorFactory>>() {
+			@NotNull
+			@Override
+			public Iterator<DetectorFactory> compute() {
+				return DetectorFactoryCollection.instance().factoryIterator();
+			}
+		});
 		fillByGroup(groupBy, acceptor, detectorFactoryIterator, byGroup, detectors);
 
 		final Comparator<DetectorNode> nodeComparator = new Comparator<DetectorNode>() {
