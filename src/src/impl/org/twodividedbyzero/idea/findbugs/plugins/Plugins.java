@@ -36,11 +36,13 @@ public enum Plugins {
 	AndroidFindbugs("AndroidFindbugs_0.5.jar", "jp.f.dev.findbugs.detect.android", true),
 
 	// http://fb-contrib.sourceforge.net/
-	fb_contrib("fb-contrib-6.6.1.jar", "com.mebigfatguy.fbcontrib", true, "fb-contrib-6.2.1.jar", "fb-contrib-6.0.0.jar", "fb-contrib-5.2.1.jar"),
+	fb_contrib("fb-contrib-6.8.0.jar", "com.mebigfatguy.fbcontrib", true, "fb-contrib-6.6.1.jar", "fb-contrib-6.2.1.jar",
+			"fb-contrib-6.0.0.jar", "fb-contrib-5.2.1.jar"),
 	fb_contrib_java6("fb-contrib-6.2.1.jar", "com.mebigfatguy.fbcontrib", false, "fb-contrib-6.0.0.jar", "fb-contrib-5.2.1.jar"),
 
 	// http://h3xstream.github.io/find-sec-bugs/
-	findsecbugs_plugin("findsecbugs-plugin-1.4.6.jar", "com.h3xstream.findsecbugs", false, "findsecbugs-plugin-1.4.5.jar",
+	findsecbugs_plugin("findsecbugs-plugin-1.5.0.jar", "com.h3xstream.findsecbugs", false, "findsecbugs-plugin-1.4.6.jar",
+			"findsecbugs-plugin-1.4.5.jar",
 			"findsecbugs-plugin-1.4.4.jar", "findsecbugs-plugin-1.4.3.jar", "findsecbugs-plugin-1.4.2.jar",
 			"findsecbugs-plugin-1.4.1.jar", "findsecbugs-plugin-1.4.0.jar", "findsecbugs-plugin-1.3.0.jar",
 			"findsecbugs-plugin-1.2.1.jar", "findsecbugs-plugin-1.2.0.jar");
