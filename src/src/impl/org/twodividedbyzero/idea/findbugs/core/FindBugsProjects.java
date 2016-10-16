@@ -25,6 +25,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.CompilerProjectExtension;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.util.NotNullComputable;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
@@ -34,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
+import org.twodividedbyzero.idea.findbugs.common.util.WithPluginClassloader;
 import org.twodividedbyzero.idea.findbugs.gui.common.BalloonTipFactory;
 import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 
@@ -122,11 +124,17 @@ public final class FindBugsProjects {
 		FindBugsProject ret = projects.get(module);
 		if (ret == null) {
 
-			ret = FindBugsProject.create(
-					project,
-					module,
-					makeProjectName(module)
-			);
+			ret = WithPluginClassloader.notNull(new NotNullComputable<FindBugsProject>() {
+				@NotNull
+				@Override
+				public FindBugsProject compute() {
+					return FindBugsProject.create(
+							project,
+							module,
+							makeProjectName(module)
+					);
+				}
+			});
 
 			final VirtualFile[] sourceRoots = getSourceRoots(module, includeTests);
 			for (final VirtualFile sourceRoot : sourceRoots) {
