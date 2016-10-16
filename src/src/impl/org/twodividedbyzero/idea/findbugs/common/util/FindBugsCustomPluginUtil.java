@@ -77,11 +77,25 @@ public final class FindBugsCustomPluginUtil {
 
 
 	private static Plugin loadTemporary(@NotNull final URL plugin) throws MalformedURLException, PluginException {
-		final PluginLoader pluginLoader = PluginLoader.getPluginLoader(plugin, PluginLoader.class.getClassLoader(), false, true);
+		final Thread currentThread = Thread.currentThread();
+		final ClassLoader cl = currentThread.getContextClassLoader();
+		final ClassLoader pluginClassLoader = PluginLoader.class.getClassLoader();
+		final PluginLoader pluginLoader;
+		try {
+			// getPluginLoader makes use of org.dom4j.DocumentFactory#getInstance which calls createSingleton
+			// which uses Class.forName instead of support a specified ClassLoader.
+			currentThread.setContextClassLoader(pluginClassLoader);
+			pluginLoader = PluginLoader.getPluginLoader(plugin, pluginClassLoader, false, true);
+		} finally {
+			currentThread.setContextClassLoader(cl);
+		}
 		final Plugin ret = pluginLoader.loadPlugin();
 		if (ret != null) {
 			ret.setGloballyEnabled(true);
 		}
+		// Note that all our classes (incl transitive) must be loaded by
+		// the PluginClassLoader instance of FindBugs-IDEA plugin. Check:
+		// DebugUtil.dumpClasses(PluginLoader.class);
 		return ret;
 	}
 
