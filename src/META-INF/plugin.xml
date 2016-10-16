@@ -93,6 +93,7 @@
             <li>Issue 157: Fix possible ISE caused by after-compile hook</li>
             <li>Issue 172: Fix possible ISE caused by Search Everywhere</li>
             <li>Issue 176: Fix illegal toolwindow access outside EDT</li>
+            <li>Plugin compatibility: IDEA 15, IDEA 2016, Android Studio 2.2</li>
         </ul>
         <h3>1.0.0</h3>
         <ul>
