@@ -26,6 +26,8 @@ import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
@@ -41,9 +43,7 @@ import org.twodividedbyzero.idea.findbugs.common.FindBugsPluginConstants;
 import org.twodividedbyzero.idea.findbugs.common.util.IdeaUtilImpl;
 import org.twodividedbyzero.idea.findbugs.common.util.New;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -192,7 +192,7 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 		}
 
 		final CompileScope compileScope = compileContext.getCompileScope();
-		final VirtualFile[] affectedFiles = getAffectedFiles(compileScope);
+		final List<VirtualFile> affectedFiles = getAffectedFiles(project, compileScope);
 
 		new FindBugsStarter(
 				project,
@@ -211,34 +211,28 @@ public class FindBugsCompileAfterHook implements CompilationStatusListener, Proj
 
 			@Override
 			protected boolean configure(@NotNull final ProgressIndicator indicator, @NotNull final FindBugsProjects projects, final boolean justCompiled) {
-				projects.addFiles(affectedFiles, false, hasTests(affectedFiles));
-				return true;
+				return projects.addFiles(affectedFiles, false, hasTests(affectedFiles));
 			}
 		}.start();
 	}
 
 	@NotNull
-	private static VirtualFile[] getAffectedFiles(@NotNull final CompileScope compileScope) {
-		VirtualFile[] affectedFiles = null;
-		List<VirtualFile> affectedFilesList = null;
-
-		for (FileType fileType : IdeaUtilImpl.SUPPORTED_FILE_TYPES) {
-			final VirtualFile[] af = compileScope.getFiles(fileType, true);
-			if (affectedFiles == null || affectedFiles.length == 0) {
-				affectedFiles = af;
-			} else if (af.length > 0) {
-				if (affectedFilesList == null) {
-					affectedFilesList = new ArrayList<VirtualFile>(affectedFiles.length + af.length);
-					Collections.addAll(affectedFilesList, affectedFiles);
+	private static List<VirtualFile> getAffectedFiles(
+			@NotNull final Project project,
+			@NotNull final CompileScope compileScope
+	) {
+		final List<VirtualFile> ret = New.arrayList();
+		for (final FileType fileType : IdeaUtilImpl.SUPPORTED_FILE_TYPES) {
+			final VirtualFile[] files = compileScope.getFiles(fileType, true);
+			for (final VirtualFile file : files) {
+				// It seems that "isSourceOnly" does not work (as expected), see issue #150
+				final Module module = ModuleUtilCore.findModuleForFile(file, project);
+				if (module != null) {
+					ret.add(file);
 				}
-				Collections.addAll(affectedFilesList, af);
 			}
 		}
-		if (affectedFilesList != null) {
-			return affectedFilesList.toArray(new VirtualFile[affectedFilesList.size()]);
-		}
-		//noinspection ConstantConditions
-		return affectedFiles;
+		return ret;
 	}
 
 	private static boolean isAfterAutoMakeEnabled(@NotNull final Project project) {

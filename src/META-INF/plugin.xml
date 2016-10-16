@@ -89,6 +89,7 @@
         <h3>1.0.1</h3>
         <ul>
             <li>Issue 154: Fix possible classloader issue with dom4j</li>
+            <li>Issue 157: Fix possible ISE caused by after-compile hook</li>
             <li>Issue 172: Fix possible ISE caused by Search Everywhere</li>
             <li>Issue 176: Fix illegal toolwindow access outside EDT</li>
         </ul>
