@@ -45,7 +45,7 @@ public abstract class AbstractSettings {
 	 * @see ProjectFilterSettings#setMinRank(int)
 	 */
 	@Tag
-	public int minRank = BugRanker.VISIBLE_RANK_MIN;
+	public int minRank = BugRanker.VISIBLE_RANK_MAX;
 
 	/**
 	 * @see ProjectFilterSettings#setMinPriority(String)

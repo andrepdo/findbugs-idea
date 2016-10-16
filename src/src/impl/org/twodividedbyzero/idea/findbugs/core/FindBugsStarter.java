@@ -66,7 +66,6 @@ import org.twodividedbyzero.idea.findbugs.resources.ResourcesLoader;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -298,10 +297,11 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 
 		final DetectorFactoryCollection detectorFactoryCollection = DetectorFactoryCollection.instance();
 
+		final ProjectFilterSettings projectFilterSettings;
 		final UserPreferences userPrefs = UserPreferences.createDefaultUserPreferences();
 		{
 			userPrefs.setEffort(settings.analysisEffort);
-			final ProjectFilterSettings projectFilterSettings = userPrefs.getFilterSettings();
+			projectFilterSettings = userPrefs.getFilterSettings();
 			projectFilterSettings.setMinRank(settings.minRank);
 			projectFilterSettings.setMinPriority(settings.minPriority);
 
@@ -330,13 +330,14 @@ public abstract class FindBugsStarter implements AnalysisAbortingListener {
 				project,
 				module,
 				bugCollection,
-				new HashSet<String>(settings.hiddenBugCategory),
+				projectFilterSettings,
 				indicator,
 				_cancellingByUser,
 				analyzedClassCountOffset
 		);
 
 		reporter.setPriorityThreshold(userPrefs.getUserDetectorThreshold());
+		reporter.setRankThreshold(projectFilterSettings.getMinRank());
 
 		final FindBugs2 engine = new FindBugs2();
 		{

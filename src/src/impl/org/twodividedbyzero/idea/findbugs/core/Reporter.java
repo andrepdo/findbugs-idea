@@ -32,6 +32,7 @@ import edu.umd.cs.findbugs.FindBugsProgress;
 import edu.umd.cs.findbugs.ProjectStats;
 import edu.umd.cs.findbugs.SortedBugCollection;
 import edu.umd.cs.findbugs.classfile.ClassDescriptor;
+import edu.umd.cs.findbugs.config.ProjectFilterSettings;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.twodividedbyzero.idea.findbugs.common.EventDispatchThreadHelper;
@@ -63,16 +64,16 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 	private final SortedBugCollection _bugCollection;
 
 	@NotNull
-	private final Set<String> hiddenBugCategory;
+	private final ProjectFilterSettings projectFilterSettings;
 
 	private final ProgressIndicator _indicator;
 	private final AtomicBoolean _cancellingByUser;
 	private final TransferToEDTQueue<Runnable> _transferToEDTQueue;
 
-	private int _pass = -1;
-	private int _filteredBugCount;
-	private int _count;
-	private int _goal;
+	private int pass = -1;
+	private int bugCount;
+	private int stepCount;
+	private int goal;
 	@NonNls
 	private String _currentStageName;
 	private boolean _canceled;
@@ -83,7 +84,7 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 			@NotNull final Project project,
 			@NotNull final Module module,
 			@NotNull final SortedBugCollection bugCollection,
-			@NotNull final Set<String> hiddenBugCategory,
+			@NotNull final ProjectFilterSettings projectFilterSettings,
 			@NotNull final ProgressIndicator indicator,
 			@NotNull final AtomicBoolean cancellingByUser,
 			final int analyzedClassCountOffset
@@ -91,7 +92,7 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 		_project = project;
 		this.module = module;
 		_bugCollection = bugCollection;
-		this.hiddenBugCategory = hiddenBugCategory;
+		this.projectFilterSettings = projectFilterSettings;
 		_indicator = indicator;
 		_cancellingByUser = cancellingByUser;
 		this.analyzedClassCountOffset = analyzedClassCountOffset;
@@ -123,17 +124,16 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 
 	@Override
 	protected void doReportBug(@NotNull final BugInstance bug) {
-		_bugCollection.add(bug);
-
-		if (isHiddenBugGroup(bug)) {
-			return;
+		if (!projectFilterSettings.displayWarning(bug)) {
+			if (!projectFilterSettings.displayWarning(bug)) {
+				return;
+			}
 		}
-		_filteredBugCount++;
+		_bugCollection.add(bug);
+		bugCount++;
 		observeClass(bug.getPrimaryClass().getClassDescriptor());
 
-		/**
-		 * Guarantee thread visibility *one* time.
-		 */
+		// Guarantee thread visibility *one* time.
 		final AtomicReference<SortedBugCollection> bugCollectionRef = New.atomicRef(_bugCollection);
 		final AtomicReference<BugInstance> bugRef = New.atomicRef(bug);
 		final int analyzedClassCount = analyzedClassCountOffset + getProjectStats().getNumClasses();
@@ -147,12 +147,6 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 				MessageBusManager.publishNewBug(_project, bug, analyzedClassCount);
 			}
 		});
-	}
-
-
-	private boolean isHiddenBugGroup(final BugInstance bug) {
-		final String category = bug.getBugPattern().getCategory();
-		return hiddenBugCategory.contains(category);
 	}
 
 
@@ -211,7 +205,7 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 				_transferToEDTQueue.drain();
 			}
 		});
-		_indicator.setText("Finished: Found " + _filteredBugCount + " bugs.");
+		_indicator.setText("Finished: Found " + bugCount + " bugs.");
 		_indicator.finishNonCancelableSection();
 	}
 
@@ -235,10 +229,10 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 
 		final String className = classDescriptor.getDottedClassName();
 		_indicator.setText("Observing class: " + className);
-		if (_pass <= 0) {
-			_indicator.setText("Prescanning... (found " + _filteredBugCount + ", checking " + className + ')');
+		if (pass <= 0) {
+			_indicator.setText("Prescanning... (found " + bugCount + ", checking " + className + ')');
 		} else {
-			_indicator.setText("Checking... (found " + _filteredBugCount + ", checking " + className + ')');
+			_indicator.setText("Checking... (found " + bugCount + ", checking " + className + ')');
 		}
 	}
 
@@ -286,7 +280,7 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 
 	@Override
 	public void startAnalysis(final int numClasses) {
-		_pass++;
+		pass++;
 		beginStage(ANALYZING_CLASSES_i18N, numClasses);
 	}
 
@@ -303,17 +297,17 @@ final class Reporter extends AbstractBugReporter implements FindBugsProgress {
 
 
 	private void beginStage(final String stageName, final int goal) {
-		_count = 0;
-		_goal = goal;
+		stepCount = 0;
+		this.goal = goal;
 		_currentStageName = stageName;
-		_indicator.setText2(stageName + " 0/" + _goal);
+		_indicator.setText2(stageName + " 0/" + this.goal);
 	}
 
 
 	private void step() {
-		_count++;
-		final int work = _pass == 0 ? 1 : 2;
-		_indicator.setText2(_currentStageName + ' ' + _count + '/' + _goal + (ANALYZING_CLASSES_i18N.equals(_currentStageName) ? " (pass #" + work + "/2)" : ""));
+		stepCount++;
+		final int work = pass == 0 ? 1 : 2;
+		_indicator.setText2(_currentStageName + ' ' + stepCount + '/' + goal + (ANALYZING_CLASSES_i18N.equals(_currentStageName) ? " (pass #" + work + "/2)" : ""));
 	}
 
 
