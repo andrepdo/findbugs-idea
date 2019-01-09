@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2016 Andre Pfeiler
+ * Copyright 2008-2019 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -206,7 +206,8 @@ public final class BugTreeHelper {
 		}
 	}
 
-	public static TreePath getPath(@Nullable TreeNode node) {
+	@NotNull
+	public static TreePath getPath(@NotNull TreeNode node) {
 		final List<TreeNode> list = new ArrayList<TreeNode>();
 
 		while (node != null) {
@@ -221,8 +222,10 @@ public final class BugTreeHelper {
 
 	public void gotoNode(final Bug bug) {
 		final AbstractTreeNode<VisitableTreeNode> node = findTreeNodeByBugInstance(bug);
-		final TreePath path = getPath(node);
-		scrollPathToVisible(path);
+		if (node != null) {
+			final TreePath path = getPath(node);
+			scrollPathToVisible(path);
+		}
 	}
 
 	@Nullable
