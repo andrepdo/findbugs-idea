@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2016 Andre Pfeiler
+ * Copyright 2008-2019 Andre Pfeiler
  *
  * This file is part of FindBugs-IDEA.
  *
@@ -213,7 +213,10 @@ public class BugTreePanel extends JPanel {
 		if (element != null) {
 			marker = document.createRangeMarker(element.getTextRange());
 		} else if (lineStart >= 0 && lineEnd >= 0) {
-			marker = document.createRangeMarker(document.getLineStartOffset(lineStart), document.getLineEndOffset(lineEnd));
+			final int lineCount = document.getLineCount();
+			if (lineStart < lineCount && lineEnd < lineCount) {
+				marker = document.createRangeMarker(document.getLineStartOffset(lineStart), document.getLineEndOffset(lineEnd));
+			} // else document was changed
 		}
 
 		if (marker != null) {

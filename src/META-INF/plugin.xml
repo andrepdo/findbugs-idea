@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2008-2016 Andre Pfeiler
+  ~ Copyright 2008-2019 Andre Pfeiler
   ~
   ~ This file is part of FindBugs-IDEA.
   ~
@@ -86,6 +86,10 @@
     </description>
     <change-notes>
         <![CDATA[<html>
+        <h3>1.0.2</h3>
+        <ul>
+            <li>Issue 163: Fix possible IOOB exception caused by changed document</li>
+        </ul>
         <h3>1.0.1</h3>
         <ul>
             <li>Issue 146: Support minimum rank</li>
